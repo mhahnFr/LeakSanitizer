@@ -10,6 +10,9 @@
 #define MallocInfo_hpp
 
 #include <string>
+#include <utility>
+
+using namespace std::rel_ops;
 
 class MallocInfo {
     const void * const pointer;
@@ -33,6 +36,9 @@ public:
     
     int                 getDeletedOnLine()  const;
     void                setDeletedOnLine(int);
+    
+    friend bool operator==(const MallocInfo &, const MallocInfo &);
+    friend bool operator<(const MallocInfo &, const MallocInfo &);
 };
 
 #endif /* MallocInfo_hpp */

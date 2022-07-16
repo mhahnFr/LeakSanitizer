@@ -38,3 +38,11 @@ void MallocInfo::setDeletedInFile(const std::string & file) {
 void MallocInfo::setDeletedOnLine(int line) {
     deletedOnLine = line;
 }
+
+bool operator==(const MallocInfo & lhs, const MallocInfo & rhs) {
+    return lhs.getPointer() == rhs.getPointer();
+}
+
+bool operator<(const MallocInfo & lhs, const MallocInfo & rhs) {
+    return lhs.getPointer() < rhs.getPointer();
+}
