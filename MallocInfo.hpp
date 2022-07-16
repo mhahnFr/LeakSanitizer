@@ -16,6 +16,7 @@ using namespace std::rel_ops;
 
 class MallocInfo {
     const void * const pointer;
+    const size_t       size;
     const std::string  createdInFile;
     const int          createdOnLine;
     
@@ -23,8 +24,8 @@ class MallocInfo {
     int                deletedOnLine;
     
 public:
-    MallocInfo(const void * const pointer): MallocInfo(pointer, "<Unknown>", 1) {}
-    MallocInfo(const void * const, const std::string &, int);
+    MallocInfo(const void * const pointer, size_t size): MallocInfo(pointer, size, "<Unknown>", 1) {}
+    MallocInfo(const void * const, size_t, const std::string &, int);
     ~MallocInfo() = default;
     
     const void * const  getPointer()        const;

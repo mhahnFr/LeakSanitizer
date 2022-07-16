@@ -8,8 +8,8 @@
 
 #include "MallocInfo.hpp"
 
-MallocInfo::MallocInfo(const void * const pointer, const std::string & file, const int line)
-    : pointer(pointer), createdInFile(file), createdOnLine(line) {}
+MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line)
+    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line) {}
 
 const void * const MallocInfo::getPointer() const {
     return pointer;
