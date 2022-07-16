@@ -10,6 +10,7 @@
 #define LSan_hpp
 
 #include <list>
+#include <ostream>
 #include "MallocInfo.hpp"
 
 class LSan {
@@ -19,9 +20,11 @@ class LSan {
     
 public:
     void addMalloc(const MallocInfo &&);
-    void removeMalloc(const MallocInfo &);
+    bool removeMalloc(const MallocInfo &);
     
     static LSan & getInstance();
+    
+    friend std::ostream & operator<<(std::ostream &, const LSan &);
 };
 
 #endif /* LSan_hpp */

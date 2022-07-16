@@ -18,6 +18,15 @@ void LSan::addMalloc(const MallocInfo && mInfo) {
     infos.push_back(mInfo);
 }
 
-void LSan::removeMalloc(const MallocInfo & mInfo) {
+bool LSan::removeMalloc(const MallocInfo & mInfo) {
+    if (std::find(infos.cbegin(), infos.cend(), mInfo) == infos.cend()) {
+        return false;
+    }
     infos.remove(mInfo);
+    return true;
+}
+
+std::ostream & operator<<(std::ostream & stream, const LSan & self) {
+    stream << "Not implemented yet!";
+    return stream;
 }
