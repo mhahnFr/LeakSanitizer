@@ -44,3 +44,12 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Xcode project user data
+xcuserdata/
+
+# macOS spcific
+.DS_Store
+
+*~
+.*
