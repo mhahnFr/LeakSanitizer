@@ -12,6 +12,10 @@
 		BFBF736228831EF800BC4208 /* LSan.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736028831EF800BC4208 /* LSan.hpp */; };
 		BFBF736528831FC200BC4208 /* MallocInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736328831FC200BC4208 /* MallocInfo.cpp */; };
 		BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
+		BFBF736828832C3300BC4208 /* wrap_malloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736728832C3300BC4208 /* wrap_malloc.cpp */; };
+		BFBF736A28832F8100BC4208 /* wrap_malloc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736928832F8100BC4208 /* wrap_malloc.hpp */; };
+		BFBF736D2883323100BC4208 /* crash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736B2883323100BC4208 /* crash.cpp */; };
+		BFBF736E2883323100BC4208 /* crash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736C2883323100BC4208 /* crash.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +25,10 @@
 		BFBF736028831EF800BC4208 /* LSan.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LSan.hpp; sourceTree = "<group>"; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
+		BFBF736728832C3300BC4208 /* wrap_malloc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wrap_malloc.cpp; sourceTree = "<group>"; };
+		BFBF736928832F8100BC4208 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
+		BFBF736B2883323100BC4208 /* crash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crash.cpp; sourceTree = "<group>"; };
+		BFBF736C2883323100BC4208 /* crash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = crash.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +50,10 @@
 				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
 				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
 				BFBF735D28831EC000BC4208 /* lsan.h */,
+				BFBF736728832C3300BC4208 /* wrap_malloc.cpp */,
+				BFBF736B2883323100BC4208 /* crash.cpp */,
+				BFBF736C2883323100BC4208 /* crash.hpp */,
+				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
 				BF97EB5728831E5B00DAF1FE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,8 +73,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFBF736E2883323100BC4208 /* crash.hpp in Headers */,
 				BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */,
 				BFBF736228831EF800BC4208 /* LSan.hpp in Headers */,
+				BFBF736A28832F8100BC4208 /* wrap_malloc.hpp in Headers */,
 				BFBF735E28831EC000BC4208 /* lsan.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -126,6 +140,8 @@
 			files = (
 				BFBF736128831EF800BC4208 /* LSan.cpp in Sources */,
 				BFBF736528831FC200BC4208 /* MallocInfo.cpp in Sources */,
+				BFBF736828832C3300BC4208 /* wrap_malloc.cpp in Sources */,
+				BFBF736D2883323100BC4208 /* crash.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
