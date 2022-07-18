@@ -6,6 +6,7 @@
 //  Copyright © 2022 mhahnFr. All rights reserved.
 //
 
+#include <algorithm>
 #include "LeakSani.hpp"
 
 LSan LSan::instance;
