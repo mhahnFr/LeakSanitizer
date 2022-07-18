@@ -7,7 +7,7 @@
 //
 
 #include "crash.hpp"
-#include "LSan.hpp"
+#include "LeakSani.hpp"
 #include <iostream>
 
 [[ noreturn ]] void crash(const std::string & reason, const char * file, int line) {

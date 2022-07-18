@@ -1,13 +1,13 @@
 //
-//  LSan.hpp
+//  LeakSani.hpp
 //  LeakSanitizer
 //
 //  Created by Manuel Hahn on 16.07.22.
 //  Copyright © 2022 mhahnFr. All rights reserved.
 //
 
-#ifndef LSan_hpp
-#define LSan_hpp
+#ifndef LeakSani_hpp
+#define LeakSani_hpp
 
 #include <list>
 #include <ostream>
@@ -27,4 +27,4 @@ public:
     friend std::ostream & operator<<(std::ostream &, const LSan &);
 };
 
-#endif /* LSan_hpp */
+#endif /* LeakSani_hpp */

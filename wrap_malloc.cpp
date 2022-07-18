@@ -7,7 +7,7 @@
 //
 
 #include "wrap_malloc.hpp"
-#include "LSan.hpp"
+#include "LeakSani.hpp"
 #include <cstdio>
 #include <iostream>
 

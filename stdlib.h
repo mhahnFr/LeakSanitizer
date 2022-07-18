@@ -3,6 +3,6 @@
 
 #include_next <stdlib.h>
 
-#include <lsan.h>
+#include <leaksan.h>
 
 #endif
