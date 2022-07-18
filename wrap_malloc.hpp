@@ -12,9 +12,17 @@
 #include "crash.hpp"
 #include <cstddef>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void * __wrap_malloc(size_t, const char *, int);
 void   __wrap_free(void *, const char *, int);
 
 [[ noreturn ]] void __wrap_exit(int, const char *, int);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif /* wrap_malloc_h */
