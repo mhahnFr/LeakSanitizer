@@ -31,7 +31,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
 }
 
 [[ noreturn ]] void __wrap_exit(int code, const char * file, int line) {
-    std::cout << "Exiting at " << file << ":" << line << std::endl
+    std::cout << "\033[32mExiting\033[39m at \033[4m" << file << ":" << line << "\033[24m" << std::endl
               << LSan::getInstance() << std::endl;
     std::exit(code);
 }

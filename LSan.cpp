@@ -28,9 +28,11 @@ bool LSan::removeMalloc(const MallocInfo & mInfo) {
 
 std::ostream & operator<<(std::ostream & stream, const LSan & self) {
     if (!self.infos.empty()) {
+        stream << "\033[3m";
         for (const auto & leak : self.infos) {
-            stream << "Leak of size " << leak.getSize() << ", allocated at " << leak.getCreatedInFile() << ":" << leak.getCreatedOnLine() << std::endl;
+            stream << "\033[1;31mLeak\033[22;39m of size " << leak.getSize() << ", allocated at \033[4m" << leak.getCreatedInFile() << ":" << leak.getCreatedOnLine() << "\033[24m" << std::endl;
         }
+        stream << "\033[23m";
     }
     return stream;
 }
