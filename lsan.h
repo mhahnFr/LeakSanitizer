@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
+#include <stdlib.h>
 
 void * __wrap_malloc(size_t, const char *, int);
 void   __wrap_free(void *, const char *, int);
