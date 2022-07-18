@@ -23,6 +23,10 @@ int MallocInfo::getCreatedOnLine() const {
     return createdOnLine;
 }
 
+size_t MallocInfo::getSize() const {
+    return size;
+}
+
 const std::string & MallocInfo::getDeletedInFile() const {
     return deletedInFile;
 }

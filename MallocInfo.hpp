@@ -31,6 +31,7 @@ public:
     const void * const  getPointer()        const;
     const std::string & getCreatedInFile()  const;
     int                 getCreatedOnLine()  const;
+    size_t              getSize()           const;
     
     const std::string & getDeletedInFile()  const;
     void                setDeletedInFile(const std::string &);
