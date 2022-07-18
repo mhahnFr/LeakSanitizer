@@ -13,9 +13,11 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 void * __wrap_malloc(size_t, const char *, int);
 void   __wrap_free(void *, const char *, int);
-void   __wrap_exit(int);
+void   __wrap_exit(int, const char *, int);
 
 #ifdef __cplusplus
 } // extern "C"
