@@ -24,6 +24,10 @@ public:
     
     static LSan & getInstance();
     
+    static void * (*malloc)(size_t);
+    static void   (*free)  (void *);
+    static void   (*exit)  (int);
+    
     friend std::ostream & operator<<(std::ostream &, const LSan &);
 };
 
