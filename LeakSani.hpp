@@ -30,6 +30,8 @@ public:
     void addMalloc(const MallocInfo &&);
     bool removeMalloc(const MallocInfo &);
     
+    size_t getTotalAllocatedBytes() const;
+    
     void * (*malloc)(size_t);
     void   (*free)  (void *);
     void   (*exit)  (int);
