@@ -8,16 +8,24 @@
 
 #include <dlfcn.h>
 #include <algorithm>
+#include <iostream>
 #include "LeakSani.hpp"
 
-LSan LSan::instance;
+LSan * LSan::instance = new LSan();
 
-void * (*LSan::malloc)(size_t) = reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
-void   (*LSan::free)(void *)   = reinterpret_cast<void (*)(void *)>  (dlsym(RTLD_NEXT, "free"));
-void   (*LSan::exit)(int)      = reinterpret_cast<void (*)(int)>     (dlsym(RTLD_NEXT, "exit"));
+//void * (*LSan::malloc)(size_t) = reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
+//void   (*LSan::free)(void *)   = reinterpret_cast<void (*)(void *)>  (dlsym(RTLD_NEXT, "free"));
+//void   (*LSan::exit)(int)      = reinterpret_cast<void (*)(int)>     (dlsym(RTLD_NEXT, "exit"));
 
 LSan & LSan::getInstance() {
-    return instance;
+    return *instance;
+}
+
+LSan::LSan() {
+    malloc = ::malloc;
+    free   = ::free;
+    exit   = _Exit;
+    atexit(reinterpret_cast<void(*)()>(__exit_hook));
 }
 
 void LSan::addMalloc(const MallocInfo && mInfo) {
@@ -30,6 +38,16 @@ bool LSan::removeMalloc(const MallocInfo & mInfo) {
     }
     infos.remove(mInfo);
     return true;
+}
+
+void LSan::__exit_hook() {
+    std::cout << "\033[32mExiting\033[39m" << std::endl
+              << getInstance() << std::endl;
+    internalCleanUp();
+}
+
+void internalCleanUp() {
+    delete LSan::instance;
 }
 
 std::ostream & operator<<(std::ostream & stream, const LSan & self) {
