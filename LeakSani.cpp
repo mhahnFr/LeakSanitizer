@@ -61,7 +61,7 @@ void internalCleanUp() {
 std::ostream & operator<<(std::ostream & stream, const LSan & self) {
     if (!self.infos.empty()) {
         stream << "\033[3m";
-        stream << self.infos.size() << " total leaks, " << self.getTotalAllocatedBytes() << " total bytes" << std::endl;
+        stream << self.infos.size() << " leaks total, " << self.getTotalAllocatedBytes() << " bytes total" << std::endl;
         for (const auto & leak : self.infos) {
             stream << "\033[1;31mLeak\033[22;39m of size " << leak.getSize() << ", allocated at \033[4m" << leak.getCreatedInFile() << ":" << leak.getCreatedOnLine() << "\033[24m" << std::endl;
         }
