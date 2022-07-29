@@ -1,6 +1,8 @@
-LIB_NAME = liblsan.a
-SHARED_L = liblsan.so
-DYLIB_NA = liblsan.dylib
+CORE_NAME = liblsan
+
+LIB_NAME = $(CORE_NAME).a
+SHARED_L = $(CORE_NAME).so
+DYLIB_NA = $(CORE_NAME).dylib
 
 SRC = $(shell find . -name \*.cpp)
 HDR = $(shell find . -name \*.h)
@@ -29,7 +31,7 @@ clean:
 	- $(RM) $(OBJS) $(DEPS)
 
 fclean: clean
-	- $(RM) $(LIB_NAME)
+	- $(RM) $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
 re: fclean
 	$(MAKE) all
