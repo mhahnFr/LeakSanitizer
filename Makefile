@@ -13,7 +13,7 @@ DEPS = $(patsubst %.cpp, %.d, $(SRC))
 LDFLAGS = 
 CXXFLAGS = -std=c++17
 
-all: $(LIB_NAME)
+all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
 $(SHARED_L): $(OBJS)
 	$(CXX) -shared -fPIC -o $(SHARED_L) $(OBJS)
