@@ -10,7 +10,6 @@
 #include "LeakSani.hpp"
 #include <cstdio>
 #include <iostream>
-#include <execinfo.h>
 
 void * __wrap_malloc(size_t size, const char * file, int line) {
     if (size == 0) {
