@@ -56,12 +56,6 @@ void free(void * pointer) {
     } else {
         LSan::free(pointer);
     }
-}
-
-void exit(int code) {
-    std::cout << "\033[32mExiting\033[39m" << std::endl
-              << LSan::getInstance() << std::endl;
-    LSan::exit(code);
 }*/
 //
 //#define DYLD_INTERPOSE(_replacement,_replacee) \
