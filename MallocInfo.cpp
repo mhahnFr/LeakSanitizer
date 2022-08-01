@@ -20,7 +20,7 @@ const std::vector<std::string> MallocInfo::createCallstack() {
     int frames = backtrace(callstack, 128);
     char ** symbols = backtrace_symbols(callstack, frames);
 
-    for (int i = 3; i < 128; ++i) {
+    for (int i = 4; i < 128; ++i) {
         Dl_info info;
         if (dladdr(callstack[i], &info)) {
             char * demangled;
@@ -29,7 +29,7 @@ const std::vector<std::string> MallocInfo::createCallstack() {
                 ret.push_back(demangled);
                 free(demangled);
             } else {
-                ret.push_back(info.dli_sname);// + (" + " + std::to_string(static_cast<uintptr_t>(callstack[i] - info.dli_saddr))));
+                ret.push_back(info.dli_sname + (" + " + std::to_string(static_cast<char *>(callstack[i]) - static_cast<char *>(info.dli_saddr))));
             }
         }
     }
@@ -75,7 +75,7 @@ void MallocInfo::generateDeletedCallstack() {
 
 void MallocInfo::printCallstack(const std::vector<std::string> & callstack, std::ostream & stream) {
     for (const auto & frame : callstack) {
-        stream << (frame == callstack.front() ? "In: " : "çat: ") << frame << std::endl;
+        stream << (frame == callstack.front() ? "In: \033[23;1m" : "\033[22;3mat: \033[23m") << frame << std::endl;
     }
 }
 
