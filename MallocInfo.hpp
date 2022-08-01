@@ -19,11 +19,14 @@ using namespace std::rel_ops;
 class MallocInfo {
     constexpr static int CALLSTACK_SIZE = 128;
     
+    MallocInfo(const void * const, size_t, const std::string &, int, int, bool);
+    
     const void * const          pointer;
     const size_t                size;
     
     const std::string           createdInFile;
     const int                   createdOnLine;
+    const bool                  createdSet;
     std::vector<std::string>    createdCallstack;
 
     std::string                 deletedInFile;
@@ -31,10 +34,10 @@ class MallocInfo {
     std::vector<std::string>    deletedCallstack;
     
     static void printCallstack(const std::vector<std::string> &, std::ostream &);
-        
+    
 public:
-    MallocInfo(const void * const pointer, size_t size): MallocInfo(pointer, size, "<Unknown>", 1) {}
-    MallocInfo(const void * const, size_t, const std::string &, int);
+    MallocInfo(const void * const, size_t, int = 5);
+    MallocInfo(const void * const, size_t, const std::string &, int, int = 4);
     ~MallocInfo() = default;
     
     const void * const  getPointer()        const;
@@ -55,7 +58,7 @@ public:
     const std::vector<std::string> & getDeletedCallstack() const;
     const std::vector<std::string> & getCreatedCallstack() const;
 
-    static const std::vector<std::string> createCallstack();
+    static const std::vector<std::string> createCallstack(int = 1);
     
     friend bool operator==(const MallocInfo &, const MallocInfo &);
     friend bool operator<(const MallocInfo &, const MallocInfo &);

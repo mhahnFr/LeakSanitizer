@@ -11,16 +11,22 @@
 #include <dlfcn.h>
 #include <cxxabi.h>
 
-MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line)
-    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdCallstack(createCallstack()) {}
+MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
+    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(createCallstack(omitCount)) {}
 
-const std::vector<std::string> MallocInfo::createCallstack() {
+MallocInfo::MallocInfo(const void * const pointer, size_t size, int omitCount)
+    : MallocInfo(pointer, size, "<Unknown>", 1, omitCount, false) {}
+
+MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount)
+    : MallocInfo(pointer, size, file, line, omitCount, true) {}
+
+const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
     std::vector<std::string> ret;
     void * callstack[128];
     int frames = backtrace(callstack, 128);
 
-    ret.reserve(frames - 4);
-    for (int i = 4; i < frames; ++i) {
+    ret.reserve(frames - omitCount);
+    for (int i = omitCount; i < frames; ++i) {
         Dl_info info;
         if (dladdr(callstack[i], &info)) {
             char * demangled;
