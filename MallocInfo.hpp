@@ -36,7 +36,7 @@ class MallocInfo {
     static void printCallstack(const std::vector<std::string> &, std::ostream &);
     
 public:
-    MallocInfo(const void * const, size_t, int = 5);
+    MallocInfo(const void * const, size_t, int = 4);
     MallocInfo(const void * const, size_t, const std::string &, int, int = 4);
     ~MallocInfo() = default;
     

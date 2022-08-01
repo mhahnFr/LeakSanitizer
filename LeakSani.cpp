@@ -13,17 +13,15 @@
 
 LSan * LSan::instance = new LSan();
 
-//void * (*LSan::malloc)(size_t) = reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
-//void   (*LSan::free)(void *)   = reinterpret_cast<void (*)(void *)>  (dlsym(RTLD_NEXT, "free"));
-//void   (*LSan::exit)(int)      = reinterpret_cast<void (*)(int)>     (dlsym(RTLD_NEXT, "exit"));
-
 LSan & LSan::getInstance() {
     return *instance;
 }
 
 LSan::LSan() {
-    malloc = ::malloc;
-    free   = ::free;
+    //malloc = ::malloc;
+    malloc = reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
+    //free   = ::free;
+    free   = reinterpret_cast<void (*)(void *)>  (dlsym(RTLD_NEXT, "free"));
     exit   = _Exit;
     atexit(reinterpret_cast<void(*)()>(__exit_hook));
 }

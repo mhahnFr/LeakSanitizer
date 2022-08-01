@@ -13,7 +13,7 @@
 [[ noreturn ]] static void crashShared() {
     std::cerr << "Terminating...\033[22m" << std::endl
               << "Callstack: "            << std::endl;
-    for (const auto & frame : MallocInfo::createCallstack()) {
+    for (const auto & frame : MallocInfo::createCallstack(4)) {
         std::cerr << frame << std::endl;
     }
     std::terminate();

@@ -17,15 +17,16 @@ void * __wrap_malloc(size_t size, const char * file, int line) {
     }
     void * ret = LSan::getInstance().malloc(size);
     if (ret != nullptr) {
-        LSan::getInstance().addMalloc(MallocInfo(ret, size, file, line));
+        LSan::getInstance().addMalloc(MallocInfo(ret, size, file, line, 5));
     }
     return ret;
 }
 
 void __wrap_free(void * pointer, const char * file, int line) {
-    if (pointer == nullptr || !LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line))) {
+    if (pointer == nullptr) {
         crash("Invalid free", file, line);
     } else {
+        LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, 5));
         LSan::getInstance().free(pointer);
     }
 }
@@ -39,25 +40,25 @@ void __wrap_free(void * pointer, const char * file, int line) {
     quit(code);
 }
 
-/*void * malloc(size_t size) {
+void * malloc(size_t size) {
     if (size == 0) {
         crash("Invalid allocation of size 0");
     }
-    char ** buf = new char*[1000]();
-    backtrace((void**) buf, 1000);
-    char ** bt = backtrace_symbols((void**) buf, 1000);
-    void * ptr = LSan::malloc(size);
-    LSan::getInstance().addMalloc(MallocInfo(ptr, size, std::string(bt[0]), 1));
+    void * ptr = LSan::getInstance().malloc(size);
+    if (ptr != nullptr) {
+        LSan::getInstance().addMalloc(MallocInfo(ptr, size, 5));
+    }
     return ptr;
 }
 
 void free(void * pointer) {
-    if (pointer == nullptr || !LSan::getInstance().removeMalloc(MallocInfo(pointer, 0))) {
+    if (pointer == nullptr) {
         crash("Invalid free");
     } else {
-        LSan::free(pointer);
+        LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, 5));
+        LSan::getInstance().free(pointer);
     }
-}*/
+}
 //
 //#define DYLD_INTERPOSE(_replacement,_replacee) \
 //   __attribute__((used)) static struct{ const void* replacement; const void* replacee; } _interpose_##_replacee \
