@@ -26,9 +26,10 @@ const std::vector<std::string> MallocInfo::createCallstack() {
             char * demangled;
             int status;
             if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, 0, &status)) != nullptr) {
-                //message += std::string(demangled) + ": " + std::to_string((char *)callstack[i] - (char *)info.dli_saddr) + "\n";
                 ret.push_back(demangled);
                 free(demangled);
+            } else {
+                ret.push_back(info.dli_sname);// + (" + " + std::to_string(static_cast<uintptr_t>(callstack[i] - info.dli_saddr))));
             }
         }
     }
@@ -72,16 +73,18 @@ void MallocInfo::generateDeletedCallstack() {
     deletedCallstack = createCallstack();
 }
 
-void MallocInfo::printCreatedCallstack(std::ostream & stream) const {
-    for (const auto & frame : createdCallstack) {
-        stream << frame << std::endl;
+void MallocInfo::printCallstack(const std::vector<std::string> & callstack, std::ostream & stream) {
+    for (const auto & frame : callstack) {
+        stream << (frame == callstack.front() ? "In: " : "çat: ") << frame << std::endl;
     }
 }
 
+void MallocInfo::printCreatedCallstack(std::ostream & stream) const {
+    printCallstack(createdCallstack, stream);
+}
+
 void MallocInfo::printDeletedCallstack(std::ostream & stream) const {
-    for (const auto & frame : deletedCallstack) {
-        stream << frame << std::endl;
-    }
+    printCallstack(deletedCallstack, stream);
 }
 
 const std::vector<std::string> & MallocInfo::getCreatedCallstack() const {

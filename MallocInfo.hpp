@@ -19,16 +19,18 @@ using namespace std::rel_ops;
 class MallocInfo {
     constexpr static int CALLSTACK_SIZE = 128;
     
-    const void * const              pointer;
-    const size_t                    size;
+    const void * const          pointer;
+    const size_t                size;
     
-    const std::string               createdInFile;
-    const int                       createdOnLine;
-    const std::vector<std::string>  createdCallstack;
+    const std::string           createdInFile;
+    const int                   createdOnLine;
+    std::vector<std::string>    createdCallstack;
 
-    std::string                     deletedInFile;
-    int                             deletedOnLine;
-    std::vector<std::string>        deletedCallstack;
+    std::string                 deletedInFile;
+    int                         deletedOnLine;
+    std::vector<std::string>    deletedCallstack;
+    
+    static void printCallstack(const std::vector<std::string> &, std::ostream &);
         
 public:
     MallocInfo(const void * const pointer, size_t size): MallocInfo(pointer, size, "<Unknown>", 1) {}
