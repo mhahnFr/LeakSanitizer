@@ -18,9 +18,9 @@ const std::vector<std::string> MallocInfo::createCallstack() {
     std::vector<std::string> ret;
     void * callstack[128];
     int frames = backtrace(callstack, 128);
-    char ** symbols = backtrace_symbols(callstack, frames);
 
-    for (int i = 4; i < 128; ++i) {
+    ret.reserve(frames - 4);
+    for (int i = 4; i < frames; ++i) {
         Dl_info info;
         if (dladdr(callstack[i], &info)) {
             char * demangled;
@@ -33,7 +33,6 @@ const std::vector<std::string> MallocInfo::createCallstack() {
             }
         }
     }
-    free(symbols);
     return ret;
 }
 
