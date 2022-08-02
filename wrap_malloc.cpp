@@ -13,7 +13,7 @@
 
 void * __wrap_malloc(size_t size, const char * file, int line) {
     if (size == 0) {
-        crash("Invalid allocation of size 0", file, line);
+        crash("Invalid allocation of size 0", file, line, 4);
     }
     void * ret = LSan::getInstance().malloc(size);
     if (ret != nullptr) {
@@ -24,7 +24,7 @@ void * __wrap_malloc(size_t size, const char * file, int line) {
 
 void __wrap_free(void * pointer, const char * file, int line) {
     if (pointer == nullptr) {
-        crash("Invalid free", file, line);
+        crash("Invalid free", file, line, 4);
     } else {
         LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, 5));
         LSan::getInstance().free(pointer);
@@ -42,7 +42,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
 
 void * malloc(size_t size) {
     if (size == 0) {
-        crash("Invalid allocation of size 0");
+        crash("Invalid allocation of size 0", 4);
     }
     void * ptr = LSan::getInstance().malloc(size);
     if (ptr != nullptr) {
@@ -53,7 +53,7 @@ void * malloc(size_t size) {
 
 void free(void * pointer) {
     if (pointer == nullptr) {
-        crash("Invalid free");
+        crash("Invalid free", 4);
     } else {
         LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, 5));
         LSan::getInstance().free(pointer);

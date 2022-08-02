@@ -11,7 +11,7 @@
 
 #include <string>
 
-[[ noreturn ]] void crash(const std::string &, const char *, int);
-[[ noreturn ]] void crash(const std::string &);
+[[ noreturn ]] void crash(const std::string &, const char *, int, int = 3);
+[[ noreturn ]] void crash(const std::string &, int = 3);
 
 #endif /* crash_hpp */
