@@ -62,9 +62,7 @@ std::ostream & operator<<(std::ostream & stream, const LSan & self) {
         stream << "\033[3m";
         stream << self.infos.size() << " leaks total, " << self.getTotalAllocatedBytes() << " bytes total" << std::endl << std::endl;
         for (const auto & leak : self.infos) {
-            stream << "\033[1;3;31mLeak\033[22;39m of size " << leak.getSize() << ", allocated at \033[4m" << leak.getCreatedInFile() << ":" << leak.getCreatedOnLine() << "\033[24m" << std::endl;
-            leak.printCreatedCallstack(stream);
-            stream << std::endl;
+            stream << leak << std::endl;
         }
         stream << "\033[23m";
     }

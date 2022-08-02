@@ -62,6 +62,8 @@ public:
     
     friend bool operator==(const MallocInfo &, const MallocInfo &);
     friend bool operator<(const MallocInfo &, const MallocInfo &);
+    
+    friend std::ostream & operator<<(std::ostream &, const MallocInfo &);
 };
 
 #endif /* MallocInfo_hpp */

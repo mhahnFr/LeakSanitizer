@@ -107,3 +107,15 @@ bool operator==(const MallocInfo & lhs, const MallocInfo & rhs) {
 bool operator<(const MallocInfo & lhs, const MallocInfo & rhs) {
     return lhs.getPointer() < rhs.getPointer();
 }
+
+std::ostream & operator<<(std::ostream & stream, const MallocInfo & self) {
+    stream << "\033[1;3;31mLeak\033[22;39m of size " << self.size << ", ";
+    if (self.createdSet) {
+        stream << "allocated at \033[4m" << self.createdInFile << ":" << self.createdOnLine << "\033[24m";
+    } else {
+        stream << "allocation stacktrace:";
+    }
+    stream << std::endl;
+    self.printCreatedCallstack(stream);
+    return stream;
+}
