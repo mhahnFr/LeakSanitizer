@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iostream>
 #include "LeakSani.hpp"
+#include "signalHandlers.hpp"
 
 LSan * LSan::instance = new LSan();
 
@@ -18,12 +19,14 @@ LSan & LSan::getInstance() {
 }
 
 LSan::LSan() {
-    //malloc = ::malloc;
     malloc = reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
-    //free   = ::free;
     free   = reinterpret_cast<void (*)(void *)>  (dlsym(RTLD_NEXT, "free"));
     exit   = _Exit;
     atexit(reinterpret_cast<void(*)()>(__exit_hook));
+    struct sigaction s{};
+    s.sa_sigaction = crashHandler;
+    sigaction(SIGSEGV, &s, nullptr);
+    sigaction(SIGBUS, &s, nullptr);
 }
 
 void LSan::addMalloc(const MallocInfo && mInfo) {
