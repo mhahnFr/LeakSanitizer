@@ -49,7 +49,7 @@ public:
     MallocInfo(const void * const, size_t, const std::string &, int, int = 4);
     ~MallocInfo() = default;
     
-    auto getPointer()        const -> const void * const;
+    auto getPointer()        const -> const void *;
     auto getCreatedInFile()  const -> const std::string &;
     auto getCreatedOnLine()  const -> int;
     auto getSize()           const -> size_t;

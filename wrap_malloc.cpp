@@ -45,6 +45,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
     auto quit = LSan::getInstance().exit;
     internalCleanUp();
     quit(code);
+    __builtin_unreachable();
 }
 
 void * malloc(size_t size) {

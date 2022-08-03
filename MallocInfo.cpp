@@ -36,13 +36,13 @@ const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
     void * callstack[128];
     int frames = backtrace(callstack, 128);
 
-    ret.reserve(frames - omitCount);
+    ret.reserve(static_cast<std::vector<std::string>::size_type>(frames - omitCount));
     for (int i = omitCount; i < frames; ++i) {
         Dl_info info;
         if (dladdr(callstack[i], &info)) {
             char * demangled;
             int status;
-            if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, 0, &status)) != nullptr) {
+            if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status)) != nullptr) {
                 ret.push_back(demangled);
                 free(demangled);
             } else {
@@ -53,7 +53,7 @@ const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
     return ret;
 }
 
-const void * const MallocInfo::getPointer() const {
+const void * MallocInfo::getPointer() const {
     return pointer;
 }
 
