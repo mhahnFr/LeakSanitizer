@@ -20,7 +20,7 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
-#include <list>
+#include <set>
 #include <ostream>
 #include <mutex>
 #include "MallocInfo.hpp"
@@ -28,7 +28,7 @@
 class LSan {
     static LSan * instance;
     
-    std::list<MallocInfo> infos;
+    std::set<MallocInfo> infos;
     std::recursive_mutex  infoMutex;
     
 public:

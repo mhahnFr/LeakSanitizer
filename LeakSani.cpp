@@ -42,15 +42,15 @@ LSan::LSan() {
 
 void LSan::addMalloc(const MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    infos.push_back(mInfo);
+    infos.emplace(mInfo);
 }
 
 bool LSan::removeMalloc(const MallocInfo & mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    if (std::find(infos.cbegin(), infos.cend(), mInfo) == infos.cend()) {
+    if (infos.find(mInfo) == infos.end()) {
         return false;
     }
-    infos.remove(mInfo);
+    infos.erase(infos.find(mInfo));
     return true;
 }
 
