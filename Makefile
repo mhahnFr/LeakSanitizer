@@ -62,7 +62,7 @@ fclean: clean
 	- $(RM) $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
 re: fclean
-	$(MAKE) all
+	$(MAKE) default
 
 .PHONY: re fclean clean all
 
