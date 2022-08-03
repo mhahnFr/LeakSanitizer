@@ -20,7 +20,6 @@
 #ifndef wrap_malloc_h
 #define wrap_malloc_h
 
-#include "crash.hpp"
 #include <cstddef>
 
 #ifdef __cplusplus

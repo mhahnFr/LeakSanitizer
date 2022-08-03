@@ -18,6 +18,8 @@
  */
 
 #include "wrap_malloc.hpp"
+#include "crash.hpp"
+#include "warn.hpp"
 #include "LeakSani.hpp"
 #include <cstdio>
 #include <iostream>
@@ -34,6 +36,9 @@ void * __wrap_malloc(size_t size, const char * file, int line) {
 }
 
 void __wrap_free(void * pointer, const char * file, int line) {
+    if (pointer == nullptr) {
+        warn("Free of NULL", file, line, 4);
+    }
     LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, 5));
     LSan::getInstance().free(pointer);
 }
@@ -60,6 +65,9 @@ void * malloc(size_t size) {
 }
 
 void free(void * pointer) {
+    if (pointer == nullptr) {
+        warn("Free of NULL", 4);
+    }
     LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, 5));
     LSan::getInstance().free(pointer);
 }

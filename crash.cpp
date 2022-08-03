@@ -18,7 +18,7 @@
  */
 
 #include "crash.hpp"
-#include "LeakSani.hpp"
+#include "MallocInfo.hpp"
 #include <iostream>
 
 [[ noreturn ]] static void crashShared(int omitCaller = 2) {
