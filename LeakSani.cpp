@@ -47,10 +47,11 @@ void LSan::addMalloc(const MallocInfo && mInfo) {
 
 bool LSan::removeMalloc(const MallocInfo & mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    if (infos.find(mInfo) == infos.end()) {
+    auto it = infos.find(mInfo);
+    if (it == infos.end()) {
         return false;
     }
-    infos.erase(infos.find(mInfo));
+    infos.erase(it);
     return true;
 }
 
