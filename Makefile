@@ -32,6 +32,15 @@ DEPS = $(patsubst %.cpp, %.d, $(SRC))
 LDFLAGS = 
 CXXFLAGS = -std=c++17 -Wall -pedantic
 
+NAME = $(SHARED_L)
+ifeq ($(shell uname -s), Linux)
+	NAME = $(DYLIB_NA)
+else ifeq ($(shell uname -s), Darwin)
+	NAME = $(LIB_NAME)
+endif
+
+default: $(NAME)
+
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
 $(SHARED_L): $(OBJS)
