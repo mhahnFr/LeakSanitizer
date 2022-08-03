@@ -22,12 +22,14 @@
 
 #include <list>
 #include <ostream>
+#include <mutex>
 #include "MallocInfo.hpp"
 
 class LSan {
     static LSan * instance;
     
     std::list<MallocInfo> infos;
+    std::recursive_mutex  infoMutex;
     
 public:
     LSan();
@@ -41,7 +43,7 @@ public:
     void addMalloc(const MallocInfo &&);
     bool removeMalloc(const MallocInfo &);
     
-    size_t getTotalAllocatedBytes() const;
+    size_t getTotalAllocatedBytes();
     
     void * (*malloc)(size_t);
     void   (*free)  (void *);
@@ -51,7 +53,7 @@ public:
     static void   __exit_hook();
 
     friend void           internalCleanUp();
-    friend std::ostream & operator<<(std::ostream &, const LSan &);
+    friend std::ostream & operator<<(std::ostream &, LSan &);
 };
 
 void internalCleanUp();

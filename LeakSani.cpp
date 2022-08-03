@@ -31,7 +31,7 @@ LSan & LSan::getInstance() {
 
 LSan::LSan() {
     malloc = reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
-    free   = reinterpret_cast<void (*)(void *)>  (dlsym(RTLD_NEXT, "free"));
+    free   = reinterpret_cast<void   (*)(void *)>(dlsym(RTLD_NEXT, "free"));
     exit   = _Exit;
     atexit(reinterpret_cast<void(*)()>(__exit_hook));
     struct sigaction s{};
@@ -41,10 +41,12 @@ LSan::LSan() {
 }
 
 void LSan::addMalloc(const MallocInfo && mInfo) {
+    std::lock_guard<std::recursive_mutex> lock(infoMutex);
     infos.push_back(mInfo);
 }
 
 bool LSan::removeMalloc(const MallocInfo & mInfo) {
+    std::lock_guard<std::recursive_mutex> lock(infoMutex);
     if (std::find(infos.cbegin(), infos.cend(), mInfo) == infos.cend()) {
         return false;
     }
@@ -52,7 +54,8 @@ bool LSan::removeMalloc(const MallocInfo & mInfo) {
     return true;
 }
 
-size_t LSan::getTotalAllocatedBytes() const {
+size_t LSan::getTotalAllocatedBytes() {
+    std::lock_guard<std::recursive_mutex> lock(infoMutex);
     size_t ret = 0;
     std::for_each(infos.cbegin(), infos.cend(), [&ret] (auto & elem) {
         ret += elem.getSize();
@@ -71,7 +74,8 @@ void internalCleanUp() {
     delete LSan::instance;
 }
 
-std::ostream & operator<<(std::ostream & stream, const LSan & self) {
+std::ostream & operator<<(std::ostream & stream, LSan & self) {
+    std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
     if (!self.infos.empty()) {
         stream << "\033[3m";
         stream << self.infos.size() << " leaks total, " << self.getTotalAllocatedBytes() << " bytes total" << std::endl << std::endl;
