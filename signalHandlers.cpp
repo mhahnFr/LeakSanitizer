@@ -37,7 +37,7 @@ static std::string signalString(int signal) {
     return "<Unknown>";
 }
 
-[[ noreturn ]] void crashHandler(int signal, siginfo_t * info, void * constext) {
+[[ noreturn ]] void crashHandler(int signal, siginfo_t * info, void *) {
 #if __cplusplus >= 202002L
     std::string address = std::format("{:#x}", info->si_addr);
 #else

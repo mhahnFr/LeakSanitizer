@@ -23,7 +23,7 @@
 #include <cxxabi.h>
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
-    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(createCallstack(omitCount)) {}
+    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(createCallstack(omitCount)), deletedOnLine() {}
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, int omitCount)
     : MallocInfo(pointer, size, "<Unknown>", 1, omitCount, false) {}
@@ -43,7 +43,7 @@ const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
             char * demangled;
             int status;
             if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status)) != nullptr) {
-                ret.push_back(demangled);
+                ret.emplace_back(demangled);
                 free(demangled);
             } else {
                 ret.push_back(info.dli_sname + (" + " + std::to_string(static_cast<char *>(callstack[i]) - static_cast<char *>(info.dli_saddr))));
