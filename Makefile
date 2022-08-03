@@ -30,7 +30,7 @@ OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
 LDFLAGS = 
-CXXFLAGS = -std=c++17
+CXXFLAGS = -std=c++17 -Wall -pedantic
 
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
