@@ -27,6 +27,8 @@
 
 class LSan {
     static LSan * instance;
+    static bool   omitMalloc;
+    static bool   omitFree;
     
     std::set<MallocInfo> infos;
     std::recursive_mutex  infoMutex;
@@ -45,12 +47,16 @@ public:
     
     size_t getTotalAllocatedBytes();
     
-    void * (*malloc)(size_t);
-    void   (*free)  (void *);
-    void   (*exit)  (int);
+    static void * (*malloc)(size_t);
+    static void   (*free)  (void *);
+    static void   (*exit)  (int);
     
     static LSan & getInstance();
     static void   __exit_hook();
+    static bool   isNull();
+    static bool   ignoreMalloc();
+    static bool   ignoreFree();
+    static void   setIgnoreMalloc(bool);
 
     friend void           internalCleanUp();
     friend std::ostream & operator<<(std::ostream &, LSan &);
