@@ -26,6 +26,7 @@
 #ifdef __linux__
 extern "C" void * __libc_malloc(size_t);
 extern "C" void   __libc_free  (void *);
+
 void * (*LSan::malloc)(size_t) = __libc_malloc;
 void   (*LSan::free)  (void *) = __libc_free;
 
@@ -38,8 +39,9 @@ void   (*LSan::free)  (void *) = reinterpret_cast<void   (*)(void *)>(dlsym(RTLD
 void (*LSan::exit)(int) = _Exit;
 
 LSan * LSan::instance = nullptr;
-
 bool LSan::omitMalloc = false;
+
+bool LSan::ignoreMalloc() { return omitMalloc; }
 
 LSan & LSan::getInstance() {
     if (instance == nullptr) {
@@ -47,8 +49,6 @@ LSan & LSan::getInstance() {
     }
     return *instance;
 }
-
-bool LSan::ignoreMalloc() { return omitMalloc; }
 
 void LSan::setIgnoreMalloc(bool ignore) {
     omitMalloc = ignore;
