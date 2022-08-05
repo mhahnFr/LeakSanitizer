@@ -31,8 +31,8 @@ void   (*LSan::exit)  (int)    = _Exit;
 
 LSan * LSan::instance = nullptr;
 
-bool LSan::omitMalloc = true,
-     LSan::omitFree   = true;
+bool LSan::omitMalloc = false,
+     LSan::omitFree   = false;
 
 LSan & LSan::getInstance() {
     if (instance == nullptr) {

@@ -21,6 +21,7 @@
 #include <execinfo.h>
 #include <dlfcn.h>
 #include <cxxabi.h>
+#include "LeakSani.hpp"
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
     : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(createCallstack(omitCount)), deletedOnLine() {}
@@ -31,7 +32,14 @@ MallocInfo::MallocInfo(const void * const pointer, size_t size, int omitCount)
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount)
     : MallocInfo(pointer, size, file, line, omitCount, true) {}
 
+MallocInfo::~MallocInfo() {
+    LSan::setIgnoreMalloc(true);
+    if (!LSan::ignoreMalloc()) abort();
+}
+
 const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
+    LSan::setIgnoreMalloc(true);
+    if (!LSan::ignoreMalloc()) abort();
     std::vector<std::string> ret;
     void * callstack[128];
     int frames = backtrace(callstack, 128);
@@ -42,7 +50,9 @@ const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
         if (dladdr(callstack[i], &info)) {
             char * demangled;
             int status;
-            if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status)) != nullptr) {
+            if (info.dli_sname == nullptr) {
+                ret.emplace_back("<Unknown>");
+            } else if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status)) != nullptr) {
                 ret.emplace_back(demangled);
                 free(demangled);
             } else {

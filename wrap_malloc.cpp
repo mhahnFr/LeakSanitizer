@@ -28,22 +28,23 @@ void * __wrap_malloc(size_t size, const char * file, int line) {
     if (size == 0) {
         crash("Invalid allocation of size 0", file, line, 4);
     }
-    //void * ret = LSan::getInstance().malloc(size);
     void * ret = LSan::malloc(size);
     if (ret != nullptr && !LSan::ignoreMalloc()) {
         LSan::setIgnoreMalloc(true);
         LSan::getInstance().addMalloc(MallocInfo(ret, size, file, line, 5));
+        LSan::setIgnoreMalloc(false);
     }
     return ret;
 }
 
 void __wrap_free(void * pointer, const char * file, int line) {
-    if (pointer == nullptr) {
-        warn("Free of NULL", file, line, 4);
-    }
     if (!LSan::ignoreFree()) {
         LSan::setIgnoreMalloc(true);
+        if (pointer == nullptr) {
+            warn("Free of NULL", file, line, 4);
+        }
         LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, 5));
+        LSan::setIgnoreMalloc(false);
     }
     LSan::free(pointer);
 }
@@ -59,30 +60,28 @@ void __wrap_free(void * pointer, const char * file, int line) {
 }
 
 void * malloc(size_t size) {
-    static bool veryFirstTry = true;
-    if (veryFirstTry) {
-        veryFirstTry = false;
-        LSan::getInstance();
-    }
     if (size == 0) {
         crash("Invalid allocation of size 0", 4);
     }
-    //void * ptr = LSan::getInstance().malloc(size);
     void * ptr = LSan::malloc(size);
     if (ptr != nullptr && !LSan::ignoreMalloc()) {
         LSan::setIgnoreMalloc(true);
-        LSan::getInstance().addMalloc(MallocInfo(ptr, size, 5));
+        {
+            LSan::getInstance().addMalloc(MallocInfo(ptr, size, 5));
+        }
+        LSan::setIgnoreMalloc(false);
     }
     return ptr;
 }
 
 void free(void * pointer) {
-    if (pointer == nullptr) {
-        warn("Free of NULL", 4);
-    }
-    if (!LSan::ignoreFree()) {
+    if (!LSan::ignoreMalloc()) {
         LSan::setIgnoreMalloc(true);
+        if (pointer == nullptr) {
+            warn("Free of NULL", 4);
+        }
         LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, 5));
+        LSan::setIgnoreMalloc(false);
     }
     LSan::free(pointer);
 }

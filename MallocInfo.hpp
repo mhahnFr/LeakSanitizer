@@ -47,7 +47,7 @@ class MallocInfo {
 public:
     MallocInfo(const void * const, size_t, int = 4);
     MallocInfo(const void * const, size_t, const std::string &, int, int = 4);
-    ~MallocInfo() = default;
+    ~MallocInfo();
     
     auto getPointer()        const -> const void *;
     auto getCreatedInFile()  const -> const std::string &;
