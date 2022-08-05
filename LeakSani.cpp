@@ -23,16 +23,23 @@
 #include "LeakSani.hpp"
 #include "signalHandlers.hpp"
 
+#ifdef __linux__
 extern "C" void * __libc_malloc(size_t);
-extern "C" void   __libc_free(void *);
-void * (*LSan::malloc)(size_t) = __libc_malloc;//reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
-void   (*LSan::free)  (void *) = __libc_free;//reinterpret_cast<void   (*)(void *)>(dlsym(RTLD_NEXT, "free"));
-void   (*LSan::exit)  (int)    = _Exit;
+extern "C" void   __libc_free  (void *);
+void * (*LSan::malloc)(size_t) = __libc_malloc;
+void   (*LSan::free)  (void *) = __libc_free;
+
+#else
+void * (*LSan::malloc)(size_t) = reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
+void   (*LSan::free)  (void *) = reinterpret_cast<void   (*)(void *)>(dlsym(RTLD_NEXT, "free"));
+
+#endif /* __linux__ */
+
+void (*LSan::exit)(int) = _Exit;
 
 LSan * LSan::instance = nullptr;
 
-bool LSan::omitMalloc = false,
-     LSan::omitFree   = false;
+bool LSan::omitMalloc = false;
 
 LSan & LSan::getInstance() {
     if (instance == nullptr) {
@@ -41,11 +48,10 @@ LSan & LSan::getInstance() {
     return *instance;
 }
 
-bool LSan::isNull()       { return instance == nullptr; }
-bool LSan::ignoreMalloc() { return omitMalloc;          }
-bool LSan::ignoreFree()   { return omitFree;            }
+bool LSan::ignoreMalloc() { return omitMalloc; }
+
 void LSan::setIgnoreMalloc(bool ignore) {
-    omitMalloc = omitFree = ignore;
+    omitMalloc = ignore;
 }
 
 LSan::LSan() {
@@ -54,26 +60,26 @@ LSan::LSan() {
     s.sa_sigaction = crashHandler;
     sigaction(SIGSEGV, &s, nullptr);
     sigaction(SIGBUS, &s, nullptr);
-    omitMalloc = omitFree = false;
+    omitMalloc = false;
 }
 
 void LSan::addMalloc(const MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    omitFree = omitMalloc = true;
+    omitMalloc = true;
     infos.emplace(mInfo);
-    omitFree = omitMalloc = false;
+    omitMalloc = false;
 }
 
 bool LSan::removeMalloc(const MallocInfo & mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    omitFree = omitMalloc = true;
+    omitMalloc = true;
     auto it = infos.find(mInfo);
     if (it == infos.end()) {
-        omitFree = omitMalloc = false;
+        omitMalloc = false;
         return false;
     }
     infos.erase(it);
-    omitFree = omitMalloc = false;
+    omitMalloc = false;
     return true;
 }
 
@@ -87,7 +93,7 @@ size_t LSan::getTotalAllocatedBytes() {
 }
 
 void LSan::__exit_hook() {
-    omitFree = omitMalloc = true;
+    omitMalloc = true;
     std::cout << std::endl
               << "\033[32mExiting\033[39m" << std::endl << std::endl
               << getInstance() << std::endl;
@@ -100,7 +106,7 @@ void internalCleanUp() {
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
-    LSan::omitFree = LSan::omitMalloc = true;
+    LSan::omitMalloc = true;
     if (!self.infos.empty()) {
         stream << "\033[3m";
         stream << self.infos.size() << " leaks total, " << self.getTotalAllocatedBytes() << " bytes total" << std::endl << std::endl;
@@ -109,6 +115,6 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         }
         stream << "\033[23m";
     }
-    LSan::omitFree = LSan::omitMalloc = false;
+    LSan::omitMalloc = false;
     return stream;
 }

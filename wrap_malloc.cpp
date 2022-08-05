@@ -38,7 +38,7 @@ void * __wrap_malloc(size_t size, const char * file, int line) {
 }
 
 void __wrap_free(void * pointer, const char * file, int line) {
-    if (!LSan::ignoreFree()) {
+    if (!LSan::ignoreMalloc()) {
         LSan::setIgnoreMalloc(true);
         if (pointer == nullptr) {
             warn("Free of NULL", file, line, 4);
