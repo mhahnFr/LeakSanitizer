@@ -60,26 +60,20 @@ LSan::LSan() {
     s.sa_sigaction = crashHandler;
     sigaction(SIGSEGV, &s, nullptr);
     sigaction(SIGBUS, &s, nullptr);
-    omitMalloc = false;
 }
 
 void LSan::addMalloc(const MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    omitMalloc = true;
     infos.emplace(mInfo);
-    omitMalloc = false;
 }
 
 bool LSan::removeMalloc(const MallocInfo & mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    omitMalloc = true;
     auto it = infos.find(mInfo);
     if (it == infos.end()) {
-        omitMalloc = false;
         return false;
     }
     infos.erase(it);
-    omitMalloc = false;
     return true;
 }
 

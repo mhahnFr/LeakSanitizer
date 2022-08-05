@@ -66,9 +66,7 @@ void * malloc(size_t size) {
     void * ptr = LSan::malloc(size);
     if (ptr != nullptr && !LSan::ignoreMalloc()) {
         LSan::setIgnoreMalloc(true);
-        {
-            LSan::getInstance().addMalloc(MallocInfo(ptr, size, 5));
-        }
+        LSan::getInstance().addMalloc(MallocInfo(ptr, size, 5));
         LSan::setIgnoreMalloc(false);
     }
     return ptr;
