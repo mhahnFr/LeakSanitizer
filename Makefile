@@ -30,11 +30,11 @@ OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
 LDFLAGS = 
-CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -g3
+CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC
 
 NAME = $(SHARED_L)
 ifeq ($(shell uname -s), Linux)
-	NAME = $(SHARED_L)
+	NAME = $(LIB_NAME)
 else ifeq ($(shell uname -s), Darwin)
 	NAME = $(LIB_NAME)
 endif
