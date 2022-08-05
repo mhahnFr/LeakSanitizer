@@ -43,6 +43,7 @@ const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
     std::vector<std::string> ret;
     void * callstack[128];
     int frames = backtrace(callstack, 128);
+    char ** strings = backtrace_symbols(callstack, frames);
 
     ret.reserve(static_cast<std::vector<std::string>::size_type>(frames - omitCount));
     for (int i = omitCount; i < frames; ++i) {
@@ -51,7 +52,7 @@ const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
             char * demangled;
             int status;
             if (info.dli_sname == nullptr) {
-                ret.emplace_back("<Unknown>");
+                ret.emplace_back(strings[i]);
             } else if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status)) != nullptr) {
                 ret.emplace_back(demangled);
                 free(demangled);
@@ -60,6 +61,7 @@ const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
             }
         }
     }
+    free(strings);
     return ret;
 }
 
