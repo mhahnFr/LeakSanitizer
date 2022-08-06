@@ -24,12 +24,16 @@
 #include <ostream>
 #include <mutex>
 #include "MallocInfo.hpp"
+#include "Stats.hpp"
 
 class LSan {
+    static Stats * stats;
+    
     static bool & getIgnoreMalloc();
     
     std::set<MallocInfo> infos;
-    std::recursive_mutex  infoMutex;
+    std::recursive_mutex infoMutex;
+    Stats                realStats;
     
 public:
     LSan();
@@ -49,10 +53,12 @@ public:
     static void   (*free)  (void *);
     static void   (*exit)  (int);
     
-    static LSan & getInstance();
-    static void   __exit_hook();
-    static bool   ignoreMalloc();
-    static void   setIgnoreMalloc(bool);
+    static auto getInstance()  -> LSan &;
+    static auto getStats()     -> Stats &;
+    static auto ignoreMalloc() -> bool;
+    
+    static void setIgnoreMalloc(bool);
+    static void __exit_hook();
 
     friend void           internalCleanUp();
     friend std::ostream & operator<<(std::ostream &, LSan &);

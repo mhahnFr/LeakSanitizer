@@ -38,6 +38,9 @@ void   (*LSan::free)  (void *) = reinterpret_cast<void   (*)(void *)>(dlsym(RTLD
 
 void (*LSan::exit)(int) = _Exit;
 
+Stats * LSan::stats = nullptr;
+
+Stats & LSan::getStats()  { return *LSan::stats;            }
 bool LSan::ignoreMalloc() { return LSan::getIgnoreMalloc(); }
 
 LSan & LSan::getInstance() {
@@ -55,15 +58,17 @@ void LSan::setIgnoreMalloc(bool ignore) {
 }
 
 LSan::LSan() {
-    atexit(reinterpret_cast<void(*)()>(__exit_hook));
+    atexit(reinterpret_cast<void (*)()>(__exit_hook));
     struct sigaction s{};
     s.sa_sigaction = crashHandler;
     sigaction(SIGSEGV, &s, nullptr);
     sigaction(SIGBUS, &s, nullptr);
+    stats = &realStats;
 }
 
 void LSan::addMalloc(const MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
+    realStats += mInfo;
     infos.emplace(mInfo);
 }
 
@@ -73,6 +78,7 @@ bool LSan::removeMalloc(const MallocInfo & mInfo) {
     if (it == infos.end()) {
         return false;
     }
+    realStats -= *it;
     infos.erase(it);
     return true;
 }
