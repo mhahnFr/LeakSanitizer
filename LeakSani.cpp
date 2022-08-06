@@ -38,20 +38,20 @@ void   (*LSan::free)  (void *) = reinterpret_cast<void   (*)(void *)>(dlsym(RTLD
 
 void (*LSan::exit)(int) = _Exit;
 
-LSan * LSan::instance = nullptr;
-bool LSan::omitMalloc = false;
-
-bool LSan::ignoreMalloc() { return omitMalloc; }
+bool LSan::ignoreMalloc() { return LSan::getIgnoreMalloc(); }
 
 LSan & LSan::getInstance() {
-    if (instance == nullptr) {
-        instance = new LSan();
-    }
+    static LSan * instance = new LSan();
     return *instance;
 }
 
+bool & LSan::getIgnoreMalloc() {
+    static bool ignore = false;
+    return ignore;
+}
+
 void LSan::setIgnoreMalloc(bool ignore) {
-    omitMalloc = ignore;
+    LSan::getIgnoreMalloc() = ignore;
 }
 
 LSan::LSan() {
@@ -87,7 +87,7 @@ size_t LSan::getTotalAllocatedBytes() {
 }
 
 void LSan::__exit_hook() {
-    omitMalloc = true;
+    setIgnoreMalloc(true);
     std::cout << std::endl
               << "\033[32mExiting\033[39m" << std::endl << std::endl
               << getInstance() << std::endl;
@@ -95,12 +95,12 @@ void LSan::__exit_hook() {
 }
 
 void internalCleanUp() {
-    delete LSan::instance;
+    delete &LSan::getInstance();
 }
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
-    LSan::omitMalloc = true;
+    LSan::setIgnoreMalloc(true);
     if (!self.infos.empty()) {
         stream << "\033[3m";
         stream << self.infos.size() << " leaks total, " << self.getTotalAllocatedBytes() << " bytes total" << std::endl << std::endl;
@@ -109,6 +109,6 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         }
         stream << "\033[23m";
     }
-    LSan::omitMalloc = false;
+    LSan::setIgnoreMalloc(false);
     return stream;
 }

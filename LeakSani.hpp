@@ -26,8 +26,7 @@
 #include "MallocInfo.hpp"
 
 class LSan {
-    static LSan * instance;
-    static bool   omitMalloc;
+    static bool & getIgnoreMalloc();
     
     std::set<MallocInfo> infos;
     std::recursive_mutex  infoMutex;
