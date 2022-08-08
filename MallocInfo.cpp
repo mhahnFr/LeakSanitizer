@@ -32,11 +32,6 @@ MallocInfo::MallocInfo(const void * const pointer, size_t size, int omitCount)
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount)
     : MallocInfo(pointer, size, file, line, omitCount, true) {}
 
-MallocInfo::~MallocInfo() {
-    LSan::setIgnoreMalloc(true);
-    if (!LSan::ignoreMalloc()) abort();
-}
-
 const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
     LSan::setIgnoreMalloc(true);
     if (!LSan::ignoreMalloc()) abort();
