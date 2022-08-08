@@ -37,6 +37,7 @@ size_t __lsan_getMallocPeek();
 size_t __lsan_getBytePeek();
 
 void   __lsan_printStats();
+void   __lsan_printStatsWithWidth(size_t);
 
 #ifdef __cplusplus
 } // extern "C"
