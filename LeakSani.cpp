@@ -106,7 +106,6 @@ void internalCleanUp() {
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
-    LSan::setIgnoreMalloc(true);
     if (!self.infos.empty()) {
         stream << "\033[3m";
         stream << self.infos.size() << " leaks total, " << self.getTotalAllocatedBytes() << " bytes total" << std::endl << std::endl;
@@ -115,6 +114,5 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         }
         stream << "\033[23m";
     }
-    LSan::setIgnoreMalloc(false);
     return stream;
 }
