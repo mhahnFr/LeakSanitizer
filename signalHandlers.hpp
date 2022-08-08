@@ -24,4 +24,7 @@
 
 [[ noreturn ]] void crashHandler(int, siginfo_t *, void *);
 
+void statsSignal(int);
+void callstackSignal(int);
+
 #endif /* signalHandlers_hpp */

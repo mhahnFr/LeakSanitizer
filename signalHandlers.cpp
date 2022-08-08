@@ -20,6 +20,9 @@
 #include <iostream>
 #include "signalHandlers.hpp"
 #include "crash.hpp"
+#include "LeakSani.hpp"
+#include "MallocInfo.hpp"
+#include "lsan_stats.h"
 
 #if __cplusplus >= 202002L
  #include <format>
@@ -46,4 +49,16 @@ static std::string signalString(int signal) {
     std::string address = s.str();
 #endif
     crash("\033[31;1m" + signalString(signal) + "\033[39;22m on address \033[1m" + address + "\033[22m", 4);
+}
+
+void callstackSignal(int) {
+    LSan::setIgnoreMalloc(true);
+    std::cout << "The current callstack:" << std::endl;
+    MallocInfo::printCallstack(MallocInfo::createCallstack(), std::cout);
+    std::cout << std::endl;
+    LSan::setIgnoreMalloc(false);
+}
+
+void statsSignal(int) {
+    __lsan_printStats();
 }
