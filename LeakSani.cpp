@@ -60,7 +60,6 @@ void LSan::setIgnoreMalloc(bool ignore) {
 LSan::LSan() {
     atexit(reinterpret_cast<void (*)()>(__exit_hook));
     struct sigaction s{};
-    //s.sa_flags = SIGINFO;
     s.sa_sigaction = crashHandler;
     sigaction(SIGSEGV, &s, nullptr);
     sigaction(SIGBUS, &s, nullptr);

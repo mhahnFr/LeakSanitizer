@@ -33,8 +33,6 @@ MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::strin
     : MallocInfo(pointer, size, file, line, omitCount, true) {}
 
 const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
-    //LSan::setIgnoreMalloc(true);
-    if (!LSan::ignoreMalloc()) abort();
     std::vector<std::string> ret;
     void * callstack[128];
     int frames = backtrace(callstack, 128);
