@@ -56,16 +56,25 @@ void __lsan_printStats() {
               << __lsan_getCurrentByteCount() << " bytes currently used, peek " << __lsan_getBytePeek() << " bytes." << std::endl;
     std::cout << "[";
     size_t i;
-    for (i = 0; i < (static_cast<float>(__lsan_getCurrentByteCount()) / __lsan_getTotalBytes()) * 100; ++i) {
+    for (i = 0; i < (static_cast<float>(__lsan_getCurrentByteCount()) / /*__lsan_getTotalBytes()*/__lsan_getBytePeek()) * 100; ++i) {
         std::cout << '*';
     }
-    for (; i < (static_cast<float>(__lsan_getBytePeek()) / __lsan_getTotalBytes()) * 100; ++i) {
+    for (; i < /*(static_cast<float>(__lsan_getBytePeek()) / __lsan_getTotalBytes()) * */100; ++i) {
         std::cout << ' ';
     }
-    std::cout << '|';
-    for (; i < 100; ++i) {
+    //std::cout << '|';
+    //for (; i < 100; ++i) {
+    //    std::cout << ' ';
+    //}
+    std::cout << "] of " << /*__lsan_getTotalBytes()*/__lsan_getBytePeek() << " peek bytes" << std::endl;
+    std::cout << "Objects (" << __lsan_getCurrentMallocCount() << "):" << std::endl << "[";
+    size_t ii;
+    for (ii = 0; ii < (static_cast<float>(__lsan_getCurrentMallocCount()) / __lsan_getMallocPeek()) * 100; ++ii) {
+        std::cout << '*';
+    }
+    for (; ii < 100; ++ii) {
         std::cout << ' ';
     }
-    std::cout << "] of " << __lsan_getTotalBytes() << " total bytes" << std::endl;
+    std::cout << "] of " << __lsan_getMallocPeek() << " peek object count" << std::endl;
     LSan::setIgnoreMalloc(false);
 }

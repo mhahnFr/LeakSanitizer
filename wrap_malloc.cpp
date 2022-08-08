@@ -26,7 +26,7 @@
 
 void * __wrap_malloc(size_t size, const char * file, int line) {
     if (size == 0) {
-        crash("Invalid allocation of size 0", file, line, 4);
+        warn("Invalid allocation of size 0", file, line, 4);
     }
     void * ret = LSan::malloc(size);
     if (ret != nullptr && !LSan::ignoreMalloc()) {
@@ -63,7 +63,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
 
 void * malloc(size_t size) {
     if (size == 0) {
-        crash("Invalid allocation of size 0", 4);
+        warn("Invalid allocation of size 0", 4);
     }
     void * ptr = LSan::malloc(size);
     if (ptr != nullptr && !LSan::ignoreMalloc()) {
