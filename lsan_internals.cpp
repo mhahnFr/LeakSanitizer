@@ -17,33 +17,13 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef lsan_stats_h
-#define lsan_stats_h
+#include "lsan_internals.hpp"
 
-#ifdef __cplusplus
-extern "C" {
+bool __lsan_invalidCrash = true;
+bool __lsan_freeNull     = true;
+
+#ifdef __linux__
+bool __lsan_invalidFree  = true;
+#else
+bool __lsan_invalidFree  = false;
 #endif
-
-#include <stddef.h>
-#include <stdbool.h>
-
-extern bool __lsan_printStatsOnExit;
-
-size_t __lsan_getTotalMallocs();
-size_t __lsan_getTotalBytes();
-size_t __lsan_getTotalFrees();
-
-size_t __lsan_getCurrentMallocCount();
-size_t __lsan_getCurrentByteCount();
-
-size_t __lsan_getMallocPeek();
-size_t __lsan_getBytePeek();
-
-void   __lsan_printStats();
-void   __lsan_printStatsWithWidth(size_t);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
-
-#endif /* lsan_stats_h */

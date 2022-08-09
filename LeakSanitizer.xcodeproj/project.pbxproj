@@ -15,6 +15,8 @@
 		BF49A5DA2899599300BC1FFD /* signalHandlers.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF49A5D82899599300BC1FFD /* signalHandlers.hpp */; };
 		BF5FFC17289AAA6500006AC4 /* warn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF5FFC15289AAA6500006AC4 /* warn.cpp */; };
 		BF5FFC18289AAA6500006AC4 /* warn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF5FFC16289AAA6500006AC4 /* warn.hpp */; };
+		BF621FDD28A291DE00414EE4 /* lsan_internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */; };
+		BF621FDE28A291DE00414EE4 /* lsan_internals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF621FDC28A291DE00414EE4 /* lsan_internals.hpp */; };
 		BF72C3CD2885CB9E00C7AE5C /* LeakSani.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */; };
 		BF72C3CE2885CB9E00C7AE5C /* LeakSani.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */; };
 		BF72C3CF2885CB9E00C7AE5C /* leaksan.h in Headers */ = {isa = PBXBuildFile; fileRef = BF72C3CB2885CB9E00C7AE5C /* leaksan.h */; };
@@ -35,6 +37,8 @@
 		BF49A5D82899599300BC1FFD /* signalHandlers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signalHandlers.hpp; sourceTree = "<group>"; };
 		BF5FFC15289AAA6500006AC4 /* warn.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = warn.cpp; sourceTree = "<group>"; };
 		BF5FFC16289AAA6500006AC4 /* warn.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = warn.hpp; sourceTree = "<group>"; };
+		BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsan_internals.cpp; sourceTree = "<group>"; };
+		BF621FDC28A291DE00414EE4 /* lsan_internals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lsan_internals.hpp; sourceTree = "<group>"; };
 		BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LeakSani.hpp; sourceTree = "<group>"; };
 		BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeakSani.cpp; sourceTree = "<group>"; };
 		BF72C3CB2885CB9E00C7AE5C /* leaksan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = leaksan.h; sourceTree = "<group>"; };
@@ -64,6 +68,8 @@
 			children = (
 				BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */,
 				BF23A2DD289ECE6A00B17349 /* lsan_stats.h */,
+				BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */,
+				BF621FDC28A291DE00414EE4 /* lsan_internals.hpp */,
 				BF72C3CB2885CB9E00C7AE5C /* leaksan.h */,
 				BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */,
 				BF23A2E0289ED24200B17349 /* Stats.cpp */,
@@ -100,6 +106,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF23A2DF289ECE6A00B17349 /* lsan_stats.h in Headers */,
+				BF621FDE28A291DE00414EE4 /* lsan_internals.hpp in Headers */,
 				BFBF736E2883323100BC4208 /* crash.hpp in Headers */,
 				BF72C3CF2885CB9E00C7AE5C /* leaksan.h in Headers */,
 				BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */,
@@ -171,6 +178,7 @@
 				BF49A5D92899599300BC1FFD /* signalHandlers.cpp in Sources */,
 				BF23A2E2289ED24200B17349 /* Stats.cpp in Sources */,
 				BF23A2DE289ECE6A00B17349 /* lsan_stats.cpp in Sources */,
+				BF621FDD28A291DE00414EE4 /* lsan_internals.cpp in Sources */,
 				BFBF736528831FC200BC4208 /* MallocInfo.cpp in Sources */,
 				BF72C3CE2885CB9E00C7AE5C /* LeakSani.cpp in Sources */,
 				BFBF736828832C3300BC4208 /* wrap_malloc.cpp in Sources */,
