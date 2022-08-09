@@ -21,6 +21,7 @@
 #include "crash.hpp"
 #include "warn.hpp"
 #include "LeakSani.hpp"
+#include "lsan_stats.h"
 #include <cstdio>
 #include <iostream>
 
@@ -56,6 +57,9 @@ void __wrap_free(void * pointer, const char * file, int line) {
     std::cout << std::endl
               << "\033[32mExiting\033[39m at \033[4m" << file << ":" << line << "\033[24m" << std::endl << std::endl
               << LSan::getInstance() << std::endl;
+    if (__lsan_printStatsOnExit) {
+        __lsan_printStats();
+    }
     auto quit = LSan::exit;
     internalCleanUp();
     quit(code);

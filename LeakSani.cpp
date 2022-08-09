@@ -22,6 +22,9 @@
 #include <iostream>
 #include "LeakSani.hpp"
 #include "signalHandlers.hpp"
+#include "lsan_stats.h"
+
+bool __lsan_printStatsOnExit = false;
 
 #ifdef __linux__
 extern "C" void * __libc_malloc(size_t);
@@ -99,6 +102,9 @@ void LSan::__exit_hook() {
     std::cout << std::endl
               << "\033[32mExiting\033[39m" << std::endl << std::endl
               << getInstance() << std::endl;
+    if (__lsan_printStatsOnExit) {
+        __lsan_printStats();
+    }
     internalCleanUp();
 }
 

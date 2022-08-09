@@ -26,6 +26,8 @@ extern "C" {
 
 #include <stddef.h>
 
+extern bool __lsan_printStatsOnExit;
+
 size_t __lsan_getTotalMallocs();
 size_t __lsan_getTotalBytes();
 size_t __lsan_getTotalFrees();
