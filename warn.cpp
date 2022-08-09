@@ -24,10 +24,7 @@
 
 static void warnShared(int omitCaller = 2) {
     std::cerr << std::endl;
-    LSan::setIgnoreMalloc(true);
-    if (!LSan::ignoreMalloc()) abort();
     MallocInfo::printCallstack(MallocInfo::createCallstack(omitCaller), std::cerr);
-    LSan::setIgnoreMalloc(false);
     std::cerr << std::endl;
 }
 
