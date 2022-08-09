@@ -33,7 +33,7 @@ extern "C" void * __libc_realloc(void *, size_t);
 extern "C" void   __libc_free   (void *);
 
 void * (*LSan::malloc) (size_t)         = __libc_malloc;
-void * (*Lsan::calloc) (size_t, size_t) = __libc_calloc;
+void * (*LSan::calloc) (size_t, size_t) = __libc_calloc;
 void * (*LSan::realloc)(void *, size_t) = __libc_realloc;
 void   (*LSan::free)   (void *)         = __libc_free;
 
