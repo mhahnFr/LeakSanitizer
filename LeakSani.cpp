@@ -23,6 +23,7 @@
 #include "LeakSani.hpp"
 #include "signalHandlers.hpp"
 #include "lsan_stats.h"
+#include "bytePrinter.hpp"
 
 bool __lsan_printStatsOnExit = false;
 
@@ -140,7 +141,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
     if (!self.infos.empty()) {
         stream << "\033[3m";
-        stream << self.infos.size() << " leaks total, " << self.getTotalAllocatedBytes() << " bytes total" << std::endl << std::endl;
+        stream << self.infos.size() << " leaks total, " << bytesToString(self.getTotalAllocatedBytes()) << " total" << std::endl << std::endl;
         for (const auto & leak : self.infos) {
             stream << leak << std::endl;
         }

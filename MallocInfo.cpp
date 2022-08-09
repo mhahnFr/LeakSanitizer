@@ -22,6 +22,7 @@
 #include <dlfcn.h>
 #include <cxxabi.h>
 #include "LeakSani.hpp"
+#include "bytePrinter.hpp"
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
     : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(createCallstack(omitCount)), deletedOnLine() {}
@@ -125,7 +126,7 @@ bool operator<(const MallocInfo & lhs, const MallocInfo & rhs) {
 }
 
 std::ostream & operator<<(std::ostream & stream, const MallocInfo & self) {
-    stream << "\033[1;3;31mLeak\033[22;39m of size " << self.size << ", ";
+    stream << "\033[1;3;31mLeak\033[22;39m of size \033[23m" << bytesToString(self.size) << "\033[3m, ";
     if (self.createdSet) {
         stream << "allocated at \033[4m" << self.createdInFile << ":" << self.createdOnLine << "\033[24m";
     } else {
