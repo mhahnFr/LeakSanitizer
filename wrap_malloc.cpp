@@ -27,9 +27,9 @@
 #include <iostream>
 
 #ifdef __GLIBC__
-bool __lsan_glibc        = true;
+bool __lsan_glibc = true;
 #else
-bool __lsan_glibc        = false;
+bool __lsan_glibc = false;
 #endif
 
 void * __wrap_malloc(size_t size, const char * file, int line) {

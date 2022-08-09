@@ -20,10 +20,13 @@
 #include "lsan_internals.hpp"
 
 bool __lsan_invalidCrash = true;
-bool __lsan_freeNull     = true;
 
 #ifdef __linux__
-bool __lsan_invalidFree  = true;
+bool __lsan_invalidFree  = false;//true;
+bool __lsan_freeNull     = false;
+
 #else
 bool __lsan_invalidFree  = false;
+bool __lsan_freeNull     = true;
+
 #endif
