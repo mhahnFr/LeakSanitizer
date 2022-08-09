@@ -32,18 +32,20 @@ class MallocInfo {
     
     MallocInfo(const void * const, size_t, const std::string &, int, int, bool);
     
-    const void * const       pointer;
-    const size_t             size;
+    const void * const pointer;
+    const size_t       size;
     
-    const std::string        createdInFile;
-    const int                createdOnLine;
-    const bool               createdSet;
-    std::vector<std::string> createdCallstack;
+    const std::string createdInFile;
+    const int         createdOnLine;
+    const bool        createdSet;
+    void *            createdCallstack[128];
+    int               createdCallstackFrames;
 
-    std::string              deletedInFile;
-    int                      deletedOnLine;
-    std::vector<std::string> deletedCallstack;
-    
+    std::string       deletedInFile;
+    int               deletedOnLine;
+    void *            deletedCallstack[128];
+    int               deletedCallstackFrames;
+        
 public:
     MallocInfo(const void * const, size_t, int = 4);
     MallocInfo(const void * const, size_t, const std::string &, int, int = 4);
@@ -63,11 +65,11 @@ public:
     void printCreatedCallstack(std::ostream &) const;
     void printDeletedCallstack(std::ostream &) const;
     
-    auto getDeletedCallstack() const -> const std::vector<std::string> &;
-    auto getCreatedCallstack() const -> const std::vector<std::string> &;
+    auto getDeletedCallstack() const -> const void * const *;
+    auto getCreatedCallstack() const -> const void * const *;
 
-    static void printCallstack(const std::vector<std::string> &, std::ostream &);
-    static auto createCallstack(int = 1) -> const std::vector<std::string>;
+    static void printCallstack(void * const *, int, std::ostream &);
+    static auto createCallstack(void *[], int, int = 1) -> int;
     
     friend auto operator==(const MallocInfo &, const MallocInfo &) -> bool;
     friend auto operator<(const MallocInfo &, const MallocInfo &)  -> bool;

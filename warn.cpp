@@ -24,7 +24,9 @@
 
 static void warnShared(int omitCaller = 2) {
     std::cerr << std::endl;
-    MallocInfo::printCallstack(MallocInfo::createCallstack(omitCaller), std::cerr);
+    void * callstack[128];
+    int frames = MallocInfo::createCallstack(callstack, 128, omitCaller);
+    MallocInfo::printCallstack(callstack, frames, std::cerr);
     std::cerr << std::endl;
 }
 

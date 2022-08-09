@@ -25,7 +25,9 @@
 #include "bytePrinter.hpp"
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
-    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(createCallstack(omitCount)), deletedOnLine() {}
+    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(), createdCallstackFrames(), deletedOnLine(), deletedCallstack(), deletedCallstackFrames() {
+    createdCallstackFrames = createCallstack(createdCallstack, 128, omitCount);
+}
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, int omitCount)
     : MallocInfo(pointer, size, "<Unknown>", 1, omitCount, false) {}
@@ -33,30 +35,10 @@ MallocInfo::MallocInfo(const void * const pointer, size_t size, int omitCount)
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount)
     : MallocInfo(pointer, size, file, line, omitCount, true) {}
 
-const std::vector<std::string> MallocInfo::createCallstack(int omitCount) {
-    std::vector<std::string> ret;
-    void * callstack[128];
-    int frames = backtrace(callstack, 128);
-    char ** strings = backtrace_symbols(callstack, frames);
-
-    ret.reserve(static_cast<std::vector<std::string>::size_type>(frames - omitCount));
-    for (int i = omitCount; i < frames; ++i) {
-        Dl_info info;
-        if (dladdr(callstack[i], &info)) {
-            char * demangled;
-            int status;
-            if (info.dli_sname == nullptr) {
-                ret.emplace_back(strings[i]);
-            } else if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status)) != nullptr) {
-                ret.emplace_back(demangled);
-                free(demangled);
-            } else {
-                ret.push_back(info.dli_sname + (" + " + std::to_string(static_cast<char *>(callstack[i]) - static_cast<char *>(info.dli_saddr))));
-            }
-        }
-    }
-    free(strings);
-    return ret;
+int MallocInfo::createCallstack(void * buffer[], int bufferSize, int omitCount) {
+    int frames = backtrace(buffer, bufferSize);
+    memmove(buffer, buffer + omitCount, bufferSize - omitCount);
+    return frames - omitCount;
 }
 
 const void * MallocInfo::getPointer() const {
@@ -92,28 +74,44 @@ void MallocInfo::setDeletedOnLine(int line) {
 }
 
 void MallocInfo::generateDeletedCallstack() {
-    deletedCallstack = createCallstack();
+    deletedCallstackFrames = createCallstack(deletedCallstack, 128);
 }
 
-void MallocInfo::printCallstack(const std::vector<std::string> & callstack, std::ostream & stream) {
-    for (const auto & frame : callstack) {
-        stream << (frame == callstack.front() ? "In: \033[23;1m" : "\033[22;3mat: \033[23m") << frame << std::endl;
+void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream & stream) {
+    char ** strings = backtrace_symbols(callstack, size);
+    for (int i = 0; i < size; ++i) {
+        Dl_info info;
+        if (dladdr(callstack[i], &info)) {
+            stream << (i == 0 ? "In: \033[23;1m" : "\033[22;3mat: \033[23m");
+            char * demangled;
+            int status;
+            if (info.dli_sname == nullptr) {
+                stream << strings[i];
+            } else if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status)) != nullptr) {
+                stream << demangled;
+                free(demangled);
+            } else {
+                stream << info.dli_sname + (" + " + std::to_string(static_cast<char *>(callstack[i]) - static_cast<char *>(info.dli_saddr)));
+            }
+            stream << std::endl;
+        }
     }
+    free(strings);
 }
 
 void MallocInfo::printCreatedCallstack(std::ostream & stream) const {
-    printCallstack(createdCallstack, stream);
+    printCallstack(createdCallstack, createdCallstackFrames, stream);
 }
 
 void MallocInfo::printDeletedCallstack(std::ostream & stream) const {
-    printCallstack(deletedCallstack, stream);
+    printCallstack(deletedCallstack, deletedCallstackFrames, stream);
 }
 
-const std::vector<std::string> & MallocInfo::getCreatedCallstack() const {
+const void * const * MallocInfo::getCreatedCallstack() const {
     return createdCallstack;
 }
 
-const std::vector<std::string> & MallocInfo::getDeletedCallstack() const {
+const void * const * MallocInfo::getDeletedCallstack() const {
     return deletedCallstack;
 }
 
