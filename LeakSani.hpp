@@ -45,13 +45,16 @@ public:
     LSan & operator=(const LSan &&) = delete;
     
     void addMalloc(const MallocInfo &&);
+    void changeMalloc(const MallocInfo &);
     bool removeMalloc(const MallocInfo &);
     
     size_t getTotalAllocatedBytes();
     
-    static void * (*malloc)(size_t);
-    static void   (*free)  (void *);
-    static void   (*exit)  (int);
+    static void * (*malloc) (size_t);
+    static void * (*calloc) (size_t, size_t);
+    static void * (*realloc)(void *, size_t);
+    static void   (*free)   (void *);
+    static void   (*exit)   (int);
     
     static auto getInstance()  -> LSan &;
     static auto getStats()     -> Stats &;

@@ -49,6 +49,45 @@ void * __wrap_malloc(size_t size, const char * file, int line) {
     return ret;
 }
 
+void * __wrap_calloc(size_t objectSize, size_t count, const char * file, int line) {
+    void * ret = LSan::calloc(objectSize, count);
+    if (ret != nullptr && !LSan::ignoreMalloc()) {
+        LSan::setIgnoreMalloc(true);
+        if (objectSize * count == 0) {
+            if (!__lsan_invalidCrash || __lsan_glibc) {
+                warn("Invalid allocation of size 0", file, line, 4);
+            } else {
+                crash("Invalid allocation of size 0", file, line, 4);
+            }
+        }
+        LSan::getInstance().addMalloc(MallocInfo(ret, objectSize * count, file, line, 5));
+        LSan::setIgnoreMalloc(false);
+    }
+    return ret;
+}
+
+void * __wrap_realloc(void * pointer, size_t size, const char * file, int line) {
+    bool ignored = LSan::ignoreMalloc();
+    if (!ignored) {
+        LSan::setIgnoreMalloc(true);
+    }
+    void * ptr = LSan::realloc(pointer, size);
+    if (!ignored) {
+        if (ptr != nullptr) {
+            if (pointer != ptr) {
+                if (pointer != nullptr) {
+                    LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, 5));
+                }
+                LSan::getInstance().addMalloc(MallocInfo(ptr, size, file, line, 5));
+            } else {
+                LSan::getInstance().changeMalloc(MallocInfo(ptr, size, file, line, 5));
+            }
+        }
+        LSan::setIgnoreMalloc(false);
+    }
+    return ptr;
+}
+
 void __wrap_free(void * pointer, const char * file, int line) {
     if (!LSan::ignoreMalloc()) {
         LSan::setIgnoreMalloc(true);
@@ -87,13 +126,52 @@ void * malloc(size_t size) {
     if (ptr != nullptr && !LSan::ignoreMalloc()) {
         LSan::setIgnoreMalloc(true);
         if (size == 0) {
-            if (__lsan_invalidCrash) {
-                crash("Invalid allocation of size 0", 4);
-            } else {
+            if (!__lsan_invalidCrash || __lsan_glibc) {
                 warn("Invalid allocation of size 0", 4);
+            } else {
+                crash("Invalid allocation of size 0", 4);
             }
         }
         LSan::getInstance().addMalloc(MallocInfo(ptr, size, 5));
+        LSan::setIgnoreMalloc(false);
+    }
+    return ptr;
+}
+
+void * calloc(size_t objectSize, size_t count) {
+    void * ptr = LSan::calloc(objectSize, count);
+    if (ptr != nullptr && !LSan::ignoreMalloc()) {
+        LSan::setIgnoreMalloc(true);
+        if (objectSize * count == 0) {
+            if (!__lsan_invalidCrash || __lsan_glibc) {
+                warn("Invalid allocation of size 0", 4);
+            } else {
+                crash("Invalid allocation of size 0", 4);
+            }
+        }
+        LSan::getInstance().addMalloc(MallocInfo(ptr, objectSize * count, 5));
+        LSan::setIgnoreMalloc(false);
+    }
+    return ptr;
+}
+
+void * realloc(void * pointer, size_t size) {
+    bool ignored = LSan::ignoreMalloc();
+    if (!ignored) {
+        LSan::setIgnoreMalloc(true);
+    }
+    void * ptr = LSan::realloc(pointer, size);
+    if (!ignored) {
+        if (ptr != nullptr) {
+            if (pointer != ptr) {
+                if (pointer != nullptr) {
+                    LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, 5));
+                }
+                LSan::getInstance().addMalloc(MallocInfo(ptr, size, 5));
+            } else {
+                LSan::getInstance().changeMalloc(MallocInfo(ptr, size, 5));
+            }
+        }
         LSan::setIgnoreMalloc(false);
     }
     return ptr;

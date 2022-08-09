@@ -47,6 +47,17 @@ void Stats::addMalloc(const MallocInfo & mInfo) {
     addMalloc(mInfo.getSize());
 }
 
+void Stats::replaceMalloc(size_t oldSize, size_t newSize) {
+    currentBytes -= oldSize;
+    currentBytes += newSize;
+    if (peekBytes < currentBytes) {
+        peekBytes = currentBytes;
+    }
+    if (newSize > oldSize) {
+        totalBytes += newSize - oldSize;
+    }
+}
+
 void Stats::addFree(size_t size) {
     ++freeCount;
     

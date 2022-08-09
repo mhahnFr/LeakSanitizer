@@ -27,15 +27,21 @@
 bool __lsan_printStatsOnExit = false;
 
 #ifdef __linux__
-extern "C" void * __libc_malloc(size_t);
-extern "C" void   __libc_free  (void *);
+extern "C" void * __libc_malloc (size_t);
+extern "C" void * __libc_calloc (size_t, size_t);
+extern "C" void * __libc_realloc(void *, size_t);
+extern "C" void   __libc_free   (void *);
 
-void * (*LSan::malloc)(size_t) = __libc_malloc;
-void   (*LSan::free)  (void *) = __libc_free;
+void * (*LSan::malloc) (size_t)         = __libc_malloc;
+void * (*Lsan::calloc) (size_t, size_t) = __libc_calloc;
+void * (*LSan::realloc)(void *, size_t) = __libc_realloc;
+void   (*LSan::free)   (void *)         = __libc_free;
 
 #else
-void * (*LSan::malloc)(size_t) = reinterpret_cast<void * (*)(size_t)>(dlsym(RTLD_NEXT, "malloc"));
-void   (*LSan::free)  (void *) = reinterpret_cast<void   (*)(void *)>(dlsym(RTLD_NEXT, "free"));
+void * (*LSan::malloc) (size_t)         = reinterpret_cast<void * (*)(size_t)>        (dlsym(RTLD_NEXT, "malloc"));
+void * (*LSan::calloc) (size_t, size_t) = reinterpret_cast<void * (*)(size_t, size_t)>(dlsym(RTLD_NEXT, "calloc"));
+void * (*LSan::realloc)(void *, size_t) = reinterpret_cast<void * (*)(void *, size_t)>(dlsym(RTLD_NEXT, "realloc"));
+void   (*LSan::free)   (void *)         = reinterpret_cast<void   (*)(void *)>        (dlsym(RTLD_NEXT, "free"));
 
 #endif /* __linux__ */
 
@@ -75,6 +81,24 @@ void LSan::addMalloc(const MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     realStats += mInfo;
     infos.emplace(mInfo);
+}
+
+void LSan::changeMalloc(const MallocInfo & mInfo) {
+    std::lock_guard<std::recursive_mutex> lock(infoMutex);
+    auto it = infos.find(mInfo);
+    if (it == infos.end()) {
+        realStats += mInfo;
+    } else {
+        if (it->getPointer() != mInfo.getPointer()) {
+            realStats -= *it;
+            realStats += mInfo;
+        } else {
+            realStats.replaceMalloc(it->getSize(), mInfo.getSize());
+        }
+        // TODO: Don't replace it everytime!
+        infos.erase(it);
+        infos.emplace(mInfo);
+    }
 }
 
 bool LSan::removeMalloc(const MallocInfo & mInfo) {

@@ -48,6 +48,8 @@ public:
     void addMalloc(size_t size);
     void addMalloc(const MallocInfo &);
     
+    void replaceMalloc(size_t, size_t);
+    
     void addFree(size_t size);
     void addFree(const MallocInfo &);
     

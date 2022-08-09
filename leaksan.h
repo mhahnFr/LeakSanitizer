@@ -27,6 +27,8 @@ extern "C" {
 #include <stddef.h>
 
 void * __wrap_malloc(size_t, const char *, int);
+void * __wrap_calloc(size_t, size_t, const char *, int);
+void * __wrap_realloc(void *, size_t, const char *, int);
 void   __wrap_free(void *, const char *, int);
 void   __wrap_exit(int, const char *, int);
 
@@ -34,8 +36,10 @@ void   __wrap_exit(int, const char *, int);
 } // extern "C"
 #endif
 
-#define malloc(size)  __wrap_malloc(size, __FILE__, __LINE__)
-#define free(pointer) __wrap_free(pointer, __FILE__, __LINE__)
-#define exit(code)    __wrap_exit(code, __FILE__, __LINE__)
+#define malloc(size)       __wrap_malloc(size, __FILE__, __LINE__)
+#define calloc(size, n)    __wrap_calloc(size, n, __FILE__, __LINE__)
+#define realloc(ptr, size) __wrap_realloc(ptr, size, __FILE__, __LINE__)
+#define free(pointer)      __wrap_free(pointer, __FILE__, __LINE__)
+#define exit(code)         __wrap_exit(code, __FILE__, __LINE__)
 
 #endif /* leaksan_h */

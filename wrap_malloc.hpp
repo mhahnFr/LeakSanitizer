@@ -27,6 +27,8 @@ extern "C" {
 #endif
 
 void * __wrap_malloc(size_t, const char *, int);
+void * __wrap_calloc(size_t, size_t, const char *, int);
+void * __wrap_realloc(void *, size_t, const char *, int);
 void   __wrap_free(void *, const char *, int);
 
 [[ noreturn ]] void __wrap_exit(int, const char *, int);
