@@ -55,10 +55,10 @@ void __lsan_printStats() {
 
 void __lsan_printStatsWithWidth(size_t width) {
     LSan::setIgnoreMalloc(true);
-    std::cout << "Stats of the memory usage so far: " << std::endl
-              << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects." << std::endl << std::endl
-              << __lsan_getCurrentByteCount() << " bytes currently used, peek " << __lsan_getBytePeek() << " bytes." << std::endl;
-    std::cout << "[";
+    std::cout << "\033[3mStats of the memory usage so far:\033[23m" << std::endl
+              << "\033[0m" << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects.\033[23m" << std::endl << std::endl
+              << "\033[1m" << __lsan_getCurrentByteCount() << " bytes\033[22m currently used, peek " << __lsan_getBytePeek() << " bytes." << std::endl
+              << "\033[1m[\033[22;4;2m";
     size_t i;
     for (i = 0; i < (static_cast<float>(__lsan_getCurrentByteCount()) / __lsan_getBytePeek()) * width; ++i) {
         std::cout << '*';
@@ -66,14 +66,15 @@ void __lsan_printStatsWithWidth(size_t width) {
     for (; i < width; ++i) {
         std::cout << ' ';
     }
-    std::cout << "] of " << __lsan_getBytePeek() << " peek bytes" << std::endl;
-    std::cout << "Objects (" << __lsan_getCurrentMallocCount() << "):" << std::endl << "[";
+    std::cout << "\033[22;24;1m]\033[22m of \033[1m" << __lsan_getBytePeek() << " byte\033[22m peek" << std::endl << std::endl
+              << "\033[1m" << __lsan_getCurrentMallocCount() << " objects\033[22m currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl
+              << "\033[1m[\033[22;4;2m";
     for (i = 0; i < (static_cast<float>(__lsan_getCurrentMallocCount()) / __lsan_getMallocPeek()) * width; ++i) {
         std::cout << '*';
     }
     for (; i < width; ++i) {
         std::cout << ' ';
     }
-    std::cout << "] of " << __lsan_getMallocPeek() << " peek object count" << std::endl;
+    std::cout << "\033[22;24;1m]\033[22m of \033[1m" << __lsan_getMallocPeek() << " objects\033[22m peek" << std::endl << std::endl;
     LSan::setIgnoreMalloc(false);
 }
