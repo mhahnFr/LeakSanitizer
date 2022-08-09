@@ -17,10 +17,11 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "MallocInfo.hpp"
 #include <execinfo.h>
 #include <dlfcn.h>
 #include <cxxabi.h>
+#include <cstring>
+#include "MallocInfo.hpp"
 #include "LeakSani.hpp"
 #include "bytePrinter.hpp"
 
