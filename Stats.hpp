@@ -24,15 +24,15 @@
 #include "MallocInfo.hpp"
 
 class Stats {
-    size_t currentMallocCount,
-             totalMallocCount,
-              peekMallocCount;
+    size_t currentMallocCount = 0,
+             totalMallocCount = 0,
+              peekMallocCount = 0;
 
-    size_t currentBytes,
-             totalBytes,
-              peekBytes;
+    size_t currentBytes = 0,
+             totalBytes = 0,
+              peekBytes = 0;
     
-    size_t freeCount;
+    size_t freeCount = 0;
     
 public:
     auto getCurrentMallocCount() const -> size_t;
