@@ -4,7 +4,7 @@ to gain insights into the memory usage of your program.
 
 ## Usage
 In order to get started, you can either download a compiled version of the library [here](https://www.github.com/mhahnFr/LeakSanitizer/releases).  
-You can also build it from source:
+Alternatively, you can also build it from source:
 - Clone the repository: ``git clone https://www.github.com/mhahnFr/LeakSanitizer``
 - and build the library: ``cd LeakSanitizer && make``.
 
