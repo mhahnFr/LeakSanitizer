@@ -52,13 +52,16 @@ static std::string signalString(int signal) {
 }
 
 void callstackSignal(int) {
+    bool ignore = LSan::ignoreMalloc();
     LSan::setIgnoreMalloc(true);
     std::cout << "\033[3mThe current callstack:\033[23m" << std::endl;
     void * callstack[128];
     int frames = MallocInfo::createCallstack(callstack, 128);
     MallocInfo::printCallstack(callstack, frames, std::cout);
     std::cout << std::endl;
-    LSan::setIgnoreMalloc(false);
+    if (!ignore) {
+        LSan::setIgnoreMalloc(false);
+    }
 }
 
 void statsSignal(int) {

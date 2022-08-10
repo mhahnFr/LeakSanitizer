@@ -55,6 +55,7 @@ void __lsan_printStats() {
 }
 
 void __lsan_printStatsWithWidth(size_t width) {
+    bool ignore = LSan::ignoreMalloc();
     LSan::setIgnoreMalloc(true);
     std::cout << "\033[3mStats of the memory usage so far:\033[23m" << std::endl
               << "\033[0m" << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects.\033[23m" << std::endl << std::endl
@@ -77,5 +78,7 @@ void __lsan_printStatsWithWidth(size_t width) {
         std::cout << ' ';
     }
     std::cout << "\033[22;24;1m]\033[22m of \033[1m" << __lsan_getMallocPeek() << " objects\033[22m peek" << std::endl << std::endl;
-    LSan::setIgnoreMalloc(false);
+    if (!ignore) {
+        LSan::setIgnoreMalloc(false);
+    }
 }
