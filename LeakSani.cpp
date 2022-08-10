@@ -22,8 +22,8 @@
 #include <iostream>
 #include "LeakSani.hpp"
 #include "signalHandlers.hpp"
-#include "lsan_stats.h"
 #include "bytePrinter.hpp"
+#include "include/lsan_stats.h"
 
 bool __lsan_printStatsOnExit = false;
 

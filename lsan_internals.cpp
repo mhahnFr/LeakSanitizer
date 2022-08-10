@@ -17,7 +17,7 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lsan_internals.h"
+#include "include/lsan_internals.h"
 
 bool __lsan_humanPrint   = true;
 

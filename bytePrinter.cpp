@@ -20,7 +20,7 @@
 #include <cmath>
 #include <iomanip>
 #include "bytePrinter.hpp"
-#include "lsan_internals.h"
+#include "include/lsan_internals.h"
 
 std::string bytesToString(size_t amount) {
     std::stringstream s;
