@@ -22,7 +22,7 @@
 #include "warn.hpp"
 #include "LeakSani.hpp"
 #include "lsan_stats.h"
-#include "lsan_internals.hpp"
+#include "lsan_internals.h"
 #include <cstdio>
 #include <iostream>
 
