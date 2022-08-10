@@ -20,10 +20,11 @@
 #include <cmath>
 #include <iomanip>
 #include "bytePrinter.hpp"
+#include "lsan_internals.h"
 
-std::string bytesToString(size_t amount, bool humanReadable) {
+std::string bytesToString(size_t amount) {
     std::stringstream s;
-    if (!humanReadable) {
+    if (!__lsan_humanPrint) {
         s << amount << " B";
     } else {
         const std::string sizes[] {"EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"};

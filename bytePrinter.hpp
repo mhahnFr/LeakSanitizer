@@ -23,6 +23,6 @@
 #include <string>
 #include <sstream>
 
-std::string bytesToString(size_t, bool = true);
+std::string bytesToString(size_t);
 
 #endif /* bytePrinter_hpp */

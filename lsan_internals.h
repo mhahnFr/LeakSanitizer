@@ -26,6 +26,8 @@ extern "C" {
 
 #include <stdbool.h>
 
+extern bool __lsan_humanPrint;
+
 extern bool __lsan_invalidCrash;
 extern bool __lsan_invalidFree;
 extern bool __lsan_freeNull;
