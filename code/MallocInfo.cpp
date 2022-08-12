@@ -27,7 +27,7 @@
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
     : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(), createdCallstackFrames(), deletedOnLine(), deletedCallstack(), deletedCallstackFrames() {
-    createdCallstackFrames = createCallstack(createdCallstack, 128, omitCount);
+    createdCallstackFrames = createCallstack(createdCallstack, CALLSTACK_SIZE, omitCount);
 }
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, int omitCount)
@@ -75,7 +75,7 @@ void MallocInfo::setDeletedOnLine(int line) {
 }
 
 void MallocInfo::generateDeletedCallstack() {
-    deletedCallstackFrames = createCallstack(deletedCallstack, 128);
+    deletedCallstackFrames = createCallstack(deletedCallstack, CALLSTACK_SIZE);
 }
 
 void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream & stream) {

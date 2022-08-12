@@ -38,12 +38,12 @@ class MallocInfo {
     const std::string createdInFile;
     const int         createdOnLine;
     const bool        createdSet;
-    void *            createdCallstack[128];
+    void *            createdCallstack[CALLSTACK_SIZE];
     int               createdCallstackFrames;
 
     std::string       deletedInFile;
     int               deletedOnLine;
-    void *            deletedCallstack[128];
+    void *            deletedCallstack[CALLSTACK_SIZE];
     int               deletedCallstackFrames;
         
 public:

@@ -30,7 +30,7 @@ OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
 LDFLAGS = 
-CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC
+CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Weverything -Wno-c++98-compat -Wno-padding
 
 NAME = $(SHARED_L)
 ifeq ($(shell uname -s), Linux)
