@@ -8,7 +8,7 @@ Alternatively, you can also build it from source:
 - Clone the repository: ``git clone https://www.github.com/mhahnFr/LeakSanitizer``
 - and build the library: ``cd LeakSanitizer && make``.
 
-On some systems, you might need to install the ``libexecinfo-devel`` to compile the library successfully.
+On some systems, you might need to install the ``libexecinfo-dev`` to compile the library successfully.
 
 In order to use this library, compile your code using the following flags: ``-Wno-gnu-include-next -I<path/to/library>/include``.
 
