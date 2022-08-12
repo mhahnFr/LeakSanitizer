@@ -81,7 +81,23 @@
 		BF97EB4D28831E5B00DAF1FE = {
 			isa = PBXGroup;
 			children = (
+				BF9DD3A428A6761400AEBC17 /* code */,
 				BF643E5C28A40C970080DB21 /* include */,
+				BF97EB5728831E5B00DAF1FE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BF97EB5728831E5B00DAF1FE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BF97EB5628831E5B00DAF1FE /* libLeakSanitizer.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BF9DD3A428A6761400AEBC17 /* code */ = {
+			isa = PBXGroup;
+			children = (
 				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */,
 				BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */,
@@ -100,16 +116,8 @@
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
 				BFBF736C2883323100BC4208 /* crash.hpp */,
 				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
-				BF97EB5728831E5B00DAF1FE /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		BF97EB5728831E5B00DAF1FE /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				BF97EB5628831E5B00DAF1FE /* libLeakSanitizer.a */,
-			);
-			name = Products;
+			path = code;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

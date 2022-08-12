@@ -21,8 +21,8 @@
 #include "crash.hpp"
 #include "warn.hpp"
 #include "LeakSani.hpp"
-#include "include/lsan_stats.h"
-#include "include/lsan_internals.h"
+#include "../include/lsan_stats.h"
+#include "../include/lsan_internals.h"
 #include <cstdio>
 #include <iostream>
 

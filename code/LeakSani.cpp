@@ -23,7 +23,7 @@
 #include "LeakSani.hpp"
 #include "signalHandlers.hpp"
 #include "bytePrinter.hpp"
-#include "include/lsan_stats.h"
+#include "../include/lsan_stats.h"
 
 bool __lsan_printStatsOnExit = false;
 

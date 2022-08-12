@@ -19,7 +19,7 @@
 
 #include <iostream>
 #include "LeakSani.hpp"
-#include "include/lsan_stats.h"
+#include "../include/lsan_stats.h"
 #include "bytePrinter.hpp"
 
 size_t __lsan_getTotalMallocs() {

@@ -22,7 +22,7 @@
 #include "crash.hpp"
 #include "LeakSani.hpp"
 #include "MallocInfo.hpp"
-#include "include/lsan_stats.h"
+#include "../include/lsan_stats.h"
 
 #if __cplusplus >= 202002L
  #include <format>
