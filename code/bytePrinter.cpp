@@ -28,10 +28,10 @@ std::string bytesToString(size_t amount) {
         s << amount << " B";
     } else {
         const std::string sizes[] {"EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"};
-        size_t multiplier = pow(1024, 6);
+        unsigned long long multiplier = static_cast<unsigned long long>(pow(1024, 6));
         for (size_t i = 0; i < std::size(sizes); ++i, multiplier /= 1024) {
             if (multiplier < amount) {
-                const unsigned short preDot = amount / multiplier;
+                const unsigned short preDot = static_cast<unsigned short>(amount / multiplier);
                 const unsigned char digitCount = preDot < 10 ? 1 :
                                                 (preDot < 100 ? 2 :
                                                 (preDot < 1000 ? 3 : 4));

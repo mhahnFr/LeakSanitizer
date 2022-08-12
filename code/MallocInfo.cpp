@@ -38,7 +38,7 @@ MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::strin
 
 int MallocInfo::createCallstack(void * buffer[], int bufferSize, int omitCount) {
     int frames = backtrace(buffer, bufferSize);
-    memmove(buffer, buffer + omitCount, bufferSize - omitCount);
+    memmove(buffer, buffer + omitCount, static_cast<size_t>(bufferSize - omitCount));
     return frames - omitCount;
 }
 
