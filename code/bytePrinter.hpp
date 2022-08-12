@@ -23,6 +23,6 @@
 #include <string>
 #include <sstream>
 
-std::string bytesToString(size_t);
+std::string bytesToString(unsigned long long);
 
 #endif /* bytePrinter_hpp */

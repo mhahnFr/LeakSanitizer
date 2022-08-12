@@ -22,13 +22,15 @@
 #include "bytePrinter.hpp"
 #include "../include/lsan_internals.h"
 
-std::string bytesToString(size_t amount) {
+static const unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL;
+
+std::string bytesToString(unsigned long long amount) {
     std::stringstream s;
     if (!__lsan_humanPrint) {
         s << amount << " B";
     } else {
         const std::string sizes[] {"EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"};
-        unsigned long long multiplier = static_cast<unsigned long long>(pow(1024, 6));
+        unsigned long long multiplier = exabyte;
         for (size_t i = 0; i < std::size(sizes); ++i, multiplier /= 1024) {
             if (multiplier < amount) {
                 const unsigned short preDot = static_cast<unsigned short>(amount / multiplier);
