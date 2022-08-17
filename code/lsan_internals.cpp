@@ -20,6 +20,7 @@
 #include "../include/lsan_internals.h"
 
 bool __lsan_humanPrint   = true;
+bool __lsan_printCout    = false;
 
 bool __lsan_invalidCrash = true;
 bool __lsan_invalidFree  = false;

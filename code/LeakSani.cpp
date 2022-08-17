@@ -24,6 +24,7 @@
 #include "signalHandlers.hpp"
 #include "bytePrinter.hpp"
 #include "../include/lsan_stats.h"
+#include "../include/lsan_internals.h"
 
 bool __lsan_printStatsOnExit = false;
 
@@ -124,9 +125,15 @@ size_t LSan::getTotalAllocatedBytes() {
 
 void LSan::__exit_hook() {
     setIgnoreMalloc(true);
-    std::cout << std::endl
-              << "\033[32mExiting\033[39m" << std::endl << std::endl
-              << getInstance() << std::endl;
+	if (__lsan_printCout) {
+        std::cout << std::endl
+                  << "\033[32mExiting\033[39m" << std::endl << std::endl
+                  << getInstance() << std::endl;
+	} else {
+		std::cerr << std::endl
+				  << "\033[32mExiting\033[39m" << std::endl << std::endl
+				  << getInstance() << std::endl;
+	}
     if (__lsan_printStatsOnExit) {
         __lsan_printStats();
     }
