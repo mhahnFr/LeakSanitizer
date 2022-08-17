@@ -34,4 +34,4 @@ exits.
 ### Final notes
 This project is licensed under the terms of the GPL 3.0.
 
-© Copyright 2022 [mhahnFr](https://www.github.com/mhahnFr)
+© Copyright 2022 [mhahnFr](https://www.github.com/mhahnFr) and contributors
