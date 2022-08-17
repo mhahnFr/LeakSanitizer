@@ -22,6 +22,7 @@
 #include "crash.hpp"
 #include "LeakSani.hpp"
 #include "MallocInfo.hpp"
+#include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 
 #if __cplusplus >= 202002L
@@ -54,11 +55,12 @@ static std::string signalString(int signal) {
 void callstackSignal(int) {
     bool ignore = LSan::ignoreMalloc();
     LSan::setIgnoreMalloc(true);
-    std::cout << "\033[3mThe current callstack:\033[23m" << std::endl;
+    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    out << "\033[3mThe current callstack:\033[23m" << std::endl;
     void * callstack[128];
     int frames = MallocInfo::createCallstack(callstack, 128);
-    MallocInfo::printCallstack(callstack, frames, std::cout);
-    std::cout << std::endl;
+    MallocInfo::printCallstack(callstack, frames, out);
+    out << std::endl;
     if (!ignore) {
         LSan::setIgnoreMalloc(false);
     }
