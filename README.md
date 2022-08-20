@@ -9,6 +9,7 @@ Alternatively, you can also build it from source:
 - and build the library: ``cd LeakSanitizer && make``.
 
 On some systems, you might need to install the ``libexecinfo-dev`` to compile the library successfully.
+If this is the case, add ``-lexecinfo`` to the linking flags.
 
 In order to use this library, compile your code using the following flags: ``-Wno-gnu-include-next -I<path/to/library>/include``.
 
@@ -27,7 +28,7 @@ To not track itself, prior to the tracking part the allocation tracking is disab
 
 The backtraces are converted to human readable strings once that specific backtrace is printed.
 
-When a allocation function is called for the first time, the ``atexit`` handler and the signal handlers
+When an allocation function is called for the first time, the ``atexit`` handler and the signal handlers
 are installed. The ``atexit`` handler prints all allocations that are still registered when the program
 exits.
 
