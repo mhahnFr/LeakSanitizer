@@ -114,7 +114,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
                   << "\033[32mExiting\033[39m at \033[4m" << file << ":" << line << "\033[24m" << std::endl << std::endl
                   << LSan::getInstance() << std::endl;
 	} else {
-		std::cout << std::endl
+		std::cerr << std::endl
 				  << "\033[32mExiting\033[39m at \033[4m" << file << ":" << line << "\033[24m" << std::endl << std::endl
 				  << LSan::getInstance() << std::endl;
 	}
