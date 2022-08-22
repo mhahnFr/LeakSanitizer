@@ -27,20 +27,75 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
+/**
+ * Defaults to false. Setting it to true will cause this sanitizer to print the statistics upon normal
+ * termination of the program.
+ */
 extern bool __lsan_printStatsOnExit;
 
+/**
+ * Returns the total count of allocations ever registered by this sanitizer.
+ *
+ * @return The total allocation count.
+ */
 size_t __lsan_getTotalMallocs();
+
+/**
+ * Returns the total count of allocated bytes ever registered by this sanitizer.
+ *
+ * @return The total amount of allocated bytes.
+ */
 size_t __lsan_getTotalBytes();
+
+/**
+ * Returns the total count of freed objects that were previously registered by this sanitizer.
+ *
+ * @return The total count of freed objects.
+ */
 size_t __lsan_getTotalFrees();
 
+/**
+ * Returns the count of the currently allocated objects registered by this sanitizer.
+ *
+ * @return The count of currently allocated objects.
+ */
 size_t __lsan_getCurrentMallocCount();
+
+/**
+ * Returns the amount of the currently allocated bytes registered by this sanitizer.
+ *
+ * @return The amount of currently allocated bytes.
+ */
 size_t __lsan_getCurrentByteCount();
 
+/**
+ * Returns the highest count of objects in the heap at the same time.
+ *
+ * @return The highest count of allocated objects.
+ */
 size_t __lsan_getMallocPeek();
+
+/**
+ * Returns the highest amount of bytes in the heap at the same time.
+ *
+ * @return The highest amount of allocated bytes.
+ */
 size_t __lsan_getBytePeek();
 
+/**
+ * Prints the statistics of the allocations. The bar has a size of 100 characters, it can be adjusted by
+ * using __lsan_printStatsWithWidth(size_t). The output stream defined by __lsan_printCout is used
+ * for the printing.
+ */
 void   __lsan_printStats();
-void   __lsan_printStatsWithWidth(size_t);
+
+/**
+ * Prints the statistics of the allocations. The size of the bar is specified by the given argument. The
+ * output stream defined by __lsan_printCout is used for the printing.
+ *
+ * @param width The width in characters the printed bar should have.
+ */
+void   __lsan_printStatsWithWidth(size_t width);
 
 #ifdef __cplusplus
 } // extern "C"
