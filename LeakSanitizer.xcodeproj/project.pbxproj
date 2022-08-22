@@ -37,6 +37,8 @@
 		BF23A2E1289ED24200B17349 /* Stats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Stats.hpp; sourceTree = "<group>"; };
 		BF49A5D72899599300BC1FFD /* signalHandlers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signalHandlers.cpp; sourceTree = "<group>"; };
 		BF49A5D82899599300BC1FFD /* signalHandlers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signalHandlers.hpp; sourceTree = "<group>"; };
+		BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		BF5F19FC28B3F00600DAEDE7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		BF5FFC15289AAA6500006AC4 /* warn.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = warn.cpp; sourceTree = "<group>"; };
 		BF5FFC16289AAA6500006AC4 /* warn.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = warn.hpp; sourceTree = "<group>"; };
 		BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsan_internals.cpp; sourceTree = "<group>"; };
@@ -81,6 +83,8 @@
 		BF97EB4D28831E5B00DAF1FE = {
 			isa = PBXGroup;
 			children = (
+				BF5F19FC28B3F00600DAEDE7 /* README.md */,
+				BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */,
 				BF9DD3A428A6761400AEBC17 /* code */,
 				BF643E5C28A40C970080DB21 /* include */,
 				BF97EB5728831E5B00DAF1FE /* Products */,
