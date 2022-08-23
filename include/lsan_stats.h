@@ -94,7 +94,7 @@ bool   __lsan_statsAvailable();
  * Prints the statistics of the allocations. The bar has a size of 100 characters, it can be adjusted by
  * using __lsan_printStatsWithWidth(size_t). The output stream defined by __lsan_printCout is used
  * for the printing. This function already checks for the availability of the memory statistics using the
- * function __lsan_statsAvailable, and guarantees to not crash the program, even in the case the
+ * function __lsan_statsAvailable(), and guarantees to not crash the program, even in the case the
  * memory statistics are unavailable.
  */
 void   __lsan_printStats();
@@ -102,7 +102,7 @@ void   __lsan_printStats();
 /**
  * Prints the statistics of the allocations. The size of the bar is specified by the given argument. The
  * output stream defined by __lsan_printCout is used for the printing. This function already checks
- * for the availability of the memory statistics using the function __lsan_statsAvailable, and guarantees
+ * for the availability of the memory statistics using the function __lsan_statsAvailable(), and guarantees
  * to not crash the program, even in the case the memory statistics are unavailable.
  *
  * @param width The width in characters the printed bar should have.
