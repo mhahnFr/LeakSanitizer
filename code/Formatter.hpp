@@ -17,17 +17,19 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../include/lsan_internals.h"
+#ifndef Formatter_hpp
+#define Formatter_hpp
 
-bool __lsan_humanPrint     = true;
-bool __lsan_printCout      = false;
-bool __lsan_printFormatted = true;
+#include <string>
 
-bool __lsan_invalidCrash   = true;
-bool __lsan_invalidFree    = false;
+struct Formatter {
+    enum class Style {
+        GREEN, RED, ITALIC, UNDERLINED, GREYED, BOLD
+    };
+    
+    auto get(Style)   -> std::string;
+    auto clear(Style) -> std::string;
+    auto clearAll()   -> std::string;
+};
 
-#ifdef __linux__
-bool __lsan_freeNull       = false;
-#else
-bool __lsan_freeNull       = true;
-#endif
+#endif /* Formatter_hpp */

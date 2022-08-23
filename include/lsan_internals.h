@@ -40,6 +40,13 @@ extern bool __lsan_humanPrint;
 extern bool __lsan_printCout;
 
 /**
+ * If this value is set to true, ANSII escape codes are used to format the output of this sanitizer.
+ * Otherwise, the output is not formatted using escape codes.
+ * Defaults to true.
+ */
+extern bool __lsan_printFormatted;
+
+/**
  * If this value is set to true, the program is terminated when doing something invalid regarding
  * the memory management.
  * Defaults to true.
