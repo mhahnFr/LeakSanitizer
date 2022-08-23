@@ -83,6 +83,14 @@ size_t __lsan_getMallocPeek();
 size_t __lsan_getBytePeek();
 
 /**
+ * Returns whether the memory statistics can savely be queried. If it returns false, but the memory
+ * statistics are queried regardless, the library might crash!
+ *
+ * @return Whether the memory statistics can savely be queried.
+ */
+bool   __lsan_statsAvailable();
+
+/**
  * Prints the statistics of the allocations. The bar has a size of 100 characters, it can be adjusted by
  * using __lsan_printStatsWithWidth(size_t). The output stream defined by __lsan_printCout is used
  * for the printing.

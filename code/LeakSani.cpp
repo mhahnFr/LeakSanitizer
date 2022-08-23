@@ -51,8 +51,9 @@ void (*LSan::exit)(int) = _Exit;
 
 Stats * LSan::stats = nullptr;
 
-Stats & LSan::getStats()  { return *LSan::stats;            }
-bool LSan::ignoreMalloc() { return LSan::getIgnoreMalloc(); }
+Stats & LSan::getStats()     { return *LSan::stats;            }
+bool    LSan::hasStats()     { return LSan::stats != nullptr;  }
+bool    LSan::ignoreMalloc() { return LSan::getIgnoreMalloc(); }
 
 LSan & LSan::getInstance() {
     static LSan * instance = new LSan();

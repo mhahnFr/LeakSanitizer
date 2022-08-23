@@ -58,6 +58,7 @@ public:
     
     static auto getInstance()  -> LSan &;
     static auto getStats()     -> Stats &;
+    static auto hasStats()     -> bool;
     static auto ignoreMalloc() -> bool;
     
     static void setIgnoreMalloc(bool);
