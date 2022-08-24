@@ -29,6 +29,7 @@ std::string Formatter::get(Style style) {
         case Style::GREEN:      return "\033[32m";
         case Style::GREYED:     return "\033[2m";
         case Style::ITALIC:     return "\033[3m";
+        case Style::MAGENTA:    return "\033[95m";
         case Style::RED:        return "\033[31m";
         case Style::UNDERLINED: return "\033[4m";
         default:
@@ -42,7 +43,8 @@ std::string Formatter::clear(Style style) {
     }
     switch (style) {
         case Style::RED:
-        case Style::GREEN:      return "\033[39m";
+        case Style::GREEN:
+        case Style::MAGENTA:    return "\033[39m";
             
         case Style::BOLD:
         case Style::GREYED:     return "\033[22m";

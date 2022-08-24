@@ -24,7 +24,7 @@
 
 namespace Formatter {
     enum class Style {
-        GREEN, RED, ITALIC, UNDERLINED, GREYED, BOLD
+        GREEN, RED, MAGENTA, ITALIC, UNDERLINED, GREYED, BOLD
     };
     
     auto get(Style)   -> std::string;
