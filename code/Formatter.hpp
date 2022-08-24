@@ -22,7 +22,7 @@
 
 #include <string>
 
-struct Formatter {
+namespace Formatter {
     enum class Style {
         GREEN, RED, ITALIC, UNDERLINED, GREYED, BOLD
     };

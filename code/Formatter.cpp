@@ -18,8 +18,12 @@
  */
 
 #include "Formatter.hpp"
+#include "../include/lsan_internals.h"
 
 std::string Formatter::get(Style style) {
+    if (!__lsan_printFormatted) {
+        return "";
+    }
     switch (style) {
         case Style::BOLD:       return "\033[1m";
         case Style::GREEN:      return "\033[32m";
@@ -27,11 +31,15 @@ std::string Formatter::get(Style style) {
         case Style::ITALIC:     return "\033[3m";
         case Style::RED:        return "\033[31m";
         case Style::UNDERLINED: return "\033[4m";
+        default:
+            return "";
     }
-    return "";
 }
 
 std::string Formatter::clear(Style style) {
+    if (!__lsan_printFormatted) {
+        return "";
+    }
     switch (style) {
         case Style::RED:
         case Style::GREEN:      return "\033[39m";
@@ -42,8 +50,10 @@ std::string Formatter::clear(Style style) {
         case Style::ITALIC:     return "\033[23m";
             
         case Style::UNDERLINED: return "\033[24m";
+            
+        default:
+            return "";
     }
-    return "";
 }
 
 std::string Formatter::clearAll() {
