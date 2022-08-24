@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <iostream>
 #include "LeakSani.hpp"
+#include "Formatter.hpp"
 #include "signalHandlers.hpp"
 #include "bytePrinter.hpp"
 #include "../include/lsan_stats.h"
@@ -125,16 +126,13 @@ size_t LSan::getTotalAllocatedBytes() {
 }
 
 void LSan::__exit_hook() {
+    using Formatter::Style;
     setIgnoreMalloc(true);
-	if (__lsan_printCout) {
-        std::cout << std::endl
-                  << "\033[32mExiting\033[39m" << std::endl << std::endl
-                  << getInstance() << std::endl;
-	} else {
-		std::cerr << std::endl
-				  << "\033[32mExiting\033[39m" << std::endl << std::endl
-				  << getInstance() << std::endl;
-	}
+    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    out << std::endl
+        << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN)
+        << std::endl << std::endl
+        << getInstance() << std::endl;
     if (__lsan_printStatsOnExit) {
         __lsan_printStats();
     }
@@ -146,14 +144,15 @@ void internalCleanUp() {
 }
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
+    using Formatter::Style;
     std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
     if (!self.infos.empty()) {
-        stream << "\033[3m";
+        stream << Formatter::get(Style::ITALIC);
         stream << self.infos.size() << " leaks total, " << bytesToString(self.getTotalAllocatedBytes()) << " total" << std::endl << std::endl;
         for (const auto & leak : self.infos) {
             stream << leak << std::endl;
         }
-        stream << "\033[23m";
+        stream << Formatter::clear(Style::ITALIC);
     }
     return stream;
 }

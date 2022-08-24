@@ -23,6 +23,7 @@
 #include <cstring>
 #include "MallocInfo.hpp"
 #include "LeakSani.hpp"
+#include "Formatter.hpp"
 #include "bytePrinter.hpp"
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
@@ -79,11 +80,13 @@ void MallocInfo::generateDeletedCallstack() {
 }
 
 void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream & stream) {
+    using Formatter::Style;
     char ** strings = backtrace_symbols(callstack, size);
     for (int i = 0; i < size; ++i) {
         Dl_info info;
         if (dladdr(callstack[i], &info)) {
-            stream << (i == 0 ? "In: \033[23;1m" : "\033[22;3mat: \033[23m");
+            stream << (i == 0 ? ("In: " + Formatter::clear(Style::ITALIC) + Formatter::get(Style::ITALIC))
+                              : (Formatter::clear(Style::BOLD) + Formatter::get(Style::ITALIC) + "at: " + Formatter::clear(Style::ITALIC)));
             char * demangled;
             int status;
             if (info.dli_sname == nullptr) {
@@ -125,9 +128,14 @@ bool operator<(const MallocInfo & lhs, const MallocInfo & rhs) {
 }
 
 std::ostream & operator<<(std::ostream & stream, const MallocInfo & self) {
-    stream << "\033[1;3;31mLeak\033[22;39m of size \033[23m" << bytesToString(self.size) << "\033[3m, ";
+    using Formatter::Style;
+    stream << Formatter::get(Style::BOLD) << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED)
+           << "Leak" << Formatter::clear(Style::RED) << Formatter::clear(Style::BOLD)
+           << " of size " << Formatter::clear(Style::ITALIC)
+           << bytesToString(self.size) << Formatter::get(Style::ITALIC) << ", ";
     if (self.createdSet) {
-        stream << "allocated at \033[4m" << self.createdInFile << ":" << self.createdOnLine << "\033[24m";
+        stream << "allocated at " << Formatter::get(Style::UNDERLINED)
+               << self.createdInFile << ":" << self.createdOnLine << Formatter::clear(Style::UNDERLINED);
     } else {
         stream << "allocation stacktrace:";
     }
