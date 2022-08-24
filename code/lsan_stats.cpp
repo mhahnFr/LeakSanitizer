@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include "LeakSani.hpp"
+#include "Formatter.hpp"
 #include "bytePrinter.hpp"
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
@@ -60,14 +61,31 @@ void __lsan_printStats() {
 }
 
 void __lsan_printStatsWithWidth(size_t width) {
+    using Formatter::Style;
     bool ignore = LSan::ignoreMalloc();
     LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_statsAvailable()) {
-        out << "\033[3mStats of the memory usage so far:\033[23m" << std::endl
-            << "\033[0m" << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects.\033[23m" << std::endl << std::endl
-            << "\033[1m" << bytesToString(__lsan_getCurrentByteCount()) << "\033[22m currently used, peek " << bytesToString(__lsan_getBytePeek()) << "." << std::endl
-            << "\033[1m[\033[22;4;2m";
+        out << Formatter::get(Style::ITALIC)
+            << "Stats of the memory usage so far:"
+            << Formatter::clear(Style::ITALIC)
+            << std::endl;
+        
+        out << Formatter::clearAll()
+            << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects."
+            << Formatter::clear(Style::ITALIC)
+            << std::endl << std::endl;
+        
+        out << Formatter::get(Style::BOLD)
+            << bytesToString(__lsan_getCurrentByteCount())
+            << Formatter::clear(Style::BOLD)
+            << " currently used, peek " << bytesToString(__lsan_getBytePeek()) << "." << std::endl;
+        
+        out << Formatter::get(Style::BOLD)
+            << "["
+            << Formatter::clear(Style::BOLD)
+            << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
+        
         size_t i;
         for (i = 0; i < (static_cast<float>(__lsan_getCurrentByteCount()) / __lsan_getBytePeek()) * width; ++i) {
             out << '*';
@@ -75,18 +93,41 @@ void __lsan_printStatsWithWidth(size_t width) {
         for (; i < width; ++i) {
             out << ' ';
         }
-        out << "\033[22;24;1m]\033[22m of \033[1m" << bytesToString(__lsan_getBytePeek()) << "\033[22m peek" << std::endl << std::endl
-            << "\033[1m" << __lsan_getCurrentMallocCount() << " objects\033[22m currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl
-            << "\033[1m[\033[22;4;2m";
+        out << Formatter::clear(Style::BOLD) << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
+            << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
+            << " of "
+            << Formatter::get(Style::BOLD) << bytesToString(__lsan_getBytePeek()) << Formatter::clear(Style::BOLD)
+            << " peek" << std::endl << std::endl;
+        
+        out << Formatter::get(Style::BOLD)
+            << __lsan_getCurrentMallocCount() << " objects"
+            << Formatter::clear(Style::BOLD)
+            << " currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl;
+    
+        out << Formatter::get(Style::BOLD)
+            << "["
+            << Formatter::clear(Style::BOLD)
+            << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::GREYED);
+        
         for (i = 0; i < (static_cast<float>(__lsan_getCurrentMallocCount()) / __lsan_getMallocPeek()) * width; ++i) {
             out << '*';
         }
         for (; i < width; ++i) {
             out << ' ';
         }
-        out << "\033[22;24;1m]\033[22m of \033[1m" << __lsan_getMallocPeek() << " objects\033[22m peek" << std::endl << std::endl;
+        out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
+            << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
+            << " of "
+            << Formatter::get(Style::BOLD)
+            << __lsan_getMallocPeek() << " objects"
+            << Formatter::clear(Style::BOLD)
+            << " peek" << std::endl << std::endl;
+        
     } else {
-        out << "\033[31;3mNo memory statistics available at the moment!\033[23;39m" << std::endl;
+        out << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED)
+            << "No memory statistics available at the moment!"
+            << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::RED)
+            << std::endl;
     }
     if (!ignore) {
         LSan::setIgnoreMalloc(false);
