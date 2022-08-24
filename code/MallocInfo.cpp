@@ -85,7 +85,7 @@ void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream
     for (int i = 0; i < size; ++i) {
         Dl_info info;
         if (dladdr(callstack[i], &info)) {
-            stream << (i == 0 ? ("In: " + Formatter::clear(Style::ITALIC) + Formatter::get(Style::ITALIC))
+            stream << (i == 0 ? ("In: " + Formatter::clear(Style::ITALIC) + Formatter::get(Style::BOLD))
                               : (Formatter::clear(Style::BOLD) + Formatter::get(Style::ITALIC) + "at: " + Formatter::clear(Style::ITALIC)));
             char * demangled;
             int status;
