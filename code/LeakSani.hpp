@@ -62,6 +62,8 @@ public:
     static auto ignoreMalloc() -> bool;
     
     static void setIgnoreMalloc(bool);
+    static void printInformations();
+    static void printLicense();
     static void __exit_hook();
 
     friend void           internalCleanUp();

@@ -120,6 +120,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
     if (__lsan_printStatsOnExit) {
         __lsan_printStats();
     }
+    LSan::printInformations();
     auto quit = LSan::exit;
     internalCleanUp();
     quit(code);

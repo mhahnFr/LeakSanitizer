@@ -136,11 +136,37 @@ void LSan::__exit_hook() {
     if (__lsan_printStatsOnExit) {
         __lsan_printStats();
     }
+    printInformations();
     internalCleanUp();
 }
 
 void internalCleanUp() {
     delete &LSan::getInstance();
+}
+
+void LSan::printInformations(){
+    using Formatter::Style;
+    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    out << "Report by " << Formatter::get(Style::BOLD) << "LeakSanitizer " << Formatter::clear(Style::BOLD)
+        << Formatter::get(Style::ITALIC) << VERSION << Formatter::clear(Style::ITALIC)
+        << std::endl << std::endl;
+    if (__lsan_printLicense) {
+        printLicense();
+    }
+}
+
+void LSan::printLicense() {
+    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    out << "Copyright (C) 2022 mhahnFr and contributors" << std::endl
+        << std::endl
+        << "This library is free software: you can redistribute it and/or modify it under"    << std::endl
+        << "the terms of the GNU General Public License as published by the"                  << std::endl
+        << "Free Software Foundation, either version 3 of the License, or (at your option)"   << std::endl
+        << "any later version."                                                               << std::endl
+        << std::endl
+        << "You should have received a copy of the GNU General Public License along with"     << std::endl
+        << "this library, see the file LICENSE. If not, see <https://www.gnu.org/licenses/>." << std::endl
+        << std::endl;
 }
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {

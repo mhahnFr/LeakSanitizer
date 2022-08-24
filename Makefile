@@ -39,6 +39,11 @@ else ifeq ($(shell uname -s), Darwin)
 	NAME = $(LIB_NAME)
 endif
 
+VERSION = "clean build"
+ifneq ($(shell git tag | tail -n 1),)
+	VERSION = $(shell git tag | tail -n 1)
+endif
+
 default: $(NAME)
 
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
@@ -53,7 +58,7 @@ $(LIB_NAME): $(OBJS)
 	$(AR) -crs $(LIB_NAME) $(OBJS)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -MMD -MP -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 clean:
 	- $(RM) $(OBJS) $(DEPS)

@@ -22,6 +22,7 @@
 bool __lsan_humanPrint     = true;
 bool __lsan_printCout      = false;
 bool __lsan_printFormatted = true;
+bool __lsan_printLicense   = true;
 
 bool __lsan_invalidCrash   = true;
 bool __lsan_invalidFree    = false;

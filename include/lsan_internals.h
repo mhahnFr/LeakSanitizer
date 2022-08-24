@@ -33,7 +33,7 @@ extern "C" {
 extern bool __lsan_humanPrint;
 
 /**
- * If this value is set to true, normal messages are printed to the stamdard output stream.
+ * If this value is set to true, normal messages are printed to the standard output stream.
  * Otherwise the standard error stream is also used for normal messages.
  * Defaults to true.
  */
@@ -45,6 +45,13 @@ extern bool __lsan_printCout;
  * Defaults to true.
  */
 extern bool __lsan_printFormatted;
+
+/**
+ * If this value is set to true, the license informations are printed upon normal termination of the
+ * program.
+ * Defaults to true.
+ */
+extern bool __lsan_printLicense;
 
 /**
  * If this value is set to true, the program is terminated when doing something invalid regarding
@@ -71,6 +78,10 @@ extern bool __lsan_freeNull;
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
+
+#ifndef VERSION
+# define VERSION "clean build"
 #endif
 
 #endif /* lsan_internals_hpp */
