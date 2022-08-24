@@ -19,6 +19,7 @@
 
 #include "crash.hpp"
 #include "MallocInfo.hpp"
+#include "Formatter.hpp"
 #include <iostream>
 
 [[ noreturn ]] static void crashShared(int omitCaller = 2) {
@@ -31,11 +32,19 @@
 }
 
 [[ noreturn ]] void crash(const std::string & reason, const char * file, int line, int omitCaller) {
-    std::cerr << "\033[1;31m" << reason << "\033[39m, at \033[4m" << file << ":" << line << "\033[24;22m";
+    using Formatter::Style;
+    std::cerr << Formatter::get(Style::BOLD)
+              << Formatter::get(Style::RED) << reason << Formatter::clear(Style::RED)
+              << ", at "
+              << Formatter::get(Style::UNDERLINED) << file << ":" << line
+              << Formatter::clear(Style::UNDERLINED) << Formatter::clear(Style::BOLD);
     crashShared(omitCaller);
 }
 
 [[ noreturn ]] void crash(const std::string & reason, int omitCaller) {
-    std::cerr << "\033[1;31m" << reason << "!\033[39;22m";
+    using Formatter::Style;
+    std::cerr << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
+              << reason << "!"
+              << Formatter::clear(Style::BOLD) << Formatter::clear(Style::RED);
     crashShared(omitCaller);
 }

@@ -21,6 +21,7 @@
 #include "crash.hpp"
 #include "warn.hpp"
 #include "LeakSani.hpp"
+#include "Formatter.hpp"
 #include "../include/lsan_stats.h"
 #include "../include/lsan_internals.h"
 #include <cstdio>
@@ -108,16 +109,14 @@ void __wrap_free(void * pointer, const char * file, int line) {
 }
 
 [[ noreturn ]] void __wrap_exit(int code, const char * file, int line) {
+    using Formatter::Style;
     LSan::setIgnoreMalloc(true);
-	if (__lsan_printCout) {
-        std::cout << std::endl
-                  << "\033[32mExiting\033[39m at \033[4m" << file << ":" << line << "\033[24m" << std::endl << std::endl
-                  << LSan::getInstance() << std::endl;
-	} else {
-		std::cerr << std::endl
-				  << "\033[32mExiting\033[39m at \033[4m" << file << ":" << line << "\033[24m" << std::endl << std::endl
-				  << LSan::getInstance() << std::endl;
-	}
+    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    out << std::endl
+        << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN) << " at "
+        << Formatter::get(Style::UNDERLINED) << file << ":" << line << Formatter::clear(Style::UNDERLINED)
+        << std::endl << std::endl
+        << LSan::getInstance() << std::endl;
     if (__lsan_printStatsOnExit) {
         __lsan_printStats();
     }

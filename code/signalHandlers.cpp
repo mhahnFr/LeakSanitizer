@@ -22,6 +22,7 @@
 #include "crash.hpp"
 #include "LeakSani.hpp"
 #include "MallocInfo.hpp"
+#include "Formatter.hpp"
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 
@@ -49,14 +50,22 @@ static std::string signalString(int signal) {
     s << info->si_addr;
     std::string address = s.str();
 #endif
-    crash("\033[31;1m" + signalString(signal) + "\033[39;22m on address \033[1m" + address + "\033[22m", 4);
+    using Formatter::Style;
+    crash(Formatter::get(Style::BOLD) + Formatter::get(Style::RED)
+          + signalString(signal)
+          + Formatter::clear(Style::RED) + Formatter::clear(Style::BOLD)
+          + " on address " + Formatter::get(Style::BOLD) + address + Formatter::clear(Style::BOLD), 4);
 }
 
 void callstackSignal(int) {
+    using Formatter::Style;
     bool ignore = LSan::ignoreMalloc();
     LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << "\033[3mThe current callstack:\033[23m" << std::endl;
+    out << Formatter::get(Style::ITALIC)
+        << "The current callstack:"
+        << Formatter::clear(Style::ITALIC) << std::endl;
+    
     void * callstack[128];
     int frames = MallocInfo::createCallstack(callstack, 128);
     MallocInfo::printCallstack(callstack, frames, out);

@@ -21,6 +21,7 @@
 #include "warn.hpp"
 #include "MallocInfo.hpp"
 #include "LeakSani.hpp"
+#include "Formatter.hpp"
 
 static void warnShared(int omitCaller = 2) {
     std::cerr << std::endl;
@@ -31,11 +32,18 @@ static void warnShared(int omitCaller = 2) {
 }
 
 void warn(const std::string & message, const char * file, int line, int omitCaller) {
-    std::cerr << "\033[1;95mWarning: " << message << "\033[39m, at \033[4m" << file << ":" << line << "\033[24;22m";
+    using Formatter::Style;
+    std::cerr << Formatter::get(Style::BOLD) << Formatter::get(Style::MAGENTA)
+              << "Warning: " << message << Formatter::clear(Style::MAGENTA) << ", at "
+              << Formatter::get(Style::UNDERLINED) << file << ":" << line
+              << Formatter::clear(Style::BOLD) << Formatter::clear(Style::UNDERLINED);
     warnShared(omitCaller);
 }
 
 void warn(const std::string & message, int omitCaller) {
-    std::cerr << "\033[1;95mWarning: " << message << "!\033[39;22m";
+    using Formatter::Style;
+    std::cerr << Formatter::get(Style::BOLD) << Formatter::get(Style::MAGENTA)
+              << "Warning: " << message << "!"
+              << Formatter::clear(Style::BOLD) << Formatter::clear(Style::MAGENTA);
     warnShared(omitCaller);
 }
