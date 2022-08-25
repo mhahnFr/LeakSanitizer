@@ -29,7 +29,7 @@ HDR = $(shell find . -name \*.h)
 OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
-LDFLAGS = 
+LDFLAGS = -ldl
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC
 
 NAME = $(SHARED_L)
@@ -49,10 +49,10 @@ default: $(NAME)
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
 $(SHARED_L): $(OBJS)
-	$(CXX) -shared -fPIC -o $(SHARED_L) $(OBJS)
+	$(CXX) -shared -fPIC -o $(LDFLAGS) $(SHARED_L) $(OBJS)
 
 $(DYLIB_NA): $(OBJS)
-	$(CXX) -dynamiclib -o $(DYLIB_NA) $(OBJS)
+	$(CXX) -dynamiclib -o $(LDFLAGS) $(DYLIB_NA) $(OBJS)
 
 $(LIB_NAME): $(OBJS)
 	$(AR) -crs $(LIB_NAME) $(OBJS)
