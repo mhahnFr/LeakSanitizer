@@ -88,10 +88,10 @@ void __lsan_printStatsWithWidth(size_t width) {
         
         size_t i;
         for (i = 0; i < (static_cast<float>(__lsan_getCurrentByteCount()) / __lsan_getBytePeek()) * width; ++i) {
-            out << '*';
+            out << (__lsan_printFormatted ? '*' : '=');
         }
         for (; i < width; ++i) {
-            out << ' ';
+            out << (__lsan_printFormatted ? ' ' : '.');
         }
         out << Formatter::clear(Style::BOLD) << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
             << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
@@ -110,10 +110,10 @@ void __lsan_printStatsWithWidth(size_t width) {
             << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::GREYED);
         
         for (i = 0; i < (static_cast<float>(__lsan_getCurrentMallocCount()) / __lsan_getMallocPeek()) * width; ++i) {
-            out << '*';
+            out << (__lsan_printFormatted ? '*' : '=');
         }
         for (; i < width; ++i) {
-            out << ' ';
+            out << (__lsan_printFormatted ? ' ' : '.');
         }
         out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
             << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
