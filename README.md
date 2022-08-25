@@ -15,7 +15,7 @@ In order to use this library, compile your code using the following flags: ``-Wn
 
 **Linking**:
 - On ``macOS``, link using these flags: ``-L<path/to/library> -llsan -lc++``.
-- On ``Linux``, link with ``-rdynamic -L<path/to/library> -llsan -lstdc++``.
+- On ``Linux``, link with ``-rdynamic -L<path/to/library> -llsan -ldl -lstdc++``.
 
 Once the library is correctly linked with your code, it will show your memory leaks at exit.  
 More features are described in the [wiki](https://www.github.com/mhahnFr/LeakSanitizer/wiki).
