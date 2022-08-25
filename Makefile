@@ -49,10 +49,10 @@ default: $(NAME)
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
 $(SHARED_L): $(OBJS)
-	$(CXX) -shared -fPIC -o $(LDFLAGS) $(SHARED_L) $(OBJS)
+	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS)
 
 $(DYLIB_NA): $(OBJS)
-	$(CXX) -dynamiclib -o $(LDFLAGS) $(DYLIB_NA) $(OBJS)
+	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
 
 $(LIB_NAME): $(OBJS)
 	$(AR) -crs $(LIB_NAME) $(OBJS)
