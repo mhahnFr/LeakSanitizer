@@ -44,7 +44,7 @@ public:
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
     
-    void addMalloc(const MallocInfo &&);
+    void addMalloc(MallocInfo &&);
     void changeMalloc(const MallocInfo &);
     bool removeMalloc(const MallocInfo &);
     

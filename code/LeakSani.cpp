@@ -81,7 +81,7 @@ LSan::LSan() {
     stats = &realStats;
 }
 
-void LSan::addMalloc(const MallocInfo && mInfo) {
+void LSan::addMalloc(MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     realStats += mInfo;
     infos.emplace(mInfo);
