@@ -60,6 +60,28 @@ void __lsan_printStats() {
     __lsan_printStatsWithWidth(100);
 }
 
+static inline void __lsan_printBar(size_t current, size_t peek, size_t width, const std::string & peekText, std::ostream & out) {
+    using Formatter::Style;
+    out << Formatter::get(Style::BOLD)
+        << "["
+        << Formatter::clear(Style::BOLD)
+        << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
+    
+    size_t i;
+    for (i = 0; i < (static_cast<float>(current) / peek) * width; ++i) {
+        out << (__lsan_printFormatted ? '*' : '=');
+    }
+    for (; i < width; ++i) {
+        out << (__lsan_printFormatted ? ' ' : '.');
+    }
+    out << Formatter::clear(Style::BOLD) << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
+        << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
+        << " of "
+        << Formatter::get(Style::BOLD) << peekText << Formatter::clear(Style::BOLD)
+        << " peek" << std::endl << std::endl;
+
+}
+
 void __lsan_printStatsWithWidth(size_t width) {
     using Formatter::Style;
     bool ignore = LSan::ignoreMalloc();
@@ -80,49 +102,13 @@ void __lsan_printStatsWithWidth(size_t width) {
             << bytesToString(__lsan_getCurrentByteCount())
             << Formatter::clear(Style::BOLD)
             << " currently used, peek " << bytesToString(__lsan_getBytePeek()) << "." << std::endl;
-        
-        out << Formatter::get(Style::BOLD)
-            << "["
-            << Formatter::clear(Style::BOLD)
-            << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
-        
-        size_t i;
-        for (i = 0; i < (static_cast<float>(__lsan_getCurrentByteCount()) / __lsan_getBytePeek()) * width; ++i) {
-            out << (__lsan_printFormatted ? '*' : '=');
-        }
-        for (; i < width; ++i) {
-            out << (__lsan_printFormatted ? ' ' : '.');
-        }
-        out << Formatter::clear(Style::BOLD) << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
-            << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
-            << " of "
-            << Formatter::get(Style::BOLD) << bytesToString(__lsan_getBytePeek()) << Formatter::clear(Style::BOLD)
-            << " peek" << std::endl << std::endl;
+        __lsan_printBar(__lsan_getCurrentByteCount(), __lsan_getBytePeek(), width, bytesToString(__lsan_getBytePeek()), out);
         
         out << Formatter::get(Style::BOLD)
             << __lsan_getCurrentMallocCount() << " objects"
             << Formatter::clear(Style::BOLD)
             << " currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl;
-    
-        out << Formatter::get(Style::BOLD)
-            << "["
-            << Formatter::clear(Style::BOLD)
-            << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::GREYED);
-        
-        for (i = 0; i < (static_cast<float>(__lsan_getCurrentMallocCount()) / __lsan_getMallocPeek()) * width; ++i) {
-            out << (__lsan_printFormatted ? '*' : '=');
-        }
-        for (; i < width; ++i) {
-            out << (__lsan_printFormatted ? ' ' : '.');
-        }
-        out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
-            << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
-            << " of "
-            << Formatter::get(Style::BOLD)
-            << __lsan_getMallocPeek() << " objects"
-            << Formatter::clear(Style::BOLD)
-            << " peek" << std::endl << std::endl;
-        
+         __lsan_printBar(__lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), width, std::to_string(__lsan_getMallocPeek()) + " objects", out);        
     } else {
         out << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED)
             << "No memory statistics available at the moment!"
