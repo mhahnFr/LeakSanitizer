@@ -52,7 +52,7 @@
 		BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeakSani.cpp; sourceTree = "<group>"; };
 		BF72C3CB2885CB9E00C7AE5C /* leaksan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = leaksan.h; sourceTree = "<group>"; };
 		BF72C3CC2885CB9E00C7AE5C /* stdlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdlib.h; sourceTree = "<group>"; };
-		BF97EB5628831E5B00DAF1FE /* libLeakSanitizer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLeakSanitizer.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF97EB5628831E5B00DAF1FE /* liblsan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblsan.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFAFADC428B4FDA40060076C /* Formatter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Formatter.cpp; path = code/Formatter.cpp; sourceTree = SOURCE_ROOT; };
 		BFAFADC528B4FDA40060076C /* Formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Formatter.hpp; path = code/Formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
@@ -100,7 +100,7 @@
 		BF97EB5728831E5B00DAF1FE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BF97EB5628831E5B00DAF1FE /* libLeakSanitizer.a */,
+				BF97EB5628831E5B00DAF1FE /* liblsan.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -171,7 +171,7 @@
 			);
 			name = LeakSanitizer;
 			productName = LeakSanitizer;
-			productReference = BF97EB5628831E5B00DAF1FE /* libLeakSanitizer.a */;
+			productReference = BF97EB5628831E5B00DAF1FE /* liblsan.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -344,7 +344,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = F9JP96DAHT;
 				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -356,7 +356,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = F9JP96DAHT;
 				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_OPTIMIZATION_LEVEL = 1;
+				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
