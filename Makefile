@@ -30,7 +30,7 @@ OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
 LDFLAGS = -ldl
-CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC
+CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -O1
 
 NAME = $(SHARED_L)
 ifeq ($(shell uname -s), Linux)
