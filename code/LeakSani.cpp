@@ -84,34 +84,34 @@ LSan::LSan() {
 void LSan::addMalloc(MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     realStats += mInfo;
-    infos.emplace(mInfo);
+    infos.emplace(std::make_pair(mInfo.getPointer(), mInfo));
 }
 
 void LSan::changeMalloc(const MallocInfo & mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    auto it = infos.find(mInfo);
+    auto it = infos.find(mInfo.getPointer());
     if (it == infos.end()) {
         realStats += mInfo;
     } else {
-        if (it->getPointer() != mInfo.getPointer()) {
-            realStats -= *it;
+        if (it->second.getPointer() != mInfo.getPointer()) {
+            realStats -= it->second;
             realStats += mInfo;
         } else {
-            realStats.replaceMalloc(it->getSize(), mInfo.getSize());
+            realStats.replaceMalloc(it->second.getSize(), mInfo.getSize());
         }
         // TODO: Don't replace it everytime!
         infos.erase(it);
-        infos.emplace(mInfo);
+        infos.emplace(std::make_pair(mInfo.getPointer(), mInfo));
     }
 }
 
 bool LSan::removeMalloc(const MallocInfo & mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    auto it = infos.find(mInfo);
+    auto it = infos.find(mInfo.getPointer());
     if (it == infos.end()) {
         return false;
     }
-    realStats -= *it;
+    realStats -= it->second;
     infos.erase(it);
     return true;
 }
@@ -120,7 +120,7 @@ size_t LSan::getTotalAllocatedBytes() {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     size_t ret = 0;
     std::for_each(infos.cbegin(), infos.cend(), [&ret] (auto & elem) {
-        ret += elem.getSize();
+        ret += elem.second.getSize();
     });
     return ret;
 }
@@ -176,7 +176,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         stream << Formatter::get(Style::ITALIC);
         stream << self.infos.size() << " leaks total, " << bytesToString(self.getTotalAllocatedBytes()) << " total" << std::endl << std::endl;
         for (const auto & leak : self.infos) {
-            stream << leak << std::endl;
+            stream << leak.second << std::endl;
         }
         stream << Formatter::clear(Style::ITALIC);
     }

@@ -20,7 +20,7 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
-#include <set>
+#include <map>
 #include <ostream>
 #include <mutex>
 #include "MallocInfo.hpp"
@@ -31,7 +31,7 @@ class LSan {
     
     static bool & getIgnoreMalloc();
     
-    std::set<MallocInfo> infos;
+    std::map<const void * const, MallocInfo> infos;
     std::recursive_mutex infoMutex;
     Stats                realStats;
     
