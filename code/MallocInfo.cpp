@@ -27,7 +27,7 @@
 #include "bytePrinter.hpp"
 
 MallocInfo::MallocInfo(const void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
-    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(), createdCallstackFrames(), deletedOnLine(), deletedCallstack(), deletedCallstackFrames() {
+    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(), createdCallstackFrames(), deletedOnLine(0), deleted(false), deletedCallstack(), deletedCallstackFrames(0) {
     createdCallstackFrames = createCallstack(createdCallstack, CALLSTACK_SIZE, omitCount);
 }
 
@@ -73,6 +73,14 @@ void MallocInfo::setDeletedInFile(const std::string & file) {
 
 void MallocInfo::setDeletedOnLine(int line) {
     deletedOnLine = line;
+}
+
+void MallocInfo::setDeleted(bool del) {
+    deleted = del;
+}
+
+bool MallocInfo::isDeleted() const {
+    return deleted;
 }
 
 void MallocInfo::generateDeletedCallstack() {

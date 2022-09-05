@@ -43,6 +43,7 @@ class MallocInfo {
 
     std::string       deletedInFile;
     int               deletedOnLine;
+    bool              deleted;
     void *            deletedCallstack[CALLSTACK_SIZE];
     int               deletedCallstackFrames;
         
@@ -59,8 +60,12 @@ public:
     auto getDeletedInFile()  const -> const std::string &;
     
     void setDeletedOnLine(int);
-    void generateDeletedCallstack();
     auto getDeletedOnLine()  const -> int;
+    
+    auto isDeleted()         const -> bool;
+    void setDeleted(bool);
+    
+    void generateDeletedCallstack();
     
     void printCreatedCallstack(std::ostream &) const;
     void printDeletedCallstack(std::ostream &) const;
