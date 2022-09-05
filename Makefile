@@ -32,6 +32,11 @@ DEPS = $(patsubst %.cpp, %.d, $(SRC))
 LDFLAGS = -ldl
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -O0
 
+NO_LICENSE = true
+ifeq ($(NO_LICENSE),true)
+	CXXFLAGS += -DNO_LICENSE
+endif
+
 NAME = $(SHARED_L)
 ifeq ($(shell uname -s), Linux)
 	NAME = $(LIB_NAME)
