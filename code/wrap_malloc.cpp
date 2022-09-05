@@ -33,6 +33,16 @@ bool __lsan_glibc = true;
 bool __lsan_glibc = false;
 #endif
 
+#ifdef CPP_TRACK
+void * operator new(size_t size) {
+    return malloc(size);
+}
+
+void operator delete(void * a) noexcept {
+    free(a);
+}
+#endif
+
 void * __wrap_malloc(size_t size, const char * file, int line) {
     void * ret = LSan::malloc(size);
     if (ret != nullptr && !LSan::ignoreMalloc()) {

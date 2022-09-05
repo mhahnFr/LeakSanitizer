@@ -37,6 +37,11 @@ ifeq ($(NO_LICENSE),true)
 	CXXFLAGS += -DNO_LICENSE
 endif
 
+CPP_TRACK = false
+ifeq ($(CPP_TRACK),true)
+	CXXFLAGS += -DCPP_TRACK
+endif
+
 NAME = $(SHARED_L)
 ifeq ($(shell uname -s), Linux)
 	NAME = $(LIB_NAME)
