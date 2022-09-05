@@ -81,9 +81,14 @@ LSan::LSan() {
     stats = &realStats;
 }
 
+extern void warn(const std::string & message, int);
 void LSan::addMalloc(MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     realStats += mInfo;
+    if (infos.find(mInfo.getPointer()) != infos.end()) {
+        warn("HERE", 5);
+    }
+    //infos.insert_or_assign(mInfo.getPointer(), mInfo);
     infos.emplace(std::make_pair(mInfo.getPointer(), mInfo));
 }
 
@@ -100,7 +105,11 @@ void LSan::changeMalloc(const MallocInfo & mInfo) {
             realStats.replaceMalloc(it->second.getSize(), mInfo.getSize());
         }
         // TODO: Don't replace it everytime!
-        infos.erase(it);
+        if (__lsan_trackMemory) {
+            it->second.setDeleted(true);
+        } else {
+            infos.erase(it);
+        }
         infos.emplace(std::make_pair(mInfo.getPointer(), mInfo));
     }
 }
@@ -112,7 +121,11 @@ bool LSan::removeMalloc(const MallocInfo & mInfo) {
         return false;
     }
     realStats -= it->second;
-    infos.erase(it);
+    if (__lsan_trackMemory) {
+        it->second.setDeleted(true);
+    } else {
+        infos.erase(it);
+    }
     return true;
 }
 
@@ -176,7 +189,9 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         stream << Formatter::get(Style::ITALIC);
         stream << self.infos.size() << " leaks total, " << bytesToString(self.getTotalAllocatedBytes()) << " total" << std::endl << std::endl;
         for (const auto & leak : self.infos) {
-            stream << leak.second << std::endl;
+            if (!leak.second.isDeleted()) {
+                stream << leak.second << std::endl;
+            }
         }
         stream << Formatter::clear(Style::ITALIC);
     }
