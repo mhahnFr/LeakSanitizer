@@ -37,3 +37,5 @@ bool __lsan_freeNull       = false;
 #else
 bool __lsan_freeNull       = true;
 #endif
+
+bool __lsan_trackMemory    = true;

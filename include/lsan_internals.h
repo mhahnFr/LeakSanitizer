@@ -76,6 +76,8 @@ extern bool __lsan_invalidFree;
  */
 extern bool __lsan_freeNull;
 
+extern bool __lsan_trackMemory;
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
