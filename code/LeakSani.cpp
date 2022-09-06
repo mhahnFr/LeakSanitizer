@@ -85,11 +85,8 @@ extern void warn(const std::string & message, int);
 void LSan::addMalloc(MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     realStats += mInfo;
-    if (infos.find(mInfo.getPointer()) != infos.end()) {
-        warn("HERE", 5);
-    }
-    //infos.insert_or_assign(mInfo.getPointer(), mInfo);
-    infos.emplace(std::make_pair(mInfo.getPointer(), mInfo));
+    // TODO: Only replace if the new block is bigger than the potential old one.
+    infos.insert_or_assign(mInfo.getPointer(), mInfo);
 }
 
 void LSan::changeMalloc(const MallocInfo & mInfo) {
@@ -135,6 +132,24 @@ size_t LSan::getTotalAllocatedBytes() {
     std::for_each(infos.cbegin(), infos.cend(), [&ret] (auto & elem) {
         ret += elem.second.getSize();
     });
+    return ret;
+}
+
+size_t LSan::getLeakCount() {
+    std::lock_guard<std::recursive_mutex> lock(infoMutex);
+    return std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
+        return !elem.second.isDeleted();
+    });
+}
+
+size_t LSan::getTotalLeakedBytes() {
+    std::lock_guard<std::recursive_mutex> lock(infoMutex);
+    size_t ret = 0;
+    for (const auto & elem : infos) {
+        if (!elem.second.isDeleted()) {
+            ret += elem.second.getSize();
+        }
+    }
     return ret;
 }
 
@@ -187,7 +202,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
     if (!self.infos.empty()) {
         stream << Formatter::get(Style::ITALIC);
-        stream << self.infos.size() << " leaks total, " << bytesToString(self.getTotalAllocatedBytes()) << " total" << std::endl << std::endl;
+        stream << self.getLeakCount() << " leaks total, " << bytesToString(self.getTotalLeakedBytes()) << " total" << std::endl << std::endl;
         for (const auto & leak : self.infos) {
             if (!leak.second.isDeleted()) {
                 stream << leak.second << std::endl;

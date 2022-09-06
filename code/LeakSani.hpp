@@ -49,6 +49,8 @@ public:
     bool removeMalloc(const MallocInfo &);
     
     size_t getTotalAllocatedBytes();
+    size_t getTotalLeakedBytes();
+    size_t getLeakCount();
     
     static void * (*malloc) (size_t);
     static void * (*calloc) (size_t, size_t);
