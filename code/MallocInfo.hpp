@@ -30,26 +30,26 @@ using namespace std::rel_ops;
 class MallocInfo {
     constexpr static int CALLSTACK_SIZE = 128;
     
-    MallocInfo(const void * const, size_t, const std::string &, int, int, bool);
+    MallocInfo(void * const, size_t, const std::string &, int, int, bool);
     
-    const void * const pointer;
-    const size_t       size;
+    void *      pointer;
+    size_t      size;
     
-    const std::string createdInFile;
-    const int         createdOnLine;
-    const bool        createdSet;
-    void *            createdCallstack[CALLSTACK_SIZE];
-    int               createdCallstackFrames;
+    std::string createdInFile;
+    int         createdOnLine;
+    bool        createdSet;
+    void *      createdCallstack[CALLSTACK_SIZE];
+    int         createdCallstackFrames;
 
-    std::string       deletedInFile;
-    int               deletedOnLine;
-    bool              deleted;
-    void *            deletedCallstack[CALLSTACK_SIZE];
-    int               deletedCallstackFrames;
+    std::string deletedInFile;
+    int         deletedOnLine;
+    bool        deleted;
+    void *      deletedCallstack[CALLSTACK_SIZE];
+    int         deletedCallstackFrames;
         
 public:
-    MallocInfo(const void * const, size_t, int = 4);
-    MallocInfo(const void * const, size_t, const std::string &, int, int = 4);
+    MallocInfo(void * const, size_t, int = 4);
+    MallocInfo(void * const, size_t, const std::string &, int, int = 4);
     
     auto getPointer()        const -> const void *;
     auto getCreatedInFile()  const -> const std::string &;
