@@ -81,12 +81,12 @@ LSan::LSan() {
     stats = &realStats;
 }
 
-extern void warn(const std::string & message, int);
 void LSan::addMalloc(MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     realStats += mInfo;
     // TODO: Only replace if the new block is bigger than the potential old one.
     infos.insert_or_assign(mInfo.getPointer(), mInfo);
+    __lsan_printFragmentationStats();
 }
 
 void LSan::changeMalloc(const MallocInfo & mInfo) {
@@ -159,6 +159,10 @@ size_t LSan::getTotalLeakedBytes() {
         }
     }
     return ret;
+}
+
+std::map<const void * const, MallocInfo> LSan::getInfos() const {
+    return infos;
 }
 
 void LSan::__exit_hook() {

@@ -111,11 +111,54 @@ void __lsan_printFragmentationStats() {
     __lsan_printFragmentationStatsWidth(100);
 }
 
+#include <cmath>
+static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream & out) {
+    using Formatter::Style;
+    out << Formatter::get(Style::BOLD)
+        << "["
+        << Formatter::clear(Style::BOLD)
+        << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
+    
+    const float step = LSan::getInstance().getInfos().size() / (float) width;
+    size_t tmp = 0;
+    size_t f   = 0;
+    for (const auto & elem : LSan::getInstance().getInfos()) {
+        if (elem.second.isDeleted()) {
+            ++f;
+        }
+        if (++tmp == roundf(step)) {
+            out << ((f >= step / 2.0f) ?
+                    (__lsan_printFormatted ? ' ' : '.')
+                    : (__lsan_printFormatted ? '*' : '='));
+            tmp = 0;
+            f = 0;
+        }
+    }
+/*    auto it = LSan::getInstance().getInfos().cbegin();
+    const auto e  = LSan::getInstance().getInfos().cend();
+    for (size_t i = 0; i < width; ++i) {
+        size_t f = 0;
+        for (size_t j = 0; it != e && j < step; ++j) {
+            if (it->second.isDeleted()) {
+                ++f;
+            }
+            ++it;
+        }
+        out << ((f >= step / 2) ? ' ' : '*');
+    }*/
+    out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
+        << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
+        << " of "
+        << Formatter::get(Style::BOLD) << __lsan_getMallocPeek() << " objects"
+        << Formatter::clear(Style::BOLD) << " peek" << std::endl << std::endl;
+}
+
 void __lsan_printFragmentationStatsWidth(size_t width) {
     using Formatter::Style;
     bool ignore = LSan::ignoreMalloc();
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_fragmentationStatsAvailable()) {
+        __lsan_printStatsCore(width, out, __lsan_printFragmentationObjectBar, __lsan_printFragmentationObjectBar);
         // TODO: Implement
     } else {
         out << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
