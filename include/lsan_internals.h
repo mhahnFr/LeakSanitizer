@@ -76,6 +76,11 @@ extern bool __lsan_invalidFree;
  */
 extern bool __lsan_freeNull;
 
+/**
+ * If this value is set o true, the memory fragmentation can be analyzed. Should be set at the very
+ * beginning of the program.
+ * Defaults to false.
+ */
 extern bool __lsan_trackMemory;
 
 #ifdef __cplusplus
