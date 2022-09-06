@@ -56,8 +56,8 @@ bool __lsan_statsAvailable() {
     return LSan::hasStats();
 }
 
-void __lsan_printStats() {
-    __lsan_printStatsWithWidth(100);
+bool __lsan_fragmentationStatsAvailable() {
+    return __lsan_trackMemory;
 }
 
 static inline void __lsan_printBar(size_t current, size_t peek, size_t width, const std::string & peekText, std::ostream & out) {
@@ -82,33 +82,71 @@ static inline void __lsan_printBar(size_t current, size_t peek, size_t width, co
 
 }
 
+static inline void __lsan_printStatsCore(size_t width, std::ostream & out, std::function<void (size_t, std::ostream &)> printBarBytes, std::function<void (size_t, std::ostream &)> printBarObjects) {
+    using Formatter::Style;
+    out << Formatter::get(Style::ITALIC)
+        << "Stats of the memory usage so far:"
+        << Formatter::clear(Style::ITALIC)
+        << std::endl;
+    
+    out << Formatter::clearAll()
+        << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects."
+        << Formatter::clear(Style::ITALIC)
+        << std::endl << std::endl;
+    
+    out << Formatter::get(Style::BOLD)
+        << bytesToString(__lsan_getCurrentByteCount())
+        << Formatter::clear(Style::BOLD)
+        << " currently used, peek " << bytesToString(__lsan_getBytePeek()) << "." << std::endl;
+    printBarBytes(width, out);
+    
+    out << Formatter::get(Style::BOLD)
+        << __lsan_getCurrentMallocCount() << " objects"
+        << Formatter::clear(Style::BOLD)
+        << " currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl;
+     printBarObjects(width, out);
+}
+
+void __lsan_printFragmentationStats() {
+    __lsan_printFragmentationStatsWidth(100);
+}
+
+void __lsan_printFragmentationStatsWidth(size_t width) {
+    using Formatter::Style;
+    bool ignore = LSan::ignoreMalloc();
+    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    if (__lsan_fragmentationStatsAvailable()) {
+        // TODO: Implement
+    } else {
+        out << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
+            << "No memory fragmentation stats available at the moment!" << std::endl
+            << Formatter::clear(Style::BOLD) << Formatter::get(Style::ITALIC)
+            << "Hint: Did you set "
+            << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
+            << "__lsan_trackMemory"
+            << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
+            << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
+            << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"
+            << Formatter::clearAll() << std::endl;
+    }
+    if (!ignore) {
+        LSan::setIgnoreMalloc(false);
+    }
+}
+
+void __lsan_printStats() {
+    __lsan_printStatsWithWidth(100);
+}
+
 void __lsan_printStatsWithWidth(size_t width) {
     using Formatter::Style;
     bool ignore = LSan::ignoreMalloc();
     LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_statsAvailable()) {
-        out << Formatter::get(Style::ITALIC)
-            << "Stats of the memory usage so far:"
-            << Formatter::clear(Style::ITALIC)
-            << std::endl;
-        
-        out << Formatter::clearAll()
-            << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects."
-            << Formatter::clear(Style::ITALIC)
-            << std::endl << std::endl;
-        
-        out << Formatter::get(Style::BOLD)
-            << bytesToString(__lsan_getCurrentByteCount())
-            << Formatter::clear(Style::BOLD)
-            << " currently used, peek " << bytesToString(__lsan_getBytePeek()) << "." << std::endl;
-        __lsan_printBar(__lsan_getCurrentByteCount(), __lsan_getBytePeek(), width, bytesToString(__lsan_getBytePeek()), out);
-        
-        out << Formatter::get(Style::BOLD)
-            << __lsan_getCurrentMallocCount() << " objects"
-            << Formatter::clear(Style::BOLD)
-            << " currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl;
-         __lsan_printBar(__lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), width, std::to_string(__lsan_getMallocPeek()) + " objects", out);        
+        __lsan_printStatsCore(width, out,
+                              std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
+                              std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
     } else {
         out << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED)
             << "No memory statistics available at the moment!"
