@@ -46,11 +46,12 @@ public:
     
     void addMalloc(MallocInfo &&);
     void changeMalloc(const MallocInfo &);
-    bool removeMalloc(const MallocInfo &);
+    auto removeMalloc(const MallocInfo &) -> bool;
+    auto removeMalloc(const void *)       -> bool;
     
-    size_t getTotalAllocatedBytes();
-    size_t getTotalLeakedBytes();
-    size_t getLeakCount();
+    auto getTotalAllocatedBytes() -> size_t;
+    auto getTotalLeakedBytes()    -> size_t;
+    auto getLeakCount()           -> size_t;
     
     static void * (*malloc) (size_t);
     static void * (*calloc) (size_t, size_t);

@@ -181,7 +181,7 @@ void * realloc(void * pointer, size_t size) {
         if (ptr != nullptr) {
             if (pointer != ptr) {
                 if (pointer != nullptr) {
-                    LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, 5));
+                    LSan::getInstance().removeMalloc(pointer);
                 }
                 LSan::getInstance().addMalloc(MallocInfo(ptr, size, 5));
             } else {
@@ -199,7 +199,7 @@ void free(void * pointer) {
         if (pointer == nullptr && __lsan_freeNull) {
             warn("Free of NULL", 4);
         }
-        bool removed = LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, 5));
+        bool removed = LSan::getInstance().removeMalloc(pointer);
         if (__lsan_invalidFree && !removed) {
             if (__lsan_invalidCrash) {
                 crash("Invalid free", 4);

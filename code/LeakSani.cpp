@@ -111,9 +111,9 @@ void LSan::changeMalloc(const MallocInfo & mInfo) {
     }
 }
 
-bool LSan::removeMalloc(const MallocInfo & mInfo) {
+bool LSan::removeMalloc(const void * pointer) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    auto it = infos.find(mInfo.getPointer());
+    auto it = infos.find(pointer);
     if (it == infos.end()) {
         return false;
     }
@@ -124,6 +124,10 @@ bool LSan::removeMalloc(const MallocInfo & mInfo) {
         infos.erase(it);
     }
     return true;
+}
+
+bool LSan::removeMalloc(const MallocInfo & mInfo) {
+    return removeMalloc(mInfo.getPointer());
 }
 
 size_t LSan::getTotalAllocatedBytes() {
@@ -137,9 +141,13 @@ size_t LSan::getTotalAllocatedBytes() {
 
 size_t LSan::getLeakCount() {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    return std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
-        return !elem.second.isDeleted();
-    });
+    if (__lsan_trackMemory) {
+        return std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
+            return !elem.second.isDeleted();
+        });
+    } else {
+        return infos.size();
+    }
 }
 
 size_t LSan::getTotalLeakedBytes() {
