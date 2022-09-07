@@ -119,7 +119,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
     const auto & infos = LSan::getInstance().getInfos();
-    const float step = LSan::getInstance().getInfos().size() / static_cast<float>(width);
+    const float step = infos.size() / static_cast<float>(width);
     auto it = infos.cbegin();
     for (size_t i = 0; i < width; ++i) {
         const auto e = std::next(it, step);
@@ -138,13 +138,47 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::clear(Style::BOLD) << " peek" << std::endl << std::endl;
 }
 
+static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream & out) {
+    using Formatter::Style;
+    out << Formatter::get(Style::BOLD)
+        << "["
+        << Formatter::clear(Style::BOLD)
+        << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
+    
+    const auto & infos = LSan::getInstance().getInfos();
+    auto it = infos.cbegin();
+    size_t currentBlockBegin = 0,
+           currentBlockEnd   = it->second.getSize(),
+           b                 = 0;
+    
+    const float step = __lsan_getBytePeek() / static_cast<float>(width);
+    for (size_t i = 0; i < width; ++i) {
+        size_t fs = 0;
+        for (size_t j = 0; j < step; ++j, ++b) {
+            if (b - currentBlockBegin > currentBlockEnd) {
+                ++it;
+                currentBlockBegin = b;
+                currentBlockEnd   = currentBlockBegin + it->second.getSize();
+            }
+            if (it->second.isDeleted()) {
+                ++fs;
+            }
+        }
+        out << ((fs >= step / 2.0f) ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED));
+    }
+    out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
+        << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
+        << " of "
+        << Formatter::get(Style::BOLD) << bytesToString(__lsan_getBytePeek())
+        << Formatter::clear(Style::BOLD) << " peek" << std::endl << std::endl;
+}
+
 void __lsan_printFragmentationStatsWidth(size_t width) {
     using Formatter::Style;
     bool ignore = LSan::ignoreMalloc();
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_fragmentationStatsAvailable()) {
-        __lsan_printStatsCore(width, out, __lsan_printFragmentationObjectBar, __lsan_printFragmentationObjectBar);
-        // TODO: Implement
+        __lsan_printStatsCore(width, out, __lsan_printFragmentationByteBar, __lsan_printFragmentationObjectBar);
     } else {
         out << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
             << "No memory fragmentation stats available at the moment!" << std::endl
