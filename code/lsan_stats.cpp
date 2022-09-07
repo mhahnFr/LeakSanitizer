@@ -82,10 +82,10 @@ static inline void __lsan_printBar(size_t current, size_t peek, size_t width, co
 
 }
 
-static inline void __lsan_printStatsCore(size_t width, std::ostream & out, std::function<void (size_t, std::ostream &)> printBarBytes, std::function<void (size_t, std::ostream &)> printBarObjects) {
+static inline void __lsan_printStatsCore(const std::string & statsName, size_t width, std::ostream & out, std::function<void (size_t, std::ostream &)> printBarBytes, std::function<void (size_t, std::ostream &)> printBarObjects) {
     using Formatter::Style;
     out << Formatter::get(Style::ITALIC)
-        << "Stats of the memory usage so far:"
+        << "Stats of the " << statsName << " so far:"
         << Formatter::clear(Style::ITALIC)
         << std::endl;
     
@@ -178,7 +178,9 @@ void __lsan_printFragmentationStatsWidth(size_t width) {
     bool ignore = LSan::ignoreMalloc();
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_fragmentationStatsAvailable()) {
-        __lsan_printStatsCore(width, out, __lsan_printFragmentationByteBar, __lsan_printFragmentationObjectBar);
+        __lsan_printStatsCore("memory fragmentation", width, out,
+                              __lsan_printFragmentationByteBar,
+                              __lsan_printFragmentationObjectBar);
     } else {
         out << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
             << "No memory fragmentation stats available at the moment!" << std::endl
@@ -206,7 +208,7 @@ void __lsan_printStatsWithWidth(size_t width) {
     LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_statsAvailable()) {
-        __lsan_printStatsCore(width, out,
+        __lsan_printStatsCore("memory usage", width, out,
                               std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
                               std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
     } else {
