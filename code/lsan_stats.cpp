@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <functional>
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
 #include "bytePrinter.hpp"
