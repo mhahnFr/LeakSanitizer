@@ -120,12 +120,12 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
     
     const auto & infos = LSan::getInstance().getInfos();
     const float step = LSan::getInstance().getInfos().size() / static_cast<float>(width);
+    auto it = infos.cbegin();
     for (size_t i = 0; i < width; ++i) {
-        auto b = std::next(infos.cbegin(), i * step);
-        const auto e = std::next(b, step);
+        const auto e = std::next(it, step);
         size_t fs = 0;
-        for (; b != e; ++b) {
-            if (b->second.isDeleted()) {
+        for (; it != e; ++it) {
+            if (it->second.isDeleted()) {
                 ++fs;
             }
         }
