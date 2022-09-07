@@ -69,10 +69,10 @@ static inline void __lsan_printBar(size_t current, size_t peek, size_t width, co
     
     size_t i;
     for (i = 0; i < (static_cast<float>(current) / peek) * width; ++i) {
-        out << (__lsan_printFormatted ? '*' : '=');
+        out << Formatter::get(Style::BAR_FILLED);
     }
     for (; i < width; ++i) {
-        out << (__lsan_printFormatted ? ' ' : '.');
+        out << Formatter::get(Style::BAR_EMPTY);
     }
     out << Formatter::clear(Style::BOLD) << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
         << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
@@ -129,9 +129,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
                 ++fs;
             }
         }
-        out << ((fs >= step / 2.0f) ?
-                (__lsan_printFormatted ? ' ' : '.')
-                : (__lsan_printFormatted ? '*' : '='));
+        out << ((fs >= step / 2.0f) ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED));
     }
     out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
         << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)

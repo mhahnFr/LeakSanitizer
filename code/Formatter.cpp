@@ -22,9 +22,16 @@
 
 std::string Formatter::get(Style style) {
     if (!__lsan_printFormatted) {
-        return "";
+        switch (style) {
+            case Style::BAR_EMPTY:  return ".";
+            case Style::BAR_FILLED: return "=";
+            default:
+                return "";
+        }
     }
     switch (style) {
+        case Style::BAR_EMPTY:  return " ";
+        case Style::BAR_FILLED: return "*";
         case Style::BOLD:       return "\033[1m";
         case Style::GREEN:      return "\033[32m";
         case Style::GREYED:     return "\033[2m";
