@@ -111,7 +111,6 @@ void __lsan_printFragmentationStats() {
     __lsan_printFragmentationStatsWidth(100);
 }
 
-//#include <cmath>
 static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream & out) {
     using Formatter::Style;
     out << Formatter::get(Style::BOLD)
@@ -120,7 +119,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
     const auto & infos = LSan::getInstance().getInfos();
-    const float step = LSan::getInstance().getInfos().size() / (float) width;
+    const float step = LSan::getInstance().getInfos().size() / static_cast<float>(width);
     for (size_t i = 0; i < width; ++i) {
         auto b = std::next(infos.cbegin(), i * step);
         const auto e = std::next(b, step);
@@ -134,33 +133,6 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
                 (__lsan_printFormatted ? ' ' : '.')
                 : (__lsan_printFormatted ? '*' : '='));
     }
-    /*const float step = LSan::getInstance().getInfos().size() / (float) width;
-    size_t tmp = 0;
-    size_t f   = 0;
-    for (const auto & elem : LSan::getInstance().getInfos()) {
-        if (elem.second.isDeleted()) {
-            ++f;
-        }
-        if (++tmp == roundf(step)) {
-            out << ((f >= step / 2.0f) ?
-                    (__lsan_printFormatted ? ' ' : '.')
-                    : (__lsan_printFormatted ? '*' : '='));
-            tmp = 0;
-            f = 0;
-        }
-    }*/
-/*    auto it = LSan::getInstance().getInfos().cbegin();
-    const auto e  = LSan::getInstance().getInfos().cend();
-    for (size_t i = 0; i < width; ++i) {
-        size_t f = 0;
-        for (size_t j = 0; it != e && j < step; ++j) {
-            if (it->second.isDeleted()) {
-                ++f;
-            }
-            ++it;
-        }
-        out << ((f >= step / 2) ? ' ' : '*');
-    }*/
     out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
         << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
         << " of "

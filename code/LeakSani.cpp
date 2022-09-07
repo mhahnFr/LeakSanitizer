@@ -86,7 +86,6 @@ void LSan::addMalloc(MallocInfo && mInfo) {
     realStats += mInfo;
     // TODO: Only replace if the new block is bigger than the potential old one.
     infos.insert_or_assign(mInfo.getPointer(), mInfo);
-    __lsan_printFragmentationStats();
 }
 
 void LSan::changeMalloc(const MallocInfo & mInfo) {
