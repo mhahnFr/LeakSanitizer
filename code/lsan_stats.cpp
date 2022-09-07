@@ -111,7 +111,7 @@ void __lsan_printFragmentationStats() {
     __lsan_printFragmentationStatsWidth(100);
 }
 
-#include <cmath>
+//#include <cmath>
 static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream & out) {
     using Formatter::Style;
     out << Formatter::get(Style::BOLD)
@@ -119,7 +119,22 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::clear(Style::BOLD)
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
+    const auto & infos = LSan::getInstance().getInfos();
     const float step = LSan::getInstance().getInfos().size() / (float) width;
+    for (size_t i = 0; i < width; ++i) {
+        auto b = std::next(infos.cbegin(), i * step);
+        const auto e = std::next(b, step);
+        size_t fs = 0;
+        for (; b != e; ++b) {
+            if (b->second.isDeleted()) {
+                ++fs;
+            }
+        }
+        out << ((fs >= step / 2.0f) ?
+                (__lsan_printFormatted ? ' ' : '.')
+                : (__lsan_printFormatted ? '*' : '='));
+    }
+    /*const float step = LSan::getInstance().getInfos().size() / (float) width;
     size_t tmp = 0;
     size_t f   = 0;
     for (const auto & elem : LSan::getInstance().getInfos()) {
@@ -133,7 +148,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
             tmp = 0;
             f = 0;
         }
-    }
+    }*/
 /*    auto it = LSan::getInstance().getInfos().cbegin();
     const auto e  = LSan::getInstance().getInfos().cend();
     for (size_t i = 0; i < width; ++i) {
