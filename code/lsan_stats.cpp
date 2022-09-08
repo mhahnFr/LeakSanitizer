@@ -105,17 +105,27 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
     const auto & infos = LSan::getInstance().getInfos();
-    const float step = infos.size() / static_cast<float>(width);
     auto it = infos.cbegin();
-    for (size_t i = 0; i < width; ++i) {
-        const auto e = std::next(it, step);
-        size_t fs = 0;
-        for (; it != e; ++it) {
-            if (it->second.isDeleted()) {
-                ++fs;
+    if (infos.size() < width) {
+        const float step = static_cast<float>(width) / infos.size();
+        for (; it != infos.cend(); ++it) {
+            const std::string fill = it->second.isDeleted() ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED);
+            for (size_t i = 0; i < step; ++i) {
+                out << fill;
             }
         }
-        out << ((fs >= step / 2.0f) ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED));
+    } else {
+        const float step = infos.size() / static_cast<float>(width);
+        for (size_t i = 0; i < width; ++i) {
+            const auto e = std::next(it, step);
+            size_t fs = 0;
+            for (; it != e; ++it) {
+                if (it->second.isDeleted()) {
+                    ++fs;
+                }
+            }
+            out << ((fs >= step / 2.0f) ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED));
+        }
     }
     out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
         << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
