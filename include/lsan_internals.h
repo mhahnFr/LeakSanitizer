@@ -36,6 +36,8 @@ extern bool __lsan_humanPrint;
  * If this value is set to true, normal messages are printed to the standard output stream.
  * Otherwise the standard error stream is also used for normal messages.
  * Defaults to true.
+ *
+ * @since 1.1
  */
 extern bool __lsan_printCout;
 
@@ -43,6 +45,8 @@ extern bool __lsan_printCout;
  * If this value is set to true, ANSII escape codes are used to format the output of this sanitizer.
  * Otherwise, the output is not formatted using escape codes.
  * Defaults to true.
+ *
+ * @since 1.1
  */
 extern bool __lsan_printFormatted;
 
@@ -50,6 +54,8 @@ extern bool __lsan_printFormatted;
  * If this value is set to true, the license informations are printed upon normal termination of the
  * program.
  * Defaults to true.
+ *
+ * @since 1.1
  */
 extern bool __lsan_printLicense;
 
@@ -80,6 +86,8 @@ extern bool __lsan_freeNull;
  * If this value is set to true, the memory fragmentation can be analyzed. Should be set at the very
  * beginning of the program in order to get realistic results.
  * Defaults to false.
+ *
+ * @since 1.2
  */
 extern bool __lsan_trackMemory;
 

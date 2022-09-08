@@ -87,6 +87,7 @@ size_t __lsan_getBytePeek();
  * statistics are queried regardless, the library might crash!
  *
  * @return Whether the memory statistics can savely be queried.
+ * @since 1.1
  */
 bool   __lsan_statsAvailable();
 
@@ -95,6 +96,7 @@ bool   __lsan_statsAvailable();
  * the statistics can be queried regardless without crash, but they might be wrong.
  *
  * @return Whether the memory fragmentation statistics are available.
+ * @since 1.2
  */
 bool   __lsan_fStatsAvailable();
 
@@ -103,6 +105,7 @@ bool   __lsan_fStatsAvailable();
  * the statistics can be queried regardless without crash, but they might be wrong.
  *
  * @return Whether the memory fragmentation statisitcs are available.
+ * @since 1.2
  */
 bool   __lsan_fragStatsAvailable();
 
@@ -111,6 +114,7 @@ bool   __lsan_fragStatsAvailable();
  * the statistics can be queried regardless without crash, but they might be wrong.
  *
  * @return Whether the memory fragmentation statisitcs are available.
+ * @since 1.2
  */
 bool   __lsan_fragmentationStatsAvailable();
 
@@ -122,6 +126,8 @@ bool   __lsan_fragmentationStatsAvailable();
  * This function already checks for the availability of the memory statistics using the function
  * __lsan_fStatsAvailable() and guarantees to not crash the program, even in the case the memory
  * fragmentation statistics are unavailable.
+ *
+ * @since 1.2
  */
 void   __lsan_printFStats();
 
@@ -133,6 +139,8 @@ void   __lsan_printFStats();
  * This function already checks for the availability of the memory statistics using the function
  * __lsan_fragStatsAvailable() and guarantees to not crash the program, even in the case the memory
  * fragmentation statistics are unavailable.
+ *
+ * @since 1.2
  */
 void   __lsan_printFragStats();
 
@@ -144,6 +152,8 @@ void   __lsan_printFragStats();
  * This function already checks for the availability of the memory statistics using the function
  * __lsan_fragmentationStatsAvailable() and guarantees to not crash the program, even in the case the
  * memory fragmentation statistics are unavailable.
+ *
+ * @since 1.2
  */
 void   __lsan_printFragmentationStats();
 
@@ -156,6 +166,7 @@ void   __lsan_printFragmentationStats();
  * memory fragmentation statistics are unavailable.
  *
  * @param width The width in characters the printed bar should have.
+ * @since 1.2
  */
 void   __lsan_printFStatsWithWidth(size_t width);
 
@@ -168,6 +179,7 @@ void   __lsan_printFStatsWithWidth(size_t width);
  * memory fragmentation statistics are unavailable.
  *
  * @param width The width in characters the printed bar should have.
+ * @since 1.2
  */
 void   __lsan_printFragStatsWithWidth(size_t width);
 
@@ -180,6 +192,7 @@ void   __lsan_printFragStatsWithWidth(size_t width);
  * the case the memory fragmentation statistics are unavailable.
  *
  * @param width The width in characters the printed bar should have.
+ * @since 1.2
  */
 void   __lsan_printFragmentationStatsWithWidth(size_t width);
 
