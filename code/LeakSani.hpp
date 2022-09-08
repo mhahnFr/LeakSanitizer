@@ -52,7 +52,7 @@ public:
     auto getTotalAllocatedBytes() -> size_t;
     auto getTotalLeakedBytes()    -> size_t;
     auto getLeakCount()           -> size_t;
-    auto getInfos()         const -> std::map<const void * const, MallocInfo>;
+    auto getInfos()         const -> const std::map<const void * const, MallocInfo> &;
     
     static void * (*malloc) (size_t);
     static void * (*calloc) (size_t, size_t);

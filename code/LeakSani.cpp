@@ -160,7 +160,7 @@ size_t LSan::getTotalLeakedBytes() {
     return ret;
 }
 
-std::map<const void * const, MallocInfo> LSan::getInfos() const {
+const std::map<const void * const, MallocInfo> & LSan::getInfos() const {
     return infos;
 }
 
