@@ -91,8 +91,14 @@ size_t __lsan_getBytePeek();
 bool   __lsan_statsAvailable();
 
 bool   __lsan_fragmentationStatsAvailable();
+bool   __lsan_fragStatsAvailable();
+bool   __lsan_fStatsAvailable();
+void   __lsan_printFStats();
+void   __lsan_printFragStats();
 void   __lsan_printFragmentationStats();
-void   __lsan_printFragmentationStatsWidth(size_t);
+void   __lsan_printFStatsWithWidth            (size_t);
+void   __lsan_printFragStatsWithWidth         (size_t);
+void   __lsan_printFragmentationStatsWithWidth(size_t);
 
 /**
  * Prints the statistics of the allocations. The bar has a size of 100 characters, it can be adjusted by

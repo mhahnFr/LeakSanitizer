@@ -25,41 +25,21 @@
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 
-size_t __lsan_getTotalMallocs() {
-    return LSan::getStats().getTotalMallocCount();
-}
+size_t __lsan_getTotalMallocs() { return LSan::getStats().getTotalMallocCount(); }
+size_t __lsan_getTotalBytes()   { return LSan::getStats().getTotalBytes();       }
+size_t __lsan_getTotalFrees()   { return LSan::getStats().getTotalFreeCount();   }
 
-size_t __lsan_getTotalBytes() {
-    return LSan::getStats().getTotalBytes();
-}
+size_t __lsan_getCurrentMallocCount() { return LSan::getStats().getCurrentMallocCount(); }
+size_t __lsan_getCurrentByteCount()   { return LSan::getStats().getCurrentBytes();       }
 
-size_t __lsan_getTotalFrees() {
-    return LSan::getStats().getTotalFreeCount();
-}
+size_t __lsan_getMallocPeek() { return LSan::getStats().getMallocPeek(); }
+size_t __lsan_getBytePeek()   { return LSan::getStats().getBytePeek();   }
 
-size_t __lsan_getCurrentMallocCount() {
-    return LSan::getStats().getCurrentMallocCount();
-}
+bool __lsan_statsAvailable() { return LSan::hasStats(); }
 
-size_t __lsan_getCurrentByteCount() {
-    return LSan::getStats().getCurrentBytes();
-}
-
-size_t __lsan_getMallocPeek() {
-    return LSan::getStats().getMallocPeek();
-}
-
-size_t __lsan_getBytePeek() {
-    return LSan::getStats().getBytePeek();
-}
-
-bool __lsan_statsAvailable() {
-    return LSan::hasStats();
-}
-
-bool __lsan_fragmentationStatsAvailable() {
-    return __lsan_trackMemory;
-}
+bool __lsan_fStatsAvailable()             { return __lsan_fragmentationStatsAvailable(); }
+bool __lsan_fragStatsAvailable()          { return __lsan_fragmentationStatsAvailable(); }
+bool __lsan_fragmentationStatsAvailable() { return __lsan_trackMemory; }
 
 static inline void __lsan_printBar(size_t current, size_t peek, size_t width, const std::string & peekText, std::ostream & out) {
     using Formatter::Style;
@@ -83,7 +63,9 @@ static inline void __lsan_printBar(size_t current, size_t peek, size_t width, co
 
 }
 
-static inline void __lsan_printStatsCore(const std::string & statsName, size_t width, std::ostream & out, std::function<void (size_t, std::ostream &)> printBarBytes, std::function<void (size_t, std::ostream &)> printBarObjects) {
+static inline void __lsan_printStatsCore(const std::string & statsName, size_t width, std::ostream & out,
+                                         std::function<void (size_t, std::ostream &)> printBarBytes,
+                                         std::function<void (size_t, std::ostream &)> printBarObjects) {
     using Formatter::Style;
     out << Formatter::get(Style::ITALIC)
         << "Stats of the " << statsName << " so far:"
@@ -108,9 +90,12 @@ static inline void __lsan_printStatsCore(const std::string & statsName, size_t w
      printBarObjects(width, out);
 }
 
-void __lsan_printFragmentationStats() {
-    __lsan_printFragmentationStatsWidth(100);
-}
+void __lsan_printFStats()             { __lsan_printFragmentationStats();             }
+void __lsan_printFragStats()          { __lsan_printFragmentationStats();             }
+void __lsan_printFragmentationStats() { __lsan_printFragmentationStatsWithWidth(100); }
+
+void __lsan_printFStatsWithWidth   (size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
+void __lsan_printFragStatsWithWidth(size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
 
 static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream & out) {
     using Formatter::Style;
@@ -175,7 +160,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         << Formatter::clear(Style::BOLD) << " total" << std::endl << std::endl;
 }
 
-void __lsan_printFragmentationStatsWidth(size_t width) {
+void __lsan_printFragmentationStatsWithWidth(size_t width) {
     using Formatter::Style;
     bool ignore = LSan::ignoreMalloc();
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
