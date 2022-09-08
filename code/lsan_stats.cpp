@@ -152,12 +152,13 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
            currentBlockEnd   = it->second.getSize(),
            b                 = 0;
     
-    const float step = __lsan_getBytePeek() / static_cast<float>(width);
+    const size_t step = LSan::getInstance().getTotalAllocatedBytes() / static_cast<float>(width);
     for (size_t i = 0; i < width; ++i) {
         size_t fs = 0;
         for (size_t j = 0; j < step; ++j, ++b) {
-            if (b - currentBlockBegin > currentBlockEnd) {
+            if (b > currentBlockEnd) {
                 ++it;
+                assert (it != infos.cend());
                 currentBlockBegin = b;
                 currentBlockEnd   = currentBlockBegin + it->second.getSize();
             }
