@@ -38,4 +38,4 @@ bool __lsan_freeNull       = false;
 bool __lsan_freeNull       = true;
 #endif
 
-bool __lsan_trackMemory    = true;
+bool __lsan_trackMemory    = false;
