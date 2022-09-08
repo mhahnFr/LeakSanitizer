@@ -30,6 +30,6 @@ namespace Formatter {
     auto get(Style)   -> std::string;
     auto clear(Style) -> std::string;
     auto clearAll()   -> std::string;
-};
+}
 
 #endif /* Formatter_hpp */
