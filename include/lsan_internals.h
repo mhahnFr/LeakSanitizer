@@ -83,8 +83,8 @@ extern bool __lsan_invalidFree;
 extern bool __lsan_freeNull;
 
 /**
- * If this value is set to true, the memory fragmentation can be analyzed. Should be set at the very
- * beginning of the program in order to get realistic results.
+ * If this value is set to true, the memory fragmentation can be analyzed. It should be set at the
+ * very beginning of the program in order to get realistic results.
  * Defaults to false.
  *
  * @since 1.2

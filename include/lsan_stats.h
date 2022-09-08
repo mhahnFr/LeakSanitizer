@@ -121,7 +121,7 @@ bool   __lsan_fragmentationStatsAvailable();
 /**
  * Prints the statistics of the memory fragmentation. The bar has a size of 100 characters, it can be
  * adjusted by using __lsan_printFStatsWithWidth(size_t). The output stream defined by __lsan_printCout
- * is used for the printing. The byte amounts are printed huan readable if __lsan_humanPrint is set to
+ * is used for the printing. The byte amounts are printed human readable if __lsan_humanPrint is set to
  * true.
  * This function already checks for the availability of the memory statistics using the function
  * __lsan_fStatsAvailable() and guarantees to not crash the program, even in the case the memory
@@ -134,7 +134,7 @@ void   __lsan_printFStats();
 /**
  * Prints the statistics of the memory fragmentation. The bar has a size of 100 characters, it can be
  * adjusted by using __lsan_printFragStatsWithWidth(size_t). The output stream defined by __lsan_printCout
- * is used for the printing. The byte amounts are printed huan readable if __lsan_humanPrint is set to
+ * is used for the printing. The byte amounts are printed human readable if __lsan_humanPrint is set to
  * true.
  * This function already checks for the availability of the memory statistics using the function
  * __lsan_fragStatsAvailable() and guarantees to not crash the program, even in the case the memory
@@ -147,7 +147,7 @@ void   __lsan_printFragStats();
 /**
  * Prints the statistics of the memory fragmentation. The bar has a size of 100 characters, it can be
  * adjusted by using __lsan_printFragmentationStatsWithWidth(size_t). The output stream defined by
- * __lsan_printCout is used for the printing. The byte amounts are printed huan readable if
+ * __lsan_printCout is used for the printing. The byte amounts are printed human readable if
  * __lsan_humanPrint is set to true.
  * This function already checks for the availability of the memory statistics using the function
  * __lsan_fragmentationStatsAvailable() and guarantees to not crash the program, even in the case the
