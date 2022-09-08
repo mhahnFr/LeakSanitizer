@@ -135,8 +135,8 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
     out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
         << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
         << " of "
-        << Formatter::get(Style::BOLD) << __lsan_getMallocPeek() << " objects"
-        << Formatter::clear(Style::BOLD) << " peek" << std::endl << std::endl;
+        << Formatter::get(Style::BOLD) << infos.size() << " objects"
+        << Formatter::clear(Style::BOLD) << " total" << std::endl << std::endl;
 }
 
 static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream & out) {
@@ -152,7 +152,8 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
            currentBlockEnd   = it->second.getSize(),
            b                 = 0;
     
-    const size_t step = LSan::getInstance().getTotalAllocatedBytes() / static_cast<float>(width);
+    const size_t total = LSan::getInstance().getTotalAllocatedBytes(),
+                  step = total / static_cast<float>(width);
     for (size_t i = 0; i < width; ++i) {
         size_t fs = 0;
         for (size_t j = 0; j < step; ++j, ++b) {
@@ -171,8 +172,8 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
     out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
         << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
         << " of "
-        << Formatter::get(Style::BOLD) << bytesToString(__lsan_getBytePeek())
-        << Formatter::clear(Style::BOLD) << " peek" << std::endl << std::endl;
+        << Formatter::get(Style::BOLD) << bytesToString(total)
+        << Formatter::clear(Style::BOLD) << " total" << std::endl << std::endl;
 }
 
 void __lsan_printFragmentationStatsWidth(size_t width) {
