@@ -121,14 +121,19 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         const float step = infos.size() / static_cast<float>(width),
                     loss = fmod(step, static_cast<int>(step));
         float    tmpLoss = 0.0f;
-        bool previousFilled = false;
+        
+        bool previousFilled    = false,
+             previousCorrected = false;
+        
         size_t previousFs = 0;
         for (size_t i = 0; i < width; ++i) {
             auto e = std::next(it, step);
             tmpLoss += loss;
+            bool corrected = false;
             if (tmpLoss >= 1.0f) {
                 ++e;
                 tmpLoss -= 1.0f;
+                corrected = true;
             }
             size_t fs = 0;
             for (; it != e; ++it) {
@@ -136,7 +141,13 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
                     ++fs;
                 }
             }
-            if (!previousFilled && fs < previousFs) {
+            const bool compare = (corrected && !previousCorrected) ?
+                                    (fs - 1 < previousFs)
+                                 : ((!corrected && previousCorrected) ?
+                                    (fs < previousFs - 1)
+                                 :
+                                    (fs < previousFs));
+            if (!previousFilled && compare) {
                 out << Formatter::get(Style::BAR_FILLED);
                 previousFilled = true;
             } else if (fs < step / 2.0f) {
@@ -152,6 +163,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
                 previousFilled = false;
             }
             previousFs = fs;
+            previousCorrected = corrected;
         }
     }
     out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
@@ -193,14 +205,19 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         const float step = total / static_cast<float>(width),
                     loss = fmod(step, static_cast<int>(step));
         float    tmpLoss = 0.0f;
-        bool previousFilled = false;
+        
+        bool previousFilled    = false,
+             previousCorrected = false;
+        
         size_t previousFs = 0;
         for (size_t i = 0; i < width; ++i) {
+            bool corrected = false;
             size_t tmpStep = step;
             tmpLoss += loss;
             if (tmpLoss >= 1.0f) {
                 tmpLoss -= 1.0f;
                 ++tmpStep;
+                corrected = true;
             }
             size_t fs = 0;
             for (size_t j = 0; j < tmpStep; ++j, ++b) {
@@ -213,7 +230,13 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
                     ++fs;
                 }
             }
-            if (!previousFilled && fs < previousFs) {
+            const bool compare = (corrected && !previousCorrected) ?
+                                    (fs - 1 < previousFs)
+                                 : ((!corrected && previousCorrected) ?
+                                    (fs < previousFs - 1)
+                                 :
+                                    (fs < previousFs));
+            if (!previousFilled && compare) {
                 out << Formatter::get(Style::BAR_FILLED);
                 previousFilled = true;
             } else if (fs < step / 2.0f) {
@@ -229,6 +252,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
                 previousFilled = false;
             }
             previousFs = fs;
+            previousCorrected = corrected;
         }
     }
     out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
