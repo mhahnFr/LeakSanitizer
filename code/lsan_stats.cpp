@@ -17,6 +17,7 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include <iostream>
 #include <functional>
 #include "LeakSani.hpp"
