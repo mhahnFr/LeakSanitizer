@@ -149,19 +149,35 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
     
     const size_t total = LSan::getInstance().getTotalAllocatedBytes(),
                   step = total / static_cast<float>(width);
-    for (size_t i = 0; i < width; ++i) {
-        size_t fs = 0;
-        for (size_t j = 0; j < step; ++j, ++b) {
+    
+    if (total < width) {
+        const size_t step = static_cast<float>(width) / total;
+        for (; b < total; ++b) {
             if (b >= currentBlockEnd) {
                 ++it;
                 currentBlockBegin = b;
                 currentBlockEnd   = currentBlockBegin + it->second.getSize();
             }
-            if (it->second.isDeleted()) {
-                ++fs;
+            const std::string fill = it->second.isDeleted() ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED);
+            for (size_t i = 0; i < step; ++i) {
+                out << fill;
             }
         }
-        out << ((fs >= step / 2.0f) ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED));
+    } else {
+        for (size_t i = 0; i < width; ++i) {
+            size_t fs = 0;
+            for (size_t j = 0; j < step; ++j, ++b) {
+                if (b >= currentBlockEnd) {
+                    ++it;
+                    currentBlockBegin = b;
+                    currentBlockEnd   = currentBlockBegin + it->second.getSize();
+                }
+                if (it->second.isDeleted()) {
+                    ++fs;
+                }
+            }
+            out << ((fs >= step / 2.0f) ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED));
+        }
     }
     out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
         << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
