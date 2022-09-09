@@ -154,8 +154,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
            currentBlockEnd   = it->second.getSize(),
            b                 = 0;
     
-    const size_t total = LSan::getInstance().getTotalAllocatedBytes(),
-                  step = total / static_cast<float>(width);
+    const size_t total       = LSan::getInstance().getTotalAllocatedBytes();
     
     if (total < width) {
         const size_t step = static_cast<float>(width) / total;
@@ -171,9 +170,18 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
             }
         }
     } else {
+        const float step = total / static_cast<float>(width),
+                    loss = fmod(step, static_cast<int>(step));
+        float    tmpLoss = 0.0f;
         for (size_t i = 0; i < width; ++i) {
+            size_t tmpStep = step;
+            tmpLoss += loss;
+            if (tmpLoss >= 1.0f) {
+                tmpLoss -= 1.0f;
+                ++tmpStep;
+            }
             size_t fs = 0;
-            for (size_t j = 0; j < step; ++j, ++b) {
+            for (size_t j = 0; j < tmpStep; ++j, ++b) {
                 if (b >= currentBlockEnd) {
                     ++it;
                     currentBlockBegin = b;
