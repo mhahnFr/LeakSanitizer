@@ -115,9 +115,16 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
             }
         }
     } else {
-        const float step = infos.size() / static_cast<float>(width);
+        const float step = infos.size() / static_cast<float>(width),
+                    loss = fmod(step, static_cast<int>(step));
+        float    tmpLoss = 0.0f;
         for (size_t i = 0; i < width; ++i) {
-            const auto e = std::next(it, step);
+            auto e = std::next(it, step);
+            tmpLoss += loss;
+            if (tmpLoss >= 1.0f) {
+                ++e;
+                tmpLoss -= 1.0f;
+            }
             size_t fs = 0;
             for (; it != e; ++it) {
                 if (it->second.isDeleted()) {
