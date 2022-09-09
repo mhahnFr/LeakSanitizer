@@ -41,27 +41,14 @@ bool __lsan_fStatsAvailable()             { return __lsan_fragmentationStatsAvai
 bool __lsan_fragStatsAvailable()          { return __lsan_fragmentationStatsAvailable(); }
 bool __lsan_fragmentationStatsAvailable() { return __lsan_trackMemory; }
 
-static inline void __lsan_printBar(size_t current, size_t peek, size_t width, const std::string & peekText, std::ostream & out) {
-    using Formatter::Style;
-    out << Formatter::get(Style::BOLD)
-        << "["
-        << Formatter::clear(Style::BOLD)
-        << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
-    
-    size_t i;
-    for (i = 0; i < (static_cast<float>(current) / peek) * width; ++i) {
-        out << Formatter::get(Style::BAR_FILLED);
-    }
-    for (; i < width; ++i) {
-        out << Formatter::get(Style::BAR_EMPTY);
-    }
-    out << Formatter::clear(Style::BOLD) << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
-        << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
-        << " of "
-        << Formatter::get(Style::BOLD) << peekText << Formatter::clear(Style::BOLD)
-        << " peek" << std::endl << std::endl;
+void __lsan_printStats() { __lsan_printStatsWithWidth(100); }
 
-}
+void __lsan_printFStats()             { __lsan_printFragmentationStats();             }
+void __lsan_printFragStats()          { __lsan_printFragmentationStats();             }
+void __lsan_printFragmentationStats() { __lsan_printFragmentationStatsWithWidth(100); }
+
+void __lsan_printFStatsWithWidth   (size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
+void __lsan_printFragStatsWithWidth(size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
 
 static inline void __lsan_printStatsCore(const std::string & statsName, size_t width, std::ostream & out,
                                          std::function<void (size_t, std::ostream &)> printBarBytes,
@@ -90,12 +77,27 @@ static inline void __lsan_printStatsCore(const std::string & statsName, size_t w
      printBarObjects(width, out);
 }
 
-void __lsan_printFStats()             { __lsan_printFragmentationStats();             }
-void __lsan_printFragStats()          { __lsan_printFragmentationStats();             }
-void __lsan_printFragmentationStats() { __lsan_printFragmentationStatsWithWidth(100); }
+static inline void __lsan_printBar(size_t current, size_t peek, size_t width, const std::string & peekText, std::ostream & out) {
+    using Formatter::Style;
+    out << Formatter::get(Style::BOLD)
+        << "["
+        << Formatter::clear(Style::BOLD)
+        << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
+    
+    size_t i;
+    for (i = 0; i < (static_cast<float>(current) / peek) * width; ++i) {
+        out << Formatter::get(Style::BAR_FILLED);
+    }
+    for (; i < width; ++i) {
+        out << Formatter::get(Style::BAR_EMPTY);
+    }
+    out << Formatter::clear(Style::BOLD) << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
+        << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
+        << " of "
+        << Formatter::get(Style::BOLD) << peekText << Formatter::clear(Style::BOLD)
+        << " peek" << std::endl << std::endl;
 
-void __lsan_printFStatsWithWidth   (size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
-void __lsan_printFragStatsWithWidth(size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
+}
 
 static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream & out) {
     using Formatter::Style;
@@ -224,10 +226,6 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
     if (!ignore) {
         LSan::setIgnoreMalloc(false);
     }
-}
-
-void __lsan_printStats() {
-    __lsan_printStatsWithWidth(100);
 }
 
 void __lsan_printStatsWithWidth(size_t width) {
