@@ -27,13 +27,15 @@ extern "C" {
 #include <stdbool.h>
 
 /**
- * If this value is set to true, the byte amounts are printed in a human friendly way.
+ * @brief If this value is set to true, the byte amounts are printed in a human friendly way.
+ *
  * Defaults to true.
  */
 extern bool __lsan_humanPrint;
 
 /**
- * If this value is set to true, normal messages are printed to the standard output stream.
+ * @brief If this value is set to true, normal messages are printed to the standard output stream.
+ *
  * Otherwise the standard error stream is also used for normal messages.
  * Defaults to true.
  *
@@ -42,7 +44,8 @@ extern bool __lsan_humanPrint;
 extern bool __lsan_printCout;
 
 /**
- * If this value is set to true, ANSII escape codes are used to format the output of this sanitizer.
+ * @brief If this value is set to true, ANSII escape codes are used to format the output of this sanitizer.
+ *
  * Otherwise, the output is not formatted using escape codes.
  * Defaults to true.
  *
@@ -51,8 +54,9 @@ extern bool __lsan_printCout;
 extern bool __lsan_printFormatted;
 
 /**
- * If this value is set to true, the license informations are printed upon normal termination of the
- * program.
+ * @brief If this value is set to true, the license informations are printed upon normal termination
+ * of the program.
+ *
  * Defaults to true.
  *
  * @since 1.1
@@ -60,31 +64,36 @@ extern bool __lsan_printFormatted;
 extern bool __lsan_printLicense;
 
 /**
- * If this value is set to true, the program is terminated when doing something invalid regarding
- * the memory management.
+ * @brief If this value is set to true, the program is terminated when doing something invalid
+ * regarding the memory management.
+ *
  * Defaults to true.
  */
 extern bool __lsan_invalidCrash;
 
 /**
- * If this value is set to true, the freed pointers are checked for whether they have previously been
- * allocated using this sanitizer. If a pointer which is unknown to the sanitizer is freed, a warning
- * or a termination is issued, according to the value __lsan_invalidCrash. Freeing a null pointer is
- * not checked by this flag, but by __lsan_freeNull.
+ * @brief If this value is set to true, the freed pointers are checked for whether they have
+ * previously been allocated using this sanitizer.
+ *
+ * If a pointer which is unknown to the sanitizer is freed, a warning or a termination is issued,
+ * according to the value __lsan_invalidCrash. Freeing a null pointer is not checked by this flag,
+ * but by __lsan_freeNull.
  * Defaults to false.
  */
 extern bool __lsan_invalidFree;
 
 /**
- * If this value is set to true, a warning is issued when a null pointer is freed. It does not cause
- * a termination of the program, regardless of __lsan_invalidCrash.
+ * @brief If this value is set to true, a warning is issued when a null pointer is freed.
+ *
+ * It does not cause a termination of the program, regardless of __lsan_invalidCrash.
  * Default value is system dependedly set.
  */
 extern bool __lsan_freeNull;
 
 /**
- * If this value is set to true, the memory fragmentation can be analyzed. It should be set at the
- * very beginning of the program in order to get realistic results.
+ * @brief If this value is set to true, the memory fragmentation can be analyzed.
+ *
+ * It should be set at the very beginning of the program in order to get realistic results.
  * Defaults to false.
  *
  * @since 1.2
