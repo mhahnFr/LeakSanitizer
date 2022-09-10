@@ -62,7 +62,7 @@ LSan & LSan::getInstance() {
 }
 
 bool & LSan::getIgnoreMalloc() {
-    static bool ignore = false;
+    static thread_local bool ignore = false;
     return ignore;
 }
 
