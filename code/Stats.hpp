@@ -21,9 +21,12 @@
 #define Stats_hpp
 
 #include <cstddef>
+#include <thread>
 #include "MallocInfo.hpp"
 
 class Stats {
+    std::mutex mutex;
+    
     size_t currentMallocCount = 0,
              totalMallocCount = 0,
               peekMallocCount = 0;
@@ -35,6 +38,15 @@ class Stats {
     size_t freeCount = 0;
     
 public:
+    Stats() = default;
+   ~Stats() = default;
+    
+    Stats(const Stats &);
+    Stats(Stats &&);
+    
+    Stats & operator=(const Stats &);
+    Stats & operator=(Stats &&);
+
     auto getCurrentMallocCount() const -> size_t;
     auto getTotalMallocCount()   const -> size_t;
     auto getMallocPeek()         const -> size_t;

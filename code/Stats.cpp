@@ -19,6 +19,42 @@
 
 #include "Stats.hpp"
 
+Stats::Stats(const Stats & other)
+    : mutex(), currentMallocCount(other.currentMallocCount), totalMallocCount(other.totalMallocCount), peekMallocCount(other.peekMallocCount), currentBytes(other.currentBytes), totalBytes(other.totalBytes), peekBytes(other.peekBytes), freeCount(other.freeCount) {}
+
+Stats::Stats(Stats && other)
+    : mutex(), currentMallocCount(std::move(other.currentMallocCount)), totalMallocCount(std::move(other.totalMallocCount)), peekMallocCount(std::move(other.peekMallocCount)), currentBytes(std::move(other.currentBytes)), totalBytes(std::move(other.totalBytes)), peekBytes(std::move(other.peekBytes)), freeCount(std::move(other.freeCount)) {}
+
+Stats & Stats::operator=(const Stats & other) {
+    if (&other != this) {
+        currentMallocCount = other.currentMallocCount;
+        totalMallocCount   = other.totalMallocCount;
+        peekMallocCount    = other.peekMallocCount;
+        
+        currentBytes = other.currentBytes;
+        totalBytes   = other.totalBytes;
+        peekBytes    = other.peekBytes;
+        
+        freeCount = other.freeCount;
+    }
+    return *this;
+}
+
+Stats & Stats::operator=(Stats && other) {
+    if (&other != this) {
+        currentMallocCount = std::move(other.totalMallocCount);
+        totalMallocCount   = std::move(other.totalMallocCount);
+        peekMallocCount    = std::move(other.peekMallocCount);
+        
+        currentBytes = std::move(other.currentBytes);
+        totalBytes   = std::move(other.totalBytes);
+        peekBytes    = std::move(other.peekBytes);
+        
+        freeCount = std::move(other.freeCount);
+    }
+    return *this;
+}
+
 size_t Stats::getCurrentMallocCount() const { return currentMallocCount; }
 size_t Stats::getTotalMallocCount()   const { return totalMallocCount;   }
 size_t Stats::getMallocPeek()         const { return peekMallocCount;    }
@@ -30,6 +66,8 @@ size_t Stats::getBytePeek()     const { return peekBytes;    }
 size_t Stats::getTotalFreeCount() const { return freeCount; }
 
 void Stats::addMalloc(size_t size) {
+    std::lock_guard<std::mutex> lock(mutex);
+    
     ++currentMallocCount;
     ++totalMallocCount;
     if (peekMallocCount < currentMallocCount) {
@@ -48,6 +86,8 @@ void Stats::addMalloc(const MallocInfo & mInfo) {
 }
 
 void Stats::replaceMalloc(size_t oldSize, size_t newSize) {
+    std::lock_guard<std::mutex> lock(mutex);
+    
     currentBytes -= oldSize;
     currentBytes += newSize;
     if (peekBytes < currentBytes) {
@@ -59,6 +99,8 @@ void Stats::replaceMalloc(size_t oldSize, size_t newSize) {
 }
 
 void Stats::addFree(size_t size) {
+    std::lock_guard<std::mutex> lock(mutex);
+    
     ++freeCount;
     
     --currentMallocCount;
@@ -71,7 +113,7 @@ void Stats::addFree(const MallocInfo & mInfo) {
 
 Stats Stats::operator+(const MallocInfo & minfo) {
     Stats old = *this;
-    addMalloc(minfo);
+    old.addMalloc(minfo);
     return old;
 }
 
@@ -82,7 +124,7 @@ Stats & Stats::operator+=(const MallocInfo & mInfo) {
 
 Stats Stats::operator-(const MallocInfo & mInfo) {
     Stats old = *this;
-    addFree(mInfo);
+    old.addFree(mInfo);
     return old;
 }
 
