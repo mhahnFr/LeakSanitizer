@@ -107,6 +107,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::clear(Style::BOLD)
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
+    std::lock_guard<std::recursive_mutex>(LSan::getInstance().getInfoMutex());
     const auto & infos = LSan::getInstance().getInfos();
     auto it = infos.cbegin();
     if (infos.size() < width) {
@@ -180,6 +181,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         << Formatter::clear(Style::BOLD)
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
+    std::lock_guard<std::recursive_mutex>(LSan::getInstance().getInfoMutex());
     const auto & infos = LSan::getInstance().getInfos();
     auto it = infos.cbegin();
     size_t currentBlockBegin = 0,
@@ -220,7 +222,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
                 corrected = true;
             }
             size_t fs = 0;
-            for (size_t j = 0; j < tmpStep; ++j, ++b) {
+            for (size_t j = 0; j < tmpStep && b < total; ++j, ++b) {
                 if (b >= currentBlockEnd) {
                     ++it;
                     currentBlockBegin = b;

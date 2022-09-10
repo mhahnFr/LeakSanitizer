@@ -52,6 +52,7 @@ public:
     auto getTotalAllocatedBytes() -> size_t;
     auto getTotalLeakedBytes()    -> size_t;
     auto getLeakCount()           -> size_t;
+    auto getInfoMutex()           -> std::recursive_mutex &;
     auto getInfos()         const -> const std::map<const void * const, MallocInfo> &;
     
     static void * (*malloc) (size_t);

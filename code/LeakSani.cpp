@@ -160,9 +160,8 @@ size_t LSan::getTotalLeakedBytes() {
     return ret;
 }
 
-const std::map<const void * const, MallocInfo> & LSan::getInfos() const {
-    return infos;
-}
+const std::map<const void * const, MallocInfo> & LSan::getInfos() const { return infos; }
+std::recursive_mutex &                           LSan::getInfoMutex()   { return infoMutex; }
 
 void LSan::__exit_hook() {
     using Formatter::Style;
