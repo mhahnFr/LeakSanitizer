@@ -32,8 +32,8 @@ class LSan {
     static bool & getIgnoreMalloc();
     
     std::map<const void * const, MallocInfo> infos;
-    std::recursive_mutex infoMutex;
-    Stats                realStats;
+    std::recursive_mutex                     infoMutex;
+    Stats                                    realStats;
     
 public:
     LSan();
