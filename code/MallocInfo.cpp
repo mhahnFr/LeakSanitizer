@@ -43,29 +43,20 @@ int MallocInfo::createCallstack(void * buffer[], int bufferSize, int omitCount) 
     return frames - omitCount;
 }
 
-const void * MallocInfo::getPointer() const {
-    return pointer;
-}
+const void * MallocInfo::getPointer() const { return pointer; }
 
-const std::string & MallocInfo::getCreatedInFile() const {
-    return createdInFile;
-}
+const std::string & MallocInfo::getCreatedInFile() const { return createdInFile; }
+int                 MallocInfo::getCreatedOnLine() const { return createdOnLine; }
 
-int MallocInfo::getCreatedOnLine() const {
-    return createdOnLine;
-}
+size_t MallocInfo::getSize() const { return size; }
 
-size_t MallocInfo::getSize() const {
-    return size;
-}
+const std::string & MallocInfo::getDeletedInFile() const { return deletedInFile; }
+int                 MallocInfo::getDeletedOnLine() const { return deletedOnLine; }
 
-const std::string & MallocInfo::getDeletedInFile() const {
-    return deletedInFile;
-}
+bool MallocInfo::isDeleted() const { return deleted; }
 
-int MallocInfo::getDeletedOnLine() const {
-    return deletedOnLine;
-}
+const void * const * MallocInfo::getCreatedCallstack() const { return createdCallstack; }
+const void * const * MallocInfo::getDeletedCallstack() const { return deletedCallstack; }
 
 void MallocInfo::setDeletedInFile(const std::string & file) {
     deletedInFile = file;
@@ -77,10 +68,6 @@ void MallocInfo::setDeletedOnLine(int line) {
 
 void MallocInfo::setDeleted(bool del) {
     deleted = del;
-}
-
-bool MallocInfo::isDeleted() const {
-    return deleted;
 }
 
 void MallocInfo::generateDeletedCallstack() {
@@ -117,14 +104,6 @@ void MallocInfo::printCreatedCallstack(std::ostream & stream) const {
 
 void MallocInfo::printDeletedCallstack(std::ostream & stream) const {
     printCallstack(deletedCallstack, deletedCallstackFrames, stream);
-}
-
-const void * const * MallocInfo::getCreatedCallstack() const {
-    return createdCallstack;
-}
-
-const void * const * MallocInfo::getDeletedCallstack() const {
-    return deletedCallstack;
 }
 
 bool operator==(const MallocInfo & lhs, const MallocInfo & rhs) {
