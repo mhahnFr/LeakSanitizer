@@ -25,6 +25,7 @@
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
 #include "bytePrinter.hpp"
+#include "../include/lsan_internals.h"
 
 MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, void * omitAddress, bool createdSet)
     : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(), createdCallstackFrames(), deletedOnLine(0), deleted(false), deletedCallstack(), deletedCallstackFrames(0) {
@@ -80,7 +81,8 @@ void MallocInfo::generateDeletedCallstack() {
 void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream & stream) {
     using Formatter::Style;
     char ** strings = backtrace_symbols(callstack, size);
-    for (int i = 0; i < size; ++i) {
+    int i;
+    for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
         Dl_info info;
         if (dladdr(callstack[i], &info)) {
             stream << (i == 0 ? ("In: " + Formatter::clear(Style::ITALIC) + Formatter::get(Style::BOLD))
@@ -99,6 +101,10 @@ void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream
         }
     }
     free(strings);
+    if (i < size) {
+        stream << "And " << size - i << " more lines..." << std::endl
+               << "To see more, increase the value of __lsan_callstackSize (currently " << __lsan_callstackSize << ")." << std::endl;
+    }
 }
 
 void MallocInfo::printCreatedCallstack(std::ostream & stream) const {
