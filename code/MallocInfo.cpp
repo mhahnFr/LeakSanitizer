@@ -37,12 +37,6 @@ MallocInfo::MallocInfo(void * const pointer, size_t size, void * omitAddress)
 MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, void * omitAddress)
     : MallocInfo(pointer, size, file, line, omitAddress, true) {}
 
-/*int MallocInfo::createCallstack(void * buffer[], int bufferSize, int omitCount) {
-    int frames = backtrace(buffer, bufferSize);
-    memmove(buffer, buffer + omitCount, static_cast<size_t>(bufferSize - omitCount));
-    return frames - omitCount;
-}*/
-
 int MallocInfo::createCallstack(void * buffer[], int bufferSize, void * omitAddress) {
     int i,
         frames = backtrace(buffer, bufferSize);

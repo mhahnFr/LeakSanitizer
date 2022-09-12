@@ -74,7 +74,6 @@ public:
     auto getCreatedCallstack() const -> const void * const *;
 
     static void printCallstack(void * const *, int, std::ostream &);
-    //static auto createCallstack(void *[], int, int = 1) -> int;
     static auto createCallstack(void *[], int, void * = __builtin_return_address(0)) -> int;
     
     friend auto operator==(const MallocInfo &, const MallocInfo &) -> bool;
