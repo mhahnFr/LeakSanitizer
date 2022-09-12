@@ -30,7 +30,7 @@ OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
 LDFLAGS = -ldl
-CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -O0
+CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
 
 NO_LICENSE = true
 ifeq ($(NO_LICENSE),true)

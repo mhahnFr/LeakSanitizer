@@ -26,21 +26,30 @@
 #include "Formatter.hpp"
 #include "bytePrinter.hpp"
 
-MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, int omitCount, bool createdSet)
+MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, void * omitAddress, bool createdSet)
     : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(), createdCallstackFrames(), deletedOnLine(0), deleted(false), deletedCallstack(), deletedCallstackFrames(0) {
-    createdCallstackFrames = createCallstack(createdCallstack, CALLSTACK_SIZE, omitCount);
+    createdCallstackFrames = createCallstack(createdCallstack, CALLSTACK_SIZE, omitAddress);
 }
 
-MallocInfo::MallocInfo(void * const pointer, size_t size, int omitCount)
-    : MallocInfo(pointer, size, "<Unknown>", 1, omitCount, false) {}
+MallocInfo::MallocInfo(void * const pointer, size_t size, void * omitAddress)
+    : MallocInfo(pointer, size, "<Unknown>", 1, omitAddress, false) {}
 
-MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, int omitCount)
-    : MallocInfo(pointer, size, file, line, omitCount, true) {}
+MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, void * omitAddress)
+    : MallocInfo(pointer, size, file, line, omitAddress, true) {}
 
-int MallocInfo::createCallstack(void * buffer[], int bufferSize, int omitCount) {
+/*int MallocInfo::createCallstack(void * buffer[], int bufferSize, int omitCount) {
     int frames = backtrace(buffer, bufferSize);
     memmove(buffer, buffer + omitCount, static_cast<size_t>(bufferSize - omitCount));
     return frames - omitCount;
+}*/
+
+int MallocInfo::createCallstack(void * buffer[], int bufferSize, void * omitAddress) {
+    int i,
+        frames = backtrace(buffer, bufferSize);
+    
+    for (i = 0; buffer[i] != omitAddress && i < bufferSize; ++i);
+    memmove(buffer, buffer + i, static_cast<size_t>(bufferSize - i));
+    return frames - i;
 }
 
 const void * MallocInfo::getPointer() const { return pointer; }

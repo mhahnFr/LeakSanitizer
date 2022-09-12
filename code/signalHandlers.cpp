@@ -54,7 +54,7 @@ static std::string signalString(int signal) {
     crash(Formatter::get(Style::BOLD) + Formatter::get(Style::RED)
           + signalString(signal)
           + Formatter::clear(Style::RED) + Formatter::clear(Style::BOLD)
-          + " on address " + Formatter::get(Style::BOLD) + address + Formatter::clear(Style::BOLD), 4);
+          + " on address " + Formatter::get(Style::BOLD) + address + Formatter::clear(Style::BOLD), __builtin_return_address(0));
 }
 
 void callstackSignal(int) {

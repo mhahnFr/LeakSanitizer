@@ -30,7 +30,7 @@ using namespace std::rel_ops;
 class MallocInfo {
     constexpr static int CALLSTACK_SIZE = 128;
     
-    MallocInfo(void * const, size_t, const std::string &, int, int, bool);
+    MallocInfo(void * const, size_t, const std::string &, int, void *, bool);
     
     void *      pointer;
     size_t      size;
@@ -48,8 +48,8 @@ class MallocInfo {
     int         deletedCallstackFrames;
         
 public:
-    MallocInfo(void * const, size_t, int = 4);
-    MallocInfo(void * const, size_t, const std::string &, int, int = 4);
+    MallocInfo(void * const, size_t, void * = __builtin_return_address(0));
+    MallocInfo(void * const, size_t, const std::string &, int, void * = __builtin_return_address(0));
     
     auto getPointer()        const -> const void *;
     auto getCreatedInFile()  const -> const std::string &;
@@ -74,7 +74,8 @@ public:
     auto getCreatedCallstack() const -> const void * const *;
 
     static void printCallstack(void * const *, int, std::ostream &);
-    static auto createCallstack(void *[], int, int = 1) -> int;
+    //static auto createCallstack(void *[], int, int = 1) -> int;
+    static auto createCallstack(void *[], int, void * = __builtin_return_address(0)) -> int;
     
     friend auto operator==(const MallocInfo &, const MallocInfo &) -> bool;
     friend auto operator<(const MallocInfo &, const MallocInfo &)  -> bool;

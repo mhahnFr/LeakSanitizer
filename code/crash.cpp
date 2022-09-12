@@ -22,29 +22,29 @@
 #include "Formatter.hpp"
 #include <iostream>
 
-[[ noreturn ]] static void crashShared(int omitCaller = 2) {
+[[ noreturn ]] static void crashShared(void * omitAddress = __builtin_return_address(0)) {
     std::cerr << std::endl;
     void * callstack[128];
-    int frames = MallocInfo::createCallstack(callstack, 128, omitCaller);
+    int frames = MallocInfo::createCallstack(callstack, 128, omitAddress);
     MallocInfo::printCallstack(callstack, frames, std::cerr);
     std::cerr << std::endl;
     std::terminate();
 }
 
-[[ noreturn ]] void crash(const std::string & reason, const char * file, int line, int omitCaller) {
+[[ noreturn ]] void crash(const std::string & reason, const char * file, int line, void * omitAddress) {
     using Formatter::Style;
     std::cerr << Formatter::get(Style::BOLD)
               << Formatter::get(Style::RED) << reason << Formatter::clear(Style::RED)
               << ", at "
               << Formatter::get(Style::UNDERLINED) << file << ":" << line
               << Formatter::clear(Style::UNDERLINED) << Formatter::clear(Style::BOLD);
-    crashShared(omitCaller);
+    crashShared(omitAddress);
 }
 
-[[ noreturn ]] void crash(const std::string & reason, int omitCaller) {
+[[ noreturn ]] void crash(const std::string & reason, void * omitAddress) {
     using Formatter::Style;
     std::cerr << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
               << reason << "!"
               << Formatter::clear(Style::BOLD) << Formatter::clear(Style::RED);
-    crashShared(omitCaller);
+    crashShared(omitAddress);
 }

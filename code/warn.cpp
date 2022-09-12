@@ -23,27 +23,27 @@
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
 
-static void warnShared(int omitCaller = 2) {
+static void warnShared(void * omitAddress = __builtin_return_address(0)) {
     std::cerr << std::endl;
     void * callstack[128];
-    int frames = MallocInfo::createCallstack(callstack, 128, omitCaller);
+    int frames = MallocInfo::createCallstack(callstack, 128, omitAddress);
     MallocInfo::printCallstack(callstack, frames, std::cerr);
     std::cerr << std::endl;
 }
 
-void warn(const std::string & message, const char * file, int line, int omitCaller) {
+void warn(const std::string & message, const char * file, int line, void * omitAddress) {
     using Formatter::Style;
     std::cerr << Formatter::get(Style::BOLD) << Formatter::get(Style::MAGENTA)
               << "Warning: " << message << Formatter::clear(Style::MAGENTA) << ", at "
               << Formatter::get(Style::UNDERLINED) << file << ":" << line
               << Formatter::clear(Style::BOLD) << Formatter::clear(Style::UNDERLINED);
-    warnShared(omitCaller);
+    warnShared(omitAddress);
 }
 
-void warn(const std::string & message, int omitCaller) {
+void warn(const std::string & message, void * omitAddress) {
     using Formatter::Style;
     std::cerr << Formatter::get(Style::BOLD) << Formatter::get(Style::MAGENTA)
               << "Warning: " << message << "!"
               << Formatter::clear(Style::BOLD) << Formatter::clear(Style::MAGENTA);
-    warnShared(omitCaller);
+    warnShared(omitAddress);
 }

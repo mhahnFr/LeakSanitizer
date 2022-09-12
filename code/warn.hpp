@@ -22,7 +22,7 @@
 
 #include <string>
 
-void warn(const std::string &, const char *, int, int = 3);
-void warn(const std::string &, int = 3);
+void warn(const std::string &, const char *, int, void * = __builtin_return_address(0));
+void warn(const std::string &, void * = __builtin_return_address(0));
 
 #endif /* warn_hpp */

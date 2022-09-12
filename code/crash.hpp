@@ -22,7 +22,7 @@
 
 #include <string>
 
-[[ noreturn ]] void crash(const std::string &, const char *, int, int = 3);
-[[ noreturn ]] void crash(const std::string &, int = 3);
+[[ noreturn ]] void crash(const std::string &, const char *, int, void * = __builtin_return_address(0));
+[[ noreturn ]] void crash(const std::string &, void * = __builtin_return_address(0));
 
 #endif /* crash_hpp */
