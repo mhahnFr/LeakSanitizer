@@ -21,6 +21,7 @@
 #define Stats_hpp
 
 #include <cstddef>
+#include <mutex>
 #include <thread>
 #include "MallocInfo.hpp"
 
