@@ -39,3 +39,5 @@ bool __lsan_freeNull       = true;
 #endif
 
 bool __lsan_trackMemory    = false;
+
+size_t __lsan_leakCount    = 100;

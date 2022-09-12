@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <stddef.h>
 
 /**
  * @brief If this value is set to true, the byte amounts are printed in a human friendly way.
@@ -99,6 +100,8 @@ extern bool __lsan_freeNull;
  * @since 1.2
  */
 extern bool __lsan_trackMemory;
+
+extern size_t __lsan_leakCount;
 
 #ifdef __cplusplus
 } // extern "C"

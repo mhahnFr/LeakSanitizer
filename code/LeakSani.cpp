@@ -213,9 +213,15 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     if (!self.infos.empty()) {
         stream << Formatter::get(Style::ITALIC);
         stream << self.getLeakCount() << " leaks total, " << bytesToString(self.getTotalLeakedBytes()) << " total" << std::endl << std::endl;
+        size_t i = 0;
         for (const auto & leak : self.infos) {
             if (!leak.second.isDeleted()) {
                 stream << leak.second << std::endl;
+                if (++i == __lsan_leakCount) {
+                    stream << "And xxx more..." << std::endl
+                           << "To see more, increase the value of __lsan_leak (currently " << __lsan_leakCount << ")." << std::endl;
+                    break;
+                }
             }
         }
         stream << Formatter::clear(Style::ITALIC);
