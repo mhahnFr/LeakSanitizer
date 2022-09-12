@@ -219,7 +219,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                 stream << leak.second << std::endl;
                 if (++i == __lsan_leakCount) {
                     stream << "And xxx more..." << std::endl
-                           << "To see more, increase the value of __lsan_leak (currently " << __lsan_leakCount << ")." << std::endl;
+                           << "To see more, increase the value of __lsan_leakCount (currently " << __lsan_leakCount << ")." << std::endl;
                     break;
                 }
             }

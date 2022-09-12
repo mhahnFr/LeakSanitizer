@@ -19,26 +19,26 @@
 
 #include "../include/lsan_internals.h"
 
-bool __lsan_humanPrint     = true;
-bool __lsan_printCout      = false;
-bool __lsan_printFormatted = true;
+bool __lsan_humanPrint      = true;
+bool __lsan_printCout       = false;
+bool __lsan_printFormatted  = true;
 
 #ifdef NO_LICENSE
-bool __lsan_printLicense   = false;
+bool __lsan_printLicense    = false;
 #else
-bool __lsan_printLicense   = true;
+bool __lsan_printLicense    = true;
 #endif
 
-bool __lsan_invalidCrash   = true;
-bool __lsan_invalidFree    = false;
+bool __lsan_invalidCrash    = true;
+bool __lsan_invalidFree     = false;
 
 #ifdef __linux__
-bool __lsan_freeNull       = false;
+bool __lsan_freeNull        = false;
 #else
-bool __lsan_freeNull       = true;
+bool __lsan_freeNull        = true;
 #endif
 
-bool __lsan_trackMemory    = false;
+bool __lsan_trackMemory     = false;
 
-size_t __lsan_leakCount    = 100;
-size_t __lsan_callstackSize= 20;
+size_t __lsan_leakCount     = 100;
+size_t __lsan_callstackSize = 20;
