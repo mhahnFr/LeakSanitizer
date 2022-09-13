@@ -27,6 +27,10 @@
 #include <cstdio>
 #include <iostream>
 
+#ifdef CPP_TRACK
+ #include <new>
+#endif
+
 #ifdef __GLIBC__
 bool __lsan_glibc = true;
 #else
@@ -35,12 +39,14 @@ bool __lsan_glibc = false;
 
 #ifdef CPP_TRACK
 void * operator new(size_t size) {
-    return malloc(size);
+    void * pointer = malloc(size);
+    if (pointer == nullptr) {
+        throw std::bad_alloc();
+    }
+    return pointer;
 }
 
-void operator delete(void * a) noexcept {
-    free(a);
-}
+void operator delete(void * pointer) noexcept { free(pointer); }
 #endif
 
 void * __wrap_malloc(size_t size, const char * file, int line) {
