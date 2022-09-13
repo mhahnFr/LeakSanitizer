@@ -212,14 +212,20 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
     if (!self.infos.empty()) {
         stream << Formatter::get(Style::ITALIC);
-        stream << self.getLeakCount() << " leaks total, " << bytesToString(self.getTotalLeakedBytes()) << " total" << std::endl << std::endl;
+        const size_t totalLeaks = self.getLeakCount();
+        stream << totalLeaks << " leaks total, " << bytesToString(self.getTotalLeakedBytes()) << " total" << std::endl << std::endl;
         size_t i = 0;
         for (const auto & leak : self.infos) {
             if (!leak.second.isDeleted()) {
                 stream << leak.second << std::endl;
                 if (++i == __lsan_leakCount) {
-                    stream << "And xxx more..." << std::endl
-                           << "To see more, increase the value of __lsan_leakCount (currently " << __lsan_leakCount << ")." << std::endl;
+                    stream << std::endl << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::ITALIC)
+                           << "And " << totalLeaks - i << " more..." << Formatter::clear(Style::UNDERLINED) << std::endl
+                           << Formatter::clear(Style::ITALIC) << Formatter::get(Style::GREYED)
+                           << "Hint:" << Formatter::get(Style::ITALIC) << " to see more, increase the value of "
+                           << Formatter::clear(Style::ITALIC) << "__lsan_leakCount" << Formatter::get(Style::ITALIC)
+                           << " (currently " << Formatter::clear(Style::ITALIC) << __lsan_leakCount << Formatter::get(Style::ITALIC) << ")."
+                           << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << std::endl;
                     break;
                 }
             }
