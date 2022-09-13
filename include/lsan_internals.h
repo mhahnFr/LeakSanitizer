@@ -101,7 +101,26 @@ extern bool __lsan_freeNull;
  */
 extern bool __lsan_trackMemory;
 
+/**
+ * @brief This value defines the count of leaks that are printed at the exit of the program.
+ *
+ * If more leaks are detected, the first leaks are printed and a message about the truncation
+ * is also printed.
+ * Defaults to 100.
+ *
+ * @since 1.3
+ */
 extern size_t __lsan_leakCount;
+
+/**
+ * @brief This value defines the number of functions that are printed in a callstack.
+ *
+ * If there are more functions in such a callstack, the top most functions are printed
+ * and a message about the truncation is printed.
+ * Defaults to 20.
+ *
+ * @since 1.3
+ */
 extern int __lsan_callstackSize;
 
 #ifdef __cplusplus
