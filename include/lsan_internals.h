@@ -102,7 +102,7 @@ extern bool __lsan_freeNull;
 extern bool __lsan_trackMemory;
 
 extern size_t __lsan_leakCount;
-extern size_t __lsan_callstackSize;
+extern int __lsan_callstackSize;
 
 #ifdef __cplusplus
 } // extern "C"
