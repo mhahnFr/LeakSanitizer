@@ -22,11 +22,11 @@
 #include "bytePrinter.hpp"
 #include "../include/lsan_internals.h"
 
-static const unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL;
+static constexpr unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL;
 
 std::string bytesToString(unsigned long long amount) {
     std::stringstream s;
-    if (!__lsan_humanPrint) {
+    if (!__lsan_humanPrint || amount == 0) {
         s << amount << " B";
     } else {
         const std::string sizes[] {"EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"};
