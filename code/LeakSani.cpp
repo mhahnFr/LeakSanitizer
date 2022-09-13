@@ -29,7 +29,7 @@
 
 bool __lsan_printStatsOnExit = false;
 
-#ifdef __glibc__
+#ifdef __GLIBC__
 extern "C" void * __libc_malloc (size_t);
 extern "C" void * __libc_calloc (size_t, size_t);
 extern "C" void * __libc_realloc(void *, size_t);
