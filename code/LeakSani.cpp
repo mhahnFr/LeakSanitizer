@@ -100,13 +100,10 @@ void LSan::changeMalloc(const MallocInfo & mInfo) {
         } else {
             realStats.replaceMalloc(it->second.getSize(), mInfo.getSize());
         }
-        // TODO: Don't replace it everytime!
         if (__lsan_trackMemory) {
             it->second.setDeleted(true);
-        } else {
-            infos.erase(it);
         }
-        infos.emplace(std::make_pair(mInfo.getPointer(), mInfo));
+        infos.insert_or_assign(mInfo.getPointer(), mInfo);
     }
 }
 
