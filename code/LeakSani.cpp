@@ -113,7 +113,7 @@ void LSan::changeMalloc(const MallocInfo & mInfo) {
 bool LSan::removeMalloc(const void * pointer) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     auto it = infos.find(pointer);
-    if (it == infos.end()) {
+    if (it == infos.end() || it->second.isDeleted()) {
         return false;
     }
     realStats -= it->second;
