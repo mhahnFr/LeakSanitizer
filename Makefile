@@ -50,8 +50,8 @@ else ifeq ($(shell uname -s), Darwin)
 endif
 
 VERSION = "clean build"
-ifneq ($(shell git tag | tail -n 1),)
-	VERSION = $(shell git tag | tail -n 1)
+ifneq ($(shell git describe --tags --abbrev=0),)
+	VERSION = $(shell git describe --tags --abbrev=0)
 endif
 
 default: $(NAME)
