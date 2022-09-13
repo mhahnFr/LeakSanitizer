@@ -102,8 +102,13 @@ void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream
     }
     free(strings);
     if (i < size) {
-        stream << "And " << size - i << " more lines..." << std::endl
-               << "To see more, increase the value of __lsan_callstackSize (currently " << __lsan_callstackSize << ")." << std::endl;
+        stream << std::endl << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::ITALIC)
+               << "And " << size - i << " more lines..." << Formatter::clear(Style::UNDERLINED) << std::endl
+               << Formatter::get(Style::GREYED) << Formatter::clear(Style::ITALIC)
+               << "Hint:" << Formatter::get(Style::ITALIC) << " to see more, increase the value of "
+               << Formatter::clear(Style::ITALIC) << "__lsan_callstackSize" << Formatter::get(Style::ITALIC)
+               << " (currently " << Formatter::clear(Style::ITALIC) << __lsan_callstackSize << Formatter::get(Style::ITALIC) << ")."
+               << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << std::endl;
     }
 }
 
