@@ -42,12 +42,7 @@ ifeq ($(CPP_TRACK),true)
 	CXXFLAGS += -DCPP_TRACK
 endif
 
-NAME = $(SHARED_L)
-ifeq ($(shell uname -s), Linux)
-	NAME = $(LIB_NAME)
-else ifeq ($(shell uname -s), Darwin)
-	NAME = $(LIB_NAME)
-endif
+NAME = $(LIB_NAME)
 
 VERSION = "clean build"
 ifneq ($(shell git describe --tags --abbrev=0),)

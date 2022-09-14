@@ -14,8 +14,9 @@ If this is the case, add ``-lexecinfo`` to the linking flags.
 In order to use this library, compile your code using the following flags: ``-Wno-gnu-include-next -I<path/to/library>/include``.
 
 **Linking**:
-- On ``macOS``, link using these flags: ``-L<path/to/library> -llsan -lc++``.
-- On ``Linux``, link with ``-rdynamic -L<path/to/library> -llsan -ldl -lstdc++``.
+- On **macOS**, link using these flags: ``-L<path/to/library> -llsan -lc++``.
+- On **Linux**, link with ``-rdynamic -L<path/to/library> -llsan -ldl -lstdc++``.
+- On **FreeBSD**, link with ``-rdynamic -L<path/to/library> -llsan -ldl -lexecinfo -lstdc++``.
 
 Once the library is correctly linked with your code, it will show your memory leaks at exit.  
 More features are described in the [wiki](https://www.github.com/mhahnFr/LeakSanitizer/wiki).
