@@ -267,6 +267,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
 void __lsan_printFragmentationStatsWithWidth(size_t width) {
     using Formatter::Style;
     bool ignore = LSan::ignoreMalloc();
+    LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_fragmentationStatsAvailable()) {
         __lsan_printStatsCore("memory fragmentation", width, out,
