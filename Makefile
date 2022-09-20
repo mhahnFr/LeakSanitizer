@@ -54,9 +54,16 @@ ifneq ($(shell git describe --tags --abbrev=0),)
 	VERSION = $(shell git describe --tags --abbrev=0)
 endif
 
+INSTALL_PATH ?= /usr/local
+
 default: $(NAME)
 
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
+
+# TODO: File checking
+install: $(SHARED_L)
+	cp $(SHARED_L) $(INSTALL_PATH)/lib
+	cp -r "include" "$(INSTALL_PATH)/include/"
 
 $(SHARED_L): $(OBJS)
 	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS)
