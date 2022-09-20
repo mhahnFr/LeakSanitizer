@@ -37,6 +37,11 @@ ifeq ($(NO_LICENSE),true)
 	CXXFLAGS += -DNO_LICENSE
 endif
 
+NO_WEBSITE = true
+ifeq ($(NO_WEBSITE),true)
+	CXXFLAGS += -DNO_WEBSITE
+endif
+
 CPP_TRACK = false
 ifeq ($(CPP_TRACK),true)
 	CXXFLAGS += -DCPP_TRACK

@@ -29,6 +29,12 @@ bool   __lsan_printLicense   = false;
 bool   __lsan_printLicense   = true;
 #endif
 
+#ifdef NO_WEBSITE
+bool   __lsan_printWebsite   = false;
+#else
+bool   __lsan_printWebsite   = true;
+#endif
+
 bool   __lsan_invalidCrash   = true;
 
 bool   __lsan_invalidFree    = false;

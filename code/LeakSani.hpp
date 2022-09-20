@@ -72,6 +72,7 @@ public:
     static void setIgnoreMalloc(bool);
     static void printInformations();
     static void printLicense();
+    static void printWebsite();
     static void __exit_hook();
 
     friend void           internalCleanUp();

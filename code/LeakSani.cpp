@@ -187,9 +187,8 @@ void LSan::printInformations(){
     out << "Report by " << Formatter::get(Style::BOLD) << "LeakSanitizer " << Formatter::clear(Style::BOLD)
         << Formatter::get(Style::ITALIC) << VERSION << Formatter::clear(Style::ITALIC)
         << std::endl << std::endl;
-    if (__lsan_printLicense) {
-        printLicense();
-    }
+    if (__lsan_printLicense) { printLicense(); }
+    if (__lsan_printWebsite) { printWebsite(); }
 }
 
 void LSan::printLicense() {
@@ -204,6 +203,17 @@ void LSan::printLicense() {
         << "You should have received a copy of the GNU General Public License along with"     << std::endl
         << "this library, see the file LICENSE. If not, see <https://www.gnu.org/licenses/>." << std::endl
         << std::endl;
+}
+
+void LSan::printWebsite() {
+    using Formatter::Style;
+    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    out << Formatter::get(Style::ITALIC)
+        << "For more information, visit "
+        << Formatter::get(Style::UNDERLINED)
+        << "github.com/mhahnFr/LeakSanitizer"
+        << Formatter::clear(Style::UNDERLINED) << Formatter::clear(Style::ITALIC)
+        << std::endl << std::endl;
 }
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {

@@ -65,6 +65,15 @@ extern bool __lsan_printFormatted;
 extern bool __lsan_printLicense;
 
 /**
+ * @brief If this value is set to true, the link to the home page of the LeakSanitizer is printed.
+ *
+ * Default value is set by the Makefile.
+ *
+ * @since 1.4
+ */
+extern bool __lsan_printWebsite;
+
+/**
  * @brief If this value is set to true, the program is terminated when doing something invalid
  * regarding the memory management.
  *
