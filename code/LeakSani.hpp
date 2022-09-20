@@ -29,11 +29,12 @@
 class LSan {
     static Stats * stats;
     
-    static bool & getIgnoreMalloc();
+    static auto getIgnoreMalloc() -> bool &;
     
     std::map<const void * const, MallocInfo> infos;
     std::recursive_mutex                     infoMutex;
     Stats                                    realStats;
+    bool                                     callstackSizeExceeded = false;
     
 public:
     LSan();
@@ -54,6 +55,8 @@ public:
     auto getLeakCount()           -> size_t;
     auto getInfoMutex()           -> std::recursive_mutex &;
     auto getInfos()         const -> const std::map<const void * const, MallocInfo> &;
+    
+    void setCallstackSizeExceeded(bool);
     
     static void * (*malloc) (size_t);
     static void * (*calloc) (size_t, size_t);

@@ -81,6 +81,8 @@ LSan::LSan() {
     stats = &realStats;
 }
 
+void LSan::setCallstackSizeExceeded(bool exceeded) { callstackSizeExceeded = exceeded; }
+
 void LSan::addMalloc(MallocInfo && mInfo) {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     realStats += mInfo;
@@ -216,6 +218,14 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
             if (!leak.second.isDeleted()) {
                 stream << leak.second << std::endl;
                 if (++i == __lsan_leakCount) {
+                    if (self.callstackSizeExceeded) {
+                        stream << Formatter::get(Style::GREYED)
+                               << "Hint:" << Formatter::get(Style::ITALIC) << " to see longer callstacks, increase the value of "
+                               << Formatter::clear(Style::ITALIC) << "__lsan_callstackSize" << Formatter::get(Style::ITALIC)
+                               << " (currently " << Formatter::clear(Style::ITALIC) << __lsan_callstackSize << Formatter::get(Style::ITALIC) << ")."
+                               << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << std::endl;
+                        self.callstackSizeExceeded = false;
+                    }
                     stream << std::endl << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::ITALIC)
                            << "And " << totalLeaks - i << " more..." << Formatter::clear(Style::UNDERLINED) << std::endl
                            << Formatter::clear(Style::ITALIC) << Formatter::get(Style::GREYED)
