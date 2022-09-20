@@ -63,7 +63,11 @@ all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 # TODO: File checking
 install: $(SHARED_L)
 	cp $(SHARED_L) $(INSTALL_PATH)/lib
-	cp -r "include" "$(INSTALL_PATH)/include/"
+	cp -r "include" "$(INSTALL_PATH)/include/lsan"
+
+uninstall:
+	$(RM) $(SHARED_L) $(INSTALL_PATH)/lib
+	$(RM) -r "$(INSTALL_PATH)/include/lsan"
 
 $(SHARED_L): $(OBJS)
 	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS)
@@ -86,6 +90,6 @@ fclean: clean
 re: fclean
 	$(MAKE) default
 
-.PHONY: re fclean clean all
+.PHONY: re fclean clean all uninstall
 
 -include $(DEPS)
