@@ -24,7 +24,6 @@
 #include "Formatter.hpp"
 #include "../include/lsan_stats.h"
 #include "../include/lsan_internals.h"
-#include <cstdio>
 #include <iostream>
 
 #ifdef CPP_TRACK

@@ -17,7 +17,6 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
 #include <iomanip>
 #include "bytePrinter.hpp"
 #include "../include/lsan_internals.h"
