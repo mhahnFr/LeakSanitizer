@@ -120,7 +120,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         }
     } else {
         const float step = infos.size() / static_cast<float>(width),
-                    loss = fmod(step, static_cast<int>(step));
+                    loss = fmodf(step, static_cast<int>(step));
         float    tmpLoss = 0.0f;
         
         bool previousFilled    = false,
@@ -128,7 +128,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         
         size_t previousFs = 0;
         for (size_t i = 0; i < width; ++i) {
-            auto e = std::next(it, step);
+            auto e = std::next(it, static_cast<int>(step));
             tmpLoss += loss;
             bool corrected = false;
             if (tmpLoss >= 1.0f) {
@@ -191,7 +191,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
     const size_t total       = LSan::getInstance().getTotalAllocatedBytes();
     
     if (total < width) {
-        const size_t step = static_cast<float>(width) / total;
+        const size_t step = static_cast<size_t>(static_cast<float>(width) / total);
         for (; b < total; ++b) {
             if (b >= currentBlockEnd) {
                 ++it;
@@ -205,7 +205,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         }
     } else {
         const float step = total / static_cast<float>(width),
-                    loss = fmod(step, static_cast<int>(step));
+                    loss = fmodf(step, static_cast<int>(step));
         float    tmpLoss = 0.0f;
         
         bool previousFilled    = false,
@@ -214,7 +214,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         size_t previousFs = 0;
         for (size_t i = 0; i < width; ++i) {
             bool corrected = false;
-            size_t tmpStep = step;
+            size_t tmpStep = static_cast<size_t>(step);
             tmpLoss += loss;
             if (tmpLoss >= 1.0f) {
                 tmpLoss -= 1.0f;

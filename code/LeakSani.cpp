@@ -140,9 +140,9 @@ size_t LSan::getTotalAllocatedBytes() {
 size_t LSan::getLeakCount() {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
     if (__lsan_trackMemory) {
-        return std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
+        return static_cast<size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
             return !elem.second.isDeleted();
-        });
+        }));
     } else {
         return infos.size();
     }
