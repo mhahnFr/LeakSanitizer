@@ -78,7 +78,7 @@ $(DYLIB_NA): $(OBJS) # libcallstack
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
 
 $(LIB_NAME): $(OBJS) $(LIBCALLSTACK_A)
-	$(AR) -crs $(LIB_NAME) $(OBJS) $(LIBCALLSTACK_A)
+	$(AR) -crsv $(LIB_NAME) $(OBJS) $(LIBCALLSTACK_A)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
