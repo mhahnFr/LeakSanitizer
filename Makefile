@@ -29,7 +29,10 @@ HDR = $(shell find . -name \*.h)
 OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
-LDFLAGS = -ldl
+LIBCALLSTACK_DIR = ./CallstackLibrary
+LIBCALLSTACK_A   = $(LIBCALLSTACK_DIR)/libcallstack.a
+
+LDFLAGS = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
 
 NO_LICENSE = true
@@ -68,23 +71,28 @@ uninstall:
 	$(RM) $(INSTALL_PATH)/lib/$(SHARED_L)
 	$(RM) -r "$(INSTALL_PATH)/include/lsan"
 
-$(SHARED_L): $(OBJS)
+$(SHARED_L): $(OBJS) # libcallstack
 	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS)
 
-$(DYLIB_NA): $(OBJS)
+$(DYLIB_NA): $(OBJS) # libcallstack
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
 
-$(LIB_NAME): $(OBJS)
-	$(AR) -crs $(LIB_NAME) $(OBJS)
+$(LIB_NAME): $(OBJS) $(LIBCALLSTACK_A)
+	$(AR) -crs $(LIB_NAME) $(OBJS) $(LIBCALLSTACK_A)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
+$(LIBCALLSTACK_A):
+	$(MAKE) -C $(LIBCALLSTACK_DIR) libcallstack.a
+
 clean:
 	- $(RM) $(OBJS) $(DEPS)
+	- $(MAKE) -C $(LIBCALLSTACK_DIR) clean
 
 fclean: clean
 	- $(RM) $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
+	- $(MAKE) -C $(LIBCALLSTACK_DIR) fclean
 
 re: fclean
 	$(MAKE) default
