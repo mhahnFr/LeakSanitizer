@@ -97,6 +97,9 @@ void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream
             } else {
                 stream << info.dli_sname + (" + " + std::to_string(static_cast<char *>(callstack[i]) - static_cast<char *>(info.dli_saddr)));
             }
+            if (i == 0) {
+                stream << Formatter::clear(Style::BOLD);
+            }
             stream << std::endl;
         }
     }
