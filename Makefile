@@ -31,6 +31,7 @@ DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
 LIBCALLSTACK_DIR = ./CallstackLibrary
 LIBCALLSTACK_A   = $(LIBCALLSTACK_DIR)/libcallstack.a
+LIBCALLSTACK_EX  = tmpLibCallstack
 
 LDFLAGS = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
@@ -77,8 +78,8 @@ $(SHARED_L): $(OBJS) # libcallstack
 $(DYLIB_NA): $(OBJS) # libcallstack
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
 
-$(LIB_NAME): $(OBJS) $(LIBCALLSTACK_A)
-	$(AR) -crsv $(LIB_NAME) $(OBJS) $(LIBCALLSTACK_A)
+$(LIB_NAME): $(OBJS) $(LIBCALLSTACK_EX)
+	$(AR) -crsv $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EX) -type f)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
@@ -86,8 +87,13 @@ $(LIB_NAME): $(OBJS) $(LIBCALLSTACK_A)
 $(LIBCALLSTACK_A):
 	$(MAKE) -C $(LIBCALLSTACK_DIR) libcallstack.a
 
+$(LIBCALLSTACK_EX): $(LIBCALLSTACK_A)
+	mkdir -p $(LIBCALLSTACK_EX)
+	cd $(LIBCALLSTACK_EX); $(AR) -x $(abspath $(LIBCALLSTACK_A))
+
 clean:
 	- $(RM) $(OBJS) $(DEPS)
+	- $(RM) -r tmpLibCallstack
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) clean
 
 fclean: clean
