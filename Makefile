@@ -29,9 +29,12 @@ HDR = $(shell find . -name \*.h)
 OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
-LIBCALLSTACK_DIR = ./CallstackLibrary
-LIBCALLSTACK_A   = $(LIBCALLSTACK_DIR)/libcallstack.a
-LIBCALLSTACK_EX  = tmpLibCallstack
+LIBCALLSTACK_NAME = libcallstack
+LIBCALLSTACK_DIR  = ./CallstackLibrary
+LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
+LIBCALLSTACK_SO   = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).so
+LIBCALLSTACK_DY   = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).dylib
+LIBCALLSTACK_EXTR = tmpLibCallstack
 
 LDFLAGS = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
@@ -72,28 +75,34 @@ uninstall:
 	$(RM) $(INSTALL_PATH)/lib/$(SHARED_L)
 	$(RM) -r "$(INSTALL_PATH)/include/lsan"
 
-$(SHARED_L): $(OBJS) # libcallstack
-	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS)
+$(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
+	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS) $(LIBCALLSTACK_A)
 
-$(DYLIB_NA): $(OBJS) # libcallstack
-	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
+$(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
+	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS) $(LIBCALLSTACK_A)
 
-$(LIB_NAME): $(OBJS) $(LIBCALLSTACK_EX)
-	$(AR) -crsv $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EX) -type f)
+$(LIB_NAME): $(OBJS) $(LIBCALLSTACK_EXTR)
+	$(AR) -crsv $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EXTR) -type f -name \*.o)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 $(LIBCALLSTACK_A):
-	$(MAKE) -C $(LIBCALLSTACK_DIR) libcallstack.a
+	$(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_NAME).a
 
-$(LIBCALLSTACK_EX): $(LIBCALLSTACK_A)
-	mkdir -p $(LIBCALLSTACK_EX)
-	cd $(LIBCALLSTACK_EX); $(AR) -x $(abspath $(LIBCALLSTACK_A))
+$(LIBCALLSTACK_SO):
+	$(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_NAME).so
+	
+$(LIBCALLSTACK_DY):
+	$(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_NAME).dylib
+
+$(LIBCALLSTACK_EXTR): $(LIBCALLSTACK_A)
+	mkdir -p $(LIBCALLSTACK_EXTR)
+	cd $(LIBCALLSTACK_EXTR); $(AR) -x $(abspath $(LIBCALLSTACK_A))
 
 clean:
 	- $(RM) $(OBJS) $(DEPS)
-	- $(RM) -r tmpLibCallstack
+	- $(RM) -r $(LIBCALLSTACK_EXTR)
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) clean
 
 fclean: clean
