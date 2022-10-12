@@ -25,6 +25,8 @@
 #include <string>
 #include <utility>
 
+#include "../CallstackLibrary/include/callstack.h"
+
 using namespace std::rel_ops;
 
 class MallocInfo {
@@ -35,21 +37,27 @@ class MallocInfo {
     void *      pointer;
     size_t      size;
     
-    std::string createdInFile;
-    int         createdOnLine;
-    bool        createdSet;
-    void *      createdCallstack[CALLSTACK_SIZE];
-    int         createdCallstackFrames;
+    std::string              createdInFile;
+    int                      createdOnLine;
+    bool                     createdSet;
+    mutable struct callstack createdCallstack;
 
-    std::string deletedInFile;
-    int         deletedOnLine;
-    bool        deleted;
-    void *      deletedCallstack[CALLSTACK_SIZE];
-    int         deletedCallstackFrames;
+    std::string              deletedInFile;
+    int                      deletedOnLine;
+    bool                     deleted;
+    mutable struct callstack deletedCallstack;
         
 public:
     MallocInfo(void * const, size_t, void * = __builtin_return_address(0));
     MallocInfo(void * const, size_t, const std::string &, int, void * = __builtin_return_address(0));
+    
+    MallocInfo(MallocInfo &&)      = default;
+    
+    MallocInfo(const MallocInfo &);
+   ~MallocInfo();
+    
+    MallocInfo & operator=(const MallocInfo &);
+    MallocInfo & operator=(MallocInfo &&);
     
     auto getPointer()        const -> const void *;
     auto getCreatedInFile()  const -> const std::string &;
@@ -70,10 +78,11 @@ public:
     void printCreatedCallstack(std::ostream &) const;
     void printDeletedCallstack(std::ostream &) const;
     
-    auto getDeletedCallstack() const -> const void * const *;
-    auto getCreatedCallstack() const -> const void * const *;
+    auto getDeletedCallstack() const -> const struct callstack &;
+    auto getCreatedCallstack() const -> const struct callstack &;
 
-    static void printCallstack(void * const *, int, std::ostream &);
+    static void printCallstack(struct callstack &, std::ostream &);
+    //static void printCallstackOld(void * const *, int, std::ostream &);
     static auto createCallstack(void *[], int, void * = __builtin_return_address(0)) -> int;
     
     friend auto operator==(const MallocInfo &, const MallocInfo &) -> bool;

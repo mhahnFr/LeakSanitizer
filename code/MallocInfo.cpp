@@ -28,8 +28,10 @@
 #include "../include/lsan_internals.h"
 
 MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, void * omitAddress, bool createdSet)
-    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(), createdCallstackFrames(), deletedOnLine(0), deleted(false), deletedCallstack(), deletedCallstackFrames(0) {
-    createdCallstackFrames = createCallstack(createdCallstack, CALLSTACK_SIZE, omitAddress);
+    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(), deletedOnLine(0), deleted(false), deletedCallstack() {
+    void * trace[CALLSTACK_SIZE];
+    int length = createCallstack(trace, CALLSTACK_SIZE, omitAddress);
+    callstack_emplaceWithBacktrace(&createdCallstack, trace, static_cast<size_t>(length));
 }
 
 MallocInfo::MallocInfo(void * const pointer, size_t size, void * omitAddress)
@@ -37,6 +39,56 @@ MallocInfo::MallocInfo(void * const pointer, size_t size, void * omitAddress)
 
 MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, void * omitAddress)
     : MallocInfo(pointer, size, file, line, omitAddress, true) {}
+
+MallocInfo::MallocInfo(const MallocInfo & other)
+    : pointer(other.pointer), size(other.size), createdInFile(other.createdInFile), createdOnLine(other.createdOnLine), createdSet(other.createdSet), createdCallstack(), deletedInFile(other.deletedInFile), deletedOnLine(other.deletedOnLine), deleted(other.deleted), deletedCallstack() {
+    callstack_copy(&createdCallstack, &other.createdCallstack);
+    callstack_copy(&deletedCallstack, &other.deletedCallstack);
+}
+
+MallocInfo::~MallocInfo() {
+    callstack_destroy(&deletedCallstack);
+    callstack_destroy(&createdCallstack);
+}
+
+MallocInfo & MallocInfo::operator=(const MallocInfo & other) {
+    if (std::addressof(other) != this) {
+        callstack_copy(&createdCallstack, &other.createdCallstack);
+        callstack_copy(&deletedCallstack, &other.deletedCallstack);
+        
+        pointer = other.pointer;
+        size    = other.size;
+        
+        createdInFile = other.createdInFile;
+        createdOnLine = other.createdOnLine;
+        createdSet    = other.createdSet;
+        
+        deletedInFile = other.deletedInFile;
+        deletedOnLine = other.deletedOnLine;
+        deleted       = other.deleted;
+    }
+    return *this;
+}
+
+MallocInfo & MallocInfo::operator=(MallocInfo && other) {
+    callstack_destroy(&createdCallstack);
+    callstack_destroy(&deletedCallstack);
+    
+    pointer          = std::move(other.pointer);
+    size             = std::move(other.size);
+    
+    createdInFile    = std::move(other.createdInFile);
+    createdOnLine    = std::move(other.createdOnLine);
+    createdSet       = std::move(other.createdSet);
+    createdCallstack = std::move(other.createdCallstack);
+    
+    deletedInFile    = std::move(other.deletedInFile);
+    deletedOnLine    = std::move(other.deletedOnLine);
+    deleted          = std::move(other.deleted);
+    deletedCallstack = std::move(other.deletedCallstack);
+    
+    return *this;
+}
 
 int MallocInfo::createCallstack(void * buffer[], int bufferSize, void * omitAddress) {
     int i,
@@ -59,8 +111,8 @@ int                 MallocInfo::getDeletedOnLine() const { return deletedOnLine;
 
 bool MallocInfo::isDeleted() const { return deleted; }
 
-const void * const * MallocInfo::getCreatedCallstack() const { return createdCallstack; }
-const void * const * MallocInfo::getDeletedCallstack() const { return deletedCallstack; }
+const struct callstack & MallocInfo::getCreatedCallstack() const { return createdCallstack; }
+const struct callstack & MallocInfo::getDeletedCallstack() const { return deletedCallstack; }
 
 void MallocInfo::setDeletedInFile(const std::string & file) {
     deletedInFile = file;
@@ -75,35 +127,25 @@ void MallocInfo::setDeleted(bool del) {
 }
 
 void MallocInfo::generateDeletedCallstack() {
-    deletedCallstackFrames = createCallstack(deletedCallstack, CALLSTACK_SIZE);
+    void * trace[CALLSTACK_SIZE];
+    int length = createCallstack(trace, CALLSTACK_SIZE);
+    callstack_emplaceWithBacktrace(&deletedCallstack, trace, length);
 }
 
-void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream & stream) {
+void MallocInfo::printCallstack(struct callstack & callstack, std::ostream & stream) {
     using Formatter::Style;
-    char ** strings = backtrace_symbols(callstack, size);
-    int i;
+    char ** strings = callstack_toArray(&callstack);
+    const size_t size = callstack_getFrameCount(&callstack);
+    size_t i;
     for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
-        Dl_info info;
-        if (dladdr(callstack[i], &info)) {
-            stream << (i == 0 ? ("In: " + Formatter::clear(Style::ITALIC) + Formatter::get(Style::BOLD))
-                              : (Formatter::clear(Style::BOLD) + Formatter::get(Style::ITALIC) + "at: " + Formatter::clear(Style::ITALIC)));
-            char * demangled;
-            int status;
-            if (info.dli_sname == nullptr) {
-                stream << strings[i];
-            } else if ((demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status)) != nullptr) {
-                stream << demangled;
-                free(demangled);
-            } else {
-                stream << info.dli_sname + (" + " + std::to_string(static_cast<char *>(callstack[i]) - static_cast<char *>(info.dli_saddr)));
-            }
-            if (i == 0) {
-                stream << Formatter::clear(Style::BOLD);
-            }
-            stream << std::endl;
+        stream << (i == 0 ? ("In: " + Formatter::clear(Style::ITALIC) + Formatter::get(Style::BOLD))
+                          : (Formatter::clear(Style::BOLD) + Formatter::get(Style::ITALIC) + "at: " + Formatter::clear(Style::ITALIC)));
+        stream << (strings[i] == nullptr ? "<Unknown>" : strings[i]);
+        if (i == 0) {
+            stream << Formatter::clear(Style::BOLD);
         }
+        stream << std::endl;
     }
-    free(strings);
     if (i < size) {
         stream << std::endl << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::ITALIC)
                << "And " << size - i << " more lines..."
@@ -113,11 +155,11 @@ void MallocInfo::printCallstack(void * const * callstack, int size, std::ostream
 }
 
 void MallocInfo::printCreatedCallstack(std::ostream & stream) const {
-    printCallstack(createdCallstack, createdCallstackFrames, stream);
+    printCallstack(createdCallstack, stream);
 }
 
 void MallocInfo::printDeletedCallstack(std::ostream & stream) const {
-    printCallstack(deletedCallstack, deletedCallstackFrames, stream);
+    printCallstack(deletedCallstack, stream);
 }
 
 bool operator==(const MallocInfo & lhs, const MallocInfo & rhs) {

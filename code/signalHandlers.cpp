@@ -66,9 +66,9 @@ void callstackSignal(int) {
         << "The current callstack:"
         << Formatter::clear(Style::ITALIC) << std::endl;
     
-    void * callstack[128];
-    int frames = MallocInfo::createCallstack(callstack, 128);
-    MallocInfo::printCallstack(callstack, frames, out);
+    struct callstack callstack;
+    callstack_emplace(&callstack);
+    MallocInfo::printCallstack(callstack, out);
     out << std::endl;
     if (!ignore) {
         LSan::setIgnoreMalloc(false);
