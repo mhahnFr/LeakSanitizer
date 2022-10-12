@@ -82,7 +82,7 @@ $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS) $(LIBCALLSTACK_A)
 
 $(LIB_NAME): $(OBJS) $(LIBCALLSTACK_EXTR)
-	$(AR) -crsv $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EXTR) -type f -name \*.o)
+	$(AR) -crs $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EXTR) -type f -name \*.o)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
