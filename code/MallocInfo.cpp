@@ -18,8 +18,6 @@
  */
 
 #include <execinfo.h>
-#include <dlfcn.h>
-#include <cxxabi.h>
 #include <cstring>
 #include "MallocInfo.hpp"
 #include "LeakSani.hpp"
