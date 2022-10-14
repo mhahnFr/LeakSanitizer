@@ -22,7 +22,7 @@
 #include "Formatter.hpp"
 #include <iostream>
 
-[[ noreturn ]] static void crashShared(void * omitAddress = __builtin_return_address(0)) {
+[[ noreturn ]] static inline void crashShared(void * omitAddress = __builtin_return_address(0)) {
     std::cerr << std::endl;
     void * callstack[128];
     int frames = MallocInfo::createCallstack(callstack, 128, omitAddress);
