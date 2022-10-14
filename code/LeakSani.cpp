@@ -46,7 +46,7 @@ void * (*LSan::calloc) (size_t, size_t) = reinterpret_cast<void * (*)(size_t, si
 void * (*LSan::realloc)(void *, size_t) = reinterpret_cast<void * (*)(void *, size_t)>(dlsym(RTLD_NEXT, "realloc"));
 void   (*LSan::free)   (void *)         = reinterpret_cast<void   (*)(void *)>        (dlsym(RTLD_NEXT, "free"));
 
-#endif /* __linux__ */
+#endif /* __GLIBC__ */
 
 void (*LSan::exit)(int) = _Exit;
 
