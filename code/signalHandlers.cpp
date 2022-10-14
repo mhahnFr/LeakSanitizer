@@ -66,9 +66,7 @@ void callstackSignal(int) {
         << "The current callstack:"
         << Formatter::clear(Style::ITALIC) << std::endl;
     
-    struct callstack callstack;
-    callstack_emplace(&callstack);
-    MallocInfo::printCallstack(callstack, out);
+    MallocInfo::printCallstack(cs::callstack(), out);
     out << std::endl;
     if (!ignore) {
         LSan::setIgnoreMalloc(false);

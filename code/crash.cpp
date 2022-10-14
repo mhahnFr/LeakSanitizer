@@ -26,9 +26,7 @@
     std::cerr << std::endl;
     void * callstack[128];
     int frames = MallocInfo::createCallstack(callstack, 128, omitAddress);
-    struct callstack tmp;
-    callstack_emplaceWithBacktrace(&tmp, callstack, static_cast<size_t>(frames));
-    MallocInfo::printCallstack(tmp, std::cerr);
+    MallocInfo::printCallstack(cs::callstack(callstack, static_cast<size_t>(frames)), std::cerr);
     std::cerr << std::endl;
     std::terminate();
 }

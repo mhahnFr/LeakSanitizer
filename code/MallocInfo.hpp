@@ -37,27 +37,19 @@ class MallocInfo {
     void *      pointer;
     size_t      size;
     
-    std::string              createdInFile;
-    int                      createdOnLine;
-    bool                     createdSet;
-    mutable struct callstack createdCallstack;
+    std::string           createdInFile;
+    int                   createdOnLine;
+    bool                  createdSet;
+    mutable cs::callstack createdCallstack;
 
-    std::string              deletedInFile;
-    int                      deletedOnLine;
-    bool                     deleted;
-    mutable struct callstack deletedCallstack;
+    std::string           deletedInFile;
+    int                   deletedOnLine;
+    bool                  deleted;
+    mutable cs::callstack deletedCallstack;
         
 public:
     MallocInfo(void * const, size_t, void * = __builtin_return_address(0));
     MallocInfo(void * const, size_t, const std::string &, int, void * = __builtin_return_address(0));
-    
-    MallocInfo(MallocInfo &&)      = default;
-    
-    MallocInfo(const MallocInfo &);
-   ~MallocInfo();
-    
-    MallocInfo & operator=(const MallocInfo &);
-    MallocInfo & operator=(MallocInfo &&);
     
     auto getPointer()        const -> const void *;
     auto getCreatedInFile()  const -> const std::string &;
@@ -78,11 +70,11 @@ public:
     void printCreatedCallstack(std::ostream &) const;
     void printDeletedCallstack(std::ostream &) const;
     
-    auto getDeletedCallstack() const -> const struct callstack &;
-    auto getCreatedCallstack() const -> const struct callstack &;
+    auto getDeletedCallstack() const -> const cs::callstack &;
+    auto getCreatedCallstack() const -> const cs::callstack &;
 
-    static void printCallstack(struct callstack &, std::ostream &);
-    //static void printCallstackOld(void * const *, int, std::ostream &);
+    static void printCallstack(cs::callstack &,  std::ostream &);
+    static void printCallstack(cs::callstack &&, std::ostream &);
     static auto createCallstack(void *[], int, void * = __builtin_return_address(0)) -> int;
     
     friend auto operator==(const MallocInfo &, const MallocInfo &) -> bool;
