@@ -37,14 +37,14 @@ class MallocInfo {
     void *      pointer;
     size_t      size;
     
-    std::string           createdInFile;
-    int                   createdOnLine;
-    bool                  createdSet;
+    std::string            createdInFile;
+    int                    createdOnLine;
+    bool                   createdSet;
     mutable lcs::callstack createdCallstack;
 
-    std::string           deletedInFile;
-    int                   deletedOnLine;
-    bool                  deleted;
+    std::string            deletedInFile;
+    int                    deletedOnLine;
+    bool                   deleted;
     mutable lcs::callstack deletedCallstack;
         
 public:
