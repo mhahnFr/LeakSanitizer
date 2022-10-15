@@ -59,8 +59,8 @@ int                 MallocInfo::getDeletedOnLine() const { return deletedOnLine;
 
 bool MallocInfo::isDeleted() const { return deleted; }
 
-const cs::callstack & MallocInfo::getCreatedCallstack() const { return createdCallstack; }
-const cs::callstack & MallocInfo::getDeletedCallstack() const { return deletedCallstack; }
+const lcs::callstack & MallocInfo::getCreatedCallstack() const { return createdCallstack; }
+const lcs::callstack & MallocInfo::getDeletedCallstack() const { return deletedCallstack; }
 
 void MallocInfo::setDeletedInFile(const std::string & file) {
     deletedInFile = file;
@@ -80,11 +80,11 @@ void MallocInfo::generateDeletedCallstack() {
     callstack_emplaceWithBacktrace(deletedCallstack, trace, length);
 }
 
-void MallocInfo::printCallstack(cs::callstack && callstack, std::ostream & stream) {
+void MallocInfo::printCallstack(lcs::callstack && callstack, std::ostream & stream) {
     printCallstack(callstack, stream);
 }
 
-void MallocInfo::printCallstack(cs::callstack & callstack, std::ostream & stream) {
+void MallocInfo::printCallstack(lcs::callstack & callstack, std::ostream & stream) {
     using Formatter::Style;
     char ** strings = callstack_toArray(callstack);
     const size_t size = callstack_getFrameCount(callstack);

@@ -40,12 +40,12 @@ class MallocInfo {
     std::string           createdInFile;
     int                   createdOnLine;
     bool                  createdSet;
-    mutable cs::callstack createdCallstack;
+    mutable lcs::callstack createdCallstack;
 
     std::string           deletedInFile;
     int                   deletedOnLine;
     bool                  deleted;
-    mutable cs::callstack deletedCallstack;
+    mutable lcs::callstack deletedCallstack;
         
 public:
     MallocInfo(void * const, size_t, void * = __builtin_return_address(0));
@@ -70,11 +70,11 @@ public:
     void printCreatedCallstack(std::ostream &) const;
     void printDeletedCallstack(std::ostream &) const;
     
-    auto getDeletedCallstack() const -> const cs::callstack &;
-    auto getCreatedCallstack() const -> const cs::callstack &;
+    auto getDeletedCallstack() const -> const lcs::callstack &;
+    auto getCreatedCallstack() const -> const lcs::callstack &;
 
-    static void printCallstack(cs::callstack &,  std::ostream &);
-    static void printCallstack(cs::callstack &&, std::ostream &);
+    static void printCallstack(lcs::callstack &,  std::ostream &);
+    static void printCallstack(lcs::callstack &&, std::ostream &);
     static auto createCallstack(void *[], int, void * = __builtin_return_address(0)) -> int;
     
     friend auto operator==(const MallocInfo &, const MallocInfo &) -> bool;

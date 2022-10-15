@@ -27,7 +27,7 @@ static inline void warnShared(void * omitAddress = __builtin_return_address(0)) 
     std::cerr << std::endl;
     void * callstack[128];
     int frames = MallocInfo::createCallstack(callstack, 128, omitAddress);
-    MallocInfo::printCallstack(cs::callstack(callstack, static_cast<size_t>(frames)), std::cerr);
+    MallocInfo::printCallstack(lcs::callstack(callstack, static_cast<size_t>(frames)), std::cerr);
     std::cerr << std::endl;
 }
 
