@@ -44,4 +44,4 @@ bool   __lsan_trackMemory    = false;
 
 size_t __lsan_leakCount      = 100;
 
-int    __lsan_callstackSize  = 20;
+size_t __lsan_callstackSize  = 20;

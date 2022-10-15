@@ -130,7 +130,7 @@ extern size_t __lsan_leakCount;
  *
  * @since 1.3
  */
-extern int __lsan_callstackSize;
+extern size_t __lsan_callstackSize;
 
 #ifdef __cplusplus
 } // extern "C"
