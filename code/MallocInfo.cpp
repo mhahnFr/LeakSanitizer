@@ -29,7 +29,7 @@ MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & fi
     : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(false), deletedOnLine(0), deleted(false), deletedCallstack(false) {
     void * trace[CALLSTACK_SIZE];
     int length = createCallstack(trace, CALLSTACK_SIZE, omitAddress);
-    callstack_emplaceWithBacktrace(createdCallstack, trace, static_cast<size_t>(length));
+    callstack_emplaceWithBacktrace(createdCallstack, trace, length);
 }
 
 MallocInfo::MallocInfo(void * const pointer, size_t size, void * omitAddress)
