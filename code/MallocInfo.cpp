@@ -26,26 +26,13 @@
 #include "../include/lsan_internals.h"
 
 MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, void * omitAddress, bool createdSet)
-    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(false), deletedOnLine(0), deleted(false), deletedCallstack(false) {
-    void * trace[CALLSTACK_SIZE];
-    int length = createCallstack(trace, CALLSTACK_SIZE, omitAddress);
-    callstack_emplaceWithBacktrace(createdCallstack, trace, length);
-}
+    : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdSet(createdSet), createdCallstack(omitAddress), deletedOnLine(0), deleted(false), deletedCallstack(false) {}
 
 MallocInfo::MallocInfo(void * const pointer, size_t size, void * omitAddress)
     : MallocInfo(pointer, size, "<Unknown>", 1, omitAddress, false) {}
 
 MallocInfo::MallocInfo(void * const pointer, size_t size, const std::string & file, const int line, void * omitAddress)
     : MallocInfo(pointer, size, file, line, omitAddress, true) {}
-
-int MallocInfo::createCallstack(void * buffer[], int bufferSize, void * omitAddress) {
-    int i,
-        frames = backtrace(buffer, bufferSize);
-    
-    for (i = 0; buffer[i] != omitAddress && i < bufferSize; ++i);
-    memmove(buffer, buffer + i, static_cast<size_t>(bufferSize - i));
-    return frames - i;
-}
 
 const void * MallocInfo::getPointer() const { return pointer; }
 
@@ -75,9 +62,7 @@ void MallocInfo::setDeleted(bool del) {
 }
 
 void MallocInfo::generateDeletedCallstack() {
-    void * trace[CALLSTACK_SIZE];
-    int length = createCallstack(trace, CALLSTACK_SIZE);
-    callstack_emplaceWithBacktrace(deletedCallstack, trace, length);
+    callstack_emplaceWithAddress(deletedCallstack, __builtin_return_address(0));
 }
 
 void MallocInfo::printCallstack(lcs::callstack && callstack, std::ostream & stream) {

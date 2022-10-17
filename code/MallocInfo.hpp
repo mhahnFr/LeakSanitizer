@@ -75,7 +75,6 @@ public:
 
     static void printCallstack(lcs::callstack &,  std::ostream &);
     static void printCallstack(lcs::callstack &&, std::ostream &);
-    static auto createCallstack(void *[], int, void * = __builtin_return_address(0)) -> int;
     
     friend auto operator==(const MallocInfo &, const MallocInfo &) -> bool;
     friend auto operator<(const MallocInfo &, const MallocInfo &)  -> bool;
