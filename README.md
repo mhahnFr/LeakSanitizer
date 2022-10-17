@@ -5,7 +5,7 @@ to gain insights into the memory usage of your program.
 ## Usage
 In order to get started, you can either download a compiled version of the library [here](https://www.github.com/mhahnFr/LeakSanitizer/releases).  
 Alternatively, you can also build it from source:
-- Clone the repository: ``git clone --recursive https://www.github.com/mhahnFr/LeakSanitizer``
+- Clone the repository: ``git clone --recursive https://www.github.com/mhahnFr/LeakSanitizer.git``
 - and build the library: ``cd LeakSanitizer && make``.
 
 On some systems, you might need to install the ``libexecinfo-dev`` to compile the library successfully.
