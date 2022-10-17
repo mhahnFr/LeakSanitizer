@@ -1,3 +1,3 @@
 [submodule "CallstackLibrary"]
 	path = CallstackLibrary
-	url = git@github.com:mhahnFr/CallstackLibrary.git
+	url = https://www.github.com/mhahnFr/CallstackLibrary
