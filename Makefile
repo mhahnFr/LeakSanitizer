@@ -23,7 +23,7 @@ LIB_NAME = $(CORE_NAME).a
 SHARED_L = $(CORE_NAME).so
 DYLIB_NA = $(CORE_NAME).dylib
 
-SRC = $(shell find . -name \*.cpp)
+SRC = $(shell find . -name \*.cpp \! -path \*CallstackLibrary\*)
 HDR = $(shell find . -name \*.h)
 
 OBJS = $(patsubst %.cpp, %.o, $(SRC))
@@ -83,7 +83,7 @@ $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS) $(LIBCALLSTACK_A)
 
 $(LIB_NAME): $(OBJS) $(LIBCALLSTACK_EXTR)
-	$(AR) -crs $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EXTR) -type f -name \*.o)
+	$(AR) -crs $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EXTR) -type f \( -name \*.o -o -name \*.opp \))
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
