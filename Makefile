@@ -69,12 +69,14 @@ default: $(NAME)
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
 install: $(SHARED_L)
+	mkdir -p $(INSTALL_PATH)/lib
+	mkdir -p "$(INSTALL_PATH)/include"
 	cp $(SHARED_L) $(INSTALL_PATH)/lib
-	cp -r "include" "$(INSTALL_PATH)/include"
+	find "include" -name \*.h -exec cp {} "$(INSTALL_PATH)/include" \;
 
 uninstall:
-	$(RM) $(INSTALL_PATH)/lib/$(SHARED_L)
-	$(RM) -r "$(INSTALL_PATH)/include/$(shell find include -type f -name \*.h)"
+	- $(RM) $(INSTALL_PATH)/lib/$(SHARED_L)
+	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -type f -name \*.h))
 
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS) $(LIBCALLSTACK_A)
