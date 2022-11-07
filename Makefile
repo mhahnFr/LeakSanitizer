@@ -76,7 +76,7 @@ install: $(SHARED_L)
 
 uninstall:
 	- $(RM) $(INSTALL_PATH)/lib/$(SHARED_L)
-	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -type f -name \*.h))
+	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -name \*.h))
 
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS) $(LIBCALLSTACK_A)
