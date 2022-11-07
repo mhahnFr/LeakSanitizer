@@ -70,11 +70,11 @@ all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
 install: $(SHARED_L)
 	cp $(SHARED_L) $(INSTALL_PATH)/lib
-	cp -r "include" "$(INSTALL_PATH)/include/lsan"
+	cp -r "include" "$(INSTALL_PATH)/include"
 
 uninstall:
 	$(RM) $(INSTALL_PATH)/lib/$(SHARED_L)
-	$(RM) -r "$(INSTALL_PATH)/include/lsan"
+	$(RM) -r "$(INSTALL_PATH)/include/$(shell find include -type f -name \*.h)"
 
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS) $(LIBCALLSTACK_A)
