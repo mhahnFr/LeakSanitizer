@@ -51,6 +51,17 @@ void __lsan_printFragmentationStats() { __lsan_printFragmentationStatsWithWidth(
 void __lsan_printFStatsWithWidth   (size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
 void __lsan_printFragStatsWithWidth(size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
 
+/**
+ * @brief Prints the statistics using the given parameters.
+ *
+ * The given functions are responsible for printing the bar.
+ *
+ * @param statsName the name of the statistics, printed at the beginning
+ * @param width the width in characters that the printed bar should have, passed to the bar printing functions
+ * @param out the stream to which to print
+ * @param printBarBytes a function printing a bar for the byte part of the stats, it gets the width and the output stream as paramters.
+ * @param printBarObjects a function printing a bar for the object part of the stats, it gets the width and the output stream as paramters
+ */
 static inline void __lsan_printStatsCore(const std::string & statsName, size_t width, std::ostream & out,
                                          std::function<void (size_t, std::ostream &)> printBarBytes,
                                          std::function<void (size_t, std::ostream &)> printBarObjects) {
@@ -78,6 +89,15 @@ static inline void __lsan_printStatsCore(const std::string & statsName, size_t w
      printBarObjects(width, out);
 }
 
+/**
+ * @brief A function that prints a bar using the given parameters.
+ *
+ * @param current the current amount
+ * @param peek the peek amount
+ * @param width the width in characters the bar should have
+ * @param peekText the text to printed as peek, immediately after the bar
+ * @param out the output stream to print to
+ */
 static inline void __lsan_printBar(size_t current, size_t peek, size_t width, const std::string & peekText, std::ostream & out) {
     using Formatter::Style;
     out << Formatter::get(Style::BOLD)
@@ -100,6 +120,12 @@ static inline void __lsan_printBar(size_t current, size_t peek, size_t width, co
 
 }
 
+/**
+ * @brief Prints a bar representing the fragmentation of the allocated objects.
+ *
+ * @param width the width in characters the bar should have
+ * @param out the output stream to print to
+ */
 static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream & out) {
     using Formatter::Style;
     out << Formatter::get(Style::BOLD)
@@ -174,6 +200,12 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::clear(Style::BOLD) << " total" << std::endl << std::endl;
 }
 
+/**
+ * @brief Prints a bar representing the fragmentation of the allocated bytes.
+ *
+ * @param width the width in characters the bar should have
+ * @param out the output stream to print to
+ */
 static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream & out) {
     using Formatter::Style;
     out << Formatter::get(Style::BOLD)
