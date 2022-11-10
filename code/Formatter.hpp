@@ -22,14 +22,61 @@
 
 #include <string>
 
+/**
+ * A namespace containing helper functions and classes for formatting
+ * output on terminals.
+ */
 namespace Formatter {
+    /// An enumeration containing possible formats.
     enum class Style {
-        GREEN, RED, MAGENTA, ITALIC, UNDERLINED, GREYED, BOLD, BAR_FILLED, BAR_EMPTY
+        /// Represents the text color green.
+        GREEN,
+        /// Represents the text color red.
+        RED,
+        /// Represents the text color magenta.
+        MAGENTA,
+        /// Represents *italic* text.
+        ITALIC,
+        /// Represents underlined text.
+        UNDERLINED,
+        /// Represents greyed color, that is, the current text color becomes less bright.
+        GREYED,
+        /// Represents **bold** text.
+        BOLD,
+        /// Represents a filled element inside a bar.
+        BAR_FILLED,
+        /// Represents an empty element inside a bar.
+        BAR_EMPTY
     };
     
-    auto get(Style)   -> std::string;
-    auto clear(Style) -> std::string;
-    auto clearAll()   -> std::string;
+    /**
+     * @brief Returns an ANSI escape code for the requested style.
+     *
+     * The returned string might be empty if the `__lsan_printFormatted` is
+     * set to `false`.
+     *
+     * @param style the requested style
+     * @return the corresponding escape code
+     */
+    auto get(Style style)   -> std::string;
+
+    /**
+     * @brief Returns an ANSI esape code to clear the given style.
+     *
+     * The returned string might be empty if the `__lsan_printFormatted` is
+     * set to `false`.
+     *
+     * @param style the style to clear
+     * @return the corresponding escape code
+     */
+    auto clear(Style style) -> std::string;
+
+    /**
+     * Returns an ANSI escape code to clear all possible styles.
+     *
+     * @return the corresponding escape code
+     */
+    auto clearAll()         -> std::string;
 }
 
 #endif /* Formatter_hpp */
