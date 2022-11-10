@@ -21,8 +21,16 @@
 #define bytePrinter_hpp
 
 #include <string>
-#include <sstream>
 
-std::string bytesToString(unsigned long long);
+/**
+ * @brief Returns a human readable representation of the given byte amount.
+ *
+ * Depending on `__lsan_humanPrint`, the amount may be represented in
+ * a higher entitiy.
+ *
+ * @param amount the amount to create a string representation of
+ * @return a string representation of the given byte amount
+ */
+std::string bytesToString(unsigned long long amount);
 
 #endif /* bytePrinter_hpp */

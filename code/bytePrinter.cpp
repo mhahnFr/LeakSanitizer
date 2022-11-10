@@ -18,9 +18,11 @@
  */
 
 #include <iomanip>
+#include <sstream>
 #include "bytePrinter.hpp"
 #include "../include/lsan_internals.h"
 
+/// Represents exactly 1 EiB. Needed for the calculations as starting point.
 static constexpr unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL;
 
 std::string bytesToString(unsigned long long amount) {
