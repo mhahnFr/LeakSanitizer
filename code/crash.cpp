@@ -22,6 +22,11 @@
 #include "Formatter.hpp"
 #include <iostream>
 
+/**
+ * Prints a callstack up to the given return address and terminates the program.
+ *
+ * @param omitAddress the return address upon which function calls are ignored
+ */
 [[ noreturn ]] static inline void crashShared(void * omitAddress = __builtin_return_address(0)) {
     std::cerr << std::endl;
     MallocInfo::printCallstack(lcs::callstack(omitAddress), std::cerr);

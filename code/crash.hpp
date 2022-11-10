@@ -22,7 +22,25 @@
 
 #include <string>
 
-[[ noreturn ]] void crash(const std::string &, const char *, int, void * = __builtin_return_address(0));
-[[ noreturn ]] void crash(const std::string &, void * = __builtin_return_address(0));
+/**
+ * @brief Prints the given message as an error and terminates the program.
+ *
+ * A callstack is created and printed along with the file and line.
+ *
+ * @param message the message to display
+ * @param file the filename
+ * @param line the line inside the file
+ * @param omitAddress the return address upon which function calls are ignored
+ */
+[[ noreturn ]] void crash(const std::string & message, const char * file, int line, void * omitAddress = __builtin_return_address(0));
+/**
+ * @brief Prints the given message as an error and terminates the program.
+ *
+ * A callstack is created and printed.
+ *
+ * @param message the message to display
+ * @param omitAddress the return address upon which function calls are ignored
+ */
+[[ noreturn ]] void crash(const std::string & message, void * omitAddress = __builtin_return_address(0));
 
 #endif /* crash_hpp */
