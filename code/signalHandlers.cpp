@@ -32,6 +32,12 @@
  #include <sstream>
 #endif
 
+/**
+ * Returns a string representation for the given signal code.
+ *
+ * @param signal the signal code
+ * @return a string representation of the given signal
+ */
 static std::string signalString(int signal) {
     switch (signal) {
         case SIGBUS:  return "Bus error";
