@@ -30,8 +30,6 @@
 using namespace std::rel_ops;
 
 class MallocInfo {
-    constexpr static int CALLSTACK_SIZE = 128;
-    
     MallocInfo(void * const, size_t, const std::string &, int, void *, bool);
     
     void *      pointer;
