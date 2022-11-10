@@ -22,7 +22,25 @@
 
 #include <string>
 
-void warn(const std::string &, const char *, int, void * = __builtin_return_address(0));
-void warn(const std::string &, void * = __builtin_return_address(0));
+/**
+ * @brief Prints the given message as a warning.
+ *
+ * Prints a callstack and the file and line where the warning occurred.
+ *
+ * @param message the message to display
+ * @param file the file name
+ * @param line the line number inside the file
+ * @param omitAddress the return address upon which function calls are ignored
+ */
+void warn(const std::string & message, const char * file, int line, void * omitAddress = __builtin_return_address(0));
+/**
+ * @brief Prints the given message as a warning.
+ *
+ * Prints a callstack of where the warning occurred.
+ *
+ * @param message the message to display
+ * @param omitAddress the returns address upon which function calls are ignored
+ */
+void warn(const std::string & message, void * omitAddress = __builtin_return_address(0));
 
 #endif /* warn_hpp */

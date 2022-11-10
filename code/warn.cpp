@@ -23,6 +23,11 @@
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
 
+/**
+ * Creates and prints a callstack until the given return address.
+ *
+ * @param omitAddress the return address upon which function calls are ignored
+ */
 static inline void warnShared(void * omitAddress = __builtin_return_address(0)) {
     std::cerr << std::endl;
     MallocInfo::printCallstack(lcs::callstack(omitAddress), std::cerr);
