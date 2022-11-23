@@ -62,6 +62,11 @@ ifneq ($(shell git describe --tags --abbrev=0),)
 	VERSION = $(shell git describe --tags --abbrev=0)
 endif
 
+ifeq ($(shell ls $(LIBCALLSTACK_DIR)),)
+	_  = $(shell git submodule init)
+	_ += $(shell git submodule update)
+endif
+
 INSTALL_PATH ?= /usr/local
 
 default: $(NAME)
