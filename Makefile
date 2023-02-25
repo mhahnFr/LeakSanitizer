@@ -40,6 +40,10 @@ LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true'
 LDFLAGS = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
 
+ifeq ($(shell uname -s),Darwin)
+ 	LDFLAGS += -current_version 1.4 -compatibility_version 1 -install_name $(abspath $@)
+endif
+
 NO_LICENSE = true
 ifeq ($(NO_LICENSE),true)
 	CXXFLAGS += -DNO_LICENSE
@@ -84,10 +88,10 @@ uninstall:
 	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -name \*.h))
 
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_SO)
-	$(CXX) -shared -fPIC -install_name $(abspath $(SHARED_L)) -current_version 1.4 -compatibility_version 1 $(LDFLAGS) -o $(SHARED_L) $(OBJS) $(LIBCALLSTACK_SO)
+	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS) $(LIBCALLSTACK_SO)
 
 $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_DY)
-	$(CXX) -dynamiclib -install_name $(abspath $(DYLIB_NA)) -current_version 1.4 -compatibility_version 1 $(LDFLAGS) -o $(DYLIB_NA) $(OBJS) $(LIBCALLSTACK_DY)
+	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS) $(LIBCALLSTACK_DY)
 
 $(LIB_NAME): $(OBJS) $(LIBCALLSTACK_EXTR)
 	$(AR) -crs $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EXTR) -type f \( -name \*.o -o -name \*.opp \))
