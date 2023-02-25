@@ -1,7 +1,7 @@
 #
 # LeakSanitizer - A small library showing informations about lost memory.
 #
-# Copyright (C) 2022  mhahnFr
+# Copyright (C) 2022 - 2023  mhahnFr
 #
 # This file is part of the LeakSanitizer. This library is free software:
 # you can redistribute it and/or modify it under the terms of the
