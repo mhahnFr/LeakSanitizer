@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - A small library showing informations about lost memory.
  *
- * Copyright (C) 2022  mhahnFr and contributors
+ * Copyright (C) 2022 - 2023  mhahnFr and contributors
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -26,26 +26,10 @@
 #include "../include/lsan_internals.h"
 #include <iostream>
 
-#ifdef CPP_TRACK
- #include <new>
-#endif
-
 #ifdef __GLIBC__
 bool __lsan_glibc = true;
 #else
 bool __lsan_glibc = false;
-#endif
-
-#ifdef CPP_TRACK
-void * operator new(size_t size) {
-    void * pointer = malloc(size);
-    if (pointer == nullptr) {
-        throw std::bad_alloc();
-    }
-    return pointer;
-}
-
-void operator delete(void * pointer) noexcept { free(pointer); }
 #endif
 
 void * __wrap_malloc(size_t size, const char * file, int line) {
