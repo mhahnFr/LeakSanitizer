@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - A small library showing informations about lost memory.
  *
- * Copyright (C) 2022  mhahnFr and contributors
+ * Copyright (C) 2022 - 2023  mhahnFr and contributors
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -193,7 +193,7 @@ void LSan::printInformations(){
 
 void LSan::printLicense() {
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << "Copyright (C) 2022 mhahnFr and contributors" << std::endl
+    out << "Copyright (C) 2022 - 2023 mhahnFr and contributors" << std::endl
         << std::endl
         << "This library is free software: you can redistribute it and/or modify it under"    << std::endl
         << "the terms of the GNU General Public License as published by the"                  << std::endl
