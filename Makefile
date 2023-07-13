@@ -1,5 +1,5 @@
 #
-# LeakSanitizer - A small library showing informations about lost memory.
+# LeakSanitizer - Small library showing information about lost memory.
 #
 # Copyright (C) 2022 - 2023  mhahnFr
 #
@@ -24,7 +24,6 @@ SHARED_L = $(CORE_NAME).so
 DYLIB_NA = $(CORE_NAME).dylib
 
 SRC = $(shell find . -name \*.cpp \! -path \*CallstackLibrary\*)
-HDR = $(shell find . -name \*.h)
 
 OBJS = $(patsubst %.cpp, %.o, $(SRC))
 DEPS = $(patsubst %.cpp, %.d, $(SRC))
