@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -33,7 +33,7 @@ std::string bytesToString(unsigned long long amount) {
         const std::string sizes[] {"EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"};
         unsigned long long multiplier = exabyte;
         for (size_t i = 0; i < std::size(sizes); ++i, multiplier /= 1024) {
-            if (multiplier < amount) {
+            if (multiplier <= amount) {
                 const unsigned short preDot = static_cast<unsigned short>(amount / multiplier);
                 const unsigned char digitCount = preDot < 10 ? 1 :
                                                 (preDot < 100 ? 2 :
