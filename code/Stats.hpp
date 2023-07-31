@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -23,6 +23,7 @@
 #include <cstddef>
 #include <mutex>
 #include <thread>
+
 #include "MallocInfo.hpp"
 
 /// This class contains all statistics that this sanitizer produces.
@@ -174,6 +175,7 @@ public:
      * @return this instance
      */
     auto operator+=(const MallocInfo & info) -> Stats &;
+    auto operator+=(Stats & other) -> Stats &;
     
     /**
      * Removes the given allocation record from a copy of this instance and returns

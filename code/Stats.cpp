@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -114,6 +114,23 @@ Stats Stats::operator+(const MallocInfo & minfo) {
 
 Stats & Stats::operator+=(const MallocInfo & mInfo) {
     addMalloc(mInfo);
+    return *this;
+}
+
+auto Stats::operator+=(Stats & other) -> Stats & {
+    std::lock_guard lock(mutex);
+    std::lock_guard lock_other(other.mutex);
+    
+    currentMallocCount += other.currentMallocCount;
+    totalMallocCount   += other.totalMallocCount;
+    peekMallocCount    += other.peekMallocCount;
+    
+    currentBytes += other.currentBytes;
+    totalBytes   += other.totalBytes;
+    peekBytes    += other.peekBytes;
+    
+    freeCount += other.freeCount;
+    
     return *this;
 }
 
