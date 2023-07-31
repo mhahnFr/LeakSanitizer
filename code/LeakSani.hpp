@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -20,11 +20,14 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
+#include <list>
 #include <map>
-#include <ostream>
 #include <mutex>
+#include <ostream>
+
 #include "MallocInfo.hpp"
 #include "Stats.hpp"
+#include "threadAllocInfo/ThreadAllocInfo.hpp"
 
 /**
  * This class manages everything this sanitizer is capable to do.
@@ -49,6 +52,8 @@ class LSan {
     Stats                                    realStats;
     /// Indicates whether the set callstack size had been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
+    
+    std::list<ThreadAllocInfo::CRef> threadInfos;
     
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
@@ -135,6 +140,9 @@ public:
      * @param exceeded whether the maximum callstack size has been exceeded
      */
     void setCallstackSizeExceeded(bool exceeded);
+    
+    void registerThreadAllocInfo(ThreadAllocInfo::CRef info);
+    void removeThreadAllocInfo(ThreadAllocInfo::CRef info);
     
     /// A pointer to the real `malloc` function.
     static void * (*malloc) (size_t);

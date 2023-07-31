@@ -20,6 +20,7 @@
 #ifndef ThreadAllocInfo_hpp
 #define ThreadAllocInfo_hpp
 
+#include <functional>
 #include <map>
 #include <mutex>
 
@@ -32,6 +33,9 @@ class ThreadAllocInfo {
     std::map<const void * const, MallocInfo> infos;
     
 public:
+    using  Ref = std::reference_wrapper<ThreadAllocInfo>;
+    using CRef = std::reference_wrapper<const ThreadAllocInfo>;
+    
     ThreadAllocInfo();
    ~ThreadAllocInfo();
     
