@@ -48,6 +48,14 @@ public:
     void addMalloc(MallocInfo && info);
     void changeMalloc(const MallocInfo & info);
     auto removeMalloc(const void * pointer) -> bool;
+    
+    constexpr inline auto getStats() -> Stats & {
+        return stats;
+    }
+    
+    constexpr inline auto getInfos() -> std::map<const void * const, MallocInfo> & {
+        return infos;
+    }
 };
 
 #endif /* ThreadAllocInfo_hpp */

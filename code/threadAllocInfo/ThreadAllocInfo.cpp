@@ -19,14 +19,16 @@
 
 #include "ThreadAllocInfo.hpp"
 
+#include "../LeakSani.hpp"
+
 #include "../../include/lsan_internals.h"
 
 ThreadAllocInfo::ThreadAllocInfo() {
-    // TODO: Register in the main class
+    LSan::getInstance().registerThreadAllocInfo(*this);
 }
 
 ThreadAllocInfo::~ThreadAllocInfo() {
-    // TODO: Unregister from the main class
+    LSan::getInstance().removeThreadAllocInfo(*this);
 }
 
 void ThreadAllocInfo::addMalloc(MallocInfo && info) {

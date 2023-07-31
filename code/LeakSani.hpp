@@ -20,10 +20,10 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
-#include <list>
 #include <map>
 #include <mutex>
 #include <ostream>
+#include <vector>
 
 #include "MallocInfo.hpp"
 #include "Stats.hpp"
@@ -53,7 +53,7 @@ class LSan {
     /// Indicates whether the set callstack size had been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
     
-    std::list<ThreadAllocInfo::CRef> threadInfos;
+    std::vector<ThreadAllocInfo::CRef> threadInfos;
     
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
@@ -142,7 +142,7 @@ public:
     void setCallstackSizeExceeded(bool exceeded);
     
     void registerThreadAllocInfo(ThreadAllocInfo::CRef info);
-    void removeThreadAllocInfo(ThreadAllocInfo::CRef info);
+    void removeThreadAllocInfo(ThreadAllocInfo::Ref info);
     
     /// A pointer to the real `malloc` function.
     static void * (*malloc) (size_t);

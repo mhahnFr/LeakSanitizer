@@ -1,5 +1,5 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
  * Copyright (C) 2022 - 2023  mhahnFr and contributors
  *
@@ -18,14 +18,18 @@
  */
 
 #include <dlfcn.h>
+
 #include <algorithm>
 #include <iostream>
+
 #include "LeakSani.hpp"
+
 #include "Formatter.hpp"
-#include "signalHandlers.hpp"
 #include "bytePrinter.hpp"
-#include "../include/lsan_stats.h"
+#include "signalHandlers.hpp"
+
 #include "../include/lsan_internals.h"
+#include "../include/lsan_stats.h"
 
 bool __lsan_printStatsOnExit = false;
 
@@ -79,6 +83,26 @@ LSan::LSan() {
     signal(SIGUSR1, statsSignal);
     signal(SIGUSR2, callstackSignal);
     stats = &realStats;
+}
+
+void LSan::registerThreadAllocInfo(ThreadAllocInfo::CRef info) {
+    std::lock_guard lock(infoMutex);
+    
+    threadInfos.push_back(info);
+}
+
+void LSan::removeThreadAllocInfo(ThreadAllocInfo::Ref info) {
+    std::lock_guard lock(infoMutex);
+    
+    realStats += info.get().getStats();
+    infos.merge(info.get().getInfos());
+    
+    auto it = std::find_if(threadInfos.cbegin(), threadInfos.cend(), [&info] (const auto & elem) {
+        return std::addressof(elem.get()) == std::addressof(info.get());
+    });
+    if (it != threadInfos.end()) {
+        threadInfos.erase(it);
+    }
 }
 
 void LSan::setCallstackSizeExceeded(bool exceeded) { callstackSizeExceeded = exceeded; }
