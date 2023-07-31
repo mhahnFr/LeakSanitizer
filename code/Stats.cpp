@@ -20,10 +20,26 @@
 #include "Stats.hpp"
 
 Stats::Stats(const Stats & other)
-    : mutex(), currentMallocCount(other.currentMallocCount), totalMallocCount(other.totalMallocCount), peekMallocCount(other.peekMallocCount), currentBytes(other.currentBytes), totalBytes(other.totalBytes), peekBytes(other.peekBytes), freeCount(other.freeCount) {}
+    : mutex(),
+      currentMallocCount(other.currentMallocCount),
+      totalMallocCount(other.totalMallocCount),
+      peekMallocCount(other.peekMallocCount),
+      currentBytes(other.currentBytes),
+      totalBytes(other.totalBytes),
+      peekBytes(other.peekBytes),
+      freeCount(other.freeCount)
+{}
 
 Stats::Stats(Stats && other)
-    : mutex(), currentMallocCount(std::move(other.currentMallocCount)), totalMallocCount(std::move(other.totalMallocCount)), peekMallocCount(std::move(other.peekMallocCount)), currentBytes(std::move(other.currentBytes)), totalBytes(std::move(other.totalBytes)), peekBytes(std::move(other.peekBytes)), freeCount(std::move(other.freeCount)) {}
+    : mutex(),
+      currentMallocCount(std::move(other.currentMallocCount)),
+      totalMallocCount(std::move(other.totalMallocCount)),
+      peekMallocCount(std::move(other.peekMallocCount)),
+      currentBytes(std::move(other.currentBytes)),
+      totalBytes(std::move(other.totalBytes)),
+      peekBytes(std::move(other.peekBytes)),
+      freeCount(std::move(other.freeCount))
+{}
 
 Stats & Stats::operator=(const Stats & other) {
     if (&other != this) {
@@ -106,21 +122,9 @@ void Stats::addFree(size_t size) {
     currentBytes -= size;
 }
 
-Stats Stats::operator+(const MallocInfo & minfo) {
-    Stats old = *this;
-    old.addMalloc(minfo);
-    return old;
-}
-
 Stats & Stats::operator+=(const MallocInfo & mInfo) {
     addMalloc(mInfo);
     return *this;
-}
-
-Stats Stats::operator-(const MallocInfo & mInfo) {
-    Stats old = *this;
-    old.addFree(mInfo);
-    return old;
 }
 
 Stats & Stats::operator-=(const MallocInfo & mInfo) {
