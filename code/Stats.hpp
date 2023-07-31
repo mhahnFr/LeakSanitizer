@@ -29,7 +29,7 @@
 /// This class contains all statistics that this sanitizer produces.
 class Stats {
     /// The mutex used to protect the statistics.
-    std::mutex mutex;
+    mutable std::mutex mutex;
     
     /// The count of currently active allocations.
     size_t currentMallocCount = 0,
@@ -162,29 +162,13 @@ public:
     void addFree(const MallocInfo & info);
     
     /**
-     * Adds the given allocation record to a copy of this instance and returns that copy.
-     *
-     * @param info the allocation record to append to the copy
-     * @return the result of the calculation
-     */
-    auto operator+ (const MallocInfo & info) -> Stats;
-    /**
      * Adds the given allocation record to this instance and returns itself.
      *
      * @param info the allocation record to append
      * @return this instance
      */
     auto operator+=(const MallocInfo & info) -> Stats &;
-    auto operator+=(Stats & other) -> Stats &;
-    
-    /**
-     * Removes the given allocation record from a copy of this instance and returns
-     * that copy.
-     *
-     * @param info the allocation record to substract from the copy
-     * @return the result of te calculation
-     */
-    auto operator- (const MallocInfo & info) -> Stats;
+    auto operator+=(const Stats & other) -> Stats &;
     /**
      * Removes the given allocation record from this instance and returns itself.
      *
