@@ -19,10 +19,41 @@
 
 #include "ThreadAllocInfo.hpp"
 
+#include "../../include/lsan_internals.h"
+
 ThreadAllocInfo::ThreadAllocInfo() {
     // TODO: Register in the main class
 }
 
 ThreadAllocInfo::~ThreadAllocInfo() {
     // TODO: Unregister from the main class
+}
+
+void ThreadAllocInfo::addMalloc(MallocInfo && info) {
+    std::lock_guard lock(statsMutex);
+
+    stats += info;
+    infos.insert_or_assign(info.getPointer(), info);
+}
+
+// TODO: Change malloc
+
+auto ThreadAllocInfo::removeMalloc(const void * pointer) -> bool {
+    std::lock_guard lock(statsMutex);
+    
+    auto it = infos.find(pointer);
+    
+    if (it == infos.end()) {
+        // TODO: Maybe allocated in another thread?
+        return false;
+    } else if (it->second.isDeleted()) {
+        return false;
+    }
+    stats -= it->second;
+    if (__lsan_trackMemory) {
+        it->second.setDeleted(true);
+    } else {
+        infos.erase(it);
+    }
+    return true;
 }

@@ -40,6 +40,10 @@ public:
     
     ThreadAllocInfo & operator=(const ThreadAllocInfo &) = delete;
     ThreadAllocInfo & operator=(ThreadAllocInfo &&)      = delete;
+    
+    void addMalloc(MallocInfo && info);
+    void changeMalloc(const MallocInfo & info);
+    auto removeMalloc(const void * pointer) -> bool;
 };
 
 #endif /* ThreadAllocInfo_hpp */
