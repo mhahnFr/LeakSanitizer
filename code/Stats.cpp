@@ -71,15 +71,47 @@ Stats & Stats::operator=(Stats && other) {
     return *this;
 }
 
-size_t Stats::getCurrentMallocCount() const { return currentMallocCount; }
-size_t Stats::getTotalMallocCount()   const { return totalMallocCount;   }
-size_t Stats::getMallocPeek()         const { return peekMallocCount;    }
+auto Stats::getCurrentMallocCount() const -> std::size_t {
+    std::lock_guard lock(mutex);
+    
+    return currentMallocCount;
+}
 
-size_t Stats::getCurrentBytes() const { return currentBytes; }
-size_t Stats::getTotalBytes()   const { return totalBytes;   }
-size_t Stats::getBytePeek()     const { return peekBytes;    }
+auto Stats::getTotalMallocCount() const -> std::size_t {
+    std::lock_guard lock(mutex);
+    
+    return totalMallocCount;
+}
 
-size_t Stats::getTotalFreeCount() const { return freeCount; }
+auto Stats::getMallocPeek() const -> std::size_t {
+    std::lock_guard lock(mutex);
+    
+    return peekMallocCount;
+}
+
+auto Stats::getCurrentBytes() const -> std::size_t {
+    std::lock_guard lock(mutex);
+    
+    return currentBytes;
+}
+
+auto Stats::getTotalBytes() const -> std::size_t {
+    std::lock_guard lock(mutex);
+    
+    return totalBytes;
+}
+
+auto Stats::getBytePeek() const -> std::size_t {
+    std::lock_guard lock(mutex);
+    
+    return peekBytes;
+}
+
+auto Stats::getTotalFreeCount() const -> std::size_t {
+    std::lock_guard lock(mutex);
+    
+    return freeCount;
+}
 
 void Stats::addFree  (const MallocInfo & mInfo) { addFree(mInfo.getSize());   }
 void Stats::addMalloc(const MallocInfo & mInfo) { addMalloc(mInfo.getSize()); }
