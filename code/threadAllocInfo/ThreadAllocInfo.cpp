@@ -38,7 +38,26 @@ void ThreadAllocInfo::addMalloc(MallocInfo && info) {
     infos.insert_or_assign(info.getPointer(), info);
 }
 
-// TODO: Change malloc
+void ThreadAllocInfo::changeMalloc(const MallocInfo & info) {
+    std::lock_guard lock(infosMutex);
+    
+    auto it = infos.find(info.getPointer());
+    if (it == infos.end()) {
+        // TODO: Maybe allocated in another thread?
+        stats += info;
+    } else {
+        if (it->second.getPointer() != info.getPointer()) {
+            stats -= it->second;
+            stats += info;
+        } else {
+            stats.replaceMalloc(it->second.getSize(), info.getSize());
+        }
+        if (__lsan_trackMemory) {
+            it->second.setDeleted(true);
+        }
+        infos.insert_or_assign(info.getPointer(), info);
+    }
+}
 
 auto ThreadAllocInfo::removeMalloc(const void * pointer) -> bool {
     std::lock_guard lock(infosMutex);
