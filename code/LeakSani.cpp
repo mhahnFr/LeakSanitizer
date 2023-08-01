@@ -58,7 +58,6 @@ Stats * LSan::stats = nullptr;
 
 Stats & LSan::getStats()     { return *LSan::stats;            }
 bool    LSan::hasStats()     { return LSan::stats != nullptr;  }
-bool    LSan::ignoreMalloc() { return LSan::getIgnoreMalloc(); }
 
 LSan & LSan::getInstance() {
     static LSan * instance = new LSan();
@@ -68,15 +67,6 @@ LSan & LSan::getInstance() {
 auto LSan::getLocalInstance() -> ThreadAllocInfo & {
     static thread_local ThreadAllocInfo localInfo;
     return localInfo;
-}
-
-bool & LSan::getIgnoreMalloc() {
-    static thread_local bool ignore = false;
-    return ignore;
-}
-
-void LSan::setIgnoreMalloc(bool ignore) {
-    LSan::getIgnoreMalloc() = ignore;
 }
 
 LSan::LSan() {
@@ -111,51 +101,6 @@ void LSan::removeThreadAllocInfo(ThreadAllocInfo::Ref info) {
 }
 
 void LSan::setCallstackSizeExceeded(bool exceeded) { callstackSizeExceeded = exceeded; }
-
-void LSan::addMalloc(MallocInfo && mInfo) {
-    std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    realStats += mInfo;
-    // TODO: Only replace if the new block is bigger than the potential old one.
-    infos.insert_or_assign(mInfo.getPointer(), mInfo);
-}
-
-void LSan::changeMalloc(const MallocInfo & mInfo) {
-    std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    auto it = infos.find(mInfo.getPointer());
-    if (it == infos.end()) {
-        realStats += mInfo;
-    } else {
-        if (it->second.getPointer() != mInfo.getPointer()) {
-            realStats -= it->second;
-            realStats += mInfo;
-        } else {
-            realStats.replaceMalloc(it->second.getSize(), mInfo.getSize());
-        }
-        if (__lsan_trackMemory) {
-            it->second.setDeleted(true);
-        }
-        infos.insert_or_assign(mInfo.getPointer(), mInfo);
-    }
-}
-
-bool LSan::removeMalloc(const void * pointer) {
-    std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    auto it = infos.find(pointer);
-    if (it == infos.end() || it->second.isDeleted()) {
-        return false;
-    }
-    realStats -= it->second;
-    if (__lsan_trackMemory) {
-        it->second.setDeleted(true);
-    } else {
-        infos.erase(it);
-    }
-    return true;
-}
-
-bool LSan::removeMalloc(const MallocInfo & mInfo) {
-    return removeMalloc(mInfo.getPointer());
-}
 
 size_t LSan::getTotalAllocatedBytes() {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);

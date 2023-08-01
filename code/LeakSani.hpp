@@ -36,14 +36,6 @@ class LSan {
     /// A pointer to the statistics instance held by each instance.
     static Stats * stats;
     
-    /**
-     * Statically holds a boolean value which idicates whether to track allocations
-     * or not at the moment of querying.
-     *
-     * @return a reference to the statically stored boolean value
-     */
-    static auto getIgnoreMalloc() -> bool &;
-    
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
@@ -64,40 +56,6 @@ public:
     LSan(const LSan &&)             = delete;
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
-    
-    /**
-     * Adds the given allocation record to the principle list and to the statistics.
-     *
-     * @param info the allocation record to add
-     */
-    void addMalloc(MallocInfo && info);
-    /**
-     * Exchanges the allocation record associated with the pointer of the given allocation record
-     * by the given allocation record.
-     *
-     * @param info the allocation record to exchange
-     */
-    void changeMalloc(const MallocInfo & info);
-    /**
-     * @brief Attempts to remove the given allocation record from the principal list.
-     *
-     * The allocation record is removed from the statistics and marked as deallocated.
-     * It is removed from the principal list if the fragmentation tracking is turned off.
-     *
-     * @param info the info to mark as deallocated
-     * @return whether the allocation record was found in the principal list
-     */
-    auto removeMalloc(const MallocInfo & info) -> bool;
-    /**
-     * @brief Attempts to remove the allocation record associated with the given pointer.
-     *
-     * The allocation record is removed from the statistics and marked as deallocated if it
-     * was found. It is not removed from the principal list if the fragmentation tracking is enabled.
-     *
-     * @param pointer the pointer whose associated allocation record should be marked as deallocated
-     * @return whether an associated allocation record was found
-     */
-    auto removeMalloc(const void * pointer)    -> bool;
     
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
@@ -174,19 +132,7 @@ public:
      * @return whether the statistics are available
      */
     static auto hasStats()     -> bool;
-    /**
-     * Returns whether the allocations should be tracked at the time of querying.
-     *
-     * @return whether the allocations should be tracked at the moment
-     */
-    static auto ignoreMalloc() -> bool;
     
-    /**
-     * Sets whether the next allocations should be tracked.
-     *
-     * @param ignore whether to ignore the next allocations
-     */
-    static void setIgnoreMalloc(bool ignore);
     /**
      * Prints the informations of this sanitizer.
      */
