@@ -65,6 +65,11 @@ LSan & LSan::getInstance() {
     return *instance;
 }
 
+auto LSan::getLocalInstance() -> ThreadAllocInfo & {
+    static thread_local ThreadAllocInfo localInfo;
+    return localInfo;
+}
+
 bool & LSan::getIgnoreMalloc() {
     static thread_local bool ignore = false;
     return ignore;

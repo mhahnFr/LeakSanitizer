@@ -161,6 +161,7 @@ public:
      * @return the current instance
      */
     static auto getInstance()  -> LSan &;
+    static auto getLocalInstance() -> ThreadAllocInfo &;
     /**
      * Returns the current instance of the statitcs object.
      *

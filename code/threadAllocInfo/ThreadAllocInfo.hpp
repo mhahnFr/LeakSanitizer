@@ -31,6 +31,7 @@ class ThreadAllocInfo {
     Stats stats;
     std::recursive_mutex infosMutex;
     std::map<const void * const, MallocInfo> infos;
+    bool ignoreMalloc;
     
 public:
     using  Ref = std::reference_wrapper<ThreadAllocInfo>;
@@ -48,6 +49,14 @@ public:
     void addMalloc(MallocInfo && info);
     void changeMalloc(const MallocInfo & info);
     auto removeMalloc(const void * pointer) -> bool;
+    
+    constexpr inline void setIgnoreMalloc(const bool ignoreMalloc) {
+        this->ignoreMalloc = ignoreMalloc;
+    }
+    
+    constexpr inline auto getIgnoreMalloc() const -> bool {
+        return ignoreMalloc;
+    }
     
     constexpr inline auto getStats() -> Stats & {
         return stats;
