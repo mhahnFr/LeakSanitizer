@@ -32,7 +32,7 @@ ThreadAllocInfo::~ThreadAllocInfo() {
 }
 
 void ThreadAllocInfo::addMalloc(MallocInfo && info) {
-    std::lock_guard lock(statsMutex);
+    std::lock_guard lock(infosMutex);
 
     stats += info;
     infos.insert_or_assign(info.getPointer(), info);
@@ -41,7 +41,7 @@ void ThreadAllocInfo::addMalloc(MallocInfo && info) {
 // TODO: Change malloc
 
 auto ThreadAllocInfo::removeMalloc(const void * pointer) -> bool {
-    std::lock_guard lock(statsMutex);
+    std::lock_guard lock(infosMutex);
     
     auto it = infos.find(pointer);
     

@@ -29,7 +29,7 @@
 
 class ThreadAllocInfo {
     Stats stats;
-    std::recursive_mutex statsMutex;
+    std::recursive_mutex infosMutex;
     std::map<const void * const, MallocInfo> infos;
     
 public:
