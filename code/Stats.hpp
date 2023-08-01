@@ -32,21 +32,21 @@ class Stats {
     mutable std::mutex mutex;
     
     /// The count of currently active allocations.
-    size_t currentMallocCount = 0,
+    std::size_t currentMallocCount = 0,
     /// The total count of allocations tracked by this sanitizer.
              totalMallocCount = 0,
     /// The maximal count of active allocations at one time.
               peekMallocCount = 0;
 
     /// The count of currently allocated bytes.
-    size_t currentBytes = 0,
+    std::size_t currentBytes = 0,
     /// The total count of allocated bytes tracked by this sanitizer.
              totalBytes = 0,
     /// The maximal count of active allocated bytes at one time.
               peekBytes = 0;
     
     /// The count of deallocations tracked by this sanitizer.
-    size_t freeCount = 0;
+    std::size_t freeCount = 0;
     
 public:
     Stats() = default;
@@ -83,45 +83,45 @@ public:
      *
      * @return the count of currently active allocations
      */
-    auto getCurrentMallocCount() const -> size_t;
+    auto getCurrentMallocCount() const -> std::size_t;
     /**
      * Returns the total count of tracked allocations.
      *
      * @return the total count of allocations
      */
-    auto getTotalMallocCount()   const -> size_t;
+    auto getTotalMallocCount()   const -> std::size_t;
     /**
      * Returns the maximal count of allocations active at one time.
      *
      * @return the peek of allocations
      */
-    auto getMallocPeek()         const -> size_t;
+    auto getMallocPeek()         const -> std::size_t;
     
     /**
      * Returns the count of currently allocated bytes.
      *
      * @return the amount of currently allocated bytes
      */
-    auto getCurrentBytes() const -> size_t;
+    auto getCurrentBytes() const -> std::size_t;
     /**
      * Returns the total count of allocated bytes tracked by this sanitizer.
      *
      * @return the total count of tracked allocated bytes
      */
-    auto getTotalBytes()   const -> size_t;
+    auto getTotalBytes()   const -> std::size_t;
     /**
      * Returns the maximal count of allocated bytes active at one time.
      *
      * @return the peek of allocated bytes at one time
      */
-    auto getBytePeek()     const -> size_t;
+    auto getBytePeek()     const -> std::size_t;
     
     /**
      * Returns the total count of deallocations tracked by this sanitizer.
      *
      * @return the total count of deallocations
      */
-    auto getTotalFreeCount() const -> size_t;
+    auto getTotalFreeCount() const -> std::size_t;
     
     /**
      * Adds the given size to the tracked allocations.
@@ -130,7 +130,7 @@ public:
      *
      * @param size the size of the allocated object
      */
-    void addMalloc(size_t size);
+    void addMalloc(std::size_t size);
     /**
      * Adds the given allocation record to the tracked allocations.
      *
@@ -144,7 +144,7 @@ public:
      * @param oldSize the size to substract
      * @param newSize the size to add
      */
-    void replaceMalloc(size_t oldSize, size_t newSize);
+    void replaceMalloc(std::size_t oldSize, std::size_t newSize);
     
     /**
      * Adds a deallocation to the statistics.
@@ -153,7 +153,7 @@ public:
      *
      * @param size the size to of the deallocated object
      */
-    void addFree(size_t size);
+    void addFree(std::size_t size);
     /**
      * Adds a deallocation to the statistics.
      *
