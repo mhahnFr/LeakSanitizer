@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -298,8 +298,11 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
 
 void __lsan_printFragmentationStatsWithWidth(size_t width) {
     using Formatter::Style;
-    bool ignore = LSan::ignoreMalloc();
-    LSan::setIgnoreMalloc(true);
+    
+    auto & instance = LSan::getLocalInstance();
+    
+    bool ignore = instance.getIgnoreMalloc();
+    instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_fragmentationStatsAvailable()) {
         __lsan_printStatsCore("memory fragmentation", width, out,
@@ -318,14 +321,17 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
             << Formatter::clearAll() << std::endl;
     }
     if (!ignore) {
-        LSan::setIgnoreMalloc(false);
+        instance.setIgnoreMalloc(false);
     }
 }
 
 void __lsan_printStatsWithWidth(size_t width) {
     using Formatter::Style;
-    bool ignore = LSan::ignoreMalloc();
-    LSan::setIgnoreMalloc(true);
+    
+    auto & instance = LSan::getLocalInstance();
+    
+    bool ignore = instance.getIgnoreMalloc();
+    instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_statsAvailable()) {
         __lsan_printStatsCore("memory usage", width, out,
@@ -338,6 +344,6 @@ void __lsan_printStatsWithWidth(size_t width) {
             << std::endl;
     }
     if (!ignore) {
-        LSan::setIgnoreMalloc(false);
+        instance.setIgnoreMalloc(false);
     }
 }

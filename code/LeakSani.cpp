@@ -193,7 +193,7 @@ std::recursive_mutex &                           LSan::getInfoMutex()   { return
 
 void LSan::__exit_hook() {
     using Formatter::Style;
-    setIgnoreMalloc(true);
+    getLocalInstance().setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << std::endl
         << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN)

@@ -50,6 +50,10 @@ public:
     void changeMalloc(const MallocInfo & info);
     auto removeMalloc(const void * pointer) -> bool;
     
+    constexpr auto removeMalloc(MallocInfo && info) -> bool {
+        return removeMalloc(info.getPointer());
+    }
+    
     constexpr inline void setIgnoreMalloc(const bool ignoreMalloc) {
         this->ignoreMalloc = ignoreMalloc;
     }
