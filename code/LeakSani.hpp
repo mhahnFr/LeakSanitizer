@@ -36,7 +36,7 @@ class LSan {
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
-    std::recursive_mutex                     infoMutex;
+    mutable std::recursive_mutex             infoMutex;
     /// An object holding all statistics.
     Stats                                    stats;
     /// Indicates whether the set callstack size had been exceeded during the printing.
@@ -75,19 +75,8 @@ public:
      * @return the total count of leaked objects
      */
     auto getLeakCount()           -> size_t;
-    /**
-     * Returns a reference to the mutex used to protect the principal list storing the
-     * allocation records.
-     *
-     * @return the mutex protecting the principal list
-     */
-    auto getInfoMutex()           -> std::recursive_mutex &;
-    /**
-     * Returns a reference to the principal list storing the allocation records.
-     *
-     * @return the principal list of allocation records
-     */
-    auto getInfos()         const -> const std::map<const void * const, MallocInfo> &;
+    
+    auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo>;
     
     /**
      * Sets whether the maximum callstack size has been exceeded during the printing.

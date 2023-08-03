@@ -78,3 +78,11 @@ auto ThreadAllocInfo::removeMalloc(const void * pointer) -> bool {
     }
     return true;
 }
+
+void ThreadAllocInfo::lockMutex() const {
+    infosMutex.lock();
+}
+
+void ThreadAllocInfo::unlockMutex() const {
+    infosMutex.unlock();
+}

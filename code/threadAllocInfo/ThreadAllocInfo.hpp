@@ -29,7 +29,7 @@
 
 class ThreadAllocInfo {
     Stats stats;
-    std::recursive_mutex infosMutex;
+    mutable std::recursive_mutex infosMutex;
     std::map<const void * const, MallocInfo> infos;
     bool ignoreMalloc;
     
@@ -73,6 +73,13 @@ public:
     constexpr inline auto getInfos() -> std::map<const void * const, MallocInfo> & {
         return infos;
     }
+    
+    constexpr inline auto getInfos() const -> const std::map<const void * const, MallocInfo> & {
+        return infos;
+    }
+    
+    void lockMutex() const;
+    void unlockMutex() const;
 };
 
 #endif /* ThreadAllocInfo_hpp */
