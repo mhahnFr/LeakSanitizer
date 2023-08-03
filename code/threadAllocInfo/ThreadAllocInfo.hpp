@@ -66,6 +66,10 @@ public:
         return stats;
     }
     
+    constexpr inline auto getStats() const -> const Stats & {
+        return stats;
+    }
+    
     constexpr inline auto getInfos() -> std::map<const void * const, MallocInfo> & {
         return infos;
     }

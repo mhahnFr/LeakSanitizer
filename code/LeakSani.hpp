@@ -33,15 +33,12 @@
  * This class manages everything this sanitizer is capable to do.
  */
 class LSan {
-    /// A pointer to the statistics instance held by each instance.
-    static Stats * stats;
-    
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
     std::recursive_mutex                     infoMutex;
     /// An object holding all statistics.
-    Stats                                    realStats;
+    Stats                                    stats;
     /// Indicates whether the set callstack size had been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
     
@@ -125,13 +122,7 @@ public:
      *
      * @return the current statistics instance
      */
-    static auto getStats()     -> Stats &;
-    /**
-     * Returns whether the statictics are available.
-     *
-     * @return whether the statistics are available
-     */
-    static auto hasStats()     -> bool;
+    static auto getStats()     -> Stats;
     
     /**
      * Prints the informations of this sanitizer.
