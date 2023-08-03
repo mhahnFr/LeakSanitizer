@@ -36,8 +36,6 @@ size_t __lsan_getCurrentByteCount()   { return LSan::getStats().getCurrentBytes(
 size_t __lsan_getMallocPeek() { return LSan::getStats().getMallocPeek(); }
 size_t __lsan_getBytePeek()   { return LSan::getStats().getBytePeek();   }
 
-bool __lsan_statsAvailable() { return LSan::hasStats(); }
-
 bool __lsan_fStatsAvailable()             { return __lsan_fragmentationStatsAvailable(); }
 bool __lsan_fragStatsAvailable()          { return __lsan_fragmentationStatsAvailable(); }
 bool __lsan_fragmentationStatsAvailable() { return __lsan_trackMemory; }
@@ -333,16 +331,9 @@ void __lsan_printStatsWithWidth(size_t width) {
     bool ignore = instance.getIgnoreMalloc();
     instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    if (__lsan_statsAvailable()) {
-        __lsan_printStatsCore("memory usage", width, out,
-                              std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
-                              std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
-    } else {
-        out << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED)
-            << "No memory statistics available at the moment!"
-            << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::RED)
-            << std::endl;
-    }
+    __lsan_printStatsCore("memory usage", width, out,
+                          std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
+                          std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
     if (!ignore) {
         instance.setIgnoreMalloc(false);
     }

@@ -1,5 +1,5 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
  * Copyright (C) 2022 - 2023  mhahnFr
  *
@@ -19,6 +19,14 @@
 
 #ifndef lsan_stats_h
 #define lsan_stats_h
+
+#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
+ #define DEPRECATED(message) [[ deprecated(message) ]]
+#elif defined(__GNUC__) || defined(__clang__)
+ #define DEPRECATED(message) __attribute__((deprecated(message)))
+#else
+ #define DEPRECATED(message)
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,7 +99,9 @@ size_t __lsan_getBytePeek();
  * @return Whether the memory statistics can savely be queried.
  * @since 1.1
  */
-bool   __lsan_statsAvailable();
+DEPRECATED("Always true since version 1.5") static inline bool   __lsan_statsAvailable() {
+    return true;
+}
 
 /**
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
