@@ -44,8 +44,7 @@ auto ThreadAllocInfo::changeMalloc(const MallocInfo & info, bool search) -> bool
     auto it = infos.find(info.getPointer());
     if (it == infos.end()) {
         if (search && !LSan::getInstance().maybeChangeMalloc(info)) {
-            // FIXME: Register as new allocation!
-            stats += info;
+            addMalloc(MallocInfo(info));
             return true;
         } else {
             return false;
