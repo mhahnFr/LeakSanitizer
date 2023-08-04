@@ -38,25 +38,30 @@ void ThreadAllocInfo::addMalloc(MallocInfo && info) {
     infos.insert_or_assign(info.getPointer(), info);
 }
 
-void ThreadAllocInfo::changeMalloc(const MallocInfo & info) {
+auto ThreadAllocInfo::changeMalloc(const MallocInfo & info, bool search) -> bool {
     std::lock_guard lock(infosMutex);
     
     auto it = infos.find(info.getPointer());
     if (it == infos.end()) {
-        // TODO: Maybe allocated in another thread?
+        if (search && !LSan::getInstance().maybeChangeMalloc(info)) {
+            // FIXME: Register as new allocation!
+            stats += info;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    if (it->second.getPointer() != info.getPointer()) {
+        stats -= it->second;
         stats += info;
     } else {
-        if (it->second.getPointer() != info.getPointer()) {
-            stats -= it->second;
-            stats += info;
-        } else {
-            stats.replaceMalloc(it->second.getSize(), info.getSize());
-        }
-        if (__lsan_trackMemory) {
-            it->second.setDeleted(true);
-        }
-        infos.insert_or_assign(info.getPointer(), info);
+        stats.replaceMalloc(it->second.getSize(), info.getSize());
     }
+    if (__lsan_trackMemory) {
+        it->second.setDeleted(true);
+    }
+    infos.insert_or_assign(info.getPointer(), info);
+    return true;
 }
 
 auto ThreadAllocInfo::removeMalloc(const void * pointer, bool search) -> bool {

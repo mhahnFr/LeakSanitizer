@@ -124,6 +124,38 @@ auto LSan::removeMallocHere(const void * pointer) -> bool {
     return true;
 }
 
+auto LSan::changeMallocHere(const MallocInfo & info) -> bool {
+    std::lock_guard lock(infoMutex);
+    
+    auto it = infos.find(info.getPointer());
+    if (it == infos.end()) {
+        return false;
+    }
+    if (it->second.getPointer() != info.getPointer()) {
+        stats -= it->second;
+        stats += info;
+    } else {
+        stats.replaceMalloc(it->second.getSize(), info.getSize());
+    }
+    if (__lsan_trackMemory) {
+        it->second.setDeleted(true);
+    }
+    infos.insert_or_assign(info.getPointer(), info);
+    return true;
+}
+
+auto LSan::maybeChangeMalloc(const MallocInfo & info) -> bool {
+    if (changeMallocHere(info)) {
+        return true;
+    }
+    for (auto & localInstance : threadInfos) {
+        if (localInstance.get().changeMalloc(info, false)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 auto LSan::removeMalloc(const void * pointer) -> bool {
     if (removeMallocHere(pointer)) {
         return true;

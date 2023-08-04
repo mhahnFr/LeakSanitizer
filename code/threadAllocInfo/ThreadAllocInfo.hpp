@@ -47,7 +47,7 @@ public:
     ThreadAllocInfo & operator=(ThreadAllocInfo &&)      = delete;
     
     void addMalloc(MallocInfo && info);
-    void changeMalloc(const MallocInfo & info);
+    auto changeMalloc(const MallocInfo & info, bool search = true) -> bool;
     auto removeMalloc(const void * pointer, bool search = true) -> bool;
     
     constexpr auto removeMalloc(MallocInfo && info) -> bool {

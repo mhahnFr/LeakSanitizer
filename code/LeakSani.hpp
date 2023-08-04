@@ -45,6 +45,7 @@ class LSan {
     std::vector<ThreadAllocInfo::Ref> threadInfos;
     
     auto removeMallocHere(const void * pointer) -> bool;
+    auto changeMallocHere(const MallocInfo & info) -> bool;
     
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
@@ -56,6 +57,7 @@ public:
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
     
+    auto maybeChangeMalloc(const MallocInfo & info) -> bool;
     auto removeMalloc(const void * pointer) -> bool;
     
     /**
