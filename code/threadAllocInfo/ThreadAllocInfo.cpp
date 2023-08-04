@@ -59,14 +59,13 @@ void ThreadAllocInfo::changeMalloc(const MallocInfo & info) {
     }
 }
 
-auto ThreadAllocInfo::removeMalloc(const void * pointer) -> bool {
+auto ThreadAllocInfo::removeMalloc(const void * pointer, bool search) -> bool {
     std::lock_guard lock(infosMutex);
     
     auto it = infos.find(pointer);
     
     if (it == infos.end()) {
-        // TODO: Maybe allocated in another thread?
-        return false;
+        return search ? LSan::getInstance().removeMalloc(pointer) : false;
     } else if (it->second.isDeleted()) {
         return false;
     }

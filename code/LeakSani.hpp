@@ -42,7 +42,9 @@ class LSan {
     /// Indicates whether the set callstack size had been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
     
-    std::vector<ThreadAllocInfo::CRef> threadInfos;
+    std::vector<ThreadAllocInfo::Ref> threadInfos;
+    
+    auto removeMallocHere(const void * pointer) -> bool;
     
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
@@ -53,6 +55,8 @@ public:
     LSan(const LSan &&)             = delete;
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
+    
+    auto removeMalloc(const void * pointer) -> bool;
     
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
@@ -85,7 +89,7 @@ public:
      */
     void setCallstackSizeExceeded(bool exceeded);
     
-    void registerThreadAllocInfo(ThreadAllocInfo::CRef info);
+    void registerThreadAllocInfo(ThreadAllocInfo::Ref info);
     void removeThreadAllocInfo(ThreadAllocInfo::Ref info);
     
     /// A pointer to the real `malloc` function.

@@ -48,7 +48,7 @@ public:
     
     void addMalloc(MallocInfo && info);
     void changeMalloc(const MallocInfo & info);
-    auto removeMalloc(const void * pointer) -> bool;
+    auto removeMalloc(const void * pointer, bool search = true) -> bool;
     
     constexpr auto removeMalloc(MallocInfo && info) -> bool {
         return removeMalloc(info.getPointer());

@@ -86,7 +86,7 @@ LSan::LSan() {
     signal(SIGUSR2, callstackSignal);
 }
 
-void LSan::registerThreadAllocInfo(ThreadAllocInfo::CRef info) {
+void LSan::registerThreadAllocInfo(ThreadAllocInfo::Ref info) {
     std::lock_guard lock(infoMutex);
     
     threadInfos.push_back(info);
@@ -104,6 +104,36 @@ void LSan::removeThreadAllocInfo(ThreadAllocInfo::Ref info) {
     if (it != threadInfos.end()) {
         threadInfos.erase(it);
     }
+}
+
+auto LSan::removeMallocHere(const void * pointer) -> bool {
+    std::lock_guard lock(infoMutex);
+    
+    auto it = infos.find(pointer);
+    if (it == infos.end()) {
+        return false;
+    } else if (it->second.isDeleted()) {
+        return true;
+    }
+    stats -= it->second;
+    if (__lsan_trackMemory) {
+        it->second.setDeleted(true);
+    } else {
+        infos.erase(it);
+    }
+    return true;
+}
+
+auto LSan::removeMalloc(const void * pointer) -> bool {
+    if (removeMallocHere(pointer)) {
+        return true;
+    }
+    for (auto & localInstance : threadInfos) {
+        if (localInstance.get().removeMalloc(pointer, false)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void LSan::setCallstackSizeExceeded(bool exceeded) { callstackSizeExceeded = exceeded; }
