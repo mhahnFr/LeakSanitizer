@@ -50,7 +50,7 @@ public:
     auto changeMalloc(const MallocInfo & info, bool search = true) -> bool;
     auto removeMalloc(const void * pointer, bool search = true) -> bool;
     
-    constexpr auto removeMalloc(MallocInfo && info) -> bool {
+    auto removeMalloc(MallocInfo && info) -> bool {
         return removeMalloc(info.getPointer());
     }
     
