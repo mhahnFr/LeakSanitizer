@@ -24,7 +24,7 @@
 #include <mutex>
 #include <thread>
 
-#include "MallocInfo.hpp"
+#include "../MallocInfo.hpp"
 
 /// This class contains all statistics that this sanitizer produces.
 class Stats {

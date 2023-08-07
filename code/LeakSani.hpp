@@ -26,7 +26,8 @@
 #include <vector>
 
 #include "MallocInfo.hpp"
-#include "Stats.hpp"
+
+#include "statistics/Stats.hpp"
 #include "threadAllocInfo/ThreadAllocInfo.hpp"
 
 /**

@@ -134,6 +134,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		BF41CC5D2A813B4500EAA3A1 /* statistics */ = {
+			isa = PBXGroup;
+			children = (
+				BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */,
+				BF23A2E0289ED24200B17349 /* Stats.cpp */,
+				BF23A2E1289ED24200B17349 /* Stats.hpp */,
+			);
+			path = statistics;
+			sourceTree = "<group>";
+		};
 		BF643E5C28A40C970080DB21 /* include */ = {
 			isa = PBXGroup;
 			children = (
@@ -171,16 +181,14 @@
 		BF9DD3A428A6761400AEBC17 /* code */ = {
 			isa = PBXGroup;
 			children = (
+				BF41CC5D2A813B4500EAA3A1 /* statistics */,
 				BF30D8562A78159E001D4EBF /* threadAllocInfo */,
 				BFAFADC428B4FDA40060076C /* Formatter.cpp */,
 				BFAFADC528B4FDA40060076C /* Formatter.hpp */,
 				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */,
-				BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */,
 				BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */,
 				BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */,
-				BF23A2E0289ED24200B17349 /* Stats.cpp */,
-				BF23A2E1289ED24200B17349 /* Stats.hpp */,
 				BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */,
 				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
 				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,

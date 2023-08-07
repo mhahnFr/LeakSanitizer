@@ -25,7 +25,8 @@
 #include <mutex>
 
 #include "../MallocInfo.hpp"
-#include "../Stats.hpp"
+
+#include "../statistics/Stats.hpp"
 
 class ThreadAllocInfo {
     Stats stats;

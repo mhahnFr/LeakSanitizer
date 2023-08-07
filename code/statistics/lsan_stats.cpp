@@ -20,11 +20,13 @@
 #include <cmath>
 #include <iostream>
 #include <functional>
-#include "LeakSani.hpp"
-#include "Formatter.hpp"
-#include "bytePrinter.hpp"
-#include "../include/lsan_internals.h"
-#include "../include/lsan_stats.h"
+
+#include "../Formatter.hpp"
+#include "../bytePrinter.hpp"
+#include "../LeakSani.hpp"
+
+#include "../../include/lsan_internals.h"
+#include "../../include/lsan_stats.h"
 
 size_t __lsan_getTotalMallocs() { return LSan::getStats().getTotalMallocCount(); }
 size_t __lsan_getTotalBytes()   { return LSan::getStats().getTotalBytes();       }
