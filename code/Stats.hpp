@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -33,16 +33,16 @@ class Stats {
     /// The count of currently active allocations.
     std::size_t currentMallocCount = 0,
     /// The total count of allocations tracked by this sanitizer.
-             totalMallocCount = 0,
+                  totalMallocCount = 0,
     /// The maximal count of active allocations at one time.
-              peekMallocCount = 0;
+                   peekMallocCount = 0;
 
     /// The count of currently allocated bytes.
     std::size_t currentBytes = 0,
     /// The total count of allocated bytes tracked by this sanitizer.
-             totalBytes = 0,
+                  totalBytes = 0,
     /// The maximal count of active allocated bytes at one time.
-              peekBytes = 0;
+                   peekBytes = 0;
     
     /// The count of deallocations tracked by this sanitizer.
     std::size_t freeCount = 0;
