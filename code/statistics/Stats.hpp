@@ -23,7 +23,8 @@
 #include <cstddef>
 #include <mutex>
 #include <thread>
-#include "MallocInfo.hpp"
+
+#include "../MallocInfo.hpp"
 
 /// This class contains all statistics that this sanitizer produces.
 class Stats {
@@ -167,7 +168,7 @@ public:
      * @return this instance
      */
     auto operator+=(const MallocInfo & info) -> Stats &;
-
+    auto operator+=(const Stats & other) -> Stats &;
     /**
      * Removes the given allocation record from this instance and returns itself.
      *

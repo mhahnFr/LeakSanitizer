@@ -159,6 +159,23 @@ Stats & Stats::operator+=(const MallocInfo & mInfo) {
     return *this;
 }
 
+auto Stats::operator+=(const Stats & other) -> Stats & {
+    std::lock_guard lock(mutex);
+    std::lock_guard lock_other(other.mutex);
+    
+    currentMallocCount += other.currentMallocCount;
+    totalMallocCount   += other.totalMallocCount;
+    peekMallocCount    += other.peekMallocCount; // FIXME: Revisit peek calculation!
+    
+    currentBytes += other.currentBytes;
+    totalBytes   += other.totalBytes;
+    peekBytes    += other.peekBytes;
+    
+    freeCount += other.freeCount;
+    
+    return *this;
+}
+
 Stats & Stats::operator-=(const MallocInfo & mInfo) {
     addFree(mInfo);
     return *this;

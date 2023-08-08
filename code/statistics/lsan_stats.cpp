@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -20,11 +20,13 @@
 #include <cmath>
 #include <iostream>
 #include <functional>
-#include "LeakSani.hpp"
-#include "Formatter.hpp"
-#include "bytePrinter.hpp"
-#include "../include/lsan_internals.h"
-#include "../include/lsan_stats.h"
+
+#include "../Formatter.hpp"
+#include "../bytePrinter.hpp"
+#include "../LeakSani.hpp"
+
+#include "../../include/lsan_internals.h"
+#include "../../include/lsan_stats.h"
 
 size_t __lsan_getTotalMallocs() { return LSan::getStats().getTotalMallocCount(); }
 size_t __lsan_getTotalBytes()   { return LSan::getStats().getTotalBytes();       }
@@ -35,8 +37,6 @@ size_t __lsan_getCurrentByteCount()   { return LSan::getStats().getCurrentBytes(
 
 size_t __lsan_getMallocPeek() { return LSan::getStats().getMallocPeek(); }
 size_t __lsan_getBytePeek()   { return LSan::getStats().getBytePeek();   }
-
-bool __lsan_statsAvailable() { return LSan::hasStats(); }
 
 bool __lsan_fStatsAvailable()             { return __lsan_fragmentationStatsAvailable(); }
 bool __lsan_fragStatsAvailable()          { return __lsan_fragmentationStatsAvailable(); }
@@ -133,8 +133,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::clear(Style::BOLD)
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
-    std::lock_guard<std::recursive_mutex>(LSan::getInstance().getInfoMutex());
-    const auto & infos = LSan::getInstance().getInfos();
+    const auto & infos = LSan::getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
     if (infos.size() < width) {
         const float step = static_cast<float>(width) / infos.size();
@@ -213,14 +212,16 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         << Formatter::clear(Style::BOLD)
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
-    std::lock_guard<std::recursive_mutex>(LSan::getInstance().getInfoMutex());
-    const auto & infos = LSan::getInstance().getInfos();
+    const auto & infos = LSan::getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
     size_t currentBlockBegin = 0,
            currentBlockEnd   = it->second.getSize(),
            b                 = 0;
     
-    const size_t total       = LSan::getInstance().getTotalAllocatedBytes();
+    size_t total       = 0;
+    for (const auto & [_, info] : infos) {
+        total += info.getSize();
+    }
     
     if (total < width) {
         const size_t step = static_cast<size_t>(static_cast<float>(width) / total);
@@ -298,8 +299,11 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
 
 void __lsan_printFragmentationStatsWithWidth(size_t width) {
     using Formatter::Style;
-    bool ignore = LSan::ignoreMalloc();
-    LSan::setIgnoreMalloc(true);
+    
+    auto & instance = LSan::getLocalInstance();
+    
+    bool ignore = instance.getIgnoreMalloc();
+    instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_fragmentationStatsAvailable()) {
         __lsan_printStatsCore("memory fragmentation", width, out,
@@ -318,26 +322,22 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
             << Formatter::clearAll() << std::endl;
     }
     if (!ignore) {
-        LSan::setIgnoreMalloc(false);
+        instance.setIgnoreMalloc(false);
     }
 }
 
 void __lsan_printStatsWithWidth(size_t width) {
     using Formatter::Style;
-    bool ignore = LSan::ignoreMalloc();
-    LSan::setIgnoreMalloc(true);
+    
+    auto & instance = LSan::getLocalInstance();
+    
+    bool ignore = instance.getIgnoreMalloc();
+    instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    if (__lsan_statsAvailable()) {
-        __lsan_printStatsCore("memory usage", width, out,
-                              std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
-                              std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
-    } else {
-        out << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED)
-            << "No memory statistics available at the moment!"
-            << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::RED)
-            << std::endl;
-    }
+    __lsan_printStatsCore("memory usage", width, out,
+                          std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
+                          std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
     if (!ignore) {
-        LSan::setIgnoreMalloc(false);
+        instance.setIgnoreMalloc(false);
     }
 }

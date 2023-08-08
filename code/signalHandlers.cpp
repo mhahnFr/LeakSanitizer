@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -65,8 +65,11 @@ static std::string signalString(int signal) {
 
 void callstackSignal(int) {
     using Formatter::Style;
-    bool ignore = LSan::ignoreMalloc();
-    LSan::setIgnoreMalloc(true);
+    
+    auto & instance = LSan::getLocalInstance();
+    bool ignore     = instance.getIgnoreMalloc();
+    
+    instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << Formatter::get(Style::ITALIC)
         << "The current callstack:"
@@ -75,7 +78,7 @@ void callstackSignal(int) {
     MallocInfo::printCallstack(lcs::callstack(), out);
     out << std::endl;
     if (!ignore) {
-        LSan::setIgnoreMalloc(false);
+        instance.setIgnoreMalloc(false);
     }
 }
 
