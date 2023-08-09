@@ -105,6 +105,7 @@ DEPRECATED("Always true since version 1.5") static inline bool   __lsan_statsAva
  * @return Whether the memory fragmentation statistics are available.
  * @since 1.2
  */
+DEPRECATED("Since v1.5 replaced by __lsan_statsAvailable")
 bool   __lsan_fStatsAvailable();
 
 /**
@@ -115,6 +116,7 @@ bool   __lsan_fStatsAvailable();
  * @return Whether the memory fragmentation statisitcs are available.
  * @since 1.2
  */
+DEPRECATED("Since v1.5 replaced by __lsan_statsAvailable")
 bool   __lsan_fragStatsAvailable();
 
 /**
@@ -125,6 +127,7 @@ bool   __lsan_fragStatsAvailable();
  * @return Whether the memory fragmentation statisitcs are available.
  * @since 1.2
  */
+DEPRECATED("Since v1.5 replaced by __lsan_statsAvailable")
 bool   __lsan_fragmentationStatsAvailable();
 
 /**
