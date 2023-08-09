@@ -54,18 +54,6 @@ void   (*LSan::free)   (void *)         = reinterpret_cast<void   (*)(void *)>  
 
 void (*LSan::exit)(int) = _Exit;
 
-auto LSan::getStats() -> Stats {
-    auto & instance = getInstance();
-    
-    auto toReturn = instance.stats;
-    
-    for (const auto & localInstance : instance.threadInfos) {
-//        toReturn += localInstance.get().getStats();
-    }
-    
-    return toReturn;
-}
-
 LSan & LSan::getInstance() {
     static LSan * instance = new LSan();
     return *instance;
@@ -95,7 +83,6 @@ void LSan::registerThreadAllocInfo(ThreadAllocInfo::Ref info) {
 void LSan::removeThreadAllocInfo(ThreadAllocInfo::Ref info) {
     std::lock_guard lock(infoMutex);
     
-//    stats += info.get().getStats();
     infos.merge(info.get().getInfos());
     
     auto it = std::find_if(threadInfos.cbegin(), threadInfos.cend(), [&info] (const auto & elem) {

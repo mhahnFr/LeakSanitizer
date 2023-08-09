@@ -118,7 +118,9 @@ public:
      *
      * @return the current statistics instance
      */
-    static auto getStats()     -> Stats;
+    inline static auto getStats() -> const Stats & {
+        return getInstance().stats;
+    }
     
     /**
      * Prints the informations of this sanitizer.
