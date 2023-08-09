@@ -29,7 +29,6 @@
 #include "../statistics/Stats.hpp"
 
 class ThreadAllocInfo {
-    Stats stats;
     mutable std::recursive_mutex infosMutex;
     std::map<const void * const, MallocInfo> infos;
     bool ignoreMalloc;
@@ -61,14 +60,6 @@ public:
     
     constexpr inline auto getIgnoreMalloc() const -> bool {
         return ignoreMalloc;
-    }
-    
-    constexpr inline auto getStats() -> Stats & {
-        return stats;
-    }
-    
-    constexpr inline auto getStats() const -> const Stats & {
-        return stats;
     }
     
     constexpr inline auto getInfos() -> std::map<const void * const, MallocInfo> & {

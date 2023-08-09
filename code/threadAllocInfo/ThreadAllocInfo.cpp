@@ -34,7 +34,6 @@ ThreadAllocInfo::~ThreadAllocInfo() {
 void ThreadAllocInfo::addMalloc(MallocInfo && info) {
     std::lock_guard lock(infosMutex);
 
-    stats += info;
     infos.insert_or_assign(info.getPointer(), info);
 }
 
@@ -50,15 +49,6 @@ auto ThreadAllocInfo::changeMalloc(const MallocInfo & info, bool search) -> bool
             return false;
         }
     }
-    if (it->second.getPointer() != info.getPointer()) {
-        stats -= it->second;
-        stats += info;
-    } else {
-        stats.replaceMalloc(it->second.getSize(), info.getSize());
-    }
-    if (__lsan_trackMemory) {
-        it->second.setDeleted(true);
-    }
     infos.insert_or_assign(info.getPointer(), info);
     return true;
 }
@@ -73,12 +63,7 @@ auto ThreadAllocInfo::removeMalloc(const void * pointer, bool search) -> bool {
     } else if (it->second.isDeleted()) {
         return false;
     }
-    stats -= it->second;
-    if (__lsan_trackMemory) {
-        it->second.setDeleted(true);
-    } else {
-        infos.erase(it);
-    }
+    infos.erase(it);
     return true;
 }
 

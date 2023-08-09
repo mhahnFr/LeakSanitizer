@@ -60,7 +60,7 @@ auto LSan::getStats() -> Stats {
     auto toReturn = instance.stats;
     
     for (const auto & localInstance : instance.threadInfos) {
-        toReturn += localInstance.get().getStats();
+//        toReturn += localInstance.get().getStats();
     }
     
     return toReturn;
@@ -95,7 +95,7 @@ void LSan::registerThreadAllocInfo(ThreadAllocInfo::Ref info) {
 void LSan::removeThreadAllocInfo(ThreadAllocInfo::Ref info) {
     std::lock_guard lock(infoMutex);
     
-    stats += info.get().getStats();
+//    stats += info.get().getStats();
     infos.merge(info.get().getInfos());
     
     auto it = std::find_if(threadInfos.cbegin(), threadInfos.cend(), [&info] (const auto & elem) {
