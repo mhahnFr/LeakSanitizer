@@ -93,8 +93,9 @@ size_t __lsan_getBytePeek();
  * @return Whether the memory statistics can savely be queried.
  * @since 1.1
  */
-DEPRECATED("Always true since version 1.5") static inline bool   __lsan_statsAvailable() {
-    return true;
+DEPRECATED("Since v1.5, refer to __lsan_statsActive")
+static inline bool   __lsan_statsAvailable() {
+    return __lsan_statsActive;
 }
 
 /**
