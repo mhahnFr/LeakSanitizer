@@ -1,5 +1,5 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
  * Copyright (C) 2022 - 2023  mhahnFr and contributors
  *
@@ -19,6 +19,8 @@
 
 #ifndef lsan_internals_hpp
 #define lsan_internals_hpp
+
+#include "deprecation.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,7 +110,10 @@ extern bool __lsan_freeNull;
  *
  * @since 1.2
  */
+DEPRECATED("Since v1.5, fragmentation is tracked together with the statistics")
 extern bool __lsan_trackMemory;
+
+extern bool __lsan_statsActive;
 
 /**
  * @brief This value defines the count of leaks that are printed at the exit of the program.

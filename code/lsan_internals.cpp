@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr and contributors
+ * Copyright (C) 2022 - 2023  mhahnFr and contributors
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -41,6 +41,7 @@ bool   __lsan_invalidFree    = false;
 bool   __lsan_freeNull       = false;
 
 bool   __lsan_trackMemory    = false;
+bool   __lsan_statsActive    = false;
 
 size_t __lsan_leakCount      = 100;
 
