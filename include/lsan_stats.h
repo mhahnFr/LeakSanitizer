@@ -20,13 +20,7 @@
 #ifndef lsan_stats_h
 #define lsan_stats_h
 
-#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define DEPRECATED(message) [[ deprecated(message) ]]
-#elif defined(__GNUC__) || defined(__clang__)
- #define DEPRECATED(message) __attribute__((deprecated(message)))
-#else
- #define DEPRECATED(message)
-#endif
+#include "deprecation.h"
 
 #ifdef __cplusplus
 extern "C" {

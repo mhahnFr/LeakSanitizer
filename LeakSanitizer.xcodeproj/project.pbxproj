@@ -74,6 +74,7 @@
 		BF23A2E1289ED24200B17349 /* Stats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Stats.hpp; sourceTree = "<group>"; };
 		BF30D8572A7815E8001D4EBF /* ThreadAllocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreadAllocInfo.cpp; sourceTree = "<group>"; };
 		BF30D8582A7815E8001D4EBF /* ThreadAllocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ThreadAllocInfo.hpp; sourceTree = "<group>"; };
+		BF34157C2A8405AD00DEEF10 /* deprecation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deprecation.h; sourceTree = "<group>"; };
 		BF378FB42919496000A4DAA9 /* libcallstack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcallstack.a; path = CallstackLibrary/libcallstack.a; sourceTree = "<group>"; };
 		BF41CC5E2A813C5000EAA3A1 /* Peaks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Peaks.cpp; sourceTree = "<group>"; };
 		BF41CC5F2A813C5000EAA3A1 /* Peaks.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Peaks.hpp; sourceTree = "<group>"; };
@@ -159,6 +160,7 @@
 				BF72C3CB2885CB9E00C7AE5C /* leaksan.h */,
 				BF621FDC28A291DE00414EE4 /* lsan_internals.h */,
 				BF72C3CC2885CB9E00C7AE5C /* stdlib.h */,
+				BF34157C2A8405AD00DEEF10 /* deprecation.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
