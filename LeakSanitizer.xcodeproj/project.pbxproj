@@ -102,6 +102,7 @@
 		BFBF736928832F8100BC4208 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
 		BFBF736B2883323100BC4208 /* crash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crash.cpp; sourceTree = "<group>"; };
 		BFBF736C2883323100BC4208 /* crash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = crash.hpp; sourceTree = "<group>"; };
+		BFC898552A8530BB00F7CB6D /* ATracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ATracker.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,6 +211,7 @@
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
 				BFBF736C2883323100BC4208 /* crash.hpp */,
 				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
+				BFC898552A8530BB00F7CB6D /* ATracker.h */,
 			);
 			path = code;
 			sourceTree = "<group>";
