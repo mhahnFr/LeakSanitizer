@@ -22,6 +22,8 @@
 
 #include "deprecation.h"
 
+#include "lsan_internals.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -106,8 +108,10 @@ static inline bool   __lsan_statsAvailable() {
  * @return Whether the memory fragmentation statistics are available.
  * @since 1.2
  */
-DEPRECATED("Since v1.5 replaced by __lsan_statsAvailable")
-bool   __lsan_fStatsAvailable();
+DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+static inline bool   __lsan_fStatsAvailable() {
+    return __lsan_statsActive;
+}
 
 /**
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
@@ -117,8 +121,10 @@ bool   __lsan_fStatsAvailable();
  * @return Whether the memory fragmentation statisitcs are available.
  * @since 1.2
  */
-DEPRECATED("Since v1.5 replaced by __lsan_statsAvailable")
-bool   __lsan_fragStatsAvailable();
+DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+static inline bool   __lsan_fragStatsAvailable() {
+    return __lsan_statsActive;
+}
 
 /**
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
@@ -128,8 +134,10 @@ bool   __lsan_fragStatsAvailable();
  * @return Whether the memory fragmentation statisitcs are available.
  * @since 1.2
  */
-DEPRECATED("Since v1.5 replaced by __lsan_statsAvailable")
-bool   __lsan_fragmentationStatsAvailable();
+DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+static inline bool   __lsan_fragmentationStatsAvailable() {
+    return __lsan_statsActive;
+}
 
 /**
  * @brief Prints the statistics of the memory fragmentation.

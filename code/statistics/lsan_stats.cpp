@@ -38,10 +38,6 @@ size_t __lsan_getCurrentByteCount()   { return LSan::getStats().getCurrentBytes(
 size_t __lsan_getMallocPeek() { return LSan::getStats().getMallocPeek(); }
 size_t __lsan_getBytePeek()   { return LSan::getStats().getBytePeek();   }
 
-bool __lsan_fStatsAvailable()             { return __lsan_fragmentationStatsAvailable(); }
-bool __lsan_fragStatsAvailable()          { return __lsan_fragmentationStatsAvailable(); }
-bool __lsan_fragmentationStatsAvailable() { return __lsan_trackMemory; }
-
 void __lsan_printStats() { __lsan_printStatsWithWidth(100); }
 
 void __lsan_printFStats()             { __lsan_printFragmentationStats();             }
