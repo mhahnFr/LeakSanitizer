@@ -155,6 +155,17 @@ auto LSan::removeMalloc(const void * pointer) -> bool {
     return false;
 }
 
+void LSan::addMalloc(MallocInfo && info) {
+    std::lock_guard lock(infoMutex);
+    
+    stats += info; // No need to check __lsan_statsActive here,
+                   // since allocations are only added globally
+                   // if the __lsan_statsActive is true.
+                   //                                 - mhahnFr
+    
+    infos.insert_or_assign(info.getPointer(), info);
+}
+
 void LSan::setCallstackSizeExceeded(bool exceeded) { callstackSizeExceeded = exceeded; }
 
 size_t LSan::getTotalAllocatedBytes() {

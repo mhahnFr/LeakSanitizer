@@ -25,6 +25,7 @@
 #include <ostream>
 #include <vector>
 
+#include "ATracker.h"
 #include "MallocInfo.hpp"
 
 #include "statistics/Stats.hpp"
@@ -33,7 +34,7 @@
 /**
  * This class manages everything this sanitizer is capable to do.
  */
-class LSan {
+class LSan: public ATracker {
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
@@ -59,7 +60,14 @@ public:
     LSan & operator=(const LSan &&) = delete;
     
     auto maybeChangeMalloc(const MallocInfo & info) -> bool;
-    auto removeMalloc(const void * pointer) -> bool;
+    
+    virtual auto removeMalloc(const void * pointer) -> bool override;
+    
+    virtual void addMalloc(MallocInfo && info) override;
+    
+    virtual inline auto changeMalloc(const MallocInfo & info) -> bool override {
+        return maybeChangeMalloc(info);
+    }
     
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the

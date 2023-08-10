@@ -25,7 +25,7 @@
 #include "MallocInfo.hpp"
 
 class ATracker {
-    std::atomic_bool ignoreMalloc;
+    std::atomic_bool ignoreMalloc = false;
     
 public:
     virtual ~ATracker() {}
