@@ -83,7 +83,9 @@ public:
      */
     auto getLeakCount()           -> size_t;
     
-    auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo>;
+    inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+        return infos;
+    }
     
     /**
      * Sets whether the maximum callstack size has been exceeded during the printing.

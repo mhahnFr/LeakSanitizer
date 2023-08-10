@@ -188,20 +188,6 @@ size_t LSan::getTotalLeakedBytes() {
     return ret;
 }
 
-auto LSan::getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> {
-    auto toReturn = std::map<const void * const, MallocInfo>();
-    
-    for (auto & localInstance : threadInfos) {
-        localInstance.get().lockMutex();
-        toReturn.insert(localInstance.get().getInfos().cbegin(), localInstance.get().getInfos().cend());
-        localInstance.get().unlockMutex();
-    }
-    std::lock_guard lock(infoMutex);
-    toReturn.insert(infos.cbegin(), infos.cend());
-    
-    return toReturn;
-}
-
 void LSan::__exit_hook() {
     using Formatter::Style;
     getLocalInstance().setIgnoreMalloc(true);
