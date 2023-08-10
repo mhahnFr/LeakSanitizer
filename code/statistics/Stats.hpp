@@ -168,7 +168,6 @@ public:
      * @return this instance
      */
     auto operator+=(const MallocInfo & info) -> Stats &;
-    auto operator+=(const Stats & other) -> Stats &;
     /**
      * Removes the given allocation record from this instance and returns itself.
      *
