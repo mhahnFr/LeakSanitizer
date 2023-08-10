@@ -26,7 +26,7 @@ class ATracker {
     bool ignoreMalloc;
     
 public:
-    virtual ~ATracker {}
+    virtual ~ATracker() {}
     
     virtual void addMalloc(MallocInfo && info) = 0;
     virtual auto changeMalloc(const MallocInfo & info) -> bool = 0;

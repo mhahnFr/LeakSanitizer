@@ -24,14 +24,14 @@
 #include <map>
 #include <mutex>
 
+#include "../ATracker.h"
 #include "../MallocInfo.hpp"
 
 #include "../statistics/Stats.hpp"
 
-class ThreadAllocInfo {
+class ThreadAllocInfo: public ATracker {
     mutable std::recursive_mutex infosMutex;
     std::map<const void * const, MallocInfo> infos;
-    bool ignoreMalloc;
     
 public:
     using  Ref = std::reference_wrapper<ThreadAllocInfo>;
@@ -46,20 +46,20 @@ public:
     ThreadAllocInfo & operator=(const ThreadAllocInfo &) = delete;
     ThreadAllocInfo & operator=(ThreadAllocInfo &&)      = delete;
     
-    void addMalloc(MallocInfo && info);
-    auto changeMalloc(const MallocInfo & info, bool search = true) -> bool;
-    auto removeMalloc(const void * pointer, bool search = true) -> bool;
+    virtual void addMalloc(MallocInfo && info) override;
+    auto changeMalloc(const MallocInfo & info, bool search) -> bool;
+    auto removeMalloc(const void * pointer, bool search) -> bool;
     
-    auto removeMalloc(MallocInfo && info) -> bool {
+    virtual inline auto changeMalloc(const MallocInfo & info) -> bool override {
+        return changeMalloc(info, true);
+    }
+    
+    virtual inline auto removeMalloc(const void * pointer) -> bool override {
+        return removeMalloc(pointer, true);
+    }
+    
+    virtual inline auto removeMalloc(MallocInfo && info) -> bool override {
         return removeMalloc(info.getPointer());
-    }
-    
-    constexpr inline void setIgnoreMalloc(const bool ignoreMalloc) {
-        this->ignoreMalloc = ignoreMalloc;
-    }
-    
-    constexpr inline auto getIgnoreMalloc() const -> bool {
-        return ignoreMalloc;
     }
     
     constexpr inline auto getInfos() -> std::map<const void * const, MallocInfo> & {
