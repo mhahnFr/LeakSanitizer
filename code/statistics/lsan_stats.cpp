@@ -315,7 +315,7 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
             << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
             << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
             << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"
-            << Formatter::clearAll() << std::endl;
+            << Formatter::clearAll() << std::endl << std::endl;
     }
     if (!ignore) {
         instance.setIgnoreMalloc(false);
@@ -344,7 +344,7 @@ void __lsan_printStatsWithWidth(size_t width) {
             << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
             << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
             << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"
-            << Formatter::clearAll() << std::endl;
+            << Formatter::clearAll() << std::endl << std::endl;
     }
     if (!ignore) {
         instance.setIgnoreMalloc(false);
