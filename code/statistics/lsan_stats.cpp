@@ -330,9 +330,22 @@ void __lsan_printStatsWithWidth(size_t width) {
     bool ignore = instance.getIgnoreMalloc();
     instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    __lsan_printStatsCore("memory usage", width, out,
-                          std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
-                          std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
+    if (__lsan_statsActive) {
+        __lsan_printStatsCore("memory usage", width, out,
+                              std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
+                              std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
+    } else {
+        out << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
+            << "No memory statistics available at the moment!" << std::endl
+            << Formatter::clear(Style::BOLD) << Formatter::get(Style::ITALIC)
+            << "Hint: Did you set "
+            << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
+            << "__lsan_statsActive"
+            << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
+            << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
+            << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"
+            << Formatter::clearAll() << std::endl;
+    }
     if (!ignore) {
         instance.setIgnoreMalloc(false);
     }
