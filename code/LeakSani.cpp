@@ -102,8 +102,8 @@ auto LSan::removeMallocHere(const void * pointer) -> bool {
     } else if (it->second.isDeleted()) {
         return true;
     }
-    stats -= it->second;
-    if (__lsan_trackMemory) {
+    if (__lsan_statsActive) {
+        stats -= it->second;
         it->second.setDeleted(true);
     } else {
         infos.erase(it);
@@ -118,13 +118,13 @@ auto LSan::changeMallocHere(const MallocInfo & info) -> bool {
     if (it == infos.end()) {
         return false;
     }
-    if (it->second.getPointer() != info.getPointer()) {
-        stats -= it->second;
-        stats += info;
-    } else {
-        stats.replaceMalloc(it->second.getSize(), info.getSize());
-    }
-    if (__lsan_trackMemory) {
+    if (__lsan_statsActive) {
+        if (it->second.getPointer() != info.getPointer()) {
+            stats -= it->second;
+            stats += info;
+        } else {
+            stats.replaceMalloc(it->second.getSize(), info.getSize());
+        }
         it->second.setDeleted(true);
     }
     infos.insert_or_assign(info.getPointer(), info);
@@ -179,7 +179,7 @@ size_t LSan::getTotalAllocatedBytes() {
 
 size_t LSan::getLeakCount() {
     std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    if (__lsan_trackMemory) {
+    if (__lsan_statsActive) {
         return static_cast<size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
             return !elem.second.isDeleted();
         }));
@@ -201,7 +201,7 @@ size_t LSan::getTotalLeakedBytes() {
 
 void LSan::__exit_hook() {
     using Formatter::Style;
-    getLocalInstance().setIgnoreMalloc(true);
+    getTracker().setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << std::endl
         << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN)

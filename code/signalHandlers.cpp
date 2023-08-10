@@ -66,7 +66,7 @@ static std::string signalString(int signal) {
 void callstackSignal(int) {
     using Formatter::Style;
     
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     bool ignore     = instance.getIgnoreMalloc();
     
     instance.setIgnoreMalloc(true);

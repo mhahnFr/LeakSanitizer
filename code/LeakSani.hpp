@@ -31,6 +31,8 @@
 #include "statistics/Stats.hpp"
 #include "threadAllocInfo/ThreadAllocInfo.hpp"
 
+#include "../include/lsan_internals.h"
+
 /**
  * This class manages everything this sanitizer is capable to do.
  */
@@ -123,6 +125,13 @@ public:
      */
     static auto getInstance()  -> LSan &;
     static auto getLocalInstance() -> ThreadAllocInfo &;
+
+    static inline auto getTracker() -> ATracker & {
+        if (__lsan_statsActive) {
+            return getInstance();
+        }
+        return getLocalInstance();
+    }
     /**
      * Returns the current instance of the statitcs object.
      *

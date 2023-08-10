@@ -296,12 +296,12 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
 void __lsan_printFragmentationStatsWithWidth(size_t width) {
     using Formatter::Style;
     
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     
     bool ignore = instance.getIgnoreMalloc();
     instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    if (__lsan_fragmentationStatsAvailable()) {
+    if (__lsan_statsActive) {
         __lsan_printStatsCore("memory fragmentation", width, out,
                               __lsan_printFragmentationByteBar,
                               __lsan_printFragmentationObjectBar);
@@ -325,7 +325,7 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
 void __lsan_printStatsWithWidth(size_t width) {
     using Formatter::Style;
     
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     
     bool ignore = instance.getIgnoreMalloc();
     instance.setIgnoreMalloc(true);

@@ -35,7 +35,7 @@ bool __lsan_glibc = false;
 #endif
 
 auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     auto   ret      = LSan::malloc(size);
     
     if (ret != nullptr && !instance.getIgnoreMalloc()) {
@@ -54,7 +54,7 @@ auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
 }
 
 auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file, int line) -> void * {
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     auto   ret      = LSan::calloc(objectSize, count);
     
     if (ret != nullptr && !instance.getIgnoreMalloc()) {
@@ -73,7 +73,7 @@ auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file,
 }
 
 auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int line) -> void * {
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     auto   ignored  = instance.getIgnoreMalloc();
     if (!ignored) {
         instance.setIgnoreMalloc(true);
@@ -96,7 +96,7 @@ auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int lin
 }
 
 void __wrap_free(void * pointer, const char * file, int line) {
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     
     if (!instance.getIgnoreMalloc()) {
         instance.setIgnoreMalloc(true);
@@ -119,7 +119,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
 [[ noreturn ]] void __wrap_exit(int code, const char * file, int line) {
     using Formatter::Style;
     
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     
     instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
@@ -139,7 +139,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
 }
 
 auto malloc(std::size_t size) -> void * {
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     auto   ptr      = LSan::malloc(size);
     
     if (ptr != nullptr && !instance.getIgnoreMalloc()) {
@@ -158,7 +158,7 @@ auto malloc(std::size_t size) -> void * {
 }
 
 auto calloc(std::size_t objectSize, std::size_t count) -> void * {
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     auto   ptr      = LSan::calloc(objectSize, count);
     
     if (ptr != nullptr && !instance.getIgnoreMalloc()) {
@@ -177,7 +177,7 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * {
 }
 
 auto realloc(void * pointer, std::size_t size) -> void * {
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     auto   ignored  = instance.getIgnoreMalloc();
     if (!ignored) {
         instance.setIgnoreMalloc(true);
@@ -200,7 +200,7 @@ auto realloc(void * pointer, std::size_t size) -> void * {
 }
 
 void free(void * pointer) {
-    auto & instance = LSan::getLocalInstance();
+    auto & instance = LSan::getTracker();
     
     if (!instance.getIgnoreMalloc()) {
         instance.setIgnoreMalloc(true);
