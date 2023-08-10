@@ -58,10 +58,6 @@ public:
         return removeMalloc(pointer, true);
     }
     
-    virtual inline auto removeMalloc(MallocInfo && info) -> bool override {
-        return removeMalloc(info.getPointer());
-    }
-    
     constexpr inline auto getInfos() -> std::map<const void * const, MallocInfo> & {
         return infos;
     }

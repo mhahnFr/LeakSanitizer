@@ -20,10 +20,12 @@
 #ifndef ATracker_h
 #define ATracker_h
 
+#include <atomic>
+
 #include "MallocInfo.hpp"
 
 class ATracker {
-    bool ignoreMalloc;
+    std::atomic_bool ignoreMalloc;
     
 public:
     virtual ~ATracker() {}
@@ -31,7 +33,10 @@ public:
     virtual void addMalloc(MallocInfo && info) = 0;
     virtual auto changeMalloc(const MallocInfo & info) -> bool = 0;
     virtual auto removeMalloc(const void * pointer) -> bool = 0;
-    virtual auto removeMalloc(MallocInfo && info) -> bool = 0;
+    
+    inline auto removeMalloc(MallocInfo && info) -> bool {
+        return removeMalloc(info.getPointer());
+    }
     
     constexpr inline void setIgnoreMalloc(const bool ignoreMalloc) {
         this->ignoreMalloc = ignoreMalloc;
