@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -21,34 +21,37 @@
 #define LeakSani_hpp
 
 #include <map>
-#include <ostream>
 #include <mutex>
+#include <ostream>
+#include <vector>
+
+#include "ATracker.hpp"
 #include "MallocInfo.hpp"
-#include "Stats.hpp"
+
+#include "statistics/Stats.hpp"
+#include "threadAllocInfo/ThreadAllocInfo.hpp"
+
+#include "../include/lsan_internals.h"
 
 /**
  * This class manages everything this sanitizer is capable to do.
  */
-class LSan {
-    /// A pointer to the statistics instance held by each instance.
-    static Stats * stats;
-    
-    /**
-     * Statically holds a boolean value which idicates whether to track allocations
-     * or not at the moment of querying.
-     *
-     * @return a reference to the statically stored boolean value
-     */
-    static auto getIgnoreMalloc() -> bool &;
-    
+class LSan: public ATracker {
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
-    std::recursive_mutex                     infoMutex;
+    mutable std::recursive_mutex             infoMutex;
     /// An object holding all statistics.
-    Stats                                    realStats;
+    Stats                                    stats;
     /// Indicates whether the set callstack size had been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
+    
+    std::vector<ThreadAllocInfo::Ref> threadInfos;
+    
+    auto removeMallocHere(const void * pointer) -> bool;
+    auto changeMallocHere(const MallocInfo & info) -> bool;
+    
+    auto getLocalIgnoreMalloc() const -> bool &;
     
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
@@ -60,39 +63,18 @@ public:
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
     
-    /**
-     * Adds the given allocation record to the principle list and to the statistics.
-     *
-     * @param info the allocation record to add
-     */
-    void addMalloc(MallocInfo && info);
-    /**
-     * Exchanges the allocation record associated with the pointer of the given allocation record
-     * by the given allocation record.
-     *
-     * @param info the allocation record to exchange
-     */
-    void changeMalloc(const MallocInfo & info);
-    /**
-     * @brief Attempts to remove the given allocation record from the principal list.
-     *
-     * The allocation record is removed from the statistics and marked as deallocated.
-     * It is removed from the principal list if the fragmentation tracking is turned off.
-     *
-     * @param info the info to mark as deallocated
-     * @return whether the allocation record was found in the principal list
-     */
-    auto removeMalloc(const MallocInfo & info) -> bool;
-    /**
-     * @brief Attempts to remove the allocation record associated with the given pointer.
-     *
-     * The allocation record is removed from the statistics and marked as deallocated if it
-     * was found. It is not removed from the principal list if the fragmentation tracking is enabled.
-     *
-     * @param pointer the pointer whose associated allocation record should be marked as deallocated
-     * @return whether an associated allocation record was found
-     */
-    auto removeMalloc(const void * pointer)    -> bool;
+    auto maybeChangeMalloc(const MallocInfo & info) -> bool;
+    
+    virtual auto removeMalloc(const void * pointer) -> bool override;
+    
+    virtual void addMalloc(MallocInfo && info) override;
+    
+    virtual inline auto changeMalloc(const MallocInfo & info) -> bool override {
+        return maybeChangeMalloc(info);
+    }
+    
+    virtual void setIgnoreMalloc(const bool ignoreMalloc) override;
+    virtual auto getIgnoreMalloc() const -> bool override;
     
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
@@ -115,19 +97,10 @@ public:
      * @return the total count of leaked objects
      */
     auto getLeakCount()           -> size_t;
-    /**
-     * Returns a reference to the mutex used to protect the principal list storing the
-     * allocation records.
-     *
-     * @return the mutex protecting the principal list
-     */
-    auto getInfoMutex()           -> std::recursive_mutex &;
-    /**
-     * Returns a reference to the principal list storing the allocation records.
-     *
-     * @return the principal list of allocation records
-     */
-    auto getInfos()         const -> const std::map<const void * const, MallocInfo> &;
+    
+    inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+        return infos;
+    }
     
     /**
      * Sets whether the maximum callstack size has been exceeded during the printing.
@@ -135,6 +108,9 @@ public:
      * @param exceeded whether the maximum callstack size has been exceeded
      */
     void setCallstackSizeExceeded(bool exceeded);
+    
+    void registerThreadAllocInfo(ThreadAllocInfo::Ref info);
+    void removeThreadAllocInfo(ThreadAllocInfo::Ref info);
     
     /// A pointer to the real `malloc` function.
     static void * (*malloc) (size_t);
@@ -153,31 +129,23 @@ public:
      * @return the current instance
      */
     static auto getInstance()  -> LSan &;
+    static auto getLocalInstance() -> ThreadAllocInfo &;
+
+    static inline auto getTracker() -> ATracker & {
+        if (__lsan_statsActive) {
+            return getInstance();
+        }
+        return getLocalInstance();
+    }
     /**
      * Returns the current instance of the statitcs object.
      *
      * @return the current statistics instance
      */
-    static auto getStats()     -> Stats &;
-    /**
-     * Returns whether the statictics are available.
-     *
-     * @return whether the statistics are available
-     */
-    static auto hasStats()     -> bool;
-    /**
-     * Returns whether the allocations should be tracked at the time of querying.
-     *
-     * @return whether the allocations should be tracked at the moment
-     */
-    static auto ignoreMalloc() -> bool;
+    inline static auto getStats() -> const Stats & {
+        return getInstance().stats;
+    }
     
-    /**
-     * Sets whether the next allocations should be tracked.
-     *
-     * @param ignore whether to ignore the next allocations
-     */
-    static void setIgnoreMalloc(bool ignore);
     /**
      * Prints the informations of this sanitizer.
      */

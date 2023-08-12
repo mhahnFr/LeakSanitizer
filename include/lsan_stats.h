@@ -1,5 +1,5 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
  * Copyright (C) 2022 - 2023  mhahnFr
  *
@@ -19,6 +19,10 @@
 
 #ifndef lsan_stats_h
 #define lsan_stats_h
+
+#include "deprecation.h"
+
+#include "lsan_internals.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,7 +95,10 @@ size_t __lsan_getBytePeek();
  * @return Whether the memory statistics can savely be queried.
  * @since 1.1
  */
-bool   __lsan_statsAvailable();
+DEPRECATED("Since v1.5, refer to __lsan_statsActive")
+static inline bool   __lsan_statsAvailable() {
+    return __lsan_statsActive;
+}
 
 /**
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
@@ -101,7 +108,10 @@ bool   __lsan_statsAvailable();
  * @return Whether the memory fragmentation statistics are available.
  * @since 1.2
  */
-bool   __lsan_fStatsAvailable();
+DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+static inline bool   __lsan_fStatsAvailable() {
+    return __lsan_statsActive;
+}
 
 /**
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
@@ -111,7 +121,10 @@ bool   __lsan_fStatsAvailable();
  * @return Whether the memory fragmentation statisitcs are available.
  * @since 1.2
  */
-bool   __lsan_fragStatsAvailable();
+DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+static inline bool   __lsan_fragStatsAvailable() {
+    return __lsan_statsActive;
+}
 
 /**
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
@@ -121,7 +134,10 @@ bool   __lsan_fragStatsAvailable();
  * @return Whether the memory fragmentation statisitcs are available.
  * @since 1.2
  */
-bool   __lsan_fragmentationStatsAvailable();
+DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+static inline bool   __lsan_fragmentationStatsAvailable() {
+    return __lsan_statsActive;
+}
 
 /**
  * @brief Prints the statistics of the memory fragmentation.
@@ -129,8 +145,8 @@ bool   __lsan_fragmentationStatsAvailable();
  * The bar has a size of 100 characters, it can be adjusted by using `__lsan_printFStatsWithWidth(size_t)`.
  * The output stream defined by `__lsan_printCout` is used for the printing. The byte amounts are printed
  * human readable if `__lsan_humanPrint` is set to true.
- * This function already checks for the availability of the memory statistics using the function
- * `__lsan_fStatsAvailable()` and guarantees to not crash the program, even in the case the memory
+ * This function already checks for the availability of the memory statistics using
+ * `__lsan_statsActive` and guarantees to not crash the program, even in the case the memory
  * fragmentation statistics are unavailable.
  *
  * @since 1.2
@@ -143,8 +159,8 @@ void   __lsan_printFStats();
  * The bar has a size of 100 characters, it can be adjusted by using `__lsan_printFragStatsWithWidth(size_t)`.
  * The output stream defined by `__lsan_printCout` is used for the printing. The byte amounts are printed
  * human readable if `__lsan_humanPrint` is set to true.
- * This function already checks for the availability of the memory statistics using the function
- * `__lsan_fragStatsAvailable()` and guarantees to not crash the program, even in the case the memory
+ * This function already checks for the availability of the memory statistics using
+ * `__lsan_statsActive` and guarantees to not crash the program, even in the case the memory
  * fragmentation statistics are unavailable.
  *
  * @since 1.2
@@ -157,8 +173,8 @@ void   __lsan_printFragStats();
  * The bar has a size of 100 characters, it can be adjusted by using `__lsan_printFragmentationStatsWithWidth(size_t)`.
  * The output stream defined by `__lsan_printCout` is used for the printing. The byte amounts are printed
  * human readable if `__lsan_humanPrint` is set to true.
- * This function already checks for the availability of the memory statistics using the function
- * `__lsan_fragmentationStatsAvailable()` and guarantees to not crash the program, even in the case the
+ * This function already checks for the availability of the memory statistics using
+ * `__lsan_statsActive` and guarantees to not crash the program, even in the case the
  * memory fragmentation statistics are unavailable.
  *
  * @since 1.2
@@ -170,8 +186,8 @@ void   __lsan_printFragmentationStats();
  *
  * The size of the bar is specified by the given argument. The output stream defined by `__lsan_printCout`
  * is used for the printing. The byte amounts are printed human readable if `__lsan_humanPrint` is set to true.
- * This function already checks for the availability of the memory fragmentation statistics using the
- * function `__lsan_fStatsAvailable()`, and guarantees to not crash the program, even in the case the
+ * This function already checks for the availability of the memory fragmentation statistics using
+ * `__lsan_statsActive`, and guarantees to not crash the program, even in the case the
  * memory fragmentation statistics are unavailable.
  *
  * @param width The width in characters the printed bar should have.
@@ -184,8 +200,8 @@ void   __lsan_printFStatsWithWidth(size_t width);
  *
  * The size of the bar is specified by the given argument. The output stream defined by `__lsan_printCout`
  * is used for the printing. The byte amounts are printed human readable if `__lsan_humanPrint` is set to true.
- * This function already checks for the availability of the memory fragmentation statistics using the
- * function `__lsan_fragStatsAvailable()`, and guarantees to not crash the program, even in the case the
+ * This function already checks for the availability of the memory fragmentation statistics using
+ * `__lsan_statsActive`, and guarantees to not crash the program, even in the case the
  * memory fragmentation statistics are unavailable.
  *
  * @param width The width in characters the printed bar should have.
@@ -198,8 +214,8 @@ void   __lsan_printFragStatsWithWidth(size_t width);
  *
  * The size of the bar is specified by the given argument. The output stream defined by `__lsan_printCout`
  * is used for the printing. The byte amounts are printed human readable if `__lsan_humanPrint` is set to true.
- * This function already checks for the availability of the memory fragmentation statistics using the
- * function `__lsan_fragmentationStatsAvailable()`, and guarantees to not crash the program, even in
+ * This function already checks for the availability of the memory fragmentation statistics using
+ * `__lsan_statsActive`, and guarantees to not crash the program, even in
  * the case the memory fragmentation statistics are unavailable.
  *
  * @param width The width in characters the printed bar should have.
@@ -213,8 +229,8 @@ void   __lsan_printFragmentationStatsWithWidth(size_t width);
  * The bar has a size of 100 characters, it can be adjusted by using `__lsan_printStatsWithWidth(size_t)`.
  * The output stream defined by `__lsan_printCout` is used for the printing. The byte amounts are printed
  * human readable if `__lsan_humanPrint` is set to true.
- * This function already checks for the availability of the memory statistics using the function
- * `__lsan_statsAvailable()`, and guarantees to not crash the program, even in the case the memory
+ * This function already checks for the availability of the memory statistics using
+ * `__lsan_statsActive`, and guarantees to not crash the program, even in the case the memory
  * statistics are unavailable.
  */
 void   __lsan_printStats();
@@ -224,8 +240,8 @@ void   __lsan_printStats();
  *
  * The size of the bar is specified by the given argument. The output stream defined by `__lsan_printCout`
  * is used for the printing. The byte amounts are printed human readable if `__lsan_humanPrint` is set to true.
- * This function already checks for the availability of the memory statistics using the function
- * `__lsan_statsAvailable()`, and guarantees to not crash the program, even in the case the memory
+ * This function already checks for the availability of the memory statistics using
+ * `__lsan_statsActive`, and guarantees to not crash the program, even in the case the memory
  * statistics are unavailable.
  *
  * @param width The width in characters the printed bar should have.

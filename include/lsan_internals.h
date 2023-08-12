@@ -1,5 +1,5 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
  * Copyright (C) 2022 - 2023  mhahnFr and contributors
  *
@@ -19,6 +19,8 @@
 
 #ifndef lsan_internals_hpp
 #define lsan_internals_hpp
+
+#include "deprecation.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +60,7 @@ extern bool __lsan_printFormatted;
  * @brief If this value is set to `true`, the license informations are printed upon normal termination
  * of the program.
  *
- * Defaults to `true`.
+ * Defaults value is set by the Makefile.
  *
  * @since 1.1
  */
@@ -108,7 +110,18 @@ extern bool __lsan_freeNull;
  *
  * @since 1.2
  */
+DEPRECATED("Since v1.5, replaced by __lsan_statsActive")
 extern bool __lsan_trackMemory;
+
+/**
+ * @brief If this value is set to `true`, the memory allocation statistics can be analyzed.
+ *
+ * It should be set at the very beginning of the program in order to get realistic results.
+ * Defaults `false`.
+ *
+ * @since 1.5
+ */
+extern bool __lsan_statsActive;
 
 /**
  * @brief This value defines the count of leaks that are printed at the exit of the program.
@@ -126,7 +139,7 @@ extern size_t __lsan_leakCount;
  *
  * If there are more functions in such a callstack, the top most functions are printed
  * and a message about the truncation is printed.
- * Defaults to 20`.
+ * Defaults to `20`.
  *
  * @since 1.3
  */

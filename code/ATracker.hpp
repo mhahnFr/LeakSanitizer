@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2023  mhahnFr and contributors
+ * Copyright (C) 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -17,32 +17,28 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../include/lsan_internals.h"
+#ifndef ATracker_hpp
+#define ATracker_hpp
 
-bool   __lsan_humanPrint     = true;
-bool   __lsan_printCout      = false;
-bool   __lsan_printFormatted = true;
+#include <atomic>
 
-#ifdef NO_LICENSE
-bool   __lsan_printLicense   = false;
-#else
-bool   __lsan_printLicense   = true;
-#endif
+#include "MallocInfo.hpp"
 
-#ifdef NO_WEBSITE
-bool   __lsan_printWebsite   = false;
-#else
-bool   __lsan_printWebsite   = true;
-#endif
+class ATracker {
+public:
+    virtual ~ATracker() {}
+    
+    virtual void addMalloc(MallocInfo && info) = 0;
+    virtual auto changeMalloc(const MallocInfo & info) -> bool = 0;
+    virtual auto removeMalloc(const void * pointer) -> bool = 0;
+    
+    inline auto removeMalloc(MallocInfo && info) -> bool {
+        return removeMalloc(info.getPointer());
+    }
+    
+    virtual void setIgnoreMalloc(const bool ignoreMalloc) = 0;
+    
+    virtual auto getIgnoreMalloc() const -> bool = 0;
+};
 
-bool   __lsan_invalidCrash   = true;
-
-bool   __lsan_invalidFree    = false;
-bool   __lsan_freeNull       = false;
-
-bool   __lsan_trackMemory    = false;
-bool   __lsan_statsActive    = false;
-
-size_t __lsan_leakCount      = 100;
-
-size_t __lsan_callstackSize  = 20;
+#endif /* ATracker_hpp */
