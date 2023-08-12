@@ -194,14 +194,7 @@ void LSan::printInformations(){
 void LSan::printLicense() {
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << "Copyright (C) 2022 - 2023 mhahnFr and contributors" << std::endl
-        << std::endl
-        << "This library is free software: you can redistribute it and/or modify it under"    << std::endl
-        << "the terms of the GNU General Public License as published by the"                  << std::endl
-        << "Free Software Foundation, either version 3 of the License, or (at your option)"   << std::endl
-        << "any later version."                                                               << std::endl
-        << std::endl
-        << "You should have received a copy of the GNU General Public License along with"     << std::endl
-        << "this library, see the file LICENSE. If not, see <https://www.gnu.org/licenses/>." << std::endl
+        << "Licensed under the terms of the GPL 3.0."           << std::endl
         << std::endl;
 }
 

@@ -71,7 +71,8 @@ default: $(NAME)
 
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
-install: $(SHARED_L)
+install:
+	$(MAKE) NO_LICENSE=false NO_WEBSITE=false $(SHARED_L) # TODO: library tool
 	mkdir -p $(INSTALL_PATH)/lib
 	mkdir -p "$(INSTALL_PATH)/include"
 	cp $(SHARED_L) $(INSTALL_PATH)/lib
