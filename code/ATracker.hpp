@@ -25,8 +25,6 @@
 #include "MallocInfo.hpp"
 
 class ATracker {
-    std::atomic_bool ignoreMalloc = false;
-    
 public:
     virtual ~ATracker() {}
     
@@ -38,13 +36,9 @@ public:
         return removeMalloc(info.getPointer());
     }
     
-    constexpr inline void setIgnoreMalloc(const bool ignoreMalloc) {
-        this->ignoreMalloc = ignoreMalloc;
-    }
+    virtual void setIgnoreMalloc(const bool ignoreMalloc) = 0;
     
-    constexpr inline auto getIgnoreMalloc() const -> bool {
-        return ignoreMalloc;
-    }
+    virtual auto getIgnoreMalloc() const -> bool = 0;
 };
 
 #endif /* ATracker_hpp */

@@ -32,6 +32,7 @@
 class ThreadAllocInfo: public ATracker {
     mutable std::recursive_mutex infosMutex;
     std::map<const void * const, MallocInfo> infos;
+    bool ignoreMalloc = false;
     
 public:
     using  Ref = std::reference_wrapper<ThreadAllocInfo>;
@@ -56,6 +57,14 @@ public:
     
     virtual inline auto removeMalloc(const void * pointer) -> bool override {
         return removeMalloc(pointer, true);
+    }
+    
+    virtual inline void setIgnoreMalloc(const bool ignoreMalloc) override {
+        this->ignoreMalloc = ignoreMalloc;
+    }
+    
+    virtual inline auto getIgnoreMalloc() const -> bool override {
+        return ignoreMalloc;
     }
     
     constexpr inline auto getInfos() -> std::map<const void * const, MallocInfo> & {

@@ -51,6 +51,8 @@ class LSan: public ATracker {
     auto removeMallocHere(const void * pointer) -> bool;
     auto changeMallocHere(const MallocInfo & info) -> bool;
     
+    auto getLocalIgnoreMalloc() const -> bool &;
+    
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
     LSan();
@@ -70,6 +72,9 @@ public:
     virtual inline auto changeMalloc(const MallocInfo & info) -> bool override {
         return maybeChangeMalloc(info);
     }
+    
+    virtual void setIgnoreMalloc(const bool ignoreMalloc) override;
+    virtual auto getIgnoreMalloc() const -> bool override;
     
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the

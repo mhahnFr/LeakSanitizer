@@ -166,6 +166,19 @@ void LSan::addMalloc(MallocInfo && info) {
     infos.insert_or_assign(info.getPointer(), info);
 }
 
+auto LSan::getLocalIgnoreMalloc() const -> bool & {
+    static thread_local bool ignoreMalloc = false;
+    return ignoreMalloc;
+}
+
+void LSan::setIgnoreMalloc(const bool ignoreMalloc) {
+    getLocalIgnoreMalloc() = ignoreMalloc;
+}
+
+auto LSan::getIgnoreMalloc() const -> bool {
+    return getLocalIgnoreMalloc();
+}
+
 void LSan::setCallstackSizeExceeded(bool exceeded) { callstackSizeExceeded = exceeded; }
 
 size_t LSan::getTotalAllocatedBytes() {
