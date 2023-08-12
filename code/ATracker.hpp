@@ -17,8 +17,8 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ATracker_h
-#define ATracker_h
+#ifndef ATracker_hpp
+#define ATracker_hpp
 
 #include <atomic>
 
@@ -47,4 +47,4 @@ public:
     }
 };
 
-#endif /* ATracker_h */
+#endif /* ATracker_hpp */

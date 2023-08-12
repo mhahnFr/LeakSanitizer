@@ -25,7 +25,7 @@
 #include <ostream>
 #include <vector>
 
-#include "ATracker.h"
+#include "ATracker.hpp"
 #include "MallocInfo.hpp"
 
 #include "statistics/Stats.hpp"
