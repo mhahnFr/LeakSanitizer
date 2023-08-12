@@ -60,7 +60,7 @@ extern bool __lsan_printFormatted;
  * @brief If this value is set to `true`, the license informations are printed upon normal termination
  * of the program.
  *
- * Defaults to `true`.
+ * Defaults value is set by the Makefile.
  *
  * @since 1.1
  */
@@ -113,6 +113,14 @@ extern bool __lsan_freeNull;
 DEPRECATED("Since v1.5, replaced by __lsan_statsActive")
 extern bool __lsan_trackMemory;
 
+/**
+ * @brief If this value is set to `true`, the memory allocation statistics can be analyzed.
+ *
+ * It should be set at the very beginning of the program in order to get realistic results.
+ * Defaults `false`.
+ *
+ * @since 1.5
+ */
 extern bool __lsan_statsActive;
 
 /**
