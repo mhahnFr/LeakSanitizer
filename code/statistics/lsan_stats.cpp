@@ -311,7 +311,7 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
             << Formatter::clear(Style::BOLD) << Formatter::get(Style::ITALIC)
             << "Hint: Did you set "
             << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
-            << "__lsan_trackMemory"
+            << "__lsan_statsActive"
             << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
             << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
             << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"

@@ -110,7 +110,7 @@ extern bool __lsan_freeNull;
  *
  * @since 1.2
  */
-DEPRECATED("Since v1.5, fragmentation is tracked together with the statistics")
+DEPRECATED("Since v1.5, replaced by __lsan_statsActive")
 extern bool __lsan_trackMemory;
 
 extern bool __lsan_statsActive;
@@ -131,7 +131,7 @@ extern size_t __lsan_leakCount;
  *
  * If there are more functions in such a callstack, the top most functions are printed
  * and a message about the truncation is printed.
- * Defaults to 20`.
+ * Defaults to `20`.
  *
  * @since 1.3
  */
