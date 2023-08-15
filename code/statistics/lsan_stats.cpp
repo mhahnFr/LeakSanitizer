@@ -38,15 +38,6 @@ size_t __lsan_getCurrentByteCount()   { return LSan::getStats().getCurrentBytes(
 size_t __lsan_getMallocPeek() { return LSan::getStats().getMallocPeek(); }
 size_t __lsan_getBytePeek()   { return LSan::getStats().getBytePeek();   }
 
-void __lsan_printStats() { __lsan_printStatsWithWidth(100); }
-
-void __lsan_printFStats()             { __lsan_printFragmentationStats();             }
-void __lsan_printFragStats()          { __lsan_printFragmentationStats();             }
-void __lsan_printFragmentationStats() { __lsan_printFragmentationStatsWithWidth(100); }
-
-void __lsan_printFStatsWithWidth   (size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
-void __lsan_printFragStatsWithWidth(size_t width) { __lsan_printFragmentationStatsWithWidth(width); }
-
 /**
  * @brief Prints the statistics using the given parameters.
  *
