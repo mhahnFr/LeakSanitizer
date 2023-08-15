@@ -20,25 +20,68 @@
 #ifndef ATracker_hpp
 #define ATracker_hpp
 
-#include <atomic>
-
 #include "MallocInfo.hpp"
 
+/**
+ * This class defines the functionality of an allocation tracker.
+ */
 class ATracker {
 public:
     virtual ~ATracker() {}
     
+    /**
+     * Adds the given allocation record to the tracked allocations.
+     *
+     * @param info the allocation record to be added
+     */
     virtual void addMalloc(MallocInfo && info) = 0;
+    /**
+     * Attempts to exchange the allocation record associated with the given
+     * allocation record by the given allocation record.
+     *
+     * Implementors note: the record should be searched for globally if it is not
+     * found in this instance.
+     *
+     * @param info the allocation record to be exchanged
+     * @return whether the record was replaced
+     */
     virtual auto changeMalloc(const MallocInfo & info) -> bool = 0;
-    virtual auto removeMalloc(const void * pointer) -> bool = 0;
+    /**
+     * Attempts to remove the allocation record associated with the given pointer.
+     *
+     * Implementors note: the record should be searched for globally if it is not
+     * found in this instance.
+     *
+     * @param pointer the deallocated pointer
+     * @return whether the record was removed
+     */
+    virtual auto removeMalloc(const void * pointer)    -> bool = 0;
     
+    /**
+     * Attempts to remove the allocation record associated with the given record.
+     *
+     * Implementors note: the record should be searched for globally if it is not
+     * found in this instance.
+     *
+     * @param info the allocation record
+     * @return whether the record was removed
+     */
     inline auto removeMalloc(MallocInfo && info) -> bool {
         return removeMalloc(info.getPointer());
     }
     
+    /**
+     * Sets whether upcoming allocations should be ignored.
+     *
+     * @param ignoreMalloc whether to ignore upcoming allocations
+     */
     virtual void setIgnoreMalloc(const bool ignoreMalloc) = 0;
-    
-    virtual auto getIgnoreMalloc() const -> bool = 0;
+    /**
+     * Returns whether upcoming allocations should be ignored.
+     *
+     * @return whether to ignore upcoming allocations
+     */
+    virtual auto getIgnoreMalloc() const -> bool          = 0;
 };
 
 #endif /* ATracker_hpp */
