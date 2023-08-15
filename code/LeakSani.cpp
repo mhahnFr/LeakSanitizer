@@ -31,8 +31,6 @@
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 
-bool __lsan_printStatsOnExit = false;
-
 #ifdef __GLIBC__
 extern "C" void * __libc_malloc (size_t);
 extern "C" void * __libc_calloc (size_t, size_t);
