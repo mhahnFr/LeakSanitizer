@@ -169,27 +169,19 @@ auto LSan::getLocalIgnoreMalloc() const -> bool & {
     return ignoreMalloc;
 }
 
-void LSan::setIgnoreMalloc(const bool ignoreMalloc) {
-    getLocalIgnoreMalloc() = ignoreMalloc;
-}
-
-auto LSan::getIgnoreMalloc() const -> bool {
-    return getLocalIgnoreMalloc();
-}
-
-void LSan::setCallstackSizeExceeded(bool exceeded) { callstackSizeExceeded = exceeded; }
-
-size_t LSan::getTotalAllocatedBytes() {
-    std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    size_t ret = 0;
+auto LSan::getTotalAllocatedBytes() -> std::size_t {
+    std::lock_guard lock(infoMutex);
+    
+    std::size_t ret = 0;
     std::for_each(infos.cbegin(), infos.cend(), [&ret] (auto & elem) {
         ret += elem.second.getSize();
     });
     return ret;
 }
 
-size_t LSan::getLeakCount() {
-    std::lock_guard<std::recursive_mutex> lock(infoMutex);
+auto LSan::getLeakCount() -> std::size_t {
+    std::lock_guard lock(infoMutex);
+    
     if (__lsan_statsActive) {
         return static_cast<size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
             return !elem.second.isDeleted();
@@ -199,9 +191,10 @@ size_t LSan::getLeakCount() {
     }
 }
 
-size_t LSan::getTotalLeakedBytes() {
-    std::lock_guard<std::recursive_mutex> lock(infoMutex);
-    size_t ret = 0;
+auto LSan::getTotalLeakedBytes() -> std::size_t {
+    std::lock_guard lock(infoMutex);
+    
+    std::size_t ret = 0;
     for (const auto & elem : infos) {
         if (!elem.second.isDeleted()) {
             ret += elem.second.getSize();
@@ -212,6 +205,7 @@ size_t LSan::getTotalLeakedBytes() {
 
 void LSan::__exit_hook() {
     using Formatter::Style;
+    
     getTracker().setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << std::endl
@@ -231,6 +225,7 @@ void internalCleanUp() {
 
 void LSan::printInformations(){
     using Formatter::Style;
+    
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << "Report by " << Formatter::get(Style::BOLD) << "LeakSanitizer " << Formatter::clear(Style::BOLD)
         << Formatter::get(Style::ITALIC) << VERSION << Formatter::clear(Style::ITALIC)
@@ -255,6 +250,7 @@ void LSan::printLicense() {
 
 void LSan::printWebsite() {
     using Formatter::Style;
+    
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << Formatter::get(Style::ITALIC)
         << "For more information, visit "
@@ -266,12 +262,14 @@ void LSan::printWebsite() {
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     using Formatter::Style;
-    std::lock_guard<std::recursive_mutex> lock(self.infoMutex);
+    
+    std::lock_guard lock(self.infoMutex);
+    
     if (!self.infos.empty()) {
         stream << Formatter::get(Style::ITALIC);
-        const size_t totalLeaks = self.getLeakCount();
+        const std::size_t totalLeaks = self.getLeakCount();
         stream << totalLeaks << " leaks total, " << bytesToString(self.getTotalLeakedBytes()) << " total" << std::endl << std::endl;
-        size_t i = 0;
+        std::size_t i = 0;
         for (const auto & leak : self.infos) {
             if (!leak.second.isDeleted()) {
                 stream << leak.second << std::endl;

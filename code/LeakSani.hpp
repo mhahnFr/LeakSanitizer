@@ -40,7 +40,7 @@ class LSan: public ATracker {
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
-    mutable std::recursive_mutex             infoMutex;
+    std::recursive_mutex                     infoMutex;
     /// An object holding all statistics.
     Stats                                    stats;
     /// Indicates whether the set callstack size had been exceeded during the printing.
@@ -73,8 +73,13 @@ public:
         return maybeChangeMalloc(info);
     }
     
-    virtual void setIgnoreMalloc(const bool ignoreMalloc) override;
-    virtual auto getIgnoreMalloc() const -> bool override;
+    virtual inline void setIgnoreMalloc(const bool ignoreMalloc) override {
+        getLocalIgnoreMalloc() = ignoreMalloc;
+    }
+    
+    virtual inline auto getIgnoreMalloc() const -> bool override {
+        return getLocalIgnoreMalloc();
+    }
     
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
@@ -82,23 +87,24 @@ public:
      *
      * @return the total count of bytes found in the principal list
      */
-    auto getTotalAllocatedBytes() -> size_t;
+    auto getTotalAllocatedBytes() -> std::size_t;
     /**
      * Calculates and returns the total count of bytes that are stored inside the principal
      * list and not marked as deallocated.
      *
      * @return the total count of leaked bytes
      */
-    auto getTotalLeakedBytes()    -> size_t;
+    auto getTotalLeakedBytes() -> std::size_t;
     /**
      * Calculates and returns the count of allocation records stored in the principal list
      * that are not marked as deallocated.
      *
      * @return the total count of leaked objects
      */
-    auto getLeakCount()           -> size_t;
+    auto getLeakCount() -> std::size_t;
     
-    inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+    constexpr inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+        // FIXME: Mutex anyone?
         return infos;
     }
     
@@ -107,7 +113,9 @@ public:
      *
      * @param exceeded whether the maximum callstack size has been exceeded
      */
-    void setCallstackSizeExceeded(bool exceeded);
+    constexpr inline void setCallstackSizeExceeded(bool exceeded) {
+        callstackSizeExceeded = exceeded;
+    }
     
     void registerThreadAllocInfo(ThreadAllocInfo::Ref info);
     void removeThreadAllocInfo(ThreadAllocInfo::Ref info);
