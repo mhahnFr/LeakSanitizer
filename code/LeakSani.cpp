@@ -158,13 +158,13 @@ void LSan::addMalloc(MallocInfo && info) {
     
     stats += info; // No need to check __lsan_statsActive here,
                    // since allocations are only added globally
-                   // if the __lsan_statsActive is true.
+                   // if __lsan_statsActive is true.
                    //                                 - mhahnFr
     
     infos.insert_or_assign(info.getPointer(), info);
 }
 
-auto LSan::getLocalIgnoreMalloc() const -> bool & {
+auto LSan::getLocalIgnoreMalloc() -> bool & {
     static thread_local bool ignoreMalloc = false;
     return ignoreMalloc;
 }
