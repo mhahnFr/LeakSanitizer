@@ -27,13 +27,22 @@
 #include "../ATracker.hpp"
 #include "../MallocInfo.hpp"
 
+/**
+ * This class represents a thread local allocation tracker.
+ */
 class ThreadAllocInfo: public ATracker {
-    std::recursive_mutex infosMutex;
+    /** The mutex used to protect the allocation infos.                    */
+    std::recursive_mutex                     infosMutex;
+    /** The map containing the allocation infos.                           */
     std::map<const void * const, MallocInfo> infos;
+    
+    /** Indicates whether the allocations should be tracked at the moment. */
     bool ignoreMalloc = false;
     
 public:
+    /** The reference wrapper type.          */
     using  Ref = std::reference_wrapper<ThreadAllocInfo>;
+    /** The constant reference wrapper type. */
     using CRef = std::reference_wrapper<const ThreadAllocInfo>;
     
     ThreadAllocInfo();
@@ -46,7 +55,23 @@ public:
     ThreadAllocInfo & operator=(ThreadAllocInfo &&)      = delete;
     
     virtual void addMalloc(MallocInfo && info) override;
+    
+    /**
+     * Exchanges the MallocInfo associated with the pointer of the given info
+     * by the given MallocInfo.
+     *
+     * @param info the info to be exchanged
+     * @param search indicates whether to search globally if not found here
+     * @return whether the info was exchanged
+     */
     auto changeMalloc(const MallocInfo & info, bool search) -> bool;
+    /**
+     * Removes the MallocInfo associated with the given pointer.
+     *
+     * @param pointer the deallocated pointer
+     * @param search indicates whether to search globally if not found here
+     * @return whether the info was removed
+     */
     auto removeMalloc(const void * pointer, bool search) -> bool;
     
     virtual inline auto changeMalloc(const MallocInfo & info) -> bool override {
@@ -65,10 +90,20 @@ public:
         return ignoreMalloc;
     }
     
+    /**
+     * Returns a reference to the stored allocation infos.
+     *
+     * @return the stored allocation infos
+     */
     constexpr inline auto getInfos() -> std::map<const void * const, MallocInfo> & {
         return infos;
     }
     
+    /**
+     * Returns a reference to the stored allocation infos.
+     *
+     * @return the stored allocation infos
+     */
     constexpr inline auto getInfos() const -> const std::map<const void * const, MallocInfo> & {
         return infos;
     }
