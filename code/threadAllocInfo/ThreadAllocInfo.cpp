@@ -21,8 +21,6 @@
 
 #include "../LeakSani.hpp"
 
-#include "../../include/lsan_internals.h"
-
 ThreadAllocInfo::ThreadAllocInfo() {
     LSan::getInstance().registerThreadAllocInfo(*this);
 }
@@ -65,12 +63,4 @@ auto ThreadAllocInfo::removeMalloc(const void * pointer, bool search) -> bool {
     }
     infos.erase(it);
     return true;
-}
-
-void ThreadAllocInfo::lockMutex() const {
-    infosMutex.lock();
-}
-
-void ThreadAllocInfo::unlockMutex() const {
-    infosMutex.unlock();
 }

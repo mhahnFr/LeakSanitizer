@@ -27,10 +27,8 @@
 #include "../ATracker.hpp"
 #include "../MallocInfo.hpp"
 
-#include "../statistics/Stats.hpp"
-
 class ThreadAllocInfo: public ATracker {
-    mutable std::recursive_mutex infosMutex;
+    std::recursive_mutex infosMutex;
     std::map<const void * const, MallocInfo> infos;
     bool ignoreMalloc = false;
     
@@ -74,9 +72,6 @@ public:
     constexpr inline auto getInfos() const -> const std::map<const void * const, MallocInfo> & {
         return infos;
     }
-    
-    void lockMutex() const;
-    void unlockMutex() const;
 };
 
 #endif /* ThreadAllocInfo_hpp */
