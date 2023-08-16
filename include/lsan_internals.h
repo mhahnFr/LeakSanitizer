@@ -40,7 +40,7 @@ extern bool __lsan_humanPrint;
  * @brief If this value is set to `true`, normal messages are printed to the standard output stream.
  *
  * Otherwise the standard error stream is also used for normal messages.
- * Defaults to `true`.
+ * Defaults to `false`.
  *
  * @since 1.1
  */
