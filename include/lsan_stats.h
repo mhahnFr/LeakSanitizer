@@ -88,6 +88,8 @@ size_t __lsan_getMallocPeek();
 size_t __lsan_getBytePeek();
 
 /**
+ * @deprecated Since 1.5, refer to `__lsan_statsActive`. Will be removed in v2.
+ *
  * @brief Returns whether the memory statistics can savely be queried.
  *
  * If it returns `false`, but the memory statistics are queried regardless, the library might crash!
@@ -101,6 +103,8 @@ static inline bool __lsan_statsAvailable() {
 }
 
 /**
+ * @deprecated Since 1.5, replaced by `__lsan_statsActive`. Will be removed in v2.
+ *
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
  *
  * If it returns `false`, the statistics can be queried regardless without crash, but they might be wrong.
@@ -114,6 +118,8 @@ static inline bool __lsan_fStatsAvailable() {
 }
 
 /**
+ * @deprecated Since 1.5, replaced by `__lsan_statsActive`. Will be removed in v2.
+ *
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
  *
  * If it returns `false`, the statistics can be queried regardless without crash, but they might be wrong.
@@ -127,6 +133,8 @@ static inline bool __lsan_fragStatsAvailable() {
 }
 
 /**
+ * @deprecated Since 1.5 replaced by `__lsan_statsActive`. Will be removed in v2.
+ *
  * @brief Returns whether the memory fragmentation statistics can be queried savely.
  *
  * If it returns `false`, the statistics can be queried regardless without crash, but they might be wrong.
