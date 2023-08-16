@@ -137,8 +137,16 @@ public:
      * @return the globally tracked allocations
      */
     constexpr inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
-        // FIXME: Mutex anyone?
         return infos;
+    }
+    
+    /**
+     * Returns the mutex used to protect the global allocation container.
+     *
+     * @return the mutex
+     */
+    constexpr inline auto getFragmentationInfoMutex() -> std::recursive_mutex & {
+        return infoMutex;
     }
     
     /**

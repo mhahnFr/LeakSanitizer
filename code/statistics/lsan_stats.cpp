@@ -121,6 +121,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
     const auto & infos = LSan::getInstance().getFragmentationInfos();
+    std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
     auto it = infos.cbegin();
     if (infos.size() < width) {
         const float step = static_cast<float>(width) / infos.size();
@@ -200,6 +201,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
     const auto & infos = LSan::getInstance().getFragmentationInfos();
+    std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
     auto it = infos.cbegin();
     size_t currentBlockBegin = 0,
            currentBlockEnd   = it->second.getSize(),
