@@ -183,7 +183,7 @@ auto LSan::getLeakCount() -> std::size_t {
     std::lock_guard lock(infoMutex);
     
     if (__lsan_statsActive) {
-        return static_cast<size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
+        return static_cast<std::size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
             return !elem.second.isDeleted();
         }));
     } else {

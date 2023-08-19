@@ -28,15 +28,15 @@
 #include "../../include/lsan_internals.h"
 #include "../../include/lsan_stats.h"
 
-size_t __lsan_getTotalMallocs() { return LSan::getStats().getTotalMallocCount(); }
-size_t __lsan_getTotalBytes()   { return LSan::getStats().getTotalBytes();       }
-size_t __lsan_getTotalFrees()   { return LSan::getStats().getTotalFreeCount();   }
+auto __lsan_getTotalMallocs() -> std::size_t { return LSan::getStats().getTotalMallocCount(); }
+auto __lsan_getTotalBytes()   -> std::size_t { return LSan::getStats().getTotalBytes();       }
+auto __lsan_getTotalFrees()   -> std::size_t { return LSan::getStats().getTotalFreeCount();   }
 
-size_t __lsan_getCurrentMallocCount() { return LSan::getStats().getCurrentMallocCount(); }
-size_t __lsan_getCurrentByteCount()   { return LSan::getStats().getCurrentBytes();       }
+auto __lsan_getCurrentMallocCount() -> std::size_t { return LSan::getStats().getCurrentMallocCount(); }
+auto __lsan_getCurrentByteCount()   -> std::size_t { return LSan::getStats().getCurrentBytes();       }
 
-size_t __lsan_getMallocPeek() { return LSan::getStats().getMallocPeek(); }
-size_t __lsan_getBytePeek()   { return LSan::getStats().getBytePeek();   }
+auto __lsan_getMallocPeek() -> std::size_t { return LSan::getStats().getMallocPeek(); }
+auto __lsan_getBytePeek()   -> std::size_t { return LSan::getStats().getBytePeek();   }
 
 /**
  * @brief Prints the statistics using the given parameters.
@@ -49,9 +49,9 @@ size_t __lsan_getBytePeek()   { return LSan::getStats().getBytePeek();   }
  * @param printBarBytes a function printing a bar for the byte part of the stats, it gets the width and the output stream as paramters.
  * @param printBarObjects a function printing a bar for the object part of the stats, it gets the width and the output stream as paramters
  */
-static inline void __lsan_printStatsCore(const std::string & statsName, size_t width, std::ostream & out,
-                                         std::function<void (size_t, std::ostream &)> printBarBytes,
-                                         std::function<void (size_t, std::ostream &)> printBarObjects) {
+static inline void __lsan_printStatsCore(const std::string & statsName, std::size_t width, std::ostream & out,
+                                         std::function<void (std::size_t, std::ostream &)> printBarBytes,
+                                         std::function<void (std::size_t, std::ostream &)> printBarObjects) {
     using Formatter::Style;
     out << Formatter::get(Style::ITALIC)
         << "Stats of the " << statsName << " so far:"
@@ -85,14 +85,18 @@ static inline void __lsan_printStatsCore(const std::string & statsName, size_t w
  * @param peekText the text to printed as peek, immediately after the bar
  * @param out the output stream to print to
  */
-static inline void __lsan_printBar(size_t current, size_t peek, size_t width, const std::string & peekText, std::ostream & out) {
+static inline void __lsan_printBar(std::size_t         current,
+                                   std::size_t         peek,
+                                   std::size_t         width,
+                                   const std::string & peekText,
+                                   std::ostream &      out) {
     using Formatter::Style;
     out << Formatter::get(Style::BOLD)
         << "["
         << Formatter::clear(Style::BOLD)
         << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
     
-    size_t i;
+    std::size_t i;
     for (i = 0; i < (static_cast<float>(current) / peek) * width; ++i) {
         out << Formatter::get(Style::BAR_FILLED);
     }
@@ -113,7 +117,7 @@ static inline void __lsan_printBar(size_t current, size_t peek, size_t width, co
  * @param width the width in characters the bar should have
  * @param out the output stream to print to
  */
-static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream & out) {
+static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::ostream & out) {
     using Formatter::Style;
     out << Formatter::get(Style::BOLD)
         << "["
@@ -127,7 +131,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         const float step = static_cast<float>(width) / infos.size();
         for (; it != infos.cend(); ++it) {
             const std::string fill = it->second.isDeleted() ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED);
-            for (size_t i = 0; i < step; ++i) {
+            for (std::size_t i = 0; i < step; ++i) {
                 out << fill;
             }
         }
@@ -139,8 +143,8 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
         bool previousFilled    = false,
              previousCorrected = false;
         
-        size_t previousFs = 0;
-        for (size_t i = 0; i < width; ++i) {
+        std::size_t previousFs = 0;
+        for (std::size_t i = 0; i < width; ++i) {
             auto e = std::next(it, static_cast<int>(step));
             tmpLoss += loss;
             bool corrected = false;
@@ -149,7 +153,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
                 tmpLoss -= 1.0f;
                 corrected = true;
             }
-            size_t fs = 0;
+            std::size_t fs = 0;
             for (; it != e; ++it) {
                 if (it->second.isDeleted()) {
                     ++fs;
@@ -193,7 +197,7 @@ static inline void __lsan_printFragmentationObjectBar(size_t width, std::ostream
  * @param width the width in characters the bar should have
  * @param out the output stream to print to
  */
-static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream & out) {
+static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostream & out) {
     using Formatter::Style;
     out << Formatter::get(Style::BOLD)
         << "["
@@ -203,17 +207,17 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
     const auto & infos = LSan::getInstance().getFragmentationInfos();
     std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
     auto it = infos.cbegin();
-    size_t currentBlockBegin = 0,
+    std::size_t currentBlockBegin = 0,
            currentBlockEnd   = it->second.getSize(),
            b                 = 0;
     
-    size_t total       = 0;
+    std::size_t total       = 0;
     for (const auto & [_, info] : infos) {
         total += info.getSize();
     }
     
     if (total < width) {
-        const size_t step = static_cast<size_t>(static_cast<float>(width) / total);
+        const std::size_t step = static_cast<size_t>(static_cast<float>(width) / total);
         for (; b < total; ++b) {
             if (b >= currentBlockEnd) {
                 ++it;
@@ -221,7 +225,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
                 currentBlockEnd   = currentBlockBegin + it->second.getSize();
             }
             const std::string fill = it->second.isDeleted() ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED);
-            for (size_t i = 0; i < step; ++i) {
+            for (std::size_t i = 0; i < step; ++i) {
                 out << fill;
             }
         }
@@ -233,18 +237,18 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         bool previousFilled    = false,
              previousCorrected = false;
         
-        size_t previousFs = 0;
-        for (size_t i = 0; i < width; ++i) {
+        std::size_t previousFs = 0;
+        for (std::size_t i = 0; i < width; ++i) {
             bool corrected = false;
-            size_t tmpStep = static_cast<size_t>(step);
+            std::size_t tmpStep = static_cast<size_t>(step);
             tmpLoss += loss;
             if (tmpLoss >= 1.0f) {
                 tmpLoss -= 1.0f;
                 ++tmpStep;
                 corrected = true;
             }
-            size_t fs = 0;
-            for (size_t j = 0; j < tmpStep && b < total; ++j, ++b) {
+            std::size_t fs = 0;
+            for (std::size_t j = 0; j < tmpStep && b < total; ++j, ++b) {
                 if (b >= currentBlockEnd) {
                     ++it;
                     currentBlockBegin = b;
@@ -286,7 +290,7 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
         << Formatter::clear(Style::BOLD) << " total" << std::endl << std::endl;
 }
 
-void __lsan_printFragmentationStatsWithWidth(size_t width) {
+void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
     using Formatter::Style;
     
     auto & instance = LSan::getTracker();
@@ -315,7 +319,7 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
     }
 }
 
-void __lsan_printStatsWithWidth(size_t width) {
+void __lsan_printStatsWithWidth(std::size_t width) {
     using Formatter::Style;
     
     auto & instance = LSan::getTracker();
