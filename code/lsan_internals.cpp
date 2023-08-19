@@ -17,53 +17,74 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <charconv>
 #include <cstdlib>
 #include <optional>
-#include <string>
 
 #include "../include/lsan_internals.h"
 
-static inline std::optional<std::string> getVariable(const std::string & name) {
-    const char * var = getenv(name.c_str());
+static inline auto getVariable(const char * name) -> std::optional<const char *> {
+    const char * var = getenv(name);
     
     if (var == nullptr) {
         return std::nullopt;
     }
-    std::string s = var;
-    for (auto it = s.begin(); it != s.end(); ++it) {
-        *it = tolower(*it);
-    }
-    return s;
+    return var;
 }
 
-static inline std::optional<bool> getBool(const std::string & name) {
-    auto var = getVariable(name);
-    if (!var.has_value()) {
+static inline auto getSize_tFrom(const char * value) -> std::optional<std::size_t> {
+    if (value == nullptr) {
         return std::nullopt;
     }
     
-    auto s = var.value();
-    if (s == "true" || s == "1") {
-        return true;
-    } else if (s == "false" || s == "0") {
-        return false;
+    std::size_t i = 0;
+    auto [_, err] = std::from_chars(value, value + strlen(value), i);
+    
+    if (err == std::errc()) {
+        return i;
     }
     return std::nullopt;
 }
 
-static inline std::optional<std::size_t> getSize_t(const std::string & name) {
+static inline auto getSize_t(const char * name) -> std::optional<std::size_t> {
     auto var = getVariable(name);
     
+    return var.has_value() ? getSize_tFrom(var.value()) : std::nullopt;
+}
+
+static inline auto lowerCompare(const char * string1, const char * string2) -> bool {
+    const std::size_t len1 = strlen(string1),
+                      len2 = strlen(string2);
+    
+    if (len1 != len2) {
+        return false;
+    }
+    for (std::size_t i = 0; i < len1; ++i) {
+        if (tolower(string1[i]) != tolower(string2[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static inline auto getBool(const char * name) -> std::optional<bool> {
+    auto var = getVariable(name);
     if (!var.has_value()) {
         return std::nullopt;
     }
     
     auto s = var.value();
-    try {
-        return stoll(s);
-    } catch (const std::exception &) {
+    if (lowerCompare(s, "true")) {
+        return true;
+    } else if (lowerCompare(s, "false")) {
+        return false;
+    }
+    
+    auto i = getSize_tFrom(s);
+    if (!i.has_value()) {
         return std::nullopt;
     }
+    return i.value() != 0;
 }
 
 bool __lsan_humanPrint       = getBool("LSAN_HUMAN_PRINT")    .value_or(true);
