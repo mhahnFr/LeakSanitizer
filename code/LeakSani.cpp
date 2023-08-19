@@ -275,19 +275,19 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                 stream << leak.second << std::endl;
                 if (++i == __lsan_leakCount) {
                     if (self.callstackSizeExceeded) {
-                        stream << Formatter::get(Style::GREYED)
-                               << "Hint:" << Formatter::get(Style::ITALIC) << " to see longer callstacks, increase the value of "
-                               << Formatter::clear(Style::ITALIC) << "__lsan_callstackSize" << Formatter::get(Style::ITALIC)
-                               << " (currently " << Formatter::clear(Style::ITALIC) << __lsan_callstackSize << Formatter::get(Style::ITALIC) << ")."
+                        stream << "Hint:" << Formatter::get(Style::GREYED)
+                               << Formatter::get(Style::ITALIC) << " to see longer callstacks, increase the value of "
+                               << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << "LSAN_CALLSTACK_SIZE" << Formatter::get(Style::GREYED) << " (__lsan_callstackSize)" << Formatter::get(Style::ITALIC)
+                               << " (currently " << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << __lsan_callstackSize << Formatter::get(Style::ITALIC) << Formatter::get(Style::GREYED) << ")."
                                << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << std::endl;
                         self.callstackSizeExceeded = false;
                     }
                     stream << std::endl << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::ITALIC)
-                           << "And " << totalLeaks - i << " more..." << Formatter::clear(Style::UNDERLINED) << std::endl
-                           << Formatter::clear(Style::ITALIC) << Formatter::get(Style::GREYED)
-                           << "Hint:" << Formatter::get(Style::ITALIC) << " to see more, increase the value of "
-                           << Formatter::clear(Style::ITALIC) << "__lsan_leakCount" << Formatter::get(Style::ITALIC)
-                           << " (currently " << Formatter::clear(Style::ITALIC) << __lsan_leakCount << Formatter::get(Style::ITALIC) << ")."
+                           << "And " << totalLeaks - i << " more..." << Formatter::clear(Style::UNDERLINED) << std::endl << std::endl
+                           << Formatter::clear(Style::ITALIC) << "Hint:" << Formatter::get(Style::GREYED)
+                           << Formatter::get(Style::ITALIC) << " to see more, increase the value of "
+                           << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << "LSAN_LEAK_COUNT" << Formatter::get(Style::GREYED) << " (__lsan_leakCount)" << Formatter::get(Style::ITALIC)
+                           << " (currently " << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << __lsan_leakCount << Formatter::get(Style::ITALIC) << Formatter::get(Style::GREYED) << ")."
                            << Formatter::clear(Style::ITALIC) << Formatter::clear(Style::GREYED) << std::endl;
                     break;
                 }

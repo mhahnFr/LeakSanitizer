@@ -304,7 +304,7 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
             << Formatter::clear(Style::BOLD) << Formatter::get(Style::ITALIC)
             << "Hint: Did you set "
             << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
-            << "__lsan_statsActive"
+            << "LSAN_STATS_ACTIVE (" << Formatter::get(Style::GREYED) << "__lsan_statsActive" << Formatter::clear(Style::GREYED) << ")"
             << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
             << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
             << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"
@@ -333,7 +333,7 @@ void __lsan_printStatsWithWidth(size_t width) {
             << Formatter::clear(Style::BOLD) << Formatter::get(Style::ITALIC)
             << "Hint: Did you set "
             << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
-            << "__lsan_statsActive"
+            << "LSAN_STATS_ACTIVE (" << Formatter::get(Style::GREYED) << "__lsan_statsActive" << Formatter::clear(Style::GREYED) << ")"
             << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
             << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
             << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"
