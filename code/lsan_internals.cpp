@@ -23,37 +23,6 @@
 
 #include "../include/lsan_internals.h"
 
-bool   __lsan_humanPrint       = true;
-bool   __lsan_printCout        = false;
-bool   __lsan_printFormatted   = true;
-
-#ifdef NO_LICENSE
-bool   __lsan_printLicense     = false;
-#else
-bool   __lsan_printLicense     = true;
-#endif
-
-#ifdef NO_WEBSITE
-bool   __lsan_printWebsite     = false;
-#else
-bool   __lsan_printWebsite     = true;
-#endif
-
-bool   __lsan_invalidCrash     = true;
-
-bool   __lsan_invalidFree      = false;
-bool   __lsan_freeNull         = false;
-
-bool   __lsan_trackMemory      = false;
-bool   __lsan_statsActive      = false;
-
-bool   __lsan_printStatsOnExit = false;
-
-size_t __lsan_leakCount        = 100;
-
-size_t __lsan_callstackSize    = 20;
-
-
 static inline std::optional<std::string> getVariable(const std::string & name) {
     const char * var = getenv(name.c_str());
     
@@ -97,6 +66,32 @@ static inline std::optional<std::size_t> getSize_t(const std::string & name) {
     }
 }
 
-void initInternals() {
-    // TODO: Implement
-}
+bool __lsan_humanPrint       = getBool("LSAN_HUMAN_PRINT")    .value_or(true);
+bool __lsan_printCout        = getBool("LSAN_PRINT_COUT")     .value_or(false);
+bool __lsan_printFormatted   = getBool("LSAN_PRINT_FORMATTED").value_or(true);
+
+#ifdef NO_LICENSE
+bool __lsan_printLicense     = getBool("LSAN_PRINT_LICENSE").value_or(false);
+#else
+bool __lsan_printLicense     = getBool("LSAN_PRINT_LICENSE").value_or(true);
+#endif
+
+#ifdef NO_WEBSITE
+bool __lsan_printWebsite     = getBool("LSAN_PRINT_WEBSITE").value_or(false);
+#else
+bool __lsan_printWebsite     = getBool("LSAN_PRINT_WEBSITE").value_or(true);
+#endif
+
+bool __lsan_invalidCrash     = getBool("LSAN_INVALID_CRASH").value_or(true);
+
+bool __lsan_invalidFree      = getBool("LSAN_INVALID_FREE").value_or(false);
+bool __lsan_freeNull         = getBool("LSAN_FREE_NULL")   .value_or(false);
+
+bool __lsan_trackMemory      = false; // Deprecated: No need to further allow usage. - mhahnFr
+bool __lsan_statsActive      = getBool("LSAN_STATS_ACTIVE").value_or(false);
+
+bool __lsan_printStatsOnExit = getBool("LSAN_PRINT_STATS_ON_EXIT").value_or(false);
+
+std::size_t __lsan_leakCount     = getSize_t("LSAN_LEAK_COUNT").value_or(100);
+
+std::size_t __lsan_callstackSize = getSize_t("LSAN_CALLSTACK_SIZE").value_or(20);
