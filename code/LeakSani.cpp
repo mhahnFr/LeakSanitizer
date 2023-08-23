@@ -206,7 +206,7 @@ auto LSan::getTotalLeakedBytes() -> std::size_t {
 void LSan::__exit_hook() {
     using Formatter::Style;
     
-    getTracker().setIgnoreMalloc(true);
+    setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << std::endl
         << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN)

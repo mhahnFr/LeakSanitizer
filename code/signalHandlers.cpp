@@ -66,10 +66,9 @@ static std::string signalString(int signal) {
 void callstackSignal(int) {
     using Formatter::Style;
     
-    auto & instance = LSan::getTracker();
-    bool ignore     = instance.getIgnoreMalloc();
+    bool ignore = LSan::getIgnoreMalloc();
+    LSan::setIgnoreMalloc(true);
     
-    instance.setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << Formatter::get(Style::ITALIC)
         << "The current callstack:"
@@ -78,7 +77,7 @@ void callstackSignal(int) {
     MallocInfo::printCallstack(lcs::callstack(), out);
     out << std::endl;
     if (!ignore) {
-        instance.setIgnoreMalloc(false);
+        LSan::setIgnoreMalloc(false);
     }
 }
 

@@ -289,10 +289,8 @@ static inline void __lsan_printFragmentationByteBar(size_t width, std::ostream &
 void __lsan_printFragmentationStatsWithWidth(size_t width) {
     using Formatter::Style;
     
-    auto & instance = LSan::getTracker();
-    
-    bool ignore = instance.getIgnoreMalloc();
-    instance.setIgnoreMalloc(true);
+    bool ignore = LSan::getIgnoreMalloc();
+    LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_statsActive) {
         __lsan_printStatsCore("memory fragmentation", width, out,
@@ -311,17 +309,15 @@ void __lsan_printFragmentationStatsWithWidth(size_t width) {
             << Formatter::clearAll() << std::endl << std::endl;
     }
     if (!ignore) {
-        instance.setIgnoreMalloc(false);
+        LSan::setIgnoreMalloc(false);
     }
 }
 
 void __lsan_printStatsWithWidth(size_t width) {
     using Formatter::Style;
     
-    auto & instance = LSan::getTracker();
-    
-    bool ignore = instance.getIgnoreMalloc();
-    instance.setIgnoreMalloc(true);
+    bool ignore = LSan::getIgnoreMalloc();
+    LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_statsActive) {
         __lsan_printStatsCore("memory usage", width, out,
@@ -340,6 +336,6 @@ void __lsan_printStatsWithWidth(size_t width) {
             << Formatter::clearAll() << std::endl << std::endl;
     }
     if (!ignore) {
-        instance.setIgnoreMalloc(false);
+        LSan::setIgnoreMalloc(false);
     }
 }
