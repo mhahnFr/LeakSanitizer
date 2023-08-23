@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2023  mhahnFr and contributors
+ * Copyright (C) 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -17,34 +17,15 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../include/lsan_internals.h"
+#ifndef deprecation_h
+#define deprecation_h
 
-bool   __lsan_humanPrint       = true;
-bool   __lsan_printCout        = false;
-bool   __lsan_printFormatted   = true;
-
-#ifdef NO_LICENSE
-bool   __lsan_printLicense     = false;
+#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
+ #define DEPRECATED(message) [[ deprecated(message) ]]
+#elif defined(__GNUC__) || defined(__clang__)
+ #define DEPRECATED(message) __attribute__((deprecated(message)))
 #else
-bool   __lsan_printLicense     = true;
+ #define DEPRECATED(message)
 #endif
 
-#ifdef NO_WEBSITE
-bool   __lsan_printWebsite     = false;
-#else
-bool   __lsan_printWebsite     = true;
-#endif
-
-bool   __lsan_invalidCrash     = true;
-
-bool   __lsan_invalidFree      = false;
-bool   __lsan_freeNull         = false;
-
-bool   __lsan_trackMemory      = false;
-bool   __lsan_statsActive      = false;
-
-bool   __lsan_printStatsOnExit = false;
-
-size_t __lsan_leakCount        = 100;
-
-size_t __lsan_callstackSize    = 20;
+#endif /* deprecation_h */

@@ -23,11 +23,6 @@ LIB_NAME = $(CORE_NAME).a
 SHARED_L = $(CORE_NAME).so
 DYLIB_NA = $(CORE_NAME).dylib
 
-SRC = $(shell find . -name \*.cpp \! -path \*CallstackLibrary\*)
-
-OBJS = $(patsubst %.cpp, %.o, $(SRC))
-DEPS = $(patsubst %.cpp, %.d, $(SRC))
-
 LIBCALLSTACK_NAME = libcallstack
 LIBCALLSTACK_DIR  = ./CallstackLibrary
 LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
@@ -35,6 +30,10 @@ LIBCALLSTACK_SO   = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).so
 LIBCALLSTACK_DY   = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).dylib
 LIBCALLSTACK_EXTR = tmpLibCallstack
 LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true'
+
+SRC  = $(shell find . -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
+OBJS = $(patsubst %.cpp, %.o, $(SRC))
+DEPS = $(patsubst %.cpp, %.d, $(SRC))
 
 LDFLAGS = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
