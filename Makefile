@@ -40,6 +40,10 @@ CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
 
 ifeq ($(shell uname -s),Darwin)
  	LDFLAGS += -current_version 1.4 -compatibility_version 1 -install_name $(abspath $@)
+ 	
+ 	INSTALL_TARGET = $(DYLIB_NA)
+else
+	INSTALL_TARGET = $(SHARED_L)
 endif
 
 NO_LICENSE = true
@@ -70,14 +74,16 @@ default: $(NAME)
 
 all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
 
-install: $(SHARED_L)
+install:
+	$(MAKE) NO_LICENSE=false NO_WEBSITE=false $(INSTALL_TARGET)
+	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(INSTALL_PATH)/lib/$(INSTALL_TARGET)" $(INSTALL_TARGET); fi
 	mkdir -p $(INSTALL_PATH)/lib
 	mkdir -p "$(INSTALL_PATH)/include"
-	cp $(SHARED_L) $(INSTALL_PATH)/lib
+	cp $(INSTALL_TARGET) $(INSTALL_PATH)/lib
 	find "include" -name \*.h -exec cp {} "$(INSTALL_PATH)/include" \;
 
 uninstall:
-	- $(RM) $(INSTALL_PATH)/lib/$(SHARED_L)
+	- $(RM) $(INSTALL_PATH)/lib/$(INSTALL_TARGET)
 	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -name \*.h))
 
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_SO)

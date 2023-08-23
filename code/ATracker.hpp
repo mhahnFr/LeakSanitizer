@@ -69,19 +69,6 @@ public:
     inline auto removeMalloc(MallocInfo && info) -> bool {
         return removeMalloc(info.getPointer());
     }
-    
-    /**
-     * Sets whether upcoming allocations should be ignored.
-     *
-     * @param ignoreMalloc whether to ignore upcoming allocations
-     */
-    virtual void setIgnoreMalloc(const bool ignoreMalloc) = 0;
-    /**
-     * Returns whether upcoming allocations should be ignored.
-     *
-     * @return whether to ignore upcoming allocations
-     */
-    virtual auto getIgnoreMalloc() const -> bool          = 0;
 };
 
 #endif /* ATracker_hpp */

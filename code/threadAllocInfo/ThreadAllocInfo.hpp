@@ -36,9 +36,6 @@ class ThreadAllocInfo: public ATracker {
     /** The map containing the allocation infos.                           */
     std::map<const void * const, MallocInfo> infos;
     
-    /** Indicates whether the allocations should be tracked at the moment. */
-    bool ignoreMalloc = false;
-    
 public:
     /** The reference wrapper type.          */
     using  Ref = std::reference_wrapper<ThreadAllocInfo>;
@@ -80,14 +77,6 @@ public:
     
     virtual inline auto removeMalloc(const void * pointer) -> bool override {
         return removeMalloc(pointer, true);
-    }
-    
-    virtual inline void setIgnoreMalloc(const bool ignoreMalloc) override {
-        this->ignoreMalloc = ignoreMalloc;
-    }
-    
-    virtual inline auto getIgnoreMalloc() const -> bool override {
-        return ignoreMalloc;
     }
     
     /**

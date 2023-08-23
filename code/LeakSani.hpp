@@ -101,11 +101,11 @@ public:
         return maybeChangeMalloc(info);
     }
     
-    virtual inline void setIgnoreMalloc(const bool ignoreMalloc) override {
+    static inline void setIgnoreMalloc(const bool ignoreMalloc) {
         getLocalIgnoreMalloc() = ignoreMalloc;
     }
     
-    virtual inline auto getIgnoreMalloc() const -> bool override {
+    static inline auto getIgnoreMalloc() -> bool {
         return getLocalIgnoreMalloc();
     }
     
