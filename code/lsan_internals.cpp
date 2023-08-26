@@ -19,6 +19,8 @@
 
 #include <charconv>
 #include <cstdlib>
+#include <cstring>
+#include <cctype>
 #include <optional>
 
 #include "../include/lsan_internals.h"
