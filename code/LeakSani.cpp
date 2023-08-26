@@ -223,7 +223,7 @@ void internalCleanUp() {
     delete &LSan::getInstance();
 }
 
-void LSan::printInformations(){
+void LSan::printInformations() {
     using Formatter::Style;
     
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
