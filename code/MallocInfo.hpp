@@ -153,7 +153,7 @@ public:
      *
      * @param file the filename
      */
-    constexpr inline void setDeletedInFile(const std::string & file) {
+    inline void setDeletedInFile(const std::string & file) {
         deletedInFile = file;
     }
     /**
