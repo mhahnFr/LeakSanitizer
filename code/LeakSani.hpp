@@ -202,7 +202,11 @@ public:
      * @return the appropriate tracker
      */
     static inline auto getTracker() -> ATracker & {
-        if (__lsan_statsActive) {
+        bool linux = false;
+#ifdef __linux__
+        linux = true;
+#endif
+        if (__lsan_statsActive || linux) {
             return getInstance();
         }
         return getLocalInstance();
