@@ -18,11 +18,13 @@
  */
 
 #include <iostream>
+
 #include "signalHandlers.hpp"
-#include "crash.hpp"
 #include "LeakSani.hpp"
 #include "MallocInfo.hpp"
 #include "Formatter.hpp"
+#include "crashWarner/crash.hpp"
+
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 

@@ -21,10 +21,11 @@
 
 #include "wrap_malloc.hpp"
 
-#include "crash.hpp"
-#include "warn.hpp"
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
+#include "crashWarner/crash.hpp"
+#include "crashWarner/warn.hpp"
+
 #include "../include/lsan_stats.h"
 #include "../include/lsan_internals.h"
 
