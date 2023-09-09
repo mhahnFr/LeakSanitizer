@@ -24,10 +24,6 @@
 		BF23A2DF289ECE6A00B17349 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF23A2E2289ED24200B17349 /* Stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2E0289ED24200B17349 /* Stats.cpp */; };
 		BF23A2E3289ED24200B17349 /* Stats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2E1289ED24200B17349 /* Stats.hpp */; };
-		BF30D8592A7815E8001D4EBF /* ThreadAllocInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF30D8572A7815E8001D4EBF /* ThreadAllocInfo.cpp */; };
-		BF30D85A2A7815E8001D4EBF /* ThreadAllocInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF30D8572A7815E8001D4EBF /* ThreadAllocInfo.cpp */; };
-		BF30D85B2A7815E8001D4EBF /* ThreadAllocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF30D8582A7815E8001D4EBF /* ThreadAllocInfo.hpp */; };
-		BF30D85C2A7815E8001D4EBF /* ThreadAllocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF30D8582A7815E8001D4EBF /* ThreadAllocInfo.hpp */; };
 		BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2E1289ED24200B17349 /* Stats.hpp */; };
 		BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */; };
 		BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
@@ -68,8 +64,6 @@
 		BF23A2DD289ECE6A00B17349 /* lsan_stats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_stats.h; sourceTree = "<group>"; };
 		BF23A2E0289ED24200B17349 /* Stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Stats.cpp; sourceTree = "<group>"; };
 		BF23A2E1289ED24200B17349 /* Stats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Stats.hpp; sourceTree = "<group>"; };
-		BF30D8572A7815E8001D4EBF /* ThreadAllocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreadAllocInfo.cpp; sourceTree = "<group>"; };
-		BF30D8582A7815E8001D4EBF /* ThreadAllocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ThreadAllocInfo.hpp; sourceTree = "<group>"; };
 		BF34157C2A8405AD00DEEF10 /* deprecation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deprecation.h; sourceTree = "<group>"; };
 		BF378FB42919496000A4DAA9 /* libcallstack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcallstack.a; path = CallstackLibrary/libcallstack.a; sourceTree = "<group>"; };
 		BF49A5D72899599300BC1FFD /* signalHandlers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signalHandlers.cpp; sourceTree = "<group>"; };
@@ -96,7 +90,6 @@
 		BFBF736928832F8100BC4208 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
 		BFBF736B2883323100BC4208 /* crash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crash.cpp; sourceTree = "<group>"; };
 		BFBF736C2883323100BC4208 /* crash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = crash.hpp; sourceTree = "<group>"; };
-		BFC898552A8530BB00F7CB6D /* ATracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ATracker.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,15 +112,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		BF30D8562A78159E001D4EBF /* threadAllocInfo */ = {
-			isa = PBXGroup;
-			children = (
-				BF30D8572A7815E8001D4EBF /* ThreadAllocInfo.cpp */,
-				BF30D8582A7815E8001D4EBF /* ThreadAllocInfo.hpp */,
-			);
-			path = threadAllocInfo;
-			sourceTree = "<group>";
-		};
 		BF378FB32919496000A4DAA9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -185,7 +169,6 @@
 			isa = PBXGroup;
 			children = (
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
-				BF30D8562A78159E001D4EBF /* threadAllocInfo */,
 				BFAFADC428B4FDA40060076C /* Formatter.cpp */,
 				BFAFADC528B4FDA40060076C /* Formatter.hpp */,
 				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
@@ -203,7 +186,6 @@
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
 				BFBF736C2883323100BC4208 /* crash.hpp */,
 				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
-				BFC898552A8530BB00F7CB6D /* ATracker.hpp */,
 			);
 			path = code;
 			sourceTree = "<group>";
@@ -215,7 +197,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF30D85C2A7815E8001D4EBF /* ThreadAllocInfo.hpp in Headers */,
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
 				BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */,
 				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
@@ -235,7 +216,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF30D85B2A7815E8001D4EBF /* ThreadAllocInfo.hpp in Headers */,
 				BF23A2DF289ECE6A00B17349 /* lsan_stats.h in Headers */,
 				BF621FDE28A291DE00414EE4 /* lsan_internals.h in Headers */,
 				BFBF736E2883323100BC4208 /* crash.hpp in Headers */,
@@ -337,7 +317,6 @@
 				BF0F133B29194791008F0FCD /* LeakSani.cpp in Sources */,
 				BF0F133E29194794008F0FCD /* Stats.cpp in Sources */,
 				BF0F134129194797008F0FCD /* MallocInfo.cpp in Sources */,
-				BF30D85A2A7815E8001D4EBF /* ThreadAllocInfo.cpp in Sources */,
 				BF0F1347291947A2008F0FCD /* wrap_malloc.cpp in Sources */,
 				BF0F13442919479B008F0FCD /* warn.cpp in Sources */,
 				BF0F134A291947A6008F0FCD /* crash.cpp in Sources */,
@@ -356,7 +335,6 @@
 				BF23A2DE289ECE6A00B17349 /* lsan_stats.cpp in Sources */,
 				BF621FDD28A291DE00414EE4 /* lsan_internals.cpp in Sources */,
 				BFBF736528831FC200BC4208 /* MallocInfo.cpp in Sources */,
-				BF30D8592A7815E8001D4EBF /* ThreadAllocInfo.cpp in Sources */,
 				BF72C3CE2885CB9E00C7AE5C /* LeakSani.cpp in Sources */,
 				BFBF736828832C3300BC4208 /* wrap_malloc.cpp in Sources */,
 				BFBF736D2883323100BC4208 /* crash.cpp in Sources */,
