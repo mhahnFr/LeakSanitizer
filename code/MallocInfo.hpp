@@ -27,8 +27,6 @@
 
 #include "../CallstackLibrary/include/callstack.h"
 
-using namespace std::rel_ops;
-
 /**
  * @brief This class acts as a allocation record: all information about the allocation process
  * that is available is stored.
@@ -258,8 +256,6 @@ public:
         printCallstack(callstack, out);
     }
     
-    friend auto operator==(const MallocInfo &, const MallocInfo &) -> bool;
-    friend auto operator<(const MallocInfo &, const MallocInfo &)  -> bool;
     friend auto operator<<(std::ostream &, const MallocInfo &)     -> std::ostream &;
 };
 

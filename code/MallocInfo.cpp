@@ -48,14 +48,6 @@ void MallocInfo::printCallstack(lcs::callstack & callstack, std::ostream & strea
     }
 }
 
-auto operator==(const MallocInfo & lhs, const MallocInfo & rhs) -> bool {
-    return lhs.getPointer() == rhs.getPointer();
-}
-
-auto operator<(const MallocInfo & lhs, const MallocInfo & rhs) -> bool {
-    return lhs.getPointer() < rhs.getPointer();
-}
-
 auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
     using Formatter::Style;
     

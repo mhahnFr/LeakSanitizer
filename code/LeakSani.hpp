@@ -49,22 +49,6 @@ class LSan {
     bool                                     callstackSizeExceeded = false;
     
     /**
-     * Attempts to remove an allocation in this instance.
-     *
-     * @param pointer the deallocated pointer
-     * @return whether an alloaction info was removed
-     */
-    auto removeMallocHere(const void * pointer) -> MallocInfoRemoved;
-    /**
-     * Attempts to exchange the allocation record associated with the given
-     * allocation info by the given allocation record.
-     *
-     * @param info the allocation record
-     * @return whether an allocation record was replaced
-     */
-    auto changeMallocHere(const MallocInfo & info) -> bool;
-    
-    /**
      * Returns a reference to a thread local boolean value indicating
      * whether to ignore allocations.
      *
