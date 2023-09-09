@@ -72,9 +72,9 @@ auto LSan::removeMalloc(const void * pointer) -> MallocInfoRemoved {
     
     auto it = infos.find(pointer);
     if (it == infos.end()) {
-        return false;
+        return MallocInfoRemoved(false, std::nullopt);
     } else if (it->second.isDeleted()) {
-        return false;
+        return MallocInfoRemoved(false, it->second);
     }
     if (__lsan_statsActive) {
         stats -= it->second;
@@ -82,7 +82,7 @@ auto LSan::removeMalloc(const void * pointer) -> MallocInfoRemoved {
     } else {
         infos.erase(it);
     }
-    return true;
+    return MallocInfoRemoved(true, std::nullopt);
 }
 
 auto LSan::changeMalloc(const MallocInfo & info) -> bool {

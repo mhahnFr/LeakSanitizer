@@ -98,7 +98,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
         if (pointer == nullptr && __lsan_freeNull) {
             warn("Free of NULL", file, line, __builtin_return_address(0));
         }
-        bool removed = LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, __builtin_return_address(0)));
+        auto [removed, record] = LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, __builtin_return_address(0)));
         if (__lsan_invalidFree && !removed) {
             if (__lsan_invalidCrash) {
                 crash("Invalid free", file, line, __builtin_return_address(0));
@@ -195,7 +195,7 @@ void free(void * pointer) {
         if (pointer == nullptr && __lsan_freeNull) {
             warn("Free of NULL", __builtin_return_address(0));
         }
-        bool removed = LSan::getInstance().removeMalloc(pointer);
+        auto [removed, record] = LSan::getInstance().removeMalloc(pointer);
         if (__lsan_invalidFree && !removed) {
             if (__lsan_invalidCrash) {
                 crash("Invalid free", __builtin_return_address(0));

@@ -22,7 +22,9 @@
 
 #include <map>
 #include <mutex>
+#include <optional>
 #include <ostream>
+#include <utility>
 #include <vector>
 
 #include "MallocInfo.hpp"
@@ -35,7 +37,7 @@
  * This class manages everything this sanitizer is capable to do.
  */
 class LSan {
-    using MallocInfoRemoved = bool;
+    using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
     
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
