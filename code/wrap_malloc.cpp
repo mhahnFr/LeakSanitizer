@@ -81,7 +81,7 @@ auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int lin
         if (ptr != nullptr) {
             if (pointer != ptr) {
                 if (pointer != nullptr) {
-                    LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, __builtin_return_address(0)));
+                    LSan::getInstance().removeMalloc(pointer, __builtin_return_address(0));
                 }
                 LSan::getInstance().addMalloc(MallocInfo(ptr, size, file, line, __builtin_return_address(0)));
             } else {
@@ -99,12 +99,12 @@ void __wrap_free(void * pointer, const char * file, int line) {
         if (pointer == nullptr && __lsan_freeNull) {
             warn("Free of NULL", file, line, __builtin_return_address(0));
         }
-        auto [removed, record] = LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, __builtin_return_address(0)));
+        auto [removed, record] = LSan::getInstance().removeMalloc(pointer, __builtin_return_address(0));
         if (__lsan_invalidFree && !removed) {
             if (__lsan_invalidCrash) {
-                crash("Invalid free", file, line, __builtin_return_address(0));
+                crash("Invalid free", record, __builtin_return_address(0));
             } else {
-                warn("Invalid free", file, line, __builtin_return_address(0));
+                warn("Invalid free", record, __builtin_return_address(0));
             }
         }
         LSan::setIgnoreMalloc(false);
@@ -196,12 +196,12 @@ void free(void * pointer) {
         if (pointer == nullptr && __lsan_freeNull) {
             warn("Free of NULL", __builtin_return_address(0));
         }
-        auto [removed, record] = LSan::getInstance().removeMalloc(pointer);
+        auto [removed, record] = LSan::getInstance().removeMalloc(pointer, __builtin_return_address(0));
         if (__lsan_invalidFree && !removed) {
             if (__lsan_invalidCrash) {
-                crash("Invalid free", __builtin_return_address(0));
+                crash("Invalid free", record, __builtin_return_address(0));
             } else {
-                warn("Invalid free", __builtin_return_address(0));
+                warn("Invalid free", record, __builtin_return_address(0));
             }
         }
         LSan::setIgnoreMalloc(false);

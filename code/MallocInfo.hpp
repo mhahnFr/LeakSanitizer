@@ -20,6 +20,7 @@
 #ifndef MallocInfo_hpp
 #define MallocInfo_hpp
 
+#include <optional>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -84,7 +85,7 @@ class MallocInfo {
     /// Indicating whether this allocation has been deallocated.
     bool                   deleted;
     /// The callstack where the deallocation happened.
-    mutable lcs::callstack deletedCallstack;
+    mutable std::optional<lcs::callstack> deletedCallstack;
         
 public:
     /**
@@ -195,15 +196,10 @@ public:
      *
      * @param deleted whether this allocation is deallocated
      */
-    constexpr inline void setDeleted(bool deleted) {
+    inline void setDeleted(bool deleted, void * omitAddress = __builtin_return_address(0)) {
         this->deleted = deleted;
-    }
-    
-    /**
-     * Generates and stores a callstack for the deallocation callstack.
-     */
-    inline void generateDeletedCallstack() {
-        callstack_emplaceWithAddress(deletedCallstack, __builtin_return_address(0));
+        
+        deletedCallstack = lcs::callstack(omitAddress);
     }
     
     /**
@@ -220,7 +216,12 @@ public:
      * @param out the output stream to print to
      */
     inline void printDeletedCallstack(std::ostream & out) const {
-        printCallstack(deletedCallstack, out);
+        if (!deletedCallstack.has_value()) {
+            throw std::runtime_error("MallocInfo: No deleted callstack! "
+                                     "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");
+        }
+        
+        printCallstack(deletedCallstack.value(), out);
     }
     
     /**
@@ -228,7 +229,7 @@ public:
      *
      * @return the callstack where the deallocation happened
      */
-    constexpr inline auto getDeletedCallstack() const -> const lcs::callstack & {
+    constexpr inline auto getDeletedCallstack() const -> const std::optional<lcs::callstack> & {
         return deletedCallstack;
     }
     /**

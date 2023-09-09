@@ -93,11 +93,7 @@ public:
      */
     auto changeMalloc(const MallocInfo & info) -> bool;
     
-    auto removeMalloc(const void * pointer) -> MallocInfoRemoved;
-    
-    inline auto removeMalloc(MallocInfo && info) -> MallocInfoRemoved {
-        return removeMalloc(info.getPointer());
-    }
+    auto removeMalloc(const void * pointer, void * omitAddress = __builtin_return_address(0)) -> MallocInfoRemoved;
     
     void addMalloc(MallocInfo && info);
     
