@@ -57,11 +57,6 @@ LSan & LSan::getInstance() {
     return *instance;
 }
 
-auto LSan::getLocalInstance() -> ThreadAllocInfo & {
-    static thread_local ThreadAllocInfo localInfo;
-    return localInfo;
-}
-
 LSan::LSan() {
     atexit(reinterpret_cast<void (*)()>(__exit_hook));
     struct sigaction s{};
@@ -72,33 +67,14 @@ LSan::LSan() {
     signal(SIGUSR2, callstackSignal);
 }
 
-void LSan::registerThreadAllocInfo(ThreadAllocInfo::Ref info) {
-    std::lock_guard lock(infoMutex);
-    
-    threadInfos.push_back(info);
-}
-
-void LSan::removeThreadAllocInfo(ThreadAllocInfo::Ref info) {
-    std::lock_guard lock(infoMutex);
-    
-    infos.merge(info.get().getInfos());
-    
-    auto it = std::find_if(threadInfos.cbegin(), threadInfos.cend(), [&info] (const auto & elem) {
-        return std::addressof(elem.get()) == std::addressof(info.get());
-    });
-    if (it != threadInfos.end()) {
-        threadInfos.erase(it);
-    }
-}
-
-auto LSan::removeMallocHere(const void * pointer) -> bool {
+auto LSan::removeMalloc(const void * pointer) -> MallocInfoRemoved {
     std::lock_guard lock(infoMutex);
     
     auto it = infos.find(pointer);
     if (it == infos.end()) {
         return false;
     } else if (it->second.isDeleted()) {
-        return true;
+        return false;
     }
     if (__lsan_statsActive) {
         stats -= it->second;
@@ -109,7 +85,7 @@ auto LSan::removeMallocHere(const void * pointer) -> bool {
     return true;
 }
 
-auto LSan::changeMallocHere(const MallocInfo & info) -> bool {
+auto LSan::changeMalloc(const MallocInfo & info) -> bool {
     std::lock_guard lock(infoMutex);
     
     auto it = infos.find(info.getPointer());
@@ -129,37 +105,12 @@ auto LSan::changeMallocHere(const MallocInfo & info) -> bool {
     return true;
 }
 
-auto LSan::maybeChangeMalloc(const MallocInfo & info) -> bool {
-    if (changeMallocHere(info)) {
-        return true;
-    }
-    for (auto & localInstance : threadInfos) {
-        if (localInstance.get().changeMalloc(info, false)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-auto LSan::removeMalloc(const void * pointer) -> bool {
-    if (removeMallocHere(pointer)) {
-        return true;
-    }
-    for (auto & localInstance : threadInfos) {
-        if (localInstance.get().removeMalloc(pointer, false)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 void LSan::addMalloc(MallocInfo && info) {
     std::lock_guard lock(infoMutex);
     
-    stats += info; // No need to check __lsan_statsActive here,
-                   // since allocations are only added globally
-                   // if __lsan_statsActive is true.
-                   //                                 - mhahnFr
+    if (__lsan_statsActive) {
+        stats += info;
+    }
     
     infos.insert_or_assign(info.getPointer(), info);
 }

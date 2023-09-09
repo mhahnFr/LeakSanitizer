@@ -46,7 +46,7 @@ auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
                 crash("Invalid allocation of size 0", file, line, __builtin_return_address(0));
             }
         }
-        LSan::getTracker().addMalloc(MallocInfo(ret, size, file, line, __builtin_return_address(0)));
+        LSan::getInstance().addMalloc(MallocInfo(ret, size, file, line, __builtin_return_address(0)));
         LSan::setIgnoreMalloc(false);
     }
     return ret;
@@ -64,7 +64,7 @@ auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file,
                 crash("Invalid allocation of size 0", file, line, __builtin_return_address(0));
             }
         }
-        LSan::getTracker().addMalloc(MallocInfo(ret, objectSize * count, file, line, __builtin_return_address(0)));
+        LSan::getInstance().addMalloc(MallocInfo(ret, objectSize * count, file, line, __builtin_return_address(0)));
         LSan::setIgnoreMalloc(false);
     }
     return ret;
@@ -75,17 +75,16 @@ auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int lin
     if (!ignored) {
         LSan::setIgnoreMalloc(true);
     }
-    auto & instance = LSan::getTracker();
-    void * ptr      = LSan::realloc(pointer, size);
+    void * ptr = LSan::realloc(pointer, size);
     if (!ignored) {
         if (ptr != nullptr) {
             if (pointer != ptr) {
                 if (pointer != nullptr) {
-                    instance.removeMalloc(MallocInfo(pointer, 0, file, line, __builtin_return_address(0)));
+                    LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, __builtin_return_address(0)));
                 }
-                instance.addMalloc(MallocInfo(ptr, size, file, line, __builtin_return_address(0)));
+                LSan::getInstance().addMalloc(MallocInfo(ptr, size, file, line, __builtin_return_address(0)));
             } else {
-                instance.changeMalloc(MallocInfo(ptr, size, file, line, __builtin_return_address(0)));
+                LSan::getInstance().changeMalloc(MallocInfo(ptr, size, file, line, __builtin_return_address(0)));
             }
         }
         LSan::setIgnoreMalloc(false);
@@ -99,7 +98,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
         if (pointer == nullptr && __lsan_freeNull) {
             warn("Free of NULL", file, line, __builtin_return_address(0));
         }
-        bool removed = LSan::getTracker().removeMalloc(MallocInfo(pointer, 0, file, line, __builtin_return_address(0)));
+        bool removed = LSan::getInstance().removeMalloc(MallocInfo(pointer, 0, file, line, __builtin_return_address(0)));
         if (__lsan_invalidFree && !removed) {
             if (__lsan_invalidCrash) {
                 crash("Invalid free", file, line, __builtin_return_address(0));
@@ -144,7 +143,7 @@ auto malloc(std::size_t size) -> void * {
                 crash("Invalid allocation of size 0", __builtin_return_address(0));
             }
         }
-        LSan::getTracker().addMalloc(MallocInfo(ptr, size, __builtin_return_address(0)));
+        LSan::getInstance().addMalloc(MallocInfo(ptr, size, __builtin_return_address(0)));
         LSan::setIgnoreMalloc(false);
     }
     return ptr;
@@ -162,7 +161,7 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * {
                 crash("Invalid allocation of size 0", __builtin_return_address(0));
             }
         }
-        LSan::getTracker().addMalloc(MallocInfo(ptr, objectSize * count, __builtin_return_address(0)));
+        LSan::getInstance().addMalloc(MallocInfo(ptr, objectSize * count, __builtin_return_address(0)));
         LSan::setIgnoreMalloc(false);
     }
     return ptr;
@@ -173,17 +172,16 @@ auto realloc(void * pointer, std::size_t size) -> void * {
     if (!ignored) {
         LSan::setIgnoreMalloc(true);
     }
-    auto & instance = LSan::getTracker();
-    void * ptr      = LSan::realloc(pointer, size);
+    void * ptr = LSan::realloc(pointer, size);
     if (!ignored) {
         if (ptr != nullptr) {
             if (pointer != ptr) {
                 if (pointer != nullptr) {
-                    instance.removeMalloc(pointer);
+                    LSan::getInstance().removeMalloc(pointer);
                 }
-                instance.addMalloc(MallocInfo(ptr, size, __builtin_return_address(0)));
+                LSan::getInstance().addMalloc(MallocInfo(ptr, size, __builtin_return_address(0)));
             } else {
-                instance.changeMalloc(MallocInfo(ptr, size, __builtin_return_address(0)));
+                LSan::getInstance().changeMalloc(MallocInfo(ptr, size, __builtin_return_address(0)));
             }
         }
         LSan::setIgnoreMalloc(false);
@@ -197,7 +195,7 @@ void free(void * pointer) {
         if (pointer == nullptr && __lsan_freeNull) {
             warn("Free of NULL", __builtin_return_address(0));
         }
-        bool removed = LSan::getTracker().removeMalloc(pointer);
+        bool removed = LSan::getInstance().removeMalloc(pointer);
         if (__lsan_invalidFree && !removed) {
             if (__lsan_invalidCrash) {
                 crash("Invalid free", __builtin_return_address(0));

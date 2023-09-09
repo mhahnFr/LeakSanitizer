@@ -25,18 +25,18 @@
 #include <ostream>
 #include <vector>
 
-#include "ATracker.hpp"
 #include "MallocInfo.hpp"
 
 #include "statistics/Stats.hpp"
-#include "threadAllocInfo/ThreadAllocInfo.hpp"
 
 #include "../include/lsan_internals.h"
 
 /**
  * This class manages everything this sanitizer is capable to do.
  */
-class LSan: public ATracker {
+class LSan {
+    using MallocInfoRemoved = bool;
+    
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
@@ -45,8 +45,6 @@ class LSan: public ATracker {
     Stats                                    stats;
     /// Indicates whether the set callstack size had been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
-    /** A vector holding the thread local tracker instances. */
-    std::vector<ThreadAllocInfo::Ref>        threadInfos;
     
     /**
      * Attempts to remove an allocation in this instance.
@@ -54,7 +52,7 @@ class LSan: public ATracker {
      * @param pointer the deallocated pointer
      * @return whether an alloaction info was removed
      */
-    auto removeMallocHere(const void * pointer)    -> bool;
+    auto removeMallocHere(const void * pointer) -> MallocInfoRemoved;
     /**
      * Attempts to exchange the allocation record associated with the given
      * allocation info by the given allocation record.
@@ -91,15 +89,15 @@ public:
      * @param info the allocation record to be exchanged
      * @return whether an allocation record was exchanged
      */
-    auto maybeChangeMalloc(const MallocInfo & info) -> bool;
+    auto changeMalloc(const MallocInfo & info) -> bool;
     
-    virtual auto removeMalloc(const void * pointer) -> bool override;
+    auto removeMalloc(const void * pointer) -> MallocInfoRemoved;
     
-    virtual void addMalloc(MallocInfo && info) override;
-    
-    virtual inline auto changeMalloc(const MallocInfo & info) -> bool override {
-        return maybeChangeMalloc(info);
+    inline auto removeMalloc(MallocInfo && info) -> MallocInfoRemoved {
+        return removeMalloc(info.getPointer());
     }
+    
+    void addMalloc(MallocInfo && info);
     
     static inline void setIgnoreMalloc(const bool ignoreMalloc) {
         getLocalIgnoreMalloc() = ignoreMalloc;
@@ -158,19 +156,6 @@ public:
         callstackSizeExceeded = exceeded;
     }
     
-    /**
-     * Registers the given thread local allocation tracker instance.
-     *
-     * @param info the tracker to be registered
-     */
-    void registerThreadAllocInfo(ThreadAllocInfo::Ref info);
-    /**
-     * Removes the given thread local allocation tracker instance.
-     *
-     * @param info the tracker to be removed
-     */
-    void removeThreadAllocInfo(ThreadAllocInfo::Ref info);
-    
     /// A pointer to the real `malloc` function.
     static void * (*malloc) (size_t);
     /// A pointer to the real `calloc` function.
@@ -187,30 +172,8 @@ public:
      *
      * @return the current instance
      */
-    static auto getInstance()      -> LSan &;
-    /**
-     * Returns the thread local allocation tracker instance.
-     *
-     * @return the allocation tracker associated with the calling thread
-     */
-    static auto getLocalInstance() -> ThreadAllocInfo &;
-
-    /**
-     * Returns a reference to the tracker used to track allocations
-     * for the calling thread.
-     *
-     * @return the appropriate tracker
-     */
-    static inline auto getTracker() -> ATracker & {
-        bool linux = false;
-#ifdef __linux__
-        linux = true;
-#endif
-        if (__lsan_statsActive || linux) {
-            return getInstance();
-        }
-        return getLocalInstance();
-    }
+    static auto getInstance() -> LSan &;
+    
     /**
      * Returns the current instance of the statitcs object.
      *
