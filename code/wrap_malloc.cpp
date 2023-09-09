@@ -178,7 +178,7 @@ auto realloc(void * pointer, std::size_t size) -> void * {
         if (ptr != nullptr) {
             if (pointer != ptr) {
                 if (pointer != nullptr) {
-                    LSan::getInstance().removeMalloc(pointer);
+                    LSan::getInstance().removeMalloc(pointer, __builtin_return_address(0));
                 }
                 LSan::getInstance().addMalloc(MallocInfo(ptr, size, __builtin_return_address(0)));
             } else {
