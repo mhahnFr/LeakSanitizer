@@ -39,7 +39,7 @@ LDFLAGS = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
 
 ifeq ($(shell uname -s),Darwin)
- 	LDFLAGS += -current_version 1.4 -compatibility_version 1 -install_name $(abspath $@)
+ 	LDFLAGS += -current_version 1.6 -compatibility_version 1 -install_name $(abspath $@)
  	
  	INSTALL_TARGET = $(DYLIB_NA)
 else
