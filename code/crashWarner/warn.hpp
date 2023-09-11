@@ -38,7 +38,7 @@
 void warn(const std::string & message,
           const std::string & file,
           const int           line,
-          const void *        omitAddress = __builtin_return_address(0));
+                void *        omitAddress = __builtin_return_address(0));
 
 /**
  * Prints the given message and a callstack up to the given omitting address.

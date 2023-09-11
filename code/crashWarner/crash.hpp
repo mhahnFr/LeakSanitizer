@@ -38,7 +38,7 @@
 [[ noreturn ]] void crash(const std::string & message,
                           const std::string & file,
                           const int           line,
-                          const void *        omitAddress = __builtin_return_address(0));
+                                void *        omitAddress = __builtin_return_address(0));
 
 /**
  * Terminates the linked program and prints the given message and a callstack

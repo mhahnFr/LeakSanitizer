@@ -85,7 +85,7 @@ public:
      * @param omitAddress the callstack frame delimiter
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    auto removeMalloc(const void * pointer,
+    auto removeMalloc(      void * pointer,
                       const void * omitAddress = __builtin_return_address(0)) -> MallocInfoRemoved;
     
     /**
