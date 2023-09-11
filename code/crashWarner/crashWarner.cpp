@@ -24,6 +24,13 @@
 
 #include "../Formatter.hpp"
 
+/**
+ * Prints the given message and a callstack up to the provided omit address.
+ *
+ * @param message the message to be printed
+ * @param omitAddress the address beyond which frames are omitted in the callstack
+ * @tparam Warning whether to use warning formatting
+ */
 template<bool Warning>
 static inline void printer(const std::string & message, void * omitAddress) {
     using Formatter::Style;
@@ -38,8 +45,21 @@ static inline void printer(const std::string & message, void * omitAddress) {
     std::cerr << std::endl;
 }
 
+/**
+ * Prints the given message, the file with line number and a callstack up to+
+ * the provided omit address.
+ *
+ * @param message the message to be printed
+ * @param file the file name
+ * @param line the line number
+ * @param omitAddress the address beyond which frames are omitted in the callstack
+ * @tparam Warning whether to use warning formatting
+ */
 template<bool Warning>
-static inline void printer(const std::string & message, const std::string & file, int line, void * omitAddress) {
+static inline void printer(const std::string & message,
+                           const std::string & file,
+                           const int           line,
+                           const void *        omitAddress) {
     using Formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
@@ -53,8 +73,20 @@ static inline void printer(const std::string & message, const std::string & file
     std::cerr << std::endl;
 }
 
+/**
+ * Prints the given message, the allocation information found in the
+ * optionally provided allocation record and a callstack up to the given
+ * omit address.
+ *
+ * @param message the message to be printed
+ * @param info the optional allocation record
+ * @param omitAddress the address beyond which frames are omitted in the callstack
+ * @tparam Warning whether to use warning formatting
+ */
 template<bool Warning>
-static inline void printer(const std::string & message, std::optional<std::reference_wrapper<const MallocInfo>> info, void * omitAddress) {
+static inline void printer(const std::string & message,
+                           std::optional<std::reference_wrapper<const MallocInfo>> info,
+                           void * omitAddress) {
     using Formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
