@@ -35,53 +35,24 @@
  * pointer are stored as well.
  */
 class MallocInfo {
-    /**
-     * Initializes this allocation record using the given information.
-     *
-     * @param pointer the pointer to the allocated piece of memory
-     * @param size the size of the allocated piece of memory
-     * @param file the filename where the allocation happened
-     * @param line the line number inside the file where the alocation happened
-     * @param omitAddress the return address upon which function calls are ignored
-     * @param createdSet whether the file and line information are actually set
-     */
-    inline MallocInfo(void * const        pointer,
-                      std::size_t         size,
-                      const std::string & file,
-                      const int           line,
-                      void *              omitAddress,
-                      bool                createdSet):
-        pointer(pointer),
-        size(size),
-        createdInFile(file),
-        createdOnLine(line),
-        createdSet(createdSet),
-        createdCallstack(omitAddress),
-        deletedOnLine(0),
-        deleted(false),
-        deletedCallstack(false)
-    {}
-    
     /// The pointer to the allocated piece of memory.
     void * pointer;
     /// The size of the allocated piece of memory.
     std::size_t size;
     
     /// The filename in which this allocation happened.
-    std::string            createdInFile;
+    std::optional<std::string> createdInFile;
     /// The line number in which this allocation happened.
-    int                    createdOnLine;
-    /// Indicating whether the file and the line information have been set.
-    bool                   createdSet;
+    std::optional<int>         createdOnLine;
     /// The callstack where this allocation happened.
-    mutable lcs::callstack createdCallstack;
+    mutable lcs::callstack     createdCallstack;
 
     /// The filename in which this allocation was deallocated.
-    std::string            deletedInFile;
+    std::optional<std::string>            deletedInFile;
     /// The line number in which this allocation was deallocated.
-    int                    deletedOnLine;
+    std::optional<int>                    deletedOnLine;
     /// Indicating whether this allocation has been deallocated.
-    bool                   deleted;
+    bool                                  deleted;
     /// The callstack where the deallocation happened.
     mutable std::optional<lcs::callstack> deletedCallstack;
         
@@ -91,10 +62,16 @@ public:
      *
      * @param pointer the pointer to the allocated piece of memory
      * @param size the size of the allocated piece of memory
+     * @param file the filename where the allocation happened
+     * @param line the line number inside the file where the allocation happened
      * @param omitAddress the return address upon which function calls are ignored
      */
-    inline MallocInfo(void * const pointer, std::size_t size, void * omitAddress = __builtin_return_address(0))
-        : MallocInfo(pointer, size, "<Unknown>", 1, omitAddress, false)
+    inline MallocInfo(void * const                     pointer,
+                      const std::size_t                size,
+                      std::optional<const std::string> file,
+                      std::optional<const int>         line,
+                      const void *                     omitAddress = __builtin_return_address(0))
+        : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdCallstack(omitAddress), deletedInFile(std::nullopt), deletedOnLine(std::nullopt), deleted(false), deletedCallstack(std::nullopt)
     {}
     
     /**
@@ -102,16 +79,10 @@ public:
      *
      * @param pointer the pointer to the allocated piece of memory
      * @param size the size of the allocated piece of memory
-     * @param file the filename where the allocation happened
-     * @param line the line number inside the file where the allocation happened
      * @param omitAddress the return address upon which function calls are ignored
      */
-    inline MallocInfo(void * const        pointer,
-                      std::size_t         size,
-                      const std::string & file,
-                      int                 line,
-                      void *              omitAddress = __builtin_return_address(0))
-        : MallocInfo(pointer, size, file, line, omitAddress, true)
+    inline MallocInfo(void * const pointer, std::size_t size, void * omitAddress = __builtin_return_address(0))
+        : MallocInfo(pointer, size, std::nullopt, std::nullopt, omitAddress)
     {}
     
     /**
@@ -127,7 +98,7 @@ public:
      *
      * @return the filename where the allocation happened.
      */
-    constexpr inline auto getCreatedInFile() const -> const std::string & {
+    constexpr inline auto getCreatedInFile() const -> const std::optional<std::string> & {
         return createdInFile;
     }
     /**
@@ -135,7 +106,7 @@ public:
      *
      * @return the line number where the allocation happend
      */
-    constexpr inline auto getCreatedOnLine() const -> int {
+    constexpr inline auto getCreatedOnLine() const -> std::optional<int> {
         return createdOnLine;
     }
     /**
@@ -160,7 +131,7 @@ public:
      *
      * @return the filename where the deallocation happened
      */
-    constexpr inline auto getDeletedInFile() const -> const std::string & {
+    constexpr inline auto getDeletedInFile() const -> const std::optional<std::string> & {
         return deletedInFile;
     }
     
@@ -177,7 +148,7 @@ public:
      *
      * @return the line number where the deallocation happened
      */
-    constexpr inline auto getDeletedOnLine() const -> int {
+    constexpr inline auto getDeletedOnLine() const -> std::optional<int> {
         return deletedOnLine;
     }
     
@@ -194,7 +165,7 @@ public:
      *
      * @param deleted whether this allocation is deallocated
      */
-    inline void setDeleted(bool deleted, void * omitAddress = __builtin_return_address(0)) {
+    inline void setDeleted(bool deleted, const void * omitAddress = __builtin_return_address(0)) {
         this->deleted = deleted;
         
         deletedCallstack = lcs::callstack(omitAddress);
@@ -256,7 +227,7 @@ public:
         printCallstack(callstack, out);
     }
     
-    friend auto operator<<(std::ostream &, const MallocInfo &)     -> std::ostream &;
+    friend auto operator<<(std::ostream &, const MallocInfo &) -> std::ostream &;
 };
 
 #endif /* MallocInfo_hpp */

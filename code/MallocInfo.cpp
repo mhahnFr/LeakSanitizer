@@ -55,9 +55,9 @@ auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream 
            << "Leak" << Formatter::clear(Style::RED) << Formatter::clear(Style::BOLD)
            << " of size " << Formatter::clear(Style::ITALIC)
            << bytesToString(self.size) << Formatter::get(Style::ITALIC) << ", ";
-    if (self.createdSet) {
+    if (self.createdInFile.has_value() && self.createdOnLine.has_value()) {
         stream << "allocated at " << Formatter::get(Style::UNDERLINED)
-               << self.createdInFile << ":" << self.createdOnLine << Formatter::clear(Style::UNDERLINED);
+               << self.createdInFile.value() << ":" << self.createdOnLine.value() << Formatter::clear(Style::UNDERLINED);
     } else {
         stream << "allocation stacktrace:";
     }
