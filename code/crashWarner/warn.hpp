@@ -26,8 +26,38 @@
 
 #include "../MallocInfo.hpp"
 
-void warn(const std::string & message, const std::string & file, int line, void * omitAddress = __builtin_return_address(0));
+/**
+ * Prints the given message, the file name, the line number and a callstack up
+ * to the given omitting address.
+ *
+ * @param message the message to be printed
+ * @param file the file name
+ * @param line the line number
+ * @param omitAddress the address beyond which frames are omitted from the generated callstack
+ */
+void warn(const std::string & message,
+          const std::string & file,
+          const int           line,
+          const void *        omitAddress = __builtin_return_address(0));
+
+/**
+ * Prints the given message and a callstack up to the given omitting address.
+ *
+ * @param message the message to be printed
+ * @param omitAddress the address beyond which frames are omitted from the generated callstack
+ */
 void warn(const std::string & message, void * omitAddress = __builtin_return_address(0));
-void warn(const std::string & message, std::optional<std::reference_wrapper<const MallocInfo>> info, void * omitAddress = __builtin_return_address(0));
+
+/**
+ * Prints the given message, the information provided by the optional allocation
+ * record and a callstack up to the given omitting address.
+ *
+ * @param message the message to be printed
+ * @param info the optional allocation record
+ * @param omitAddress the address beyond which frames are omitted from the generated callstack
+ */
+void warn(const std::string & message,
+          std::optional<std::reference_wrapper<const MallocInfo>> info,
+          void * omitAddress = __builtin_return_address(0));
 
 #endif /* warn_hpp */
