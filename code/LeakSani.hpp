@@ -37,6 +37,7 @@
  * This class manages everything this sanitizer is capable to do.
  */
 class LSan {
+    /** A pair consisting of a boolean and an optional allocation record. */
     using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
     
     /// A map containing all allocation records, sorted by their allocated pointers.
@@ -77,14 +78,37 @@ public:
      */
     auto changeMalloc(const MallocInfo & info) -> bool;
     
-    auto removeMalloc(const void * pointer, void * omitAddress = __builtin_return_address(0)) -> MallocInfoRemoved;
+    /**
+     * Removes the allocation record acossiated with the given pointer.
+     *
+     * @param pointer the allocation pointer
+     * @param omitAddress the callstack frame delimiter
+     * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
+     */
+    auto removeMalloc(const void * pointer,
+                      const void * omitAddress = __builtin_return_address(0)) -> MallocInfoRemoved;
     
+    /**
+     * Adds the given allocation record.
+     *
+     * @param info the allocation record to be added
+     */
     void addMalloc(MallocInfo && info);
     
+    /**
+     * Sets whether to ignore subsequent allocation management requests.
+     *
+     * @param ignoreMalloc whether to ignore allocations
+     */
     static inline void setIgnoreMalloc(const bool ignoreMalloc) {
         getLocalIgnoreMalloc() = ignoreMalloc;
     }
     
+    /**
+     * Returns whether to ignore subsequent alloctiona managements requests.
+     *
+     * @return whether to ignore allocations
+     */
     static inline auto getIgnoreMalloc() -> bool {
         return getLocalIgnoreMalloc();
     }
