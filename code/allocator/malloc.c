@@ -22,8 +22,7 @@
 #include <string.h>
 #include <strings.h>
 
-#include "error.h"
-#include "warn.h"
+#include "../crashWarner/crashWarner.h"
 
 #include "zone/zones.h"
 
@@ -41,7 +40,7 @@ void * __lsan_malloc(size_t size) {
 
 void * __lsan_calloc(size_t count, size_t size) {
     if (count > SIZE_MAX / size) {
-        malloc_warn("Allocation of more than SIZE_MAX bytes blocked");
+        __lsan_warn("Allocation of more than SIZE_MAX bytes blocked");
         errno = ENOMEM;
         return NULL;
     }
@@ -68,7 +67,7 @@ void __lsan_free(void * ptr) {
     
     struct zone * zone = zones_getZoneByPointer(ptr);
     if (zone == NULL || !zone_deallocate(zone, ptr)) {
-        malloc_error("Pointer being freed was not allocated!");
+        __lsan_crash("Pointer being freed was not allocated");
     }
 }
 
@@ -83,7 +82,7 @@ void * __lsan_realloc(void * ptr, size_t newSize) {
     
     struct zone * zone = zones_getZoneByPointer(ptr);
     if (zone == NULL) {
-        malloc_error("Pointer to be resized invalid!");
+        __lsan_crash("Pointer to be resized was not allocated");
     }
     if (zone_enlargeAllocation(zone, ptr, newSize)) {
         return ptr;

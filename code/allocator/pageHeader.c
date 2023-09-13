@@ -22,7 +22,7 @@
 
 #include "pageHeader.h"
 
-#include "warn.h"
+#include "../crashWarner/crashWarner.h"
 
 struct pageHeader * page_allocateMin(size_t minimum, size_t pageSize) {
     const size_t size = minimum % pageSize == 0 ? minimum
@@ -36,7 +36,7 @@ struct pageHeader * page_allocateMin(size_t minimum, size_t pageSize) {
                           /* offset: */ pageSize);
     
     if (toReturn == NULL) {
-        malloc_warn("Unable to allocate page!");
+        __lsan_warn("Unable to allocate page");
     } else {
         toReturn->size = size;
     }
@@ -49,6 +49,6 @@ size_t page_getPageSize(void) {
 
 void page_deallocate(struct pageHeader * self) {
     if (munmap(self, self->size) != 0) {
-        malloc_warn("Error while unmapping page!");
+        __lsan_warn("Error while unmapping page");
     }
 }
