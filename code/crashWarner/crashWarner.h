@@ -17,12 +17,18 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-#include <unistd.h>
+#ifndef crashWarner_h
+#define crashWarner_h
 
-#include "warn.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void malloc_warn(const char * message) {
-    write(2, message, strlen(message));
-    write(2, "\n", 1);
-}
+void __lsan_warn(const char * message);
+void __lsan_crash(const char * message); // TODO: [[ noreturn ]]
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif /* crashWarner_h */
