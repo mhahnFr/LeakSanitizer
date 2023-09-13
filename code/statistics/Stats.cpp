@@ -113,9 +113,6 @@ auto Stats::getTotalFreeCount() const -> std::size_t {
     return freeCount;
 }
 
-void Stats::addFree  (const MallocInfo & mInfo) { addFree(mInfo.getSize());   }
-void Stats::addMalloc(const MallocInfo & mInfo) { addMalloc(mInfo.getSize()); }
-
 void Stats::addMalloc(std::size_t size) {
     std::lock_guard lock(mutex);
     
@@ -152,14 +149,4 @@ void Stats::addFree(std::size_t size) {
     
     --currentMallocCount;
     currentBytes -= size;
-}
-
-Stats & Stats::operator+=(const MallocInfo & mInfo) {
-    addMalloc(mInfo);
-    return *this;
-}
-
-Stats & Stats::operator-=(const MallocInfo & mInfo) {
-    addFree(mInfo);
-    return *this;
 }

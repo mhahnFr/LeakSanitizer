@@ -22,36 +22,40 @@
 
 #include <map>
 #include <mutex>
+#include <optional>
 #include <ostream>
+#include <utility>
 #include <vector>
 
-#include "ATracker.hpp"
 #include "MallocInfo.hpp"
 
 #include "statistics/Stats.hpp"
-#include "threadAllocInfo/ThreadAllocInfo.hpp"
 
 #include "../include/lsan_internals.h"
 
 /**
  * This class manages everything this sanitizer is capable to do.
  */
-class LSan: public ATracker {
+class LSan {
+    /** A pair consisting of a boolean and an optional allocation record. */
+    using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
+    
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
-    mutable std::recursive_mutex             infoMutex;
+    std::recursive_mutex                     infoMutex;
     /// An object holding all statistics.
     Stats                                    stats;
     /// Indicates whether the set callstack size had been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
     
-    std::vector<ThreadAllocInfo::Ref> threadInfos;
-    
-    auto removeMallocHere(const void * pointer) -> bool;
-    auto changeMallocHere(const MallocInfo & info) -> bool;
-    
-    auto getLocalIgnoreMalloc() const -> bool &;
+    /**
+     * Returns a reference to a thread local boolean value indicating
+     * whether to ignore allocations.
+     *
+     * @return the ignoration flag
+     */
+    static auto getLocalIgnoreMalloc() -> bool &;
     
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
@@ -63,18 +67,51 @@ public:
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
     
-    auto maybeChangeMalloc(const MallocInfo & info) -> bool;
+    /**
+     * @brief Attempts to exchange the allocation record associated with the given
+     * allocation record by the given allocation record.
+     *
+     * The allocation record is searched for globally and in all running threads.
+     *
+     * @param info the allocation record to be exchanged
+     * @return whether an allocation record was exchanged
+     */
+    auto changeMalloc(const MallocInfo & info) -> bool;
     
-    virtual auto removeMalloc(const void * pointer) -> bool override;
+    /**
+     * Removes the allocation record acossiated with the given pointer.
+     *
+     * @param pointer the allocation pointer
+     * @param omitAddress the callstack frame delimiter
+     * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
+     */
+    auto removeMalloc(      void * pointer,
+                      const void * omitAddress = __builtin_return_address(0)) -> MallocInfoRemoved;
     
-    virtual void addMalloc(MallocInfo && info) override;
+    /**
+     * Adds the given allocation record.
+     *
+     * @param info the allocation record to be added
+     */
+    void addMalloc(MallocInfo && info);
     
-    virtual inline auto changeMalloc(const MallocInfo & info) -> bool override {
-        return maybeChangeMalloc(info);
+    /**
+     * Sets whether to ignore subsequent allocation management requests.
+     *
+     * @param ignoreMalloc whether to ignore allocations
+     */
+    static inline void setIgnoreMalloc(const bool ignoreMalloc) {
+        getLocalIgnoreMalloc() = ignoreMalloc;
     }
     
-    virtual void setIgnoreMalloc(const bool ignoreMalloc) override;
-    virtual auto getIgnoreMalloc() const -> bool override;
+    /**
+     * Returns whether to ignore subsequent alloctiona managements requests.
+     *
+     * @return whether to ignore allocations
+     */
+    static inline auto getIgnoreMalloc() -> bool {
+        return getLocalIgnoreMalloc();
+    }
     
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
@@ -82,24 +119,38 @@ public:
      *
      * @return the total count of bytes found in the principal list
      */
-    auto getTotalAllocatedBytes() -> size_t;
+    auto getTotalAllocatedBytes() -> std::size_t;
     /**
      * Calculates and returns the total count of bytes that are stored inside the principal
      * list and not marked as deallocated.
      *
      * @return the total count of leaked bytes
      */
-    auto getTotalLeakedBytes()    -> size_t;
+    auto getTotalLeakedBytes() -> std::size_t;
     /**
      * Calculates and returns the count of allocation records stored in the principal list
      * that are not marked as deallocated.
      *
      * @return the total count of leaked objects
      */
-    auto getLeakCount()           -> size_t;
+    auto getLeakCount() -> std::size_t;
     
-    inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+    /**
+     * Returns the globally tracked allocations.
+     *
+     * @return the globally tracked allocations
+     */
+    constexpr inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
         return infos;
+    }
+    
+    /**
+     * Returns the mutex used to protect the global allocation container.
+     *
+     * @return the mutex
+     */
+    constexpr inline auto getFragmentationInfoMutex() -> std::recursive_mutex & {
+        return infoMutex;
     }
     
     /**
@@ -107,10 +158,9 @@ public:
      *
      * @param exceeded whether the maximum callstack size has been exceeded
      */
-    void setCallstackSizeExceeded(bool exceeded);
-    
-    void registerThreadAllocInfo(ThreadAllocInfo::Ref info);
-    void removeThreadAllocInfo(ThreadAllocInfo::Ref info);
+    constexpr inline void setCallstackSizeExceeded(bool exceeded) {
+        callstackSizeExceeded = exceeded;
+    }
     
     /// A pointer to the real `malloc` function.
     static void * (*malloc) (size_t);
@@ -128,15 +178,8 @@ public:
      *
      * @return the current instance
      */
-    static auto getInstance()  -> LSan &;
-    static auto getLocalInstance() -> ThreadAllocInfo &;
-
-    static inline auto getTracker() -> ATracker & {
-        if (__lsan_statsActive) {
-            return getInstance();
-        }
-        return getLocalInstance();
-    }
+    static auto getInstance() -> LSan &;
+    
     /**
      * Returns the current instance of the statitcs object.
      *

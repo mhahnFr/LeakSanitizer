@@ -40,7 +40,7 @@ extern bool __lsan_humanPrint;
  * @brief If this value is set to `true`, normal messages are printed to the standard output stream.
  *
  * Otherwise the standard error stream is also used for normal messages.
- * Defaults to `true`.
+ * Defaults to `false`.
  *
  * @since 1.1
  */
@@ -103,6 +103,8 @@ extern bool __lsan_invalidFree;
 extern bool __lsan_freeNull;
 
 /**
+ * @deprecated Since 1.5, replaced by `__lsan_statsActive`. Will be removed in v2.
+ *
  * @brief If this value is set to `true`, the memory fragmentation can be analyzed.
  *
  * It should be set at the very beginning of the program in order to get realistic results.

@@ -32,7 +32,7 @@ std::string bytesToString(unsigned long long amount) {
     } else {
         const std::string sizes[] {"EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"};
         unsigned long long multiplier = exabyte;
-        for (size_t i = 0; i < std::size(sizes); ++i, multiplier /= 1024) {
+        for (std::size_t i = 0; i < std::size(sizes); ++i, multiplier /= 1024) {
             if (multiplier <= amount) {
                 const unsigned short preDot = static_cast<unsigned short>(amount / multiplier);
                 const unsigned char digitCount = preDot < 10 ? 1 :
