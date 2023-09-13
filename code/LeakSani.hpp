@@ -162,17 +162,6 @@ public:
         callstackSizeExceeded = exceeded;
     }
     
-    /// A pointer to the real `malloc` function.
-    static void * (*malloc) (size_t);
-    /// A pointer to the real `calloc` function.
-    static void * (*calloc) (size_t, size_t);
-    /// A pointer to the real `realloc` function.
-    static void * (*realloc)(void *, size_t);
-    /// A pointer to the real `free` function.
-    static void   (*free)   (void *);
-    /// A pointer to the real `exit` function.
-    static void   (*exit)   (int);
-    
     /**
      * Returns the current instance of this sanitizer.
      *

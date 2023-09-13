@@ -23,6 +23,7 @@
 
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
+#include "allocator/allocator.h"
 #include "crashWarner/crash.hpp"
 #include "crashWarner/warn.hpp"
 
@@ -36,7 +37,7 @@ bool __lsan_glibc = false;
 #endif
 
 auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
-    auto ret = LSan::malloc(size);
+    auto ret = __lsan_malloc(size);
     
     if (ret != nullptr && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
@@ -54,7 +55,7 @@ auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
 }
 
 auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file, int line) -> void * {
-    auto ret = LSan::calloc(objectSize, count);
+    auto ret = __lsan_calloc(objectSize, count);
     
     if (ret != nullptr && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
@@ -76,7 +77,7 @@ auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int lin
     if (!ignored) {
         LSan::setIgnoreMalloc(true);
     }
-    void * ptr = LSan::realloc(pointer, size);
+    void * ptr = __lsan_realloc(pointer, size);
     if (!ignored) {
         if (ptr != nullptr) {
             if (pointer != ptr) {
@@ -109,7 +110,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
         }
         LSan::setIgnoreMalloc(false);
     }
-    LSan::free(pointer);
+    __lsan_free(pointer);
 }
 
 [[ noreturn ]] void __wrap_exit(int code, const char * file, int line) {
@@ -132,14 +133,12 @@ void __wrap_free(void * pointer, const char * file, int line) {
         __lsan_printStats();
     }
     LSan::printInformations();
-    auto quit = LSan::exit;
     internalCleanUp();
-    quit(code);
-    __builtin_unreachable();
+    _Exit(code);
 }
 
 auto malloc(std::size_t size) -> void * {
-    auto ptr = LSan::malloc(size);
+    auto ptr = __lsan_malloc(size);
     
     if (ptr != nullptr && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
@@ -157,7 +156,7 @@ auto malloc(std::size_t size) -> void * {
 }
 
 auto calloc(std::size_t objectSize, std::size_t count) -> void * {
-    auto ptr = LSan::calloc(objectSize, count);
+    auto ptr = __lsan_calloc(objectSize, count);
     
     if (ptr != nullptr && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
@@ -179,7 +178,7 @@ auto realloc(void * pointer, std::size_t size) -> void * {
     if (!ignored) {
         LSan::setIgnoreMalloc(true);
     }
-    void * ptr = LSan::realloc(pointer, size);
+    void * ptr = __lsan_realloc(pointer, size);
     if (!ignored) {
         if (ptr != nullptr) {
             if (pointer != ptr) {
@@ -212,5 +211,5 @@ void free(void * pointer) {
         }
         LSan::setIgnoreMalloc(false);
     }
-    LSan::free(pointer);
+    __lsan_free(pointer);
 }

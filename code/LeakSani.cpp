@@ -31,27 +31,6 @@
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 
-#ifdef __GLIBC__
-extern "C" void * __libc_malloc (size_t);
-extern "C" void * __libc_calloc (size_t, size_t);
-extern "C" void * __libc_realloc(void *, size_t);
-extern "C" void   __libc_free   (void *);
-
-void * (*LSan::malloc) (size_t)         = __libc_malloc;
-void * (*LSan::calloc) (size_t, size_t) = __libc_calloc;
-void * (*LSan::realloc)(void *, size_t) = __libc_realloc;
-void   (*LSan::free)   (void *)         = __libc_free;
-
-#else
-void * (*LSan::malloc) (size_t)         = reinterpret_cast<void * (*)(size_t)>        (dlsym(RTLD_NEXT, "malloc"));
-void * (*LSan::calloc) (size_t, size_t) = reinterpret_cast<void * (*)(size_t, size_t)>(dlsym(RTLD_NEXT, "calloc"));
-void * (*LSan::realloc)(void *, size_t) = reinterpret_cast<void * (*)(void *, size_t)>(dlsym(RTLD_NEXT, "realloc"));
-void   (*LSan::free)   (void *)         = reinterpret_cast<void   (*)(void *)>        (dlsym(RTLD_NEXT, "free"));
-
-#endif /* __GLIBC__ */
-
-void (*LSan::exit)(int) = _Exit;
-
 LSan & LSan::getInstance() {
     static LSan * instance = new LSan();
     return *instance;
