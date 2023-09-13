@@ -31,12 +31,14 @@ LIBCALLSTACK_DY   = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).dylib
 LIBCALLSTACK_EXTR = tmpLibCallstack
 LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true'
 
-SRC  = $(shell find . -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
-OBJS = $(patsubst %.cpp, %.o, $(SRC))
-DEPS = $(patsubst %.cpp, %.d, $(SRC))
+SRC   = $(shell find code -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
+SRC_C = $(shell find code -name \*.c \! -path $(LIBCALLSTACK_DIR)\*)
+OBJS  = $(patsubst %.cpp, %.o, $(SRC)) $(patsubst %.c, %.o, $(SRC_C))
+DEPS  = $(patsubst %.cpp, %.d, $(SRC)) $(patsubst %.c, %.d, $(SRC_C))
 
 LDFLAGS = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
+CFLAGS = -std=gnu11 -Wall -Wextra -fPIC -Ofast
 
 ifeq ($(shell uname -s),Darwin)
  	LDFLAGS += -current_version 1.6 -compatibility_version 1 -install_name $(abspath $@)
@@ -94,6 +96,9 @@ $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_DY)
 
 $(LIB_NAME): $(OBJS) $(LIBCALLSTACK_EXTR)
 	$(AR) -crs $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EXTR) -type f \( -name \*.o -o -name \*.opp \))
+
+%.o: %.c
+	$(CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
