@@ -120,8 +120,14 @@ void __wrap_free(void * pointer, const char * file, int line) {
     out << std::endl
         << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN) << " at "
         << Formatter::get(Style::UNDERLINED) << file << ":" << line << Formatter::clear(Style::UNDERLINED)
-        << std::endl << std::endl
-        << LSan::getInstance() << std::endl;
+        << std::endl;
+    
+    if (__lsan_printExitPoint) {
+        MallocInfo::printCallstack(lcs::callstack(__builtin_return_address(0)), out);
+        out << std::endl;
+    }
+    
+    out << std::endl << LSan::getInstance() << std::endl;
     if (__lsan_printStatsOnExit) {
         __lsan_printStats();
     }

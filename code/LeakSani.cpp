@@ -160,8 +160,13 @@ void LSan::__exit_hook() {
     setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << std::endl
-        << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN)
-        << std::endl << std::endl
+        << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN);
+    
+    if (__lsan_printExitPoint) {
+        out << Formatter::get(Style::ITALIC) << ", stacktrace:" << std::endl;
+        MallocInfo::printCallstack(lcs::callstack(__builtin_return_address(0)), out);
+    }
+    out << std::endl << std::endl
         << getInstance() << std::endl;
     if (__lsan_printStatsOnExit) {
         __lsan_printStats();
