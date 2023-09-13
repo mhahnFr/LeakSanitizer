@@ -124,9 +124,9 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
     std::lock_guard lock(infoMutex);
     
     std::size_t ret = 0;
-    std::for_each(infos.cbegin(), infos.cend(), [&ret] (auto & elem) {
-        ret += elem.second.getSize();
-    });
+    for (const auto & [ptr, info] : infos) {
+        ret += info.getSize();
+    }
     return ret;
 }
 
@@ -146,9 +146,9 @@ auto LSan::getTotalLeakedBytes() -> std::size_t {
     std::lock_guard lock(infoMutex);
     
     std::size_t ret = 0;
-    for (const auto & elem : infos) {
-        if (!elem.second.isDeleted()) {
-            ret += elem.second.getSize();
+    for (const auto & [ptr, info] : infos) {
+        if (!info.isDeleted()) {
+            ret += info.getSize();
         }
     }
     return ret;
@@ -214,9 +214,9 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         const std::size_t totalLeaks = self.getLeakCount();
         stream << totalLeaks << " leaks total, " << bytesToString(self.getTotalLeakedBytes()) << " total" << std::endl << std::endl;
         std::size_t i = 0;
-        for (const auto & leak : self.infos) {
-            if (!leak.second.isDeleted()) {
-                stream << leak.second << std::endl;
+        for (const auto & [ptr, leakInfo] : self.infos) {
+            if (!leakInfo.isDeleted()) {
+                stream << leakInfo << std::endl;
                 if (++i == __lsan_leakCount) {
                     if (self.callstackSizeExceeded) {
                         stream << "Hint:" << Formatter::get(Style::GREYED)
