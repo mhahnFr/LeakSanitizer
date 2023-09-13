@@ -46,12 +46,12 @@ else
 	INSTALL_TARGET = $(SHARED_L)
 endif
 
-NO_LICENSE = true
+NO_LICENSE = false
 ifeq ($(NO_LICENSE),true)
 	CXXFLAGS += -DNO_LICENSE
 endif
 
-NO_WEBSITE = true
+NO_WEBSITE = false
 ifeq ($(NO_WEBSITE),true)
 	CXXFLAGS += -DNO_WEBSITE
 endif
