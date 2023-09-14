@@ -21,11 +21,17 @@
 #define crashWarner_h
 
 #ifdef __cplusplus
+ #define NORETURN [[ noreturn ]]
+#else
+ #define NORETURN _Noreturn
+#endif
+
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 void __lsan_warn(const char * message);
-void __lsan_crash(const char * message); // TODO: [[ noreturn ]]
+NORETURN void __lsan_crash(const char * message);
 
 #ifdef __cplusplus
 } // extern "C"
