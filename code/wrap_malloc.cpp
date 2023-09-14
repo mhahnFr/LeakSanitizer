@@ -23,6 +23,7 @@
 
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
+#include "interpose.hpp"
 #include "allocator/allocator.h"
 #include "crashWarner/crash.hpp"
 #include "crashWarner/warn.hpp"
@@ -137,8 +138,9 @@ void __wrap_free(void * pointer, const char * file, int line) {
     _Exit(code);
 }
 
+namespace lsan {
 auto malloc(std::size_t size) -> void * {
-    auto ptr = __lsan_malloc(size);
+    auto ptr = ::malloc(size);
     
     if (ptr != nullptr && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
@@ -156,7 +158,7 @@ auto malloc(std::size_t size) -> void * {
 }
 
 auto calloc(std::size_t objectSize, std::size_t count) -> void * {
-    auto ptr = __lsan_calloc(objectSize, count);
+    auto ptr = ::calloc(objectSize, count);
     
     if (ptr != nullptr && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
@@ -178,7 +180,7 @@ auto realloc(void * pointer, std::size_t size) -> void * {
     if (!ignored) {
         LSan::setIgnoreMalloc(true);
     }
-    void * ptr = __lsan_realloc(pointer, size);
+    void * ptr = ::realloc(pointer, size);
     if (!ignored) {
         if (ptr != nullptr) {
             if (pointer != ptr) {
@@ -211,5 +213,11 @@ void free(void * pointer) {
         }
         LSan::setIgnoreMalloc(false);
     }
-    __lsan_free(pointer);
+    ::free(pointer);
 }
+}
+
+INTERPOSE(lsan::malloc,  malloc);
+INTERPOSE(lsan::calloc,  calloc);
+INTERPOSE(lsan::realloc, realloc);
+INTERPOSE(lsan::free,    free);
