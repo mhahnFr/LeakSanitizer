@@ -106,6 +106,7 @@
 		BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeakSani.cpp; sourceTree = "<group>"; };
 		BF72C3CB2885CB9E00C7AE5C /* leaksan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = leaksan.h; sourceTree = "<group>"; };
 		BF72C3CC2885CB9E00C7AE5C /* stdlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdlib.h; sourceTree = "<group>"; };
+		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
 		BF97EB5628831E5B00DAF1FE /* liblsan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblsan.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFAFADC428B4FDA40060076C /* Formatter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Formatter.cpp; path = code/Formatter.cpp; sourceTree = SOURCE_ROOT; };
 		BFAFADC528B4FDA40060076C /* Formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Formatter.hpp; path = code/Formatter.hpp; sourceTree = SOURCE_ROOT; };
@@ -234,6 +235,7 @@
 				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
 				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
+				BF9623AC2AB36B86005FF2B7 /* interpose.hpp */,
 			);
 			path = code;
 			sourceTree = "<group>";
