@@ -20,6 +20,7 @@
 #ifndef crash_hpp
 #define crash_hpp
 
+#include <functional>
 #include <optional>
 #include <string>
 #include <utility>
