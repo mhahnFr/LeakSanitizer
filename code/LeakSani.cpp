@@ -31,6 +31,8 @@
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 
+bool LSan::askIgnoration = true;
+
 LSan & LSan::getInstance() {
     static LSan * instance = new LSan();
     return *instance;

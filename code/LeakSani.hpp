@@ -40,6 +40,8 @@ class LSan {
     /** A pair consisting of a boolean and an optional allocation record. */
     using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
     
+    static bool askIgnoration;
+    
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
@@ -110,7 +112,14 @@ public:
      * @return whether to ignore allocations
      */
     static inline auto getIgnoreMalloc() -> bool {
-        return getLocalIgnoreMalloc();
+        askIgnoration = false;
+        const bool toReturn = getLocalIgnoreMalloc();
+        askIgnoration = true;
+        return toReturn;
+    }
+    
+    static inline auto getAskIgnoration() -> bool {
+        return askIgnoration;
     }
     
     /**

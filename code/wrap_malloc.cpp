@@ -142,7 +142,7 @@ namespace lsan {
 auto malloc(std::size_t size) -> void * {
     auto ptr = ::malloc(size);
     
-    if (ptr != nullptr && !LSan::getIgnoreMalloc()) {
+    if (ptr != nullptr && LSan::getAskIgnoration() && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
         if (size == 0) {
             if (!__lsan_invalidCrash || __lsan_glibc) {
@@ -160,7 +160,7 @@ auto malloc(std::size_t size) -> void * {
 auto calloc(std::size_t objectSize, std::size_t count) -> void * {
     auto ptr = ::calloc(objectSize, count);
     
-    if (ptr != nullptr && !LSan::getIgnoreMalloc()) {
+    if (ptr != nullptr && LSan::getAskIgnoration() && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
         if (objectSize * count == 0) {
             if (!__lsan_invalidCrash || __lsan_glibc) {
@@ -176,7 +176,7 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * {
 }
 
 auto realloc(void * pointer, std::size_t size) -> void * {
-    auto ignored = LSan::getIgnoreMalloc();
+    auto ignored = !LSan::getAskIgnoration() || LSan::getIgnoreMalloc();
     if (!ignored) {
         LSan::setIgnoreMalloc(true);
     }
@@ -198,7 +198,7 @@ auto realloc(void * pointer, std::size_t size) -> void * {
 }
 
 void free(void * pointer) {
-    if (!LSan::getIgnoreMalloc()) {
+    if (LSan::getAskIgnoration() && !LSan::getIgnoreMalloc()) {
         LSan::setIgnoreMalloc(true);
         if (pointer == nullptr && __lsan_freeNull) {
             warn("Free of NULL", __builtin_return_address(0));
