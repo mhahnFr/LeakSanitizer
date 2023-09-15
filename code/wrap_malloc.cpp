@@ -32,9 +32,9 @@
 #include "../include/lsan_internals.h"
 
 #ifdef __GLIBC__
-bool __lsan_glibc = true;
+static bool __lsan_glibc = true;
 #else
-bool __lsan_glibc = false;
+static bool __lsan_glibc = false;
 #endif
 
 auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
