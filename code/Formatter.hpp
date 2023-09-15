@@ -29,27 +29,27 @@
  * output on terminals.
  */
 namespace Formatter {
-    /// An enumeration containing possible formats.
-    enum class Style {
-        /// Represents the text color green.
-        GREEN,
-        /// Represents the text color red.
-        RED,
-        /// Represents the text color magenta.
-        MAGENTA,
-        /// Represents *italic* text.
-        ITALIC,
-        /// Represents underlined text.
-        UNDERLINED,
-        /// Represents greyed color, that is, the current text color becomes less bright.
-        GREYED,
-        /// Represents **bold** text.
-        BOLD,
-        /// Represents a filled element inside a bar.
-        BAR_FILLED,
-        /// Represents an empty element inside a bar.
-        BAR_EMPTY
-    };
+/// An enumeration containing possible formats.
+enum class Style {
+    /// Represents the text color green.
+    GREEN,
+    /// Represents the text color red.
+    RED,
+    /// Represents the text color magenta.
+    MAGENTA,
+    /// Represents *italic* text.
+    ITALIC,
+    /// Represents underlined text.
+    UNDERLINED,
+    /// Represents greyed color, that is, the current text color becomes less bright.
+    GREYED,
+    /// Represents **bold** text.
+    BOLD,
+    /// Represents a filled element inside a bar.
+    BAR_FILLED,
+    /// Represents an empty element inside a bar.
+    BAR_EMPTY
+};
     
 /**
  * @brief Returns an ANSI escape code for the requested style.
@@ -116,12 +116,14 @@ constexpr inline auto clear() -> const char * {
     }
 }
 
-    /**
-     * Returns an ANSI escape code to clear all possible styles.
-     *
-     * @return the corresponding escape code
-     */
-    auto clearAll()         -> std::string;
+/**
+ * Returns an ANSI escape code to clear all possible styles.
+ *
+ * @return the corresponding escape code
+ */
+constexpr inline auto clearAll() -> const char * {
+    return "\033[0m";
+}
 }
 
 #endif /* Formatter_hpp */
