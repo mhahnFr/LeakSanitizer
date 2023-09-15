@@ -25,8 +25,6 @@ DYLIB_NA = $(CORE_NAME).dylib
 LIBCALLSTACK_NAME = libcallstack
 LIBCALLSTACK_DIR  = ./CallstackLibrary
 LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
-LIBCALLSTACK_SO   = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).so
-LIBCALLSTACK_DY   = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).dylib
 LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true'
 
 SRC   = $(shell find code -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
@@ -34,9 +32,9 @@ SRC_C = $(shell find code -name \*.c \! -path $(LIBCALLSTACK_DIR)\*)
 OBJS  = $(patsubst %.cpp, %.o, $(SRC)) $(patsubst %.c, %.o, $(SRC_C))
 DEPS  = $(patsubst %.cpp, %.d, $(SRC)) $(patsubst %.c, %.d, $(SRC_C))
 
-LDFLAGS = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
+LDFLAGS  = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
-CFLAGS = -std=gnu11 -Wall -Wextra -fPIC -Ofast
+CFLAGS   = -std=gnu11 -Wall -Wextra -fPIC -Ofast
 
 ifeq ($(shell uname -s),Darwin)
  	LDFLAGS += -current_version 1.6 -compatibility_version 1 -install_name $(abspath $@)
@@ -84,11 +82,11 @@ uninstall:
 	- $(RM) $(INSTALL_PATH)/lib/$(NAME)
 	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -name \*.h))
 
-$(SHARED_L): $(OBJS) $(LIBCALLSTACK_SO)
-	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS) $(LIBCALLSTACK_A)
+$(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
+	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS)
 
-$(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_DY)
-	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS) $(LIBCALLSTACK_A)
+$(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
+	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
