@@ -124,6 +124,53 @@ constexpr inline auto clear() -> const char * {
 constexpr inline auto clearAll() -> const char * {
     return "\033[0m";
 }
+
+template<Style... S>
+inline auto getString() -> std::string {
+    std::string toReturn {};
+    ((toReturn += get<S>()), ...);
+    return toReturn;
+}
+
+template<Style... S>
+inline auto get(std::ostream & out) -> std::ostream & {
+    ((out << get<S>()), ...);
+    return out;
+}
+
+template<Style... S>
+inline auto clearString() -> std::string {
+    std::string toReturn {};
+    ((toReturn += clear<S>()), ...);
+    return toReturn;
+}
+
+template<Style... S>
+inline auto clear(std::ostream & out) -> std::ostream & {
+    ((out << clear<S>()), ...);
+    return out;
+}
+
+template<Style... S>
+inline auto get(std::ostream & out, const std::string & str) -> std::ostream & {
+    out << get<S...>
+        << str
+        << clear<S...>;
+    return out;
+}
+
+template<Style... S>
+struct format {
+    const std::string & str;
+    
+    format(const std::string & str): str(str) {}
+};
+
+template<Style... S>
+auto operator<<(std::ostream & out, const format<S...> & f) -> std::ostream & {
+    out << get<S...> << f.str << clear<S...>;
+    return out;
+}
 }
 
 #endif /* Formatter_hpp */
