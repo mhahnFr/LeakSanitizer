@@ -19,7 +19,6 @@
 
 CORE_NAME = liblsan
 
-LIB_NAME = $(CORE_NAME).a
 SHARED_L = $(CORE_NAME).so
 DYLIB_NA = $(CORE_NAME).dylib
 
@@ -43,9 +42,9 @@ CFLAGS = -std=gnu11 -Wall -Wextra -fPIC -Ofast
 ifeq ($(shell uname -s),Darwin)
  	LDFLAGS += -current_version 1.6 -compatibility_version 1 -install_name $(abspath $@)
  	
- 	INSTALL_TARGET = $(DYLIB_NA)
+ 	NAME = $(DYLIB_NA)
 else
-	INSTALL_TARGET = $(SHARED_L)
+	NAME = $(SHARED_L)
 endif
 
 NO_LICENSE = false
@@ -57,8 +56,6 @@ NO_WEBSITE = false
 ifeq ($(NO_WEBSITE),true)
 	CXXFLAGS += -DNO_WEBSITE
 endif
-
-NAME = $(LIB_NAME)
 
 VERSION = "clean build"
 ifneq ($(shell git describe --tags --abbrev=0),)
@@ -74,18 +71,18 @@ INSTALL_PATH ?= /usr/local
 
 default: $(NAME)
 
-all: $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
+all: $(SHARED_L) $(DYLIB_NA)
 
 install:
-	$(MAKE) NO_LICENSE=false NO_WEBSITE=false $(INSTALL_TARGET)
-	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(INSTALL_PATH)/lib/$(INSTALL_TARGET)" $(INSTALL_TARGET); fi
+	$(MAKE) NO_LICENSE=false NO_WEBSITE=false $(NAME)
+	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(INSTALL_PATH)/lib/$(NAME)" $(NAME); fi
 	mkdir -p $(INSTALL_PATH)/lib
 	mkdir -p "$(INSTALL_PATH)/include"
-	cp $(INSTALL_TARGET) $(INSTALL_PATH)/lib
+	cp $(NAME) $(INSTALL_PATH)/lib
 	find "include" -name \*.h -exec cp {} "$(INSTALL_PATH)/include" \;
 
 uninstall:
-	- $(RM) $(INSTALL_PATH)/lib/$(INSTALL_TARGET)
+	- $(RM) $(INSTALL_PATH)/lib/$(NAME)
 	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -name \*.h))
 
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_SO)
@@ -93,9 +90,6 @@ $(SHARED_L): $(OBJS) $(LIBCALLSTACK_SO)
 
 $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_DY)
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS) $(LIBCALLSTACK_DY)
-
-$(LIB_NAME): $(OBJS) $(LIBCALLSTACK_EXTR)
-	$(AR) -crs $(LIB_NAME) $(OBJS) $(shell find $(LIBCALLSTACK_EXTR) -type f \( -name \*.o -o -name \*.opp \))
 
 %.o: %.c
 	$(CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
@@ -122,7 +116,7 @@ clean:
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) clean
 
 fclean: clean
-	- $(RM) $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
+	- $(RM) $(SHARED_L) $(DYLIB_NA)
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) fclean
 
 re: fclean
