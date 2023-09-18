@@ -171,6 +171,11 @@ auto operator<<(std::ostream & out, const format<S...> & f) -> std::ostream & {
     out << get<S...> << f.str << clear<S...>;
     return out;
 }
+
+template<Style... S>
+inline auto formatString(const std::string & str) -> std::string {
+    return getString<S...>() + str + clearString<S...>();
+}
 }
 
 #endif /* Formatter_hpp */
