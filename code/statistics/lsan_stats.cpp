@@ -115,7 +115,7 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
         << Formatter::get<Style::GREYED, Style::UNDERLINED>;
     
     const auto & infos = LSan::getInstance().getFragmentationInfos();
-    std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
+//    std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
     auto it = infos.cbegin();
     if (infos.size() < width) {
         const float step = static_cast<float>(width) / infos.size();
@@ -194,7 +194,7 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
         << Formatter::get<Style::GREYED, Style::UNDERLINED>;
     
     const auto & infos = LSan::getInstance().getFragmentationInfos();
-    std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
+//    std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
     auto it = infos.cbegin();
     std::size_t currentBlockBegin = 0,
            currentBlockEnd   = it->second.getSize(),
@@ -282,6 +282,7 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
 void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
     using Formatter::Style;
     
+    std::lock_guard lock(LSan::getInstance().getMutex());
     bool ignore = LSan::getIgnoreMalloc();
     LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
@@ -308,6 +309,7 @@ void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
 void __lsan_printStatsWithWidth(std::size_t width) {
     using Formatter::Style;
     
+    std::lock_guard lock(LSan::getInstance().getMutex());
     bool ignore = LSan::getIgnoreMalloc();
     LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
