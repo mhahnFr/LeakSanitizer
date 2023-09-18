@@ -31,6 +31,8 @@
 
 #include "statistics/Stats.hpp"
 
+#include "initialization/init.h"
+
 #include "../include/lsan_internals.h"
 
 /**
@@ -40,8 +42,6 @@ class LSan {
     /** A pair consisting of a boolean and an optional allocation record. */
     using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
     
-    static bool askIgnoration;
-    
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
     /// The mutex used to protect the principal map.
@@ -50,24 +50,31 @@ class LSan {
     Stats                                    stats;
     /// Indicates whether the set callstack size had been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
+    std::recursive_mutex                     mutex;
     
     /**
-     * Returns a reference to a thread local boolean value indicating
+     * Returns a reference to a boolean value indicating
      * whether to ignore allocations.
      *
      * @return the ignoration flag
      */
-    static auto getLocalIgnoreMalloc() -> bool &;
+    static auto _getIgnoreMalloc() -> bool &;
     
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
     LSan();
-   ~LSan() = default;
+   ~LSan() {
+        inited = false;
+    }
     
     LSan(const LSan &)              = delete;
     LSan(const LSan &&)             = delete;
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
+    
+    inline auto getMutex() -> std::recursive_mutex & {
+        return mutex;
+    }
     
     /**
      * @brief Attempts to exchange the allocation record associated with the given
@@ -103,7 +110,7 @@ public:
      * @param ignoreMalloc whether to ignore allocations
      */
     static inline void setIgnoreMalloc(const bool ignoreMalloc) {
-        getLocalIgnoreMalloc() = ignoreMalloc;
+        _getIgnoreMalloc() = ignoreMalloc;
     }
     
     /**
@@ -112,14 +119,7 @@ public:
      * @return whether to ignore allocations
      */
     static inline auto getIgnoreMalloc() -> bool {
-        askIgnoration = false;
-        const bool toReturn = getLocalIgnoreMalloc();
-        askIgnoration = true;
-        return toReturn;
-    }
-    
-    static inline auto getAskIgnoration() -> bool {
-        return askIgnoration;
+        return _getIgnoreMalloc();
     }
     
     /**

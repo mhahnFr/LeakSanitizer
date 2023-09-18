@@ -31,8 +31,6 @@
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 
-bool LSan::askIgnoration = true;
-
 LSan & LSan::getInstance() {
     static LSan * instance = new LSan();
     return *instance;
@@ -96,8 +94,8 @@ void LSan::addMalloc(MallocInfo && info) {
     infos.insert_or_assign(info.getPointer(), info);
 }
 
-auto LSan::getLocalIgnoreMalloc() -> bool & {
-    static thread_local bool ignoreMalloc = false;
+auto LSan::_getIgnoreMalloc() -> bool & {
+    static bool ignoreMalloc = false;
     return ignoreMalloc;
 }
 
