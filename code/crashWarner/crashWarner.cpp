@@ -37,11 +37,8 @@ static inline void printer(const std::string & message, void * omitAddress) {
     using Formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
-    
-    std::cerr << Formatter::get(Style::BOLD) << Formatter::get(colour)
-              << (Warning ? "Warning: " : "") << message << "!"
-              << Formatter::clear(Style::BOLD) << Formatter::clear(colour)
-              << std::endl;
+
+    std::cerr << Formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
     MallocInfo::printCallstack(lcs::callstack(omitAddress), std::cerr);
     std::cerr << std::endl;
 }
@@ -65,10 +62,10 @@ static inline void printer(const std::string & message,
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
     
-    std::cerr << Formatter::get(Style::BOLD) << Formatter::get(colour)
-              << (Warning ? "Warning: " : "") << message << Formatter::clear(colour) << ", at "
-              << Formatter::get(Style::UNDERLINED) << file << ":" << line
-              << Formatter::clear(Style::BOLD) << Formatter::clear(Style::UNDERLINED)
+    std::cerr << Formatter::get<Style::BOLD>
+              << Formatter::format<colour>((Warning ? "Warning: " : "") + message) << ", at "
+              << Formatter::get<Style::UNDERLINED> << file << ":" << line
+              << Formatter::clear<Style::BOLD, Style::UNDERLINED>
               << std::endl;
     MallocInfo::printCallstack(lcs::callstack(omitAddress), std::cerr);
     std::cerr << std::endl;
@@ -92,27 +89,17 @@ static inline void printer(const std::string & message,
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
     
-    std::cerr << Formatter::get(Style::BOLD) << Formatter::get(colour)
-              << (Warning ? "Warning: " : "") << message << "!"
-              << Formatter::clear(Style::BOLD) << Formatter::clear(colour)
-              << std::endl;
+    std::cerr << Formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
     MallocInfo::printCallstack(lcs::callstack(omitAddress), std::cerr);
     std::cerr << std::endl;
     
     if (info.has_value()) {
         const auto & record = info.value().get();
-        std::cerr << Formatter::get(Style::ITALIC) << Formatter::get(colour)
-                  << "Previously allocated here:"
-                  << Formatter::clear(Style::ITALIC) << Formatter::clear(colour)
-                  << std::endl;
+        std::cerr << Formatter::format<Style::ITALIC, colour>("Previously allocated here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
         if (record.getDeletedCallstack().has_value()) {
-            std::cerr << std::endl
-                      << Formatter::get(Style::ITALIC) << Formatter::get(colour)
-                      << "Previously freed here:"
-                      << Formatter::clear(Style::ITALIC) << Formatter::clear(colour)
-                      << std::endl;
+            std::cerr << std::endl << Formatter::format<Style::ITALIC, colour>("Previously freed here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
         }

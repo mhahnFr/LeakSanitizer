@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BF0F132F29194783008F0FCD /* Formatter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAFADC428B4FDA40060076C /* Formatter.cpp */; };
 		BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */; };
 		BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */; };
 		BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */; };
@@ -43,7 +42,6 @@
 		BF72C3CD2885CB9E00C7AE5C /* LeakSani.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */; };
 		BF72C3CE2885CB9E00C7AE5C /* LeakSani.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */; };
 		BF72C3CF2885CB9E00C7AE5C /* leaksan.h in Headers */ = {isa = PBXBuildFile; fileRef = BF72C3CB2885CB9E00C7AE5C /* leaksan.h */; };
-		BFAFADC628B4FDA40060076C /* Formatter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAFADC428B4FDA40060076C /* Formatter.cpp */; };
 		BFAFADC728B4FDA40060076C /* Formatter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAFADC528B4FDA40060076C /* Formatter.hpp */; };
 		BFBF736528831FC200BC4208 /* MallocInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736328831FC200BC4208 /* MallocInfo.cpp */; };
 		BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
@@ -108,7 +106,6 @@
 		BF72C3CC2885CB9E00C7AE5C /* stdlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdlib.h; sourceTree = "<group>"; };
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
 		BF97EB5628831E5B00DAF1FE /* liblsan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblsan.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BFAFADC428B4FDA40060076C /* Formatter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Formatter.cpp; path = code/Formatter.cpp; sourceTree = SOURCE_ROOT; };
 		BFAFADC528B4FDA40060076C /* Formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Formatter.hpp; path = code/Formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
@@ -222,7 +219,6 @@
 				BFC52F912AB21E4D0025C1F1 /* allocator */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
-				BFAFADC428B4FDA40060076C /* Formatter.cpp */,
 				BFAFADC528B4FDA40060076C /* Formatter.hpp */,
 				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */,
@@ -428,7 +424,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF0F132F29194783008F0FCD /* Formatter.cpp in Sources */,
 				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
 				BFC530022AB21F180025C1F1 /* pageHeader.c in Sources */,
 				BFC530062AB21F180025C1F1 /* allocator.c in Sources */,
@@ -451,7 +446,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFAFADC628B4FDA40060076C /* Formatter.cpp in Sources */,
 				BF49A5D92899599300BC1FFD /* signalHandlers.cpp in Sources */,
 				BFC530012AB21F180025C1F1 /* pageHeader.c in Sources */,
 				BFC530052AB21F180025C1F1 /* allocator.c in Sources */,
