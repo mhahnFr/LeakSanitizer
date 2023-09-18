@@ -24,7 +24,6 @@
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
 #include "interpose.hpp"
-#include "allocator/allocator.h"
 #include "crashWarner/crash.hpp"
 #include "crashWarner/warn.hpp"
 
@@ -40,47 +39,57 @@ static bool __lsan_glibc = false;
 #endif
 
 auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
-    auto ret = __lsan_malloc(size);
+    auto ret = ::malloc(size);
     
-    if (ret != nullptr && !LSan::getIgnoreMalloc()) {
-        LSan::setIgnoreMalloc(true);
-        if (size == 0) {
-            if (!__lsan_invalidCrash || __lsan_glibc) {
-                warn("Invalid allocation of size 0", file, line, __builtin_return_address(0));
-            } else {
-                crash("Invalid allocation of size 0", file, line, __builtin_return_address(0));
+    if (ret != nullptr && inited) {
+        std::lock_guard lock(LSan::getInstance().getMutex());
+        if (!LSan::getIgnoreMalloc()) {
+            LSan::setIgnoreMalloc(true);
+            if (size == 0) {
+                if (!__lsan_invalidCrash || __lsan_glibc) {
+                    warn("Invalid allocation of size 0", file, line, __builtin_return_address(0));
+                } else {
+                    crash("Invalid allocation of size 0", file, line, __builtin_return_address(0));
+                }
             }
+            LSan::getInstance().addMalloc(MallocInfo(ret, size, file, line, __builtin_return_address(0)));
+            LSan::setIgnoreMalloc(false);
         }
-        LSan::getInstance().addMalloc(MallocInfo(ret, size, file, line, __builtin_return_address(0)));
-        LSan::setIgnoreMalloc(false);
     }
     return ret;
 }
 
 auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file, int line) -> void * {
-    auto ret = __lsan_calloc(objectSize, count);
+    auto ret = ::calloc(objectSize, count);
     
-    if (ret != nullptr && !LSan::getIgnoreMalloc()) {
-        LSan::setIgnoreMalloc(true);
-        if (objectSize * count == 0) {
-            if (!__lsan_invalidCrash || __lsan_glibc) {
-                warn("Invalid allocation of size 0", file, line, __builtin_return_address(0));
-            } else {
-                crash("Invalid allocation of size 0", file, line, __builtin_return_address(0));
+    if (ret != nullptr && inited) {
+        std::lock_guard lock(LSan::getInstance().getMutex());
+        if (!LSan::getIgnoreMalloc()) {
+            LSan::setIgnoreMalloc(true);
+            if (objectSize * count == 0) {
+                if (!__lsan_invalidCrash || __lsan_glibc) {
+                    warn("Invalid allocation of size 0", file, line, __builtin_return_address(0));
+                } else {
+                    crash("Invalid allocation of size 0", file, line, __builtin_return_address(0));
+                }
             }
+            LSan::getInstance().addMalloc(MallocInfo(ret, objectSize * count, file, line, __builtin_return_address(0)));
+            LSan::setIgnoreMalloc(false);
         }
-        LSan::getInstance().addMalloc(MallocInfo(ret, objectSize * count, file, line, __builtin_return_address(0)));
-        LSan::setIgnoreMalloc(false);
     }
     return ret;
 }
 
 auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int line) -> void * {
+    if (!inited) return ::realloc(pointer, size);
+    
+    std::lock_guard lock(LSan::getInstance().getMutex());
+    
     auto ignored = LSan::getIgnoreMalloc();
     if (!ignored) {
         LSan::setIgnoreMalloc(true);
     }
-    void * ptr = __lsan_realloc(pointer, size);
+    void * ptr = ::realloc(pointer, size);
     if (!ignored) {
         if (ptr != nullptr) {
             if (pointer != ptr) {
@@ -98,22 +107,26 @@ auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int lin
 }
 
 void __wrap_free(void * pointer, const char * file, int line) {
-    if (!LSan::getIgnoreMalloc()) {
-        LSan::setIgnoreMalloc(true);
-        if (pointer == nullptr && __lsan_freeNull) {
-            warn("Free of NULL", file, line, __builtin_return_address(0));
-        }
-        auto [removed, record] = LSan::getInstance().removeMalloc(pointer, __builtin_return_address(0));
-        if (__lsan_invalidFree && !removed) {
-            if (__lsan_invalidCrash) {
-                crash("Invalid free", record, __builtin_return_address(0));
-            } else {
-                warn("Invalid free", record, __builtin_return_address(0));
+    if (inited) {
+        std::lock_guard lock(LSan::getInstance().getMutex());
+        
+        if (!LSan::getIgnoreMalloc()) {
+            LSan::setIgnoreMalloc(true);
+            if (pointer == nullptr && __lsan_freeNull) {
+                warn("Free of NULL", file, line, __builtin_return_address(0));
             }
+            auto [removed, record] = LSan::getInstance().removeMalloc(pointer, __builtin_return_address(0));
+            if (__lsan_invalidFree && !removed) {
+                if (__lsan_invalidCrash) {
+                    crash("Invalid free", record, __builtin_return_address(0));
+                } else {
+                    warn("Invalid free", record, __builtin_return_address(0));
+                }
+            }
+            LSan::setIgnoreMalloc(false);
         }
-        LSan::setIgnoreMalloc(false);
     }
-    __lsan_free(pointer);
+    ::free(pointer);
 }
 
 [[ noreturn ]] void __wrap_exit(int code, const char * file, int line) {
@@ -162,7 +175,7 @@ auto malloc(std::size_t size) -> void * {
     return ptr;
 }
 
-auto calloc(std::size_t objectSize, std::size_t count) -> void * {
+auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What if calloc malloc's?
     auto ptr = ::calloc(objectSize, count);
     
     if (ptr != nullptr && inited) {
