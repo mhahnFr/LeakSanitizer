@@ -86,14 +86,12 @@ static inline void printer(const std::string & message,
                            void * omitAddress) {
     using Formatter::Style;
     
-    const auto colour = Warning ? Style::MAGENTA : Style::RED;
-    
-    std::cerr << Formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
-    MallocInfo::printCallstack(lcs::callstack(omitAddress), std::cerr);
-    std::cerr << std::endl;
+    printer<Warning>(message, omitAddress);
     
     if (info.has_value()) {
+        const auto   colour = Warning ? Style::MAGENTA : Style::RED;
         const auto & record = info.value().get();
+        
         std::cerr << Formatter::format<Style::ITALIC, colour>("Previously allocated here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
