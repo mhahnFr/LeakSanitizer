@@ -27,8 +27,8 @@ LIBCALLSTACK_DIR  = ./CallstackLibrary
 LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
 LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true'
 
-SRC   = $(shell find code -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
-SRC_C = $(shell find code -name \*.c \! -path $(LIBCALLSTACK_DIR)\*)
+SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
+SRC_C = $(shell find src -name \*.c \! -path $(LIBCALLSTACK_DIR)\*)
 OBJS  = $(patsubst %.cpp, %.o, $(SRC)) $(patsubst %.c, %.o, $(SRC_C))
 DEPS  = $(patsubst %.cpp, %.d, $(SRC)) $(patsubst %.c, %.d, $(SRC_C))
 
