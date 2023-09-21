@@ -53,25 +53,19 @@ static inline void __lsan_printStatsCore(const std::string & statsName, std::siz
                                          std::function<void (std::size_t, std::ostream &)> printBarBytes,
                                          std::function<void (std::size_t, std::ostream &)> printBarObjects) {
     using Formatter::Style;
-    out << Formatter::get(Style::ITALIC)
-        << "Stats of the " << statsName << " so far:"
-        << Formatter::clear(Style::ITALIC)
-        << std::endl;
+    out << Formatter::format<Style::ITALIC>("Stats of the " + statsName + " so far:") << std::endl;
     
     out << Formatter::clearAll()
         << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects."
-        << Formatter::clear(Style::ITALIC)
         << std::endl << std::endl;
     
-    out << Formatter::get(Style::BOLD)
-        << bytesToString(__lsan_getCurrentByteCount())
-        << Formatter::clear(Style::BOLD)
+    out << Formatter::format<Style::BOLD>(bytesToString(__lsan_getCurrentByteCount()))
         << " currently used, peek " << bytesToString(__lsan_getBytePeek()) << "." << std::endl;
     printBarBytes(width, out);
     
-    out << Formatter::get(Style::BOLD)
+    out << Formatter::get<Style::BOLD>
         << __lsan_getCurrentMallocCount() << " objects"
-        << Formatter::clear(Style::BOLD)
+        << Formatter::clear<Style::BOLD>
         << " currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl;
      printBarObjects(width, out);
 }
@@ -91,23 +85,20 @@ static inline void __lsan_printBar(std::size_t         current,
                                    const std::string & peekText,
                                    std::ostream &      out) {
     using Formatter::Style;
-    out << Formatter::get(Style::BOLD)
-        << "["
-        << Formatter::clear(Style::BOLD)
-        << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
+    
+    out << Formatter::format<Style::BOLD>("[")
+        << Formatter::get<Style::GREYED, Style::UNDERLINED>;
     
     std::size_t i;
     for (i = 0; i < (static_cast<float>(current) / peek) * width; ++i) {
-        out << Formatter::get(Style::BAR_FILLED);
+        out << Formatter::get<Style::BAR_FILLED>;
     }
     for (; i < width; ++i) {
-        out << Formatter::get(Style::BAR_EMPTY);
+        out << Formatter::get<Style::BAR_EMPTY>;
     }
-    out << Formatter::clear(Style::BOLD) << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
-        << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
-        << " of "
-        << Formatter::get(Style::BOLD) << peekText << Formatter::clear(Style::BOLD)
-        << " peek" << std::endl << std::endl;
+    out << Formatter::clear<Style::GREYED, Style::UNDERLINED>
+        << Formatter::format<Style::BOLD>("]") << " of " << Formatter::format<Style::BOLD>(peekText) << " peek"
+        << std::endl << std::endl;
 
 }
 
@@ -119,10 +110,9 @@ static inline void __lsan_printBar(std::size_t         current,
  */
 static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::ostream & out) {
     using Formatter::Style;
-    out << Formatter::get(Style::BOLD)
-        << "["
-        << Formatter::clear(Style::BOLD)
-        << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
+    
+    out << Formatter::format<Style::BOLD>("[")
+        << Formatter::get<Style::GREYED, Style::UNDERLINED>;
     
     const auto & infos = LSan::getInstance().getFragmentationInfos();
     std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
@@ -130,7 +120,8 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
     if (infos.size() < width) {
         const float step = static_cast<float>(width) / infos.size();
         for (; it != infos.cend(); ++it) {
-            const std::string fill = it->second.isDeleted() ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED);
+            const std::string fill = it->second.isDeleted() ? Formatter::get<Style::BAR_EMPTY>()
+                                                            : Formatter::get<Style::BAR_FILLED>();
             for (std::size_t i = 0; i < step; ++i) {
                 out << fill;
             }
@@ -166,29 +157,28 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
                                  :
                                     (fs < previousFs));
             if (!previousFilled && compare) {
-                out << Formatter::get(Style::BAR_FILLED);
+                out << Formatter::get<Style::BAR_FILLED>;
                 previousFilled = true;
             } else if (fs < step / 2.0f) {
                 if (previousFilled && fs > previousFs) {
-                    out << Formatter::get(Style::BAR_EMPTY);
+                    out << Formatter::get<Style::BAR_EMPTY>;
                     previousFilled = false;
                 } else {
-                    out << Formatter::get(Style::BAR_FILLED);
+                    out << Formatter::get<Style::BAR_FILLED>;
                     previousFilled = true;
                 }
             } else {
-                out << Formatter::get(Style::BAR_EMPTY);
+                out << Formatter::get<Style::BAR_EMPTY>;
                 previousFilled = false;
             }
             previousFs = fs;
             previousCorrected = corrected;
         }
     }
-    out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
-        << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
-        << " of "
-        << Formatter::get(Style::BOLD) << infos.size() << " objects"
-        << Formatter::clear(Style::BOLD) << " total" << std::endl << std::endl;
+    out << Formatter::clear<Style::GREYED, Style::UNDERLINED>
+        << Formatter::format<Style::BOLD>("]") << " of "
+        << Formatter::get<Style::BOLD> << infos.size() << " objects"
+        << Formatter::clear<Style::BOLD> << " total" << std::endl << std::endl;
 }
 
 /**
@@ -199,10 +189,9 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
  */
 static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostream & out) {
     using Formatter::Style;
-    out << Formatter::get(Style::BOLD)
-        << "["
-        << Formatter::clear(Style::BOLD)
-        << Formatter::get(Style::GREYED) << Formatter::get(Style::UNDERLINED);
+    
+    out << Formatter::format<Style::BOLD>("[")
+        << Formatter::get<Style::GREYED, Style::UNDERLINED>;
     
     const auto & infos = LSan::getInstance().getFragmentationInfos();
     std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
@@ -224,7 +213,8 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
                 currentBlockBegin = b;
                 currentBlockEnd   = currentBlockBegin + it->second.getSize();
             }
-            const std::string fill = it->second.isDeleted() ? Formatter::get(Style::BAR_EMPTY) : Formatter::get(Style::BAR_FILLED);
+            const std::string fill = it->second.isDeleted() ? Formatter::get<Style::BAR_EMPTY>()
+                                                            : Formatter::get<Style::BAR_FILLED>();
             for (std::size_t i = 0; i < step; ++i) {
                 out << fill;
             }
@@ -265,29 +255,28 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
                                  :
                                     (fs < previousFs));
             if (!previousFilled && compare) {
-                out << Formatter::get(Style::BAR_FILLED);
+                out << Formatter::get<Style::BAR_FILLED>;
                 previousFilled = true;
             } else if (fs < step / 2.0f) {
                 if (previousFilled && fs > previousFs) {
-                    out << Formatter::get(Style::BAR_EMPTY);
+                    out << Formatter::get<Style::BAR_EMPTY>;
                     previousFilled = false;
                 } else {
-                    out << Formatter::get(Style::BAR_FILLED);
+                    out << Formatter::get<Style::BAR_FILLED>;
                     previousFilled = true;
                 }
             } else {
-                out << Formatter::get(Style::BAR_EMPTY);
+                out << Formatter::get<Style::BAR_EMPTY>;
                 previousFilled = false;
             }
             previousFs = fs;
             previousCorrected = corrected;
         }
     }
-    out << Formatter::clear(Style::GREYED) << Formatter::clear(Style::UNDERLINED)
-        << Formatter::get(Style::BOLD) << "]" << Formatter::clear(Style::BOLD)
-        << " of "
-        << Formatter::get(Style::BOLD) << bytesToString(total)
-        << Formatter::clear(Style::BOLD) << " total" << std::endl << std::endl;
+    out << Formatter::clear<Style::GREYED, Style::UNDERLINED>
+        << Formatter::format<Style::BOLD>("]") << " of "
+        << Formatter::format<Style::BOLD>(bytesToString(total)) << " total"
+        << std::endl << std::endl;
 }
 
 void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
@@ -301,16 +290,15 @@ void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
                               __lsan_printFragmentationByteBar,
                               __lsan_printFragmentationObjectBar);
     } else {
-        out << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
-            << "No memory fragmentation stats available at the moment!" << std::endl
-            << Formatter::clear(Style::BOLD) << Formatter::get(Style::ITALIC)
-            << "Hint: Did you set "
-            << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
-            << "LSAN_STATS_ACTIVE (" << Formatter::get(Style::GREYED) << "__lsan_statsActive" << Formatter::clear(Style::GREYED) << ")"
-            << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
-            << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
-            << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"
-            << Formatter::clearAll() << std::endl << std::endl;
+        out << Formatter::get<Style::RED>
+            << Formatter::format<Style::BOLD>("No memory fragmentation stats available at the moment!")
+            << std::endl
+            << Formatter::format<Style::ITALIC>("Hint: Did you set ")
+            << Formatter::clear<Style::RED>
+            << "LSAN_STATS_ACTIVE (" << Formatter::format<Style::GREYED>("__lsan_statsActive") << ")"
+            << Formatter::format<Style::ITALIC, Style::RED>(" to ")
+            << "true" << Formatter::format<Style::RED, Style::ITALIC>("?")
+            << std::endl << std::endl;
     }
     if (!ignore) {
         LSan::setIgnoreMalloc(false);
@@ -328,16 +316,14 @@ void __lsan_printStatsWithWidth(std::size_t width) {
                               std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
                               std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
     } else {
-        out << Formatter::get(Style::BOLD) << Formatter::get(Style::RED)
-            << "No memory statistics available at the moment!" << std::endl
-            << Formatter::clear(Style::BOLD) << Formatter::get(Style::ITALIC)
-            << "Hint: Did you set "
-            << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
-            << "LSAN_STATS_ACTIVE (" << Formatter::get(Style::GREYED) << "__lsan_statsActive" << Formatter::clear(Style::GREYED) << ")"
-            << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED) << " to "
-            << Formatter::clear(Style::RED) << Formatter::clear(Style::ITALIC)
-            << "true" << Formatter::get(Style::RED) << Formatter::get(Style::ITALIC) << "?"
-            << Formatter::clearAll() << std::endl << std::endl;
+        out << Formatter::get<Style::RED>
+            << Formatter::format<Style::BOLD>("No memory statistics available at the moment!") << std::endl
+            << Formatter::format<Style::ITALIC>("Hint: Did you set ")
+            << Formatter::clear<Style::RED>
+            << "LSAN_STATS_ACTIVE (" << Formatter::format<Style::GREYED>("__lsan_statsActive") << ")"
+            << Formatter::format<Style::ITALIC, Style::RED>(" to ")
+            << "true" << Formatter::format<Style::RED, Style::ITALIC>("?")
+            << std::endl << std::endl;
     }
     if (!ignore) {
         LSan::setIgnoreMalloc(false);

@@ -20,6 +20,7 @@
 #ifndef warn_hpp
 #define warn_hpp
 
+#include <functional>
 #include <optional>
 #include <string>
 #include <utility>

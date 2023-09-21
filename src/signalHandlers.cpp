@@ -59,10 +59,8 @@ static std::string signalString(int signal) {
     std::string address = s.str();
 #endif
     using Formatter::Style;
-    crash(Formatter::get(Style::BOLD) + Formatter::get(Style::RED)
-          + signalString(signal)
-          + Formatter::clear(Style::RED) + Formatter::clear(Style::BOLD)
-          + " on address " + Formatter::get(Style::BOLD) + address + Formatter::clear(Style::BOLD), __builtin_return_address(0));
+    crash(Formatter::formatString<Style::BOLD, Style::RED>(signalString(signal))
+          + " on address " + Formatter::formatString<Style::BOLD>(address), __builtin_return_address(0));
 }
 
 void callstackSignal(int) {
@@ -72,9 +70,7 @@ void callstackSignal(int) {
     LSan::setIgnoreMalloc(true);
     
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << Formatter::get(Style::ITALIC)
-        << "The current callstack:"
-        << Formatter::clear(Style::ITALIC) << std::endl;
+    out << Formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
     
     MallocInfo::printCallstack(lcs::callstack(), out);
     out << std::endl;

@@ -126,6 +126,16 @@ extern bool __lsan_trackMemory;
 extern bool __lsan_statsActive;
 
 /**
+ * @brief If this value is set to `true`, a callstack of the exit point is printed
+ * upon regular termination.
+ *
+ * Defaults to `false`.
+ *
+ * @since 1.7
+ */
+extern bool __lsan_printExitPoint;
+
+/**
  * @brief This value defines the count of leaks that are printed at the exit of the program.
  *
  * If more leaks are detected, the first leaks are printed and a message about the truncation

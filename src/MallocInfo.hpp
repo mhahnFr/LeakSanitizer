@@ -71,7 +71,15 @@ public:
                       std::optional<const std::string> file,
                       std::optional<const int>         line,
                       const void *                     omitAddress = __builtin_return_address(0))
-        : pointer(pointer), size(size), createdInFile(file), createdOnLine(line), createdCallstack(omitAddress), deletedInFile(std::nullopt), deletedOnLine(std::nullopt), deleted(false), deletedCallstack(std::nullopt)
+        : pointer(pointer),
+          size(size),
+          createdInFile(file),
+          createdOnLine(line),
+          createdCallstack(omitAddress),
+          deletedInFile(std::nullopt),
+          deletedOnLine(std::nullopt),
+          deleted(false),
+          deletedCallstack(std::nullopt)
     {}
     
     /**

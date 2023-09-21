@@ -32,18 +32,16 @@ void MallocInfo::printCallstack(lcs::callstack & callstack, std::ostream & strea
     const std::size_t size = callstack_getFrameCount(callstack);
     std::size_t i;
     for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
-        stream << (i == 0 ? ("In: " + Formatter::clear(Style::ITALIC) + Formatter::get(Style::BOLD))
-                          : (Formatter::clear(Style::BOLD) + Formatter::get(Style::ITALIC) + "at: " + Formatter::clear(Style::ITALIC)));
+        stream << (i == 0 ? ("In: " + Formatter::clearString<Style::ITALIC>() + Formatter::getString<Style::BOLD>())
+                          : (Formatter::clearString<Style::BOLD>() + Formatter::formatString<Style::ITALIC>("at: ")));
         stream << (strings[i] == nullptr ? "<Unknown>" : strings[i]);
         if (i == 0) {
-            stream << Formatter::clear(Style::BOLD);
+            stream << Formatter::clear<Style::BOLD>;
         }
         stream << std::endl;
     }
     if (i < size) {
-        stream << std::endl << Formatter::get(Style::UNDERLINED) << Formatter::get(Style::ITALIC)
-               << "And " << size - i << " more lines..."
-               << Formatter::clear(Style::UNDERLINED) << Formatter::clear(Style::ITALIC) << std::endl;
+        stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more lines...") << std::endl;
         LSan::getInstance().setCallstackSizeExceeded(true);
     }
 }
@@ -51,13 +49,12 @@ void MallocInfo::printCallstack(lcs::callstack & callstack, std::ostream & strea
 auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
     using Formatter::Style;
     
-    stream << Formatter::get(Style::BOLD) << Formatter::get(Style::ITALIC) << Formatter::get(Style::RED)
-           << "Leak" << Formatter::clear(Style::RED) << Formatter::clear(Style::BOLD)
-           << " of size " << Formatter::clear(Style::ITALIC)
-           << bytesToString(self.size) << Formatter::get(Style::ITALIC) << ", ";
+    stream << Formatter::get<Style::ITALIC>
+           << Formatter::format<Style::BOLD, Style::RED>("Leak") << " of size "
+           << Formatter::clear<Style::ITALIC>
+           << bytesToString(self.size) << Formatter::get<Style::ITALIC> << ", ";
     if (self.createdInFile.has_value() && self.createdOnLine.has_value()) {
-        stream << "allocated at " << Formatter::get(Style::UNDERLINED)
-               << self.createdInFile.value() << ":" << self.createdOnLine.value() << Formatter::clear(Style::UNDERLINED);
+        stream << "allocated at " << Formatter::format<Style::UNDERLINED>(self.createdInFile.value() + ":" + std::to_string(self.createdOnLine.value()));
     } else {
         stream << "allocation stacktrace:";
     }

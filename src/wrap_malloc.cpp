@@ -118,10 +118,16 @@ void __wrap_free(void * pointer, const char * file, int line) {
     LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << std::endl
-        << Formatter::get(Style::GREEN) << "Exiting" << Formatter::clear(Style::GREEN) << " at "
-        << Formatter::get(Style::UNDERLINED) << file << ":" << line << Formatter::clear(Style::UNDERLINED)
-        << std::endl << std::endl
-        << LSan::getInstance() << std::endl;
+        << Formatter::format<Style::GREEN>("Exiting") << " at "
+        << Formatter::get<Style::UNDERLINED> << file << ":" << line << Formatter::clear<Style::UNDERLINED>
+        << std::endl;
+    
+    if (__lsan_printExitPoint) {
+        MallocInfo::printCallstack(lcs::callstack(__builtin_return_address(0)), out);
+        out << std::endl;
+    }
+    
+    out << std::endl << LSan::getInstance() << std::endl;
     if (__lsan_printStatsOnExit) {
         __lsan_printStats();
     }

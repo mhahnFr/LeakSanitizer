@@ -146,6 +146,8 @@ bool __lsan_statsActive      = getBool("LSAN_STATS_ACTIVE").value_or(false);
 
 bool __lsan_printStatsOnExit = getBool("LSAN_PRINT_STATS_ON_EXIT").value_or(false);
 
+bool __lsan_printExitPoint   = getBool("LSAN_PRINT_EXIT_POINT").value_or(false);
+
 std::size_t __lsan_leakCount     = getSize_t("LSAN_LEAK_COUNT").value_or(100);
 
 std::size_t __lsan_callstackSize = getSize_t("LSAN_CALLSTACK_SIZE").value_or(20);
