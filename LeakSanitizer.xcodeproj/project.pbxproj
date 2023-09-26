@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -75,7 +75,7 @@
 		BF72C3CB2885CB9E00C7AE5C /* leaksan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = leaksan.h; sourceTree = "<group>"; };
 		BF72C3CC2885CB9E00C7AE5C /* stdlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdlib.h; sourceTree = "<group>"; };
 		BF97EB5628831E5B00DAF1FE /* liblsan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblsan.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BFAFADC528B4FDA40060076C /* Formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Formatter.hpp; path = code/Formatter.hpp; sourceTree = SOURCE_ROOT; };
+		BFAFADC528B4FDA40060076C /* Formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Formatter.hpp; path = src/Formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
 		BFBF736728832C3300BC4208 /* wrap_malloc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wrap_malloc.cpp; sourceTree = "<group>"; };
@@ -149,7 +149,7 @@
 				BF5F19FC28B3F00600DAEDE7 /* README.md */,
 				BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */,
 				BF04B4B328F86EEA00051090 /* .gitignore */,
-				BF9DD3A428A6761400AEBC17 /* code */,
+				BF9DD3A428A6761400AEBC17 /* src */,
 				BF643E5C28A40C970080DB21 /* include */,
 				BF97EB5728831E5B00DAF1FE /* Products */,
 				BF378FB32919496000A4DAA9 /* Frameworks */,
@@ -165,7 +165,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BF9DD3A428A6761400AEBC17 /* code */ = {
+		BF9DD3A428A6761400AEBC17 /* src */ = {
 			isa = PBXGroup;
 			children = (
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
@@ -183,7 +183,7 @@
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
 				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
 			);
-			path = code;
+			path = src;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
