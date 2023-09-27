@@ -118,7 +118,7 @@ clean:
 
 fclean: clean
 	- $(RM) $(LIB_NAME) $(SHARED_L) $(DYLIB_NA)
-	- $(MAKE) -C $(LIBCALLSTACK_DIR) fclean
+	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) fclean
 
 re: fclean
 	$(MAKE) default
