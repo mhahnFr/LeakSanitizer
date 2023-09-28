@@ -44,11 +44,9 @@ class LSan {
     
     /// A map containing all allocation records, sorted by their allocated pointers.
     std::map<const void * const, MallocInfo> infos;
-    /// The mutex used to protect the principal map.
-//    std::recursive_mutex                     infoMutex;
     /// An object holding all statistics.
     Stats                                    stats;
-    /// Indicates whether the set callstack size had been exceeded during the printing.
+    /// Indicates whether the set callstack size has been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
     std::recursive_mutex                     mutex;
     
@@ -152,15 +150,6 @@ public:
     constexpr inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
         return infos;
     }
-    
-    /**
-     * Returns the mutex used to protect the global allocation container.
-     *
-     * @return the mutex
-     */
-//    constexpr inline auto getFragmentationInfoMutex() -> std::recursive_mutex & {
-//        return infoMutex;
-//    }
     
     /**
      * Sets whether the maximum callstack size has been exceeded during the printing.

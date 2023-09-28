@@ -49,8 +49,6 @@ LSan::LSan() {
 }
 
 auto LSan::removeMalloc(void * pointer, const void * omitAddress) -> MallocInfoRemoved {
-//    std::lock_guard lock(infoMutex);
-    
     auto it = infos.find(pointer);
     if (it == infos.end()) {
         return MallocInfoRemoved(false, std::nullopt);
@@ -67,8 +65,6 @@ auto LSan::removeMalloc(void * pointer, const void * omitAddress) -> MallocInfoR
 }
 
 auto LSan::changeMalloc(const MallocInfo & info) -> bool {
-//    std::lock_guard lock(infoMutex);
-    
     auto it = infos.find(info.getPointer());
     if (it == infos.end()) {
         return false;
@@ -87,8 +83,6 @@ auto LSan::changeMalloc(const MallocInfo & info) -> bool {
 }
 
 void LSan::addMalloc(MallocInfo && info) {
-//    std::lock_guard lock(infoMutex);
-    
     if (__lsan_statsActive) {
         stats += info;
     }
@@ -102,8 +96,6 @@ auto LSan::_getIgnoreMalloc() -> bool & {
 }
 
 auto LSan::getTotalAllocatedBytes() -> std::size_t {
-//    std::lock_guard lock(infoMutex);
-    
     std::size_t ret = 0;
     for (const auto & [ptr, info] : infos) {
         ret += info.getSize();
@@ -112,8 +104,6 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
 }
 
 auto LSan::getLeakCount() -> std::size_t {
-//    std::lock_guard lock(infoMutex);
-    
     if (__lsan_statsActive) {
         return static_cast<std::size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
             return !elem.second.isDeleted();
@@ -124,8 +114,6 @@ auto LSan::getLeakCount() -> std::size_t {
 }
 
 auto LSan::getTotalLeakedBytes() -> std::size_t {
-//    std::lock_guard lock(infoMutex);
-    
     std::size_t ret = 0;
     for (const auto & [ptr, info] : infos) {
         if (!info.isDeleted()) {
@@ -135,7 +123,7 @@ auto LSan::getTotalLeakedBytes() -> std::size_t {
     return ret;
 }
 
-void LSan::__exit_hook() { // Assume single-threaded
+void LSan::__exit_hook() {
     using Formatter::Style;
     
     setIgnoreMalloc(true);
@@ -194,8 +182,6 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard lock(self.mutex);
     
     if (self.infos.empty()) return stream;
-    
-//    std::lock_guard lock(self.infoMutex);
     
     stream << Formatter::get<Style::ITALIC>;
     const std::size_t totalLeaks = self.getLeakCount();
