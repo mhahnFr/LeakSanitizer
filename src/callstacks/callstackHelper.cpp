@@ -19,6 +19,8 @@
 
 #include "callstackHelper.hpp"
 
+#include "../Formatter.hpp"
+
 namespace callstackHelper {
 static inline auto isInLSan(const void * frame) -> bool {
     // TODO: Implement
@@ -54,6 +56,8 @@ auto originatesInFirstParty(lcs::callstack & callstack) -> bool {
             if (++firstPartyCount >= 5) {
                 return true;
             }
+        } else {
+            break;
         }
     }
     return false;
