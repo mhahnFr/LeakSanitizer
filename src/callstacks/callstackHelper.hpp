@@ -20,6 +20,7 @@
 #ifndef callstackHelper_hpp
 #define callstackHelper_hpp
 
+#include <ostream>
 #include <string>
 
 #include "../../CallstackLibrary/include/callstack.h"
@@ -30,6 +31,10 @@ auto isCallstackFirstParty(lcs::callstack & callstack) -> bool;
 auto originatesInFirstParty(lcs::callstack & callstack) -> bool;
 
 void format(lcs::callstack & callstack, std::ostream & stream);
+
+static inline void format(lcs::callstack && callstack, std::ostream & out) {
+    format(callstack, out);
+}
 }
 
 #endif /* callstackHelper_hpp */

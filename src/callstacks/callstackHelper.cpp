@@ -20,6 +20,7 @@
 #include "callstackHelper.hpp"
 
 #include "../Formatter.hpp"
+#include "../LeakSani.hpp"
 
 namespace callstackHelper {
 static inline auto isInLSan(const void * frame) -> bool {
@@ -63,7 +64,50 @@ auto originatesInFirstParty(lcs::callstack & callstack) -> bool {
     return false;
 }
 
+template<Formatter::Style S>
+static inline void formatShared(const struct callstack_frame & frame, std::ostream & out) {
+    using Formatter::Style;
+    
+    out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
+    if (frame.sourceFile != nullptr) {
+        out << " (" << Formatter::get<Style::GREYED, Style::UNDERLINED> << frame.sourceFile
+            << ":" << frame.sourceLine << Formatter::clear<Style::GREYED, Style::UNDERLINED>;
+        if (S == Style::GREYED || S == Style::BOLD) {
+            out << Formatter::get<S>;
+        }
+        out << ")";
+    }
+    out << Formatter::clear<S> << std::endl;
+}
+
 void format(lcs::callstack & callstack, std::ostream & stream) {
-    // TODO: Implement
+    using Formatter::Style;
+    
+    const auto frames = callstack_toArray(callstack);
+    const auto size   = callstack_getFrameCount(callstack);
+    
+    bool firstHit = true;
+    std::size_t i;
+    for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
+        if (isInLSan(callstack->backtrace[i])) {
+            continue;
+        } else if (firstHit && isFirstParty(frames[i]->binaryFile)) {
+            stream << Formatter::get<Style::GREYED>
+                   << Formatter::format<Style::ITALIC>(i == 0 ? "At: " : "at: ");
+            formatShared<Style::GREYED>(*frames[i], stream);
+        } else if (firstHit) {
+            firstHit = false;
+            stream << Formatter::get<Style::BOLD>
+                   << Formatter::format<Style::ITALIC>(i == 0 ? "In: " : "in: ");
+            formatShared<Style::BOLD>(*frames[i], stream);
+        } else {
+            stream << Formatter::format<Style::ITALIC>(i == 0 ? "At: " : "at: ");
+            formatShared<Style::NONE>(*frames[i], stream);
+        }
+    }
+    if (i < size) {
+        stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more lines...") << std::endl;
+        LSan::getInstance().setCallstackSizeExceeded(true);
+    }
 }
 }

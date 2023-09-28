@@ -48,7 +48,8 @@ enum class Style {
     /// Represents a filled element inside a bar.
     BAR_FILLED,
     /// Represents an empty element inside a bar.
-    BAR_EMPTY
+    BAR_EMPTY,
+    NONE
 };
     
 /**
