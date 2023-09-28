@@ -99,7 +99,7 @@ $(LIBCALLSTACK_A):
 
 clean:
 	- $(RM) $(OBJS) $(DEPS)
-	- $(MAKE) -C $(LIBCALLSTACK_DIR) clean
+	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) clean
 
 fclean: clean
 	- $(RM) $(SHARED_L) $(DYLIB_NA)
