@@ -37,9 +37,9 @@
  * @param omitAddress the address byond which frames are omitted from the generated callstack
  */
 void crash(const std::string & message,
-                          const std::string & file,
-                          const int           line,
-                                void *        omitAddress = __builtin_return_address(0));
+           const std::string & file,
+           const int           line,
+                 void *        omitAddress = __builtin_return_address(0));
 
 /**
  * Terminates the linked program and prints the given message and a callstack
@@ -59,8 +59,8 @@ void crash(const std::string & message, void * omitAddress = __builtin_return_ad
  * @param info the optional allocation record
  * @param omitAddress the address beyond which frames are omitted from the generated callstack
  */
-void crash(const std::string & message,
-                          std::optional<std::reference_wrapper<const MallocInfo>> info,
-                          void * omitAddress = __builtin_return_address(0));
+void crash(const std::string &                                     message,
+           std::optional<std::reference_wrapper<const MallocInfo>> info,
+           void *                                                  omitAddress = __builtin_return_address(0));
 
 #endif /* crash_hpp */

@@ -83,9 +83,9 @@ static inline void printer(const std::string & message,
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
-static inline void printer(const std::string & message,
+static inline void printer(const std::string &                                     message,
                            std::optional<std::reference_wrapper<const MallocInfo>> info,
-                           lcs::callstack & callstack) {
+                           lcs::callstack &                                        callstack) {
     using Formatter::Style;
     
     printer<Warning>(message, callstack);
