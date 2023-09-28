@@ -34,8 +34,8 @@ auto isCallstackFirstParty(lcs::callstack & callstack) -> bool {
     const auto frames = callstack_getBinaries(callstack);
     
     const auto frameCount = callstack_getFrameCount(callstack);
-    for (size_t i = 0; i < frameCount; ++i) {
-        if (!isFirstParty(frames[i]->binaryFile)) {
+    for (std::size_t i = 0; i < frameCount; ++i) {
+        if (!isInLSan(callstack->backtrace[i]) && !isFirstParty(frames[i]->binaryFile)) {
             return false;
         }
     }
@@ -43,7 +43,19 @@ auto isCallstackFirstParty(lcs::callstack & callstack) -> bool {
 }
 
 auto originatesInFirstParty(lcs::callstack & callstack) -> bool {
-    // TODO: Implement
+    const auto frames = callstack_getBinaries(callstack);
+    
+    const auto frameCount = callstack_getFrameCount(callstack);
+    std::size_t firstPartyCount = 0;
+    for (std::size_t i = 0; i < frameCount; ++i) {
+        if (isInLSan(callstack->backtrace[i])) {
+            continue;
+        } else if (isFirstParty(frames[i]->binaryFile)) {
+            if (++firstPartyCount >= 5) {
+                return true;
+            }
+        }
+    }
     return false;
 }
 
