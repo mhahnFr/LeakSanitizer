@@ -31,6 +31,8 @@
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
 
+#include "../CallstackLibrary/include/callstack_internals.h"
+
 LSan & LSan::getInstance() {
     static LSan * instance = new LSan();
     return *instance;
@@ -198,6 +200,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     stream << Formatter::get<Style::ITALIC>;
     const std::size_t totalLeaks = self.getLeakCount();
     stream << totalLeaks << " leaks total, " << bytesToString(self.getTotalLeakedBytes()) << " total" << std::endl << std::endl;
+    callstack_autoClearCaches = false;
     std::size_t i = 0;
     for (const auto & [ptr, leakInfo] : self.infos) {
         if (leakInfo.isDeleted()) continue;
@@ -222,5 +225,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         }
     }
     stream << Formatter::clear<Style::ITALIC>;
+    callstack_clearCaches();
+    callstack_autoClearCaches = true;
     return stream;
 }

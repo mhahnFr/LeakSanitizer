@@ -25,7 +25,7 @@ DYLIB_NA = $(CORE_NAME).dylib
 LIBCALLSTACK_NAME = libcallstack
 LIBCALLSTACK_DIR  = ./CallstackLibrary
 LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
-LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true'
+LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true' 'CXX_OPTIMIZED=true'
 
 SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
 SRC_C = $(shell find src -name \*.c \! -path $(LIBCALLSTACK_DIR)\*)
@@ -103,7 +103,7 @@ clean:
 
 fclean: clean
 	- $(RM) $(SHARED_L) $(DYLIB_NA)
-	- $(MAKE) -C $(LIBCALLSTACK_DIR) fclean
+	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) fclean
 
 re: fclean
 	$(MAKE) default
