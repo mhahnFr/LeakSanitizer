@@ -24,6 +24,7 @@
 #include "LeakSani.hpp"
 #include "Formatter.hpp"
 #include "interpose.hpp"
+#include "callstacks/callstackHelper.hpp"
 #include "crashWarner/crash.hpp"
 #include "crashWarner/warn.hpp"
 
@@ -140,7 +141,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
         << std::endl;
     
     if (__lsan_printExitPoint) {
-        MallocInfo::printCallstack(lcs::callstack(__builtin_return_address(0)), out);
+        callstackHelper::format(lcs::callstack(__builtin_return_address(0)), out);
         out << std::endl;
     }
     

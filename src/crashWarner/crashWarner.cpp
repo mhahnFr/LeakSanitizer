@@ -40,7 +40,7 @@ static inline void printer(const std::string & message, lcs::callstack & callsta
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
 
     std::cerr << Formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
-    MallocInfo::printCallstack(callstack, std::cerr);
+    callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
 }
 
@@ -68,7 +68,7 @@ static inline void printer(const std::string & message,
               << Formatter::get<Style::UNDERLINED> << file << ":" << line
               << Formatter::clear<Style::BOLD, Style::UNDERLINED>
               << std::endl;
-    MallocInfo::printCallstack(callstack, std::cerr);
+    callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
 }
 

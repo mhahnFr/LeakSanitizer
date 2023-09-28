@@ -20,9 +20,11 @@
 #include <iostream>
 
 #include "signalHandlers.hpp"
+
+#include "Formatter.hpp"
 #include "LeakSani.hpp"
 #include "MallocInfo.hpp"
-#include "Formatter.hpp"
+#include "callstacks/callstackHelper.hpp"
 #include "crashWarner/crash.hpp"
 
 #include "../include/lsan_internals.h"
@@ -73,7 +75,7 @@ void callstackSignal(int) {
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << Formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
     
-    MallocInfo::printCallstack(lcs::callstack(), out);
+    callstackHelper::format(lcs::callstack(), out);
     out << std::endl;
     if (!ignore) {
         LSan::setIgnoreMalloc(false);

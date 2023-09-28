@@ -25,6 +25,8 @@
 #include <string>
 #include <utility>
 
+#include "callstacks/callstackHelper.hpp"
+
 #include "../CallstackLibrary/include/callstack.h"
 
 /**
@@ -185,7 +187,7 @@ public:
      * @param out the output stream to print to
      */
     inline void printCreatedCallstack(std::ostream & out) const {
-        printCallstack(createdCallstack, out);
+        callstackHelper::format(createdCallstack, out);
     }
     /**
      * Prints the callstack where this allocation was deallocated.
@@ -198,7 +200,7 @@ public:
                                      "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");
         }
         
-        printCallstack(deletedCallstack.value(), out);
+        callstackHelper::format(deletedCallstack.value(), out);
     }
     
     /**

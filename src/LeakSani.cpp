@@ -27,6 +27,7 @@
 #include "Formatter.hpp"
 #include "bytePrinter.hpp"
 #include "signalHandlers.hpp"
+#include "callstacks/callstackHelper.hpp"
 
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"
@@ -132,7 +133,7 @@ void LSan::__exit_hook() {
     
     if (__lsan_printExitPoint) {
         out << Formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
-        MallocInfo::printCallstack(lcs::callstack(__builtin_return_address(0)), out);
+        callstackHelper::format(lcs::callstack(__builtin_return_address(0)), out);
     }
     out << std::endl << std::endl
         << getInstance() << std::endl;
