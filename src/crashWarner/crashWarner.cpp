@@ -24,22 +24,23 @@
 #include "crashWarner.h"
 
 #include "../Formatter.hpp"
+#include "../callstacks/callstackHelper.hpp"
 
 /**
  * Prints the given message and a callstack up to the provided omit address.
  *
  * @param message the message to be printed
- * @param omitAddress the address beyond which frames are omitted in the callstack
+ * @param callstack the callstack to be printed
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
-static inline void printer(const std::string & message, void * omitAddress) {
+static inline void printer(const std::string & message, lcs::callstack & callstack) {
     using Formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
 
     std::cerr << Formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
-    MallocInfo::printCallstack(lcs::callstack(omitAddress), std::cerr);
+    MallocInfo::printCallstack(callstack, std::cerr);
     std::cerr << std::endl;
 }
 
@@ -50,14 +51,14 @@ static inline void printer(const std::string & message, void * omitAddress) {
  * @param message the message to be printed
  * @param file the file name
  * @param line the line number
- * @param omitAddress the address beyond which frames are omitted in the callstack
+ * @param callstack the callstack to be printed
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
 static inline void printer(const std::string & message,
                            const std::string & file,
                            const int           line,
-                           const void *        omitAddress) {
+                           lcs::callstack &    callstack) {
     using Formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
@@ -67,7 +68,7 @@ static inline void printer(const std::string & message,
               << Formatter::get<Style::UNDERLINED> << file << ":" << line
               << Formatter::clear<Style::BOLD, Style::UNDERLINED>
               << std::endl;
-    MallocInfo::printCallstack(lcs::callstack(omitAddress), std::cerr);
+    MallocInfo::printCallstack(callstack, std::cerr);
     std::cerr << std::endl;
 }
 
@@ -78,16 +79,16 @@ static inline void printer(const std::string & message,
  *
  * @param message the message to be printed
  * @param info the optional allocation record
- * @param omitAddress the address beyond which frames are omitted in the callstack
+ * @param callstack the callstack to be printed
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
 static inline void printer(const std::string & message,
                            std::optional<std::reference_wrapper<const MallocInfo>> info,
-                           void * omitAddress) {
+                           lcs::callstack & callstack) {
     using Formatter::Style;
     
-    printer<Warning>(message, omitAddress);
+    printer<Warning>(message, callstack);
     
     if (info.has_value()) {
         const auto   colour = Warning ? Style::MAGENTA : Style::RED;
@@ -104,31 +105,55 @@ static inline void printer(const std::string & message,
     }
 }
 
+template<typename F>
+static inline void withCallstack(void * omitAddress, const F & function) {
+    auto callstack = lcs::callstack(omitAddress);
+    if (!callstackHelper::originatesInFirstParty(callstack)) {
+        function(callstack);
+    }
+}
+
 void warn(const std::string & message, void * omitAddress) {
-    printer<true>(message, omitAddress);
+    withCallstack(omitAddress, [&] (auto & callstack) {
+        printer<true>(message, callstack);
+    });
 }
 
 void warn(const std::string & message, const std::string & file, int line, void * omitAddress) {
-    printer<true>(message, file, line, omitAddress);
+    withCallstack(omitAddress, [&] (auto & callstack) {
+        printer<true>(message, file, line, callstack);
+    });
 }
 
-void warn(const std::string & message, std::optional<std::reference_wrapper<const MallocInfo>> info, void * omitAddress) {
-    printer<true>(message, info, omitAddress);
+void warn(const std::string &                                     message,
+          std::optional<std::reference_wrapper<const MallocInfo>> info,
+          void *                                                  omitAddress) {
+    withCallstack(omitAddress, [&] (auto & callstack) {
+        printer<true>(message, info, callstack);
+    });
 }
 
-[[ noreturn ]] void crash(const std::string & message, void * omitAddress) {
-    printer<false>(message, omitAddress);
-    std::terminate();
+void crash(const std::string & message, void * omitAddress) {
+    withCallstack(omitAddress, [&] (auto & callstack) {
+        printer<false>(message, callstack);
+        std::terminate();
+    });
 }
 
-[[ noreturn ]] void crash(const std::string & message, const std::string & file, int line, void * omitAddress) {
-    printer<false>(message, file, line, omitAddress);
-    std::terminate();
+void crash(const std::string & message, const std::string & file, int line, void * omitAddress) {
+    withCallstack(omitAddress, [&] (auto & callstack) {
+        printer<false>(message, file, line, callstack);
+        std::terminate();
+    });
 }
 
-[[ noreturn ]] void crash(const std::string & message, std::optional<std::reference_wrapper<const MallocInfo>> info, void * omitAddress) {
-    printer<false>(message, info, omitAddress);
-    std::terminate();
+void crash(const std::string &                                     message,
+           std::optional<std::reference_wrapper<const MallocInfo>> info,
+           void *                                                  omitAddress) {
+    withCallstack(omitAddress, [&] (auto & callstack) {
+        printer<false>(message, info, callstack);
+        std::terminate();
+    });
 }
 
 void __lsan_warn(const char * message) {
@@ -137,4 +162,5 @@ void __lsan_warn(const char * message) {
 
 void __lsan_crash(const char * message) {
     crash(message, __builtin_return_address(0));
+    std::terminate();
 }
