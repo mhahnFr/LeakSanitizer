@@ -21,6 +21,10 @@
 		BF23A2DF289ECE6A00B17349 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF23A2E2289ED24200B17349 /* Stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2E0289ED24200B17349 /* Stats.cpp */; };
 		BF23A2E3289ED24200B17349 /* Stats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2E1289ED24200B17349 /* Stats.hpp */; };
+		BF3204EE2AC5C614004EC77E /* callstackHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */; };
+		BF3204EF2AC5C614004EC77E /* callstackHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */; };
+		BF3204F02AC5C614004EC77E /* callstackHelper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */; };
+		BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */; };
 		BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2E1289ED24200B17349 /* Stats.hpp */; };
 		BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */; };
 		BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
@@ -88,6 +92,8 @@
 		BF23A2DD289ECE6A00B17349 /* lsan_stats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_stats.h; sourceTree = "<group>"; };
 		BF23A2E0289ED24200B17349 /* Stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Stats.cpp; sourceTree = "<group>"; };
 		BF23A2E1289ED24200B17349 /* Stats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Stats.hpp; sourceTree = "<group>"; };
+		BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = callstackHelper.cpp; sourceTree = "<group>"; };
+		BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = callstackHelper.hpp; sourceTree = "<group>"; };
 		BF34157C2A8405AD00DEEF10 /* deprecation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deprecation.h; sourceTree = "<group>"; };
 		BF378FB42919496000A4DAA9 /* libcallstack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcallstack.a; path = CallstackLibrary/libcallstack.a; sourceTree = "<group>"; };
 		BF4368F32AACF04700252E2A /* crashWarner.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crashWarner.cpp; sourceTree = "<group>"; };
@@ -153,6 +159,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BF3204F22AC5C625004EC77E /* callstacks */ = {
+			isa = PBXGroup;
+			children = (
+				BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */,
+				BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */,
+			);
+			path = callstacks;
+			sourceTree = "<group>";
+		};
 		BF378FB32919496000A4DAA9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -220,6 +235,7 @@
 		BF9DD3A428A6761400AEBC17 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BF3204F22AC5C625004EC77E /* callstacks */,
 				BFA41A3D2AB8BBBC00DF6FAC /* initialization */,
 				BFC52F912AB21E4D0025C1F1 /* allocator */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
@@ -318,6 +334,7 @@
 				BFC52FE62AB21F180025C1F1 /* zone.h in Headers */,
 				BF0F1350291947C0008F0FCD /* Formatter.hpp in Headers */,
 				BFC52FEC2AB21F180025C1F1 /* chunk.h in Headers */,
+				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
 				BFC52FE82AB21F180025C1F1 /* zone_large.h in Headers */,
 				BFC52FEE2AB21F180025C1F1 /* zone_medium.h in Headers */,
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
@@ -344,6 +361,7 @@
 				BFC52FE52AB21F180025C1F1 /* zone.h in Headers */,
 				BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */,
 				BFC52FEB2AB21F180025C1F1 /* chunk.h in Headers */,
+				BF3204F02AC5C614004EC77E /* callstackHelper.hpp in Headers */,
 				BFC52FE72AB21F180025C1F1 /* zone_large.h in Headers */,
 				BFC52FED2AB21F180025C1F1 /* zone_medium.h in Headers */,
 				BF72C3CD2885CB9E00C7AE5C /* LeakSani.hpp in Headers */,
@@ -451,6 +469,7 @@
 				BFC52FF82AB21F180025C1F1 /* zone.c in Sources */,
 				BF0F1347291947A2008F0FCD /* wrap_malloc.cpp in Sources */,
 				BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */,
+				BF3204EF2AC5C614004EC77E /* callstackHelper.cpp in Sources */,
 				BFA41A402AB8BC1800DF6FAC /* init.cpp in Sources */,
 				BF0F134D291947A8008F0FCD /* signalHandlers.cpp in Sources */,
 				BFC52FEA2AB21F180025C1F1 /* zone_large.c in Sources */,
@@ -474,6 +493,7 @@
 				BFC52FF72AB21F180025C1F1 /* zone.c in Sources */,
 				BF72C3CE2885CB9E00C7AE5C /* LeakSani.cpp in Sources */,
 				BF4368F42AACF04700252E2A /* crashWarner.cpp in Sources */,
+				BF3204EE2AC5C614004EC77E /* callstackHelper.cpp in Sources */,
 				BFA41A3F2AB8BC1800DF6FAC /* init.cpp in Sources */,
 				BFBF736828832C3300BC4208 /* wrap_malloc.cpp in Sources */,
 				BFC52FE92AB21F180025C1F1 /* zone_large.c in Sources */,
