@@ -20,14 +20,26 @@
 #include "callstackHelper.hpp"
 
 namespace callstackHelper {
+static inline auto isInLSan(const void * frame) -> bool {
+    // TODO: Implement
+    return false;
+}
+
 auto isFirstParty(const std::string & file) -> bool {
     // TODO: Implement
     return false;
 }
 
 auto isCallstackFirstParty(lcs::callstack & callstack) -> bool {
-    // TODO: Implement
-    return false;
+    const auto frames = callstack_getBinaries(callstack);
+    
+    const auto frameCount = callstack_getFrameCount(callstack);
+    for (size_t i = 0; i < frameCount; ++i) {
+        if (!isFirstParty(frames[i]->binaryFile)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 auto originatesInFirstParty(lcs::callstack & callstack) -> bool {
