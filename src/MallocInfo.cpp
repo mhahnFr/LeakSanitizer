@@ -25,35 +25,6 @@
 
 #include "../include/lsan_internals.h"
 
-void MallocInfo::printCallstack(lcs::callstack & callstack, std::ostream & stream) {
-    using Formatter::Style;
-    
-    const auto strings = callstack_toArray(callstack);
-    const auto size    = callstack_getFrameCount(callstack);
-    std::size_t i;
-    for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
-        stream << (i == 0 ? ("In: " + Formatter::clearString<Style::ITALIC>() + Formatter::getString<Style::BOLD>())
-                          : (Formatter::clearString<Style::BOLD>() + Formatter::formatString<Style::ITALIC>("at: ")));
-        stream << (strings[i]->function == nullptr ? "<Unknown>" : strings[i]->function);
-        if (strings[i]->sourceFile != nullptr) {
-            stream << " (" << Formatter::get<Style::GREYED, Style::UNDERLINED> << strings[i]->sourceFile
-                   << ":" << strings[i]->sourceLine << Formatter::clear<Style::GREYED, Style::UNDERLINED>;
-            if (i == 0) {
-                stream << Formatter::get<Style::BOLD>;
-            }
-            stream << ")";
-        }
-        if (i == 0) {
-            stream << Formatter::clear<Style::BOLD>;
-        }
-        stream << std::endl;
-    }
-    if (i < size) {
-        stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more lines...") << std::endl;
-        LSan::getInstance().setCallstackSizeExceeded(true);
-    }
-}
-
 auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
     using Formatter::Style;
     

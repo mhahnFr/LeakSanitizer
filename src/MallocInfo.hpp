@@ -219,23 +219,6 @@ public:
     constexpr inline auto getCreatedCallstack() const -> const lcs::callstack & {
         return createdCallstack;
     }
-
-    /**
-     * Prints the given callstack formatted on the given output stream.
-     *
-     * @param callstack the callstack to be printed
-     * @param out the output stream to print to
-     */
-    static void printCallstack(lcs::callstack & callstack,  std::ostream & out);
-    /**
-     * Prints the given callstack formatted on the given output stream.
-     *
-     * @param callstack the callstack to be printed
-     * @param out the output stream to print to
-     */
-    static inline void printCallstack(lcs::callstack && callstack, std::ostream & out) {
-        printCallstack(callstack, out);
-    }
     
     friend auto operator<<(std::ostream &, const MallocInfo &) -> std::ostream &;
 };
