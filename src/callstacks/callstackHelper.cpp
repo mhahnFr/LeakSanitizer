@@ -24,8 +24,6 @@
 #include "../Formatter.hpp"
 #include "../LeakSani.hpp"
 
-#include <dlfcn.h>
-
 namespace callstackHelper {
 static inline auto isInLSan(const std::string & name) -> bool {
     return LSan::getInstance().getLibName() == name;
