@@ -138,14 +138,16 @@ public:
      *
      * @return the total count of leaked bytes
      */
-    auto getTotalLeakedBytes() -> std::size_t;
+//    auto getTotalLeakedBytes() -> std::size_t;
     /**
      * Calculates and returns the count of allocation records stored in the principal list
      * that are not marked as deallocated.
      *
      * @return the total count of leaked objects
      */
-    auto getLeakCount() -> std::size_t;
+//    auto getLeakCount() -> std::size_t;
+    
+    auto getLeakNumbers(std::vector<std::reference_wrapper<const MallocInfo>> & buffer) -> std::pair<std::size_t, std::size_t>;
     
     /**
      * Returns the globally tracked allocations.

@@ -113,25 +113,39 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
     return ret;
 }
 
-auto LSan::getLeakCount() -> std::size_t {
-    if (__lsan_statsActive) {
-        return static_cast<std::size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
-            return !elem.second.isDeleted();
-        }));
-    } else {
-        return infos.size();
-    }
-}
-
-auto LSan::getTotalLeakedBytes() -> std::size_t {
-    std::size_t ret = 0;
-    for (const auto & [ptr, info] : infos) {
-        if (!info.isDeleted()) {
-            ret += info.getSize();
+auto LSan::getLeakNumbers(std::vector<std::reference_wrapper<const MallocInfo>> & buffer) -> std::pair<std::size_t, std::size_t> {
+    std::size_t count = 0,
+                bytes = 0;
+    __builtin_printf("Iteration #1\n");
+    for (auto & [ptr, info] : infos) {
+        if (!info.isDeleted() && !callstackHelper::originatesInFirstParty(info.getCreatedCallstack())) {
+            ++count;
+            bytes += info.getSize();
+            buffer.push_back(info);
         }
     }
-    return ret;
+    return std::make_pair(count, bytes);
 }
+
+//auto LSan::getLeakCount() -> std::size_t {
+//    if (__lsan_statsActive) {
+//        return static_cast<std::size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
+//            return !elem.second.isDeleted();
+//        }));
+//    } else {
+//        return infos.size();
+//    }
+//}
+//
+//auto LSan::getTotalLeakedBytes() -> std::size_t {
+//    std::size_t ret = 0;
+//    for (const auto & [ptr, info] : infos) {
+//        if (!info.isDeleted()) {
+//            ret += info.getSize();
+//        }
+//    }
+//    return ret;
+//}
 
 void LSan::__exit_hook() {
     using Formatter::Style;
@@ -191,16 +205,16 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     
     std::lock_guard lock(self.mutex);
     
-    if (self.infos.empty()) return stream;
+    std::vector<std::reference_wrapper<const MallocInfo>> leaks;
+    const auto & [count, bytes] = self.getLeakNumbers(leaks);
+    if (count == 0) return stream;
     
     stream << Formatter::get<Style::ITALIC>;
-    const std::size_t totalLeaks = self.getLeakCount();
-    stream << totalLeaks << " leaks total, " << bytesToString(self.getTotalLeakedBytes()) << " total" << std::endl << std::endl;
+    stream << count << " leaks total, " << bytesToString(bytes) << " total" << std::endl << std::endl;
     callstack_autoClearCaches = false;
     std::size_t i = 0;
-    for (const auto & [ptr, leakInfo] : self.infos) {
-        if (leakInfo.isDeleted()) continue;
-        
+    __builtin_printf("Iteration #2\n");
+    for (auto & leakInfo : leaks) {
         stream << leakInfo << std::endl;
         if (++i == __lsan_leakCount) {
             if (self.callstackSizeExceeded) {
@@ -212,7 +226,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                        << Formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
                 self.callstackSizeExceeded = false;
             }
-            stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(totalLeaks - i) + " more...") << std::endl << std::endl
+            stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(count - i) + " more...") << std::endl << std::endl
                    << "Hint:" << Formatter::format<Style::GREYED, Style::ITALIC>(" to see more, increase the value of ")
                    << "LSAN_LEAK_COUNT" << Formatter::get<Style::GREYED> << " (__lsan_leakCount)"
                    << Formatter::format<Style::ITALIC>(" (currently ") << Formatter::clear<Style::GREYED>

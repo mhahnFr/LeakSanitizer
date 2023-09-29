@@ -211,12 +211,18 @@ public:
     constexpr inline auto getDeletedCallstack() const -> const std::optional<lcs::callstack> & {
         return deletedCallstack;
     }
+    inline auto getDeletedCallstack() -> std::optional<lcs::callstack> {
+        return deletedCallstack;
+    }
     /**
      * Returns a reference to the callstack where this allocation was allocated.
      *
      * @return the callstack where the allocation happened
      */
     constexpr inline auto getCreatedCallstack() const -> const lcs::callstack & {
+        return createdCallstack;
+    }
+    inline auto getCreatedCallstack() -> lcs::callstack & {
         return createdCallstack;
     }
     
