@@ -100,24 +100,26 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     const auto frames = callstack_toArray(callstack);
     const auto size   = callstack_getFrameCount(callstack);
     
-    bool firstHit = true;
+    bool firstHit   = true,
+         firstPrint = true;
     std::size_t i;
     for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
         if (isInLSan(frames[i]->binaryFile)) {
             continue;
         } else if (firstHit && isFirstParty(frames[i]->binaryFile)) {
             stream << Formatter::get<Style::GREYED>
-                   << Formatter::format<Style::ITALIC>(i == 0 ? "At: " : "at: ");
+                   << Formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
             formatShared<Style::GREYED>(*frames[i], stream);
         } else if (firstHit) {
             firstHit = false;
             stream << Formatter::get<Style::BOLD>
-                   << Formatter::format<Style::ITALIC>(i == 0 ? "In: " : "in: ");
+                   << Formatter::format<Style::ITALIC>(firstPrint ? "In: " : "in: ");
             formatShared<Style::BOLD>(*frames[i], stream);
         } else {
-            stream << Formatter::format<Style::ITALIC>(i == 0 ? "At: " : "at: ");
+            stream << Formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
             formatShared<Style::NONE>(*frames[i], stream);
         }
+        firstPrint = false;
     }
     if (i < size) {
         stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more lines...") << std::endl;
