@@ -127,26 +127,6 @@ auto LSan::getLeakNumbers(std::vector<std::reference_wrapper<const MallocInfo>> 
     return std::make_pair(count, bytes);
 }
 
-//auto LSan::getLeakCount() -> std::size_t {
-//    if (__lsan_statsActive) {
-//        return static_cast<std::size_t>(std::count_if(infos.cbegin(), infos.cend(), [] (auto & elem) -> bool {
-//            return !elem.second.isDeleted();
-//        }));
-//    } else {
-//        return infos.size();
-//    }
-//}
-//
-//auto LSan::getTotalLeakedBytes() -> std::size_t {
-//    std::size_t ret = 0;
-//    for (const auto & [ptr, info] : infos) {
-//        if (!info.isDeleted()) {
-//            ret += info.getSize();
-//        }
-//    }
-//    return ret;
-//}
-
 void LSan::__exit_hook() {
     using Formatter::Style;
     
