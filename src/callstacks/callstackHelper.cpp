@@ -24,6 +24,8 @@
 #include "../Formatter.hpp"
 #include "../LeakSani.hpp"
 
+#include "../../include/lsan_internals.h"
+
 namespace callstackHelper {
 static inline auto isInLSan(const std::string & name) -> bool {
     return LSan::getInstance().getLibName() == name;
@@ -57,7 +59,7 @@ auto originatesInFirstParty(lcs::callstack & callstack) -> bool {
         if (isInLSan(frames[i]->binaryFile)) {
             continue;
         } else if (isFirstParty(frames[i]->binaryFile)) {
-            if (++firstPartyCount >= 5) {
+            if (++firstPartyCount >= __lsan_firstPartyThreshold) {
                 return true;
             }
         } else {

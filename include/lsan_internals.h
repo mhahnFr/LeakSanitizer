@@ -157,6 +157,8 @@ extern size_t __lsan_leakCount;
  */
 extern size_t __lsan_callstackSize;
 
+extern size_t __lsan_firstPartyThreshold;
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
