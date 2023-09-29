@@ -43,8 +43,10 @@ static inline auto isInLSan(const std::string & name) -> bool {
 }
 
 auto isFirstParty(const std::string & file) -> bool {
-    // TODO: Implement
-    return false;
+    // TODO: Platforms?
+    
+    return file.rfind("/usr/lib", 0) != std::string::npos
+        || file.rfind("/System", 0) != std::string::npos;
 }
 
 auto isCallstackFirstParty(lcs::callstack & callstack) -> bool {
