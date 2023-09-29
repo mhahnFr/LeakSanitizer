@@ -17,15 +17,29 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <optional>
+
 #include "callstackHelper.hpp"
 
 #include "../Formatter.hpp"
 #include "../LeakSani.hpp"
 
+#include <dlfcn.h>
+
 namespace callstackHelper {
-static inline auto isInLSan(const void * frame) -> bool {
-    // TODO: Implement
-    return false;
+static inline auto lsanName() -> std::optional<const std::string> {
+    Dl_info info;
+    if (!dladdr(reinterpret_cast<const void *>(&lsanName), &info)) {
+        return std::nullopt;
+    }
+    
+    return info.dli_fname;
+}
+
+static inline auto isInLSan(const std::string & name) -> bool {
+    static const auto selfName = lsanName();
+    
+    return selfName.has_value() && selfName.value() == name;
 }
 
 auto isFirstParty(const std::string & file) -> bool {
@@ -38,7 +52,7 @@ auto isCallstackFirstParty(lcs::callstack & callstack) -> bool {
     
     const auto frameCount = callstack_getFrameCount(callstack);
     for (std::size_t i = 0; i < frameCount; ++i) {
-        if (!isInLSan(callstack->backtrace[i]) && !isFirstParty(frames[i]->binaryFile)) {
+        if (!isInLSan(frames[i]->binaryFile) && !isFirstParty(frames[i]->binaryFile)) {
             return false;
         }
     }
@@ -51,7 +65,7 @@ auto originatesInFirstParty(lcs::callstack & callstack) -> bool {
     const auto frameCount = callstack_getFrameCount(callstack);
     std::size_t firstPartyCount = 0;
     for (std::size_t i = 0; i < frameCount; ++i) {
-        if (isInLSan(callstack->backtrace[i])) {
+        if (isInLSan(frames[i]->binaryFile)) {
             continue;
         } else if (isFirstParty(frames[i]->binaryFile)) {
             if (++firstPartyCount >= 5) {
@@ -89,7 +103,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     bool firstHit = true;
     std::size_t i;
     for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
-        if (isInLSan(callstack->backtrace[i])) {
+        if (isInLSan(frames[i]->binaryFile)) {
             continue;
         } else if (firstHit && isFirstParty(frames[i]->binaryFile)) {
             stream << Formatter::get<Style::GREYED>
