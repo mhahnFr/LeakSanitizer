@@ -49,6 +49,7 @@ class LSan {
     /// Indicates whether the set callstack size has been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
     std::recursive_mutex                     mutex;
+    const std::string libName;
     
     /**
      * Returns a reference to a boolean value indicating
@@ -69,6 +70,10 @@ public:
     LSan(const LSan &&)             = delete;
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
+    
+    constexpr inline auto getLibName() const -> const std::string & {
+        return libName;
+    }
     
     constexpr inline auto getMutex() -> std::recursive_mutex & {
         return mutex;

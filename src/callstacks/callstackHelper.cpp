@@ -27,19 +27,8 @@
 #include <dlfcn.h>
 
 namespace callstackHelper {
-static inline auto lsanName() -> std::optional<const std::string> {
-    Dl_info info;
-    if (!dladdr(reinterpret_cast<const void *>(&lsanName), &info)) {
-        return std::nullopt;
-    }
-    
-    return info.dli_fname;
-}
-
 static inline auto isInLSan(const std::string & name) -> bool {
-    static const auto selfName = lsanName();
-    
-    return selfName.has_value() && selfName.value() == name;
+    return LSan::getInstance().getLibName() == name;
 }
 
 auto isFirstParty(const std::string & file) -> bool {

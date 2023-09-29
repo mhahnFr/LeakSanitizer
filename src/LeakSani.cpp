@@ -39,7 +39,16 @@ LSan & LSan::getInstance() {
     return *instance;
 }
 
-LSan::LSan() {
+static inline auto lsanName() -> std::optional<const std::string> {
+    Dl_info info;
+    if (!dladdr(reinterpret_cast<const void *>(&lsanName), &info)) {
+        return std::nullopt;
+    }
+    
+    return info.dli_fname;
+}
+
+LSan::LSan(): libName(lsanName().value()) {
     atexit(reinterpret_cast<void (*)()>(__exit_hook));
     struct sigaction s{};
     s.sa_sigaction = crashHandler;
