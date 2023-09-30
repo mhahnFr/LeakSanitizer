@@ -129,8 +129,9 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
     }
     for (auto & [ptr, info] : infos) {
         if (__lsan_printFormatted) {
-            out << "\r                                \r"
-                << "Collecting the leaks: " << static_cast<double>(i) / total * 100 << " %";
+            const auto percent = static_cast<double>(i) / total * 100;
+            out << "\rCollecting the leaks: " << Formatter::get<Formatter::Style::BOLD>
+                << percent << Formatter::clear<Formatter::Style::BOLD> << " %   ";
         }
         
         if (!info.isDeleted() && !callstackHelper::originatesInFirstParty(info.getCreatedCallstack())) {
@@ -141,8 +142,7 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
         ++i;
     }
     if (__lsan_printFormatted) {
-        out << "\r                                \r"
-            << "\033[?25h" << std::setprecision(defaultPrecision);
+        out << "\r\033[?25h" << std::setprecision(defaultPrecision);
     }
     return std::make_tuple(count, bytes, buffer);
 }
