@@ -119,7 +119,7 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
     std::size_t count = 0,
                 bytes = 0,
                 i     = 0,
-                total = __lsan_statsActive ? stats.getCurrentMallocCount() : infos.size();
+                total = infos.size();
     
     auto & out = __lsan_printCout ? std::cout : std::cerr;
     const auto defaultPrecision = static_cast<int>(out.precision());
