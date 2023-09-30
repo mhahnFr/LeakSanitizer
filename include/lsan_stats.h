@@ -32,10 +32,13 @@ extern "C" {
 #include <stdbool.h>
 
 /**
+ * @deprecated Since v1.7 this option is no longer supported. Will be removed in v2.
+ *
  * @brief Defaults to `false`.
  *
  * Setting it to `true` will cause this sanitizer to print the statistics upon normal termination of the program.
  */
+DEPRECATED("Since version 1.7 this is no longer supported.")
 extern bool __lsan_printStatsOnExit;
 
 /**
