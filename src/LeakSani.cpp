@@ -116,7 +116,6 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
 auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>> {
     std::size_t count = 0,
                 bytes = 0;
-    __builtin_printf("Iteration #1\n");
     std::forward_list<std::reference_wrapper<const MallocInfo>> buffer;
     for (auto & [ptr, info] : infos) {
         if (!info.isDeleted() && !callstackHelper::originatesInFirstParty(info.getCreatedCallstack())) {
@@ -193,7 +192,6 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     stream << count << " leaks total, " << bytesToString(bytes) << " total" << std::endl << std::endl;
     callstack_autoClearCaches = false;
     std::size_t i = 0;
-    __builtin_printf("Iteration #2\n");
     for (auto & leakInfo : leaks) {
         stream << leakInfo << std::endl;
         if (++i == __lsan_leakCount) {
