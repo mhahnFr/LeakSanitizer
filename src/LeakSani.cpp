@@ -113,18 +113,19 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
     return ret;
 }
 
-auto LSan::getLeakNumbers(std::vector<std::reference_wrapper<const MallocInfo>> & buffer) -> std::pair<std::size_t, std::size_t> {
+auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>> {
     std::size_t count = 0,
                 bytes = 0;
     __builtin_printf("Iteration #1\n");
+    std::forward_list<std::reference_wrapper<const MallocInfo>> buffer;
     for (auto & [ptr, info] : infos) {
         if (!info.isDeleted() && !callstackHelper::originatesInFirstParty(info.getCreatedCallstack())) {
             ++count;
             bytes += info.getSize();
-            buffer.push_back(info);
+            buffer.push_front(info);
         }
     }
-    return std::make_pair(count, bytes);
+    return std::make_tuple(count, bytes, buffer);
 }
 
 void LSan::__exit_hook() {
@@ -185,8 +186,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     
     std::lock_guard lock(self.mutex);
     
-    std::vector<std::reference_wrapper<const MallocInfo>> leaks;
-    const auto & [count, bytes] = self.getLeakNumbers(leaks);
+    const auto & [count, bytes, leaks] = self.getLeakNumbers();
     if (count == 0) return stream;
     
     stream << Formatter::get<Style::ITALIC>;

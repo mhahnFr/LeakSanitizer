@@ -26,6 +26,7 @@
 #include <ostream>
 #include <utility>
 #include <vector>
+#include <forward_list>
 
 #include "MallocInfo.hpp"
 
@@ -133,7 +134,7 @@ public:
      */
     auto getTotalAllocatedBytes() -> std::size_t;
     
-    auto getLeakNumbers(std::vector<std::reference_wrapper<const MallocInfo>> & buffer) -> std::pair<std::size_t, std::size_t>;
+    auto getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>>;
     
     /**
      * Returns the globally tracked allocations.
