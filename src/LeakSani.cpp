@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 
 #include "LeakSani.hpp"
 
@@ -114,15 +115,34 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
 }
 
 auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>> {
-    std::size_t count = 0,
-                bytes = 0;
     std::forward_list<std::reference_wrapper<const MallocInfo>> buffer;
+    std::size_t count = 0,
+                bytes = 0,
+                i     = 0,
+                total = __lsan_statsActive ? stats.getCurrentMallocCount() : infos.size();
+    
+    auto & out = __lsan_printCout ? std::cout : std::cerr;
+    const auto defaultPrecision = static_cast<int>(out.precision());
+    if (__lsan_printFormatted) {
+        out << std::setprecision(4) << "\033[?25l";
+        // TODO: Interrupt handler
+    }
     for (auto & [ptr, info] : infos) {
+        if (__lsan_printFormatted) {
+            out << "\r                                \r"
+                << "Collecting the leaks: " << static_cast<double>(i) / total * 100 << " %";
+        }
+        
         if (!info.isDeleted() && !callstackHelper::originatesInFirstParty(info.getCreatedCallstack())) {
             ++count;
             bytes += info.getSize();
             buffer.push_front(info);
         }
+        ++i;
+    }
+    if (__lsan_printFormatted) {
+        out << "\r                                \r"
+            << "\033[?25h" << std::setprecision(defaultPrecision);
     }
     return std::make_tuple(count, bytes, buffer);
 }
