@@ -149,6 +149,7 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
     }
     if (__lsan_printFormatted) {
         out << "\r\033[?25h" << std::setprecision(defaultPrecision);
+        out << "                                    \r";
         std::signal(SIGINT, SIG_DFL);
         std::signal(SIGTERM, SIG_DFL);
     }
