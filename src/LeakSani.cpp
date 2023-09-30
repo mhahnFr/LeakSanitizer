@@ -114,6 +114,11 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
     return ret;
 }
 
+static inline void resetCursorSignal(int signal) {
+    (__lsan_printCout ? std::cout : std::cerr) << "\033[?25h";
+    std::_Exit(signal);
+}
+
 auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>> {
     std::forward_list<std::reference_wrapper<const MallocInfo>> buffer;
     std::size_t count = 0,
@@ -125,7 +130,8 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
     const auto defaultPrecision = static_cast<int>(out.precision());
     if (__lsan_printFormatted) {
         out << std::setprecision(4) << "\033[?25l";
-        // TODO: Interrupt handler
+        std::signal(SIGINT, resetCursorSignal);
+        std::signal(SIGTERM, resetCursorSignal);
     }
     for (auto & [ptr, info] : infos) {
         if (__lsan_printFormatted) {
@@ -143,6 +149,8 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
     }
     if (__lsan_printFormatted) {
         out << "\r\033[?25h" << std::setprecision(defaultPrecision);
+        std::signal(SIGINT, SIG_DFL);
+        std::signal(SIGTERM, SIG_DFL);
     }
     return std::make_tuple(count, bytes, buffer);
 }
