@@ -169,9 +169,6 @@ void LSan::__exit_hook() {
     }
     out << std::endl << std::endl
         << getInstance() << std::endl;
-    if (__lsan_printStatsOnExit) {
-        __lsan_printStats();
-    }
     printInformations();
     internalCleanUp();
 }

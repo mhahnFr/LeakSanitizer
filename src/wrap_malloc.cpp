@@ -146,9 +146,6 @@ void __wrap_free(void * pointer, const char * file, int line) {
     }
     
     out << std::endl << LSan::getInstance() << std::endl;
-    if (__lsan_printStatsOnExit) {
-        __lsan_printStats();
-    }
     LSan::printInformations();
     internalCleanUp();
     _Exit(code);
