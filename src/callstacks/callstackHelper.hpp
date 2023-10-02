@@ -33,10 +33,6 @@ enum class CallstackType {
     USER
 };
 
-auto isFirstParty(const std::string & file) -> bool;
-auto isCallstackFirstParty(lcs::callstack & callstack) -> bool;
-auto originatesInFirstParty(lcs::callstack & callstack) -> bool;
-
 auto getCallstackType(lcs::callstack & callstack) -> CallstackType;
 
 void format(lcs::callstack & callstack, std::ostream & stream);

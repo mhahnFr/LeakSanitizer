@@ -37,7 +37,7 @@ static inline auto isTotallyIgnored(const std::string & file) -> bool {
         || file.rfind("/usr/lib/swift", 0) != std::string::npos;
 }
 
-auto isFirstParty(const std::string & file) -> bool {
+static inline auto isFirstParty(const std::string & file) -> bool {
     // TODO: Platforms?
     
     return file.rfind("/usr/lib", 0) != std::string::npos
@@ -64,43 +64,6 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
         }
     }
     return CallstackType::FIRST_PARTY;
-}
-
-auto isCallstackFirstParty(lcs::callstack & callstack) -> bool {
-    const auto frames = callstack_getBinaries(callstack);
-    
-    const auto frameCount = callstack_getFrameCount(callstack);
-    for (std::size_t i = 0; i < frameCount; ++i) {
-        const auto binaryFile = frames[i]->binaryFile;
-        
-        if (isInLSan(binaryFile)) {
-            continue;
-        } else if (isTotallyIgnored(binaryFile)) {
-            return true;
-        } else if (!isFirstParty(binaryFile)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto originatesInFirstParty(lcs::callstack & callstack) -> bool {
-    const auto frames = callstack_getBinaries(callstack);
-    
-    const auto frameCount = callstack_getFrameCount(callstack);
-    std::size_t firstPartyCount = 0;
-    for (std::size_t i = 0; i < frameCount; ++i) {
-        if (isInLSan(frames[i]->binaryFile)) {
-            continue;
-        } else if (isFirstParty(frames[i]->binaryFile)) {
-            if (++firstPartyCount >= __lsan_firstPartyThreshold) {
-                return true;
-            }
-        } else {
-            break;
-        }
-    }
-    return false;
 }
 
 template<Formatter::Style S>
