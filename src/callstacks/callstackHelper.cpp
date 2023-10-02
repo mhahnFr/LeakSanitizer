@@ -31,6 +31,12 @@ static inline auto isInLSan(const std::string & name) -> bool {
     return LSan::getInstance().getLibName() == name;
 }
 
+static inline auto isTotallyIgnored(const std::string & file) -> bool {
+    // So far totally ignored: Everything Objective-C and Swift (using ARC -> no leak).
+    return file.find("libobjc.A.dylib") != std::string::npos
+        || file.rfind("/usr/lib/swift", 0) != std::string::npos;
+}
+
 auto isFirstParty(const std::string & file) -> bool {
     // TODO: Platforms?
     
@@ -43,7 +49,13 @@ auto isCallstackFirstParty(lcs::callstack & callstack) -> bool {
     
     const auto frameCount = callstack_getFrameCount(callstack);
     for (std::size_t i = 0; i < frameCount; ++i) {
-        if (!isInLSan(frames[i]->binaryFile) && !isFirstParty(frames[i]->binaryFile)) {
+        const auto binaryFile = frames[i]->binaryFile;
+        
+        if (isInLSan(binaryFile)) {
+            continue;
+        } else if (isTotallyIgnored(binaryFile)) {
+            return true;
+        } else if (!isFirstParty(binaryFile)) {
             return false;
         }
     }
