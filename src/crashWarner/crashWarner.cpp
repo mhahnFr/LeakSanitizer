@@ -108,7 +108,7 @@ static inline void printer(const std::string &                                  
 template<typename F>
 static inline void withCallstack(void * omitAddress, const F & function) {
     auto callstack = lcs::callstack(omitAddress);
-    if (!callstackHelper::originatesInFirstParty(callstack)) {
+    if (callstackHelper::getCallstackType(callstack) == callstackHelper::CallstackType::USER) {
         function(callstack);
     }
 }
