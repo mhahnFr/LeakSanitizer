@@ -52,7 +52,7 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
     for (std::size_t i = 0; i < frameCount; ++i) {
         const auto binaryFile = frames[i]->binaryFile;
         
-        if (isInLSan(binaryFile)) continue;
+        if (binaryFile == nullptr || isInLSan(binaryFile)) continue;
         
         if (isTotallyIgnored(binaryFile)) return CallstackType::HARD_IGNORE;
         if (isFirstParty(binaryFile)) {
@@ -92,9 +92,11 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
          firstPrint = true;
     std::size_t i;
     for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
-        if (isInLSan(frames[i]->binaryFile)) {
+        const auto binaryFile = frames[i]->binaryFile;
+        
+        if (binaryFile == nullptr || isInLSan(binaryFile)) {
             continue;
-        } else if (firstHit && isFirstParty(frames[i]->binaryFile)) {
+        } else if (firstHit && isFirstParty(binaryFile)) {
             stream << Formatter::get<Style::GREYED>
                    << Formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
             formatShared<Style::GREYED>(*frames[i], stream);
