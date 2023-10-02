@@ -52,10 +52,11 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
     for (std::size_t i = 0; i < frameCount; ++i) {
         const auto binaryFile = frames[i]->binaryFile;
         
-        if (binaryFile == nullptr || isInLSan(binaryFile)) continue;
-        
-        if (isTotallyIgnored(binaryFile)) return CallstackType::HARD_IGNORE;
-        if (isFirstParty(binaryFile)) {
+        if (binaryFile == nullptr || isInLSan(binaryFile)) {
+            continue;
+        } else if (isTotallyIgnored(binaryFile)) {
+            return CallstackType::HARD_IGNORE;
+        } else if (isFirstParty(binaryFile)) {
             if (++firstPartyCount >= __lsan_firstPartyThreshold) {
                 return CallstackType::FIRST_PARTY_ORIGIN;
             }
