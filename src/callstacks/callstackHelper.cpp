@@ -44,6 +44,28 @@ auto isFirstParty(const std::string & file) -> bool {
         || file.rfind("/System", 0) != std::string::npos;
 }
 
+auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
+    const auto frames = callstack_getBinaries(callstack);
+    
+    std::size_t firstPartyCount = 0;
+    const auto frameCount = callstack_getFrameCount(callstack);
+    for (std::size_t i = 0; i < frameCount; ++i) {
+        const auto binaryFile = frames[i]->binaryFile;
+        
+        if (isInLSan(binaryFile)) continue;
+        
+        if (isTotallyIgnored(binaryFile)) return CallstackType::HARD_IGNORE;
+        if (isFirstParty(binaryFile)) {
+            if (++firstPartyCount >= __lsan_firstPartyThreshold) {
+                return CallstackType::FIRST_PARTY_ORIGIN;
+            }
+        } else {
+            return CallstackType::USER;
+        }
+    }
+    return CallstackType::FIRST_PARTY;
+}
+
 auto isCallstackFirstParty(lcs::callstack & callstack) -> bool {
     const auto frames = callstack_getBinaries(callstack);
     

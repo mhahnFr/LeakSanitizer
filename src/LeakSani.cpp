@@ -140,9 +140,7 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
                 << percent << Formatter::clear<Formatter::Style::BOLD> << " %   ";
         }
         
-        if (!info.isDeleted()
-            && !callstackHelper::originatesInFirstParty(info.getCreatedCallstack())
-            && !callstackHelper::isCallstackFirstParty(info.getCreatedCallstack())) {
+        if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
             ++count;
             bytes += info.getSize();
             buffer.push_front(info);

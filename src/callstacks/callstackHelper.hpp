@@ -26,9 +26,18 @@
 #include "../../CallstackLibrary/include/callstack.h"
 
 namespace callstackHelper {
+enum class CallstackType {
+    HARD_IGNORE,
+    FIRST_PARTY,
+    FIRST_PARTY_ORIGIN,
+    USER
+};
+
 auto isFirstParty(const std::string & file) -> bool;
 auto isCallstackFirstParty(lcs::callstack & callstack) -> bool;
 auto originatesInFirstParty(lcs::callstack & callstack) -> bool;
+
+auto getCallstackType(lcs::callstack & callstack) -> CallstackType;
 
 void format(lcs::callstack & callstack, std::ostream & stream);
 
