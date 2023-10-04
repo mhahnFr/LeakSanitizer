@@ -57,7 +57,7 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
         } else if (isTotallyIgnored(binaryFile)) {
             return CallstackType::HARD_IGNORE;
         } else if (isFirstParty(binaryFile)) {
-            if (++firstPartyCount >= __lsan_firstPartyThreshold) {
+            if (++firstPartyCount > __lsan_firstPartyThreshold) {
                 return CallstackType::FIRST_PARTY_ORIGIN;
             }
         } else {
