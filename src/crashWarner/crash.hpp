@@ -50,6 +50,8 @@ void crash(const std::string & message,
  */
 void crash(const std::string & message, void * omitAddress = __builtin_return_address(0));
 
+void crashForce(const std::string & message, void * omitAddress = __builtin_return_address(0));
+
 /**
  * Terminates the linked program and prints the given message, the information
  * provided by the optional allocation record and a callstack up to the given omitting

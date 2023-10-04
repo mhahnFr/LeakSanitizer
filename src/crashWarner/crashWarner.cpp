@@ -44,6 +44,11 @@ static inline void printer(const std::string & message, lcs::callstack & callsta
     std::cerr << std::endl;
 }
 
+template<bool Warning>
+static inline void printer(const std::string & message, lcs::callstack && callstack) {
+    printer<Warning>(message, callstack);
+}
+
 /**
  * Prints the given message, the file with line number and a callstack up to+
  * the provided omit address.
@@ -138,6 +143,11 @@ void crash(const std::string & message, void * omitAddress) {
         printer<false>(message, callstack);
         std::terminate();
     });
+}
+
+void crashForce(const std::string & message, void * omitAddress) {
+    printer<false>(message, lcs::callstack(omitAddress));
+    std::terminate();
 }
 
 void crash(const std::string & message, const std::string & file, int line, void * omitAddress) {

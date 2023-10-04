@@ -61,7 +61,7 @@ static std::string signalString(int signal) {
     std::string address = s.str();
 #endif
     using Formatter::Style;
-    crash(Formatter::formatString<Style::BOLD, Style::RED>(signalString(signal))
+    crashForce(Formatter::formatString<Style::BOLD, Style::RED>(signalString(signal))
           + " on address " + Formatter::formatString<Style::BOLD>(address), __builtin_return_address(0));
     std::terminate();
 }
