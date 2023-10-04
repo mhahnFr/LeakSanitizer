@@ -129,7 +129,7 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
     auto & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_printFormatted) {
         out << "\033[?25l";
-        std::signal(SIGINT, resetCursorSignal);
+        std::signal(SIGINT,  resetCursorSignal);
         std::signal(SIGTERM, resetCursorSignal);
     }
     for (auto & [ptr, info] : infos) {
@@ -148,7 +148,7 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
     }
     if (__lsan_printFormatted) {
         out << "\r\033[?25h                                    \r";
-        std::signal(SIGINT, SIG_DFL);
+        std::signal(SIGINT,  SIG_DFL);
         std::signal(SIGTERM, SIG_DFL);
     }
     return std::make_tuple(count, bytes, buffer);
