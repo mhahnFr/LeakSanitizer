@@ -83,7 +83,7 @@ uninstall:
 	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -name \*.h))
 
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
-	$(CXX) -shared -fPIC $(LDFLAGS) -o $(SHARED_L) $(OBJS)
+	$(CXX) -shared -fPIC $(OBJS) $(LDFLAGS) -o $(SHARED_L)
 
 $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
