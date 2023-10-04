@@ -206,6 +206,17 @@ void LSan::printWebsite() {
         << std::endl << std::endl;
 }
 
+static inline void printCallstackSizeExceeded(std::ostream & stream) {
+    using Formatter::Style;
+    
+    stream << "Hint:" << Formatter::get<Style::GREYED>
+           << Formatter::format<Style::ITALIC>(" to see longer callstacks, increase the value of ")
+           << Formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << Formatter::get<Style::GREYED>
+           << " (__lsan_callstackSize)" << Formatter::format<Style::ITALIC>(" (currently ")
+           << Formatter::clear<Style::GREYED> << __lsan_callstackSize
+           << Formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
+}
+
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     using Formatter::Style;
     
@@ -219,15 +230,9 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     callstack_autoClearCaches = false;
     std::size_t i = 0;
     for (auto & leakInfo : leaks) {
-        stream << leakInfo << std::endl;
-        if (++i == __lsan_leakCount) {
+        if (i + 1 > __lsan_leakCount) {
             if (self.callstackSizeExceeded) {
-                stream << "Hint:" << Formatter::get<Style::GREYED>
-                       << Formatter::format<Style::ITALIC>(" to see longer callstacks, increase the value of ")
-                       << Formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << Formatter::get<Style::GREYED>
-                       << " (__lsan_callstackSize)" << Formatter::format<Style::ITALIC>(" (currently ")
-                       << Formatter::clear<Style::GREYED> << __lsan_callstackSize
-                       << Formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
+                printCallstackSizeExceeded(stream);
                 self.callstackSizeExceeded = false;
             }
             stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(count - i) + " more...") << std::endl << std::endl
@@ -237,6 +242,12 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                    << __lsan_leakCount << Formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
             break;
         }
+        stream << leakInfo << std::endl;
+        ++i;
+    }
+    if (self.callstackSizeExceeded) {
+        printCallstackSizeExceeded(stream);
+        self.callstackSizeExceeded = false;
     }
     stream << Formatter::clear<Style::ITALIC>;
     callstack_clearCaches();
