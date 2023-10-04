@@ -127,17 +127,16 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
                 total = infos.size();
     
     auto & out = __lsan_printCout ? std::cout : std::cerr;
-    const auto defaultPrecision = static_cast<int>(out.precision());
     if (__lsan_printFormatted) {
-        out << std::setprecision(4) << "\033[?25l";
+        out << "\033[?25l";
         std::signal(SIGINT, resetCursorSignal);
         std::signal(SIGTERM, resetCursorSignal);
     }
     for (auto & [ptr, info] : infos) {
         if (__lsan_printFormatted) {
-            const auto percent = static_cast<double>(i) / total * 100;
-            out << "\rCollecting the leaks: " << Formatter::get<Formatter::Style::BOLD>
-                << percent << Formatter::clear<Formatter::Style::BOLD> << " %   ";
+            char buffer[6] {};
+            std::snprintf(buffer, 6, "%05.2f", static_cast<double>(i) / total * 100);
+            out << "\rCollecting the leaks: " << Formatter::format<Formatter::Style::BOLD>(buffer) << " %";
         }
         
         if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
@@ -148,8 +147,7 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
         ++i;
     }
     if (__lsan_printFormatted) {
-        out << "\r\033[?25h" << std::setprecision(defaultPrecision);
-        out << "                                    \r";
+        out << "\r\033[?25h                                    \r";
         std::signal(SIGINT, SIG_DFL);
         std::signal(SIGTERM, SIG_DFL);
     }
