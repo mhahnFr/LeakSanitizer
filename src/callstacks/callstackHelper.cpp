@@ -50,7 +50,7 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
     std::size_t firstPartyCount = 0;
     const auto frameCount = callstack_getFrameCount(callstack);
     for (std::size_t i = 0; i < frameCount; ++i) {
-        const auto binaryFile = frames[i]->binaryFile;
+        const auto binaryFile = frames[i].binaryFile;
         
         if (binaryFile == nullptr || isInLSan(binaryFile)) {
             continue;
@@ -93,22 +93,22 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
          firstPrint = true;
     std::size_t i, printed;
     for (i = printed = 0; i < size && printed < __lsan_callstackSize; ++i) {
-        const auto binaryFile = frames[i]->binaryFile;
+        const auto binaryFile = frames[i].binaryFile;
         
         if (binaryFile == nullptr || isInLSan(binaryFile)) {
             continue;
         } else if (firstHit && isFirstParty(binaryFile)) {
             stream << Formatter::get<Style::GREYED>
                    << Formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
-            formatShared<Style::GREYED>(*frames[i], stream);
+            formatShared<Style::GREYED>(frames[i], stream);
         } else if (firstHit) {
             firstHit = false;
             stream << Formatter::get<Style::BOLD>
                    << Formatter::format<Style::ITALIC>(firstPrint ? "In: " : "in: ");
-            formatShared<Style::BOLD>(*frames[i], stream);
+            formatShared<Style::BOLD>(frames[i], stream);
         } else {
             stream << Formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
-            formatShared<Style::NONE>(*frames[i], stream);
+            formatShared<Style::NONE>(frames[i], stream);
         }
         firstPrint = false;
         ++printed;
