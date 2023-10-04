@@ -91,8 +91,8 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     
     bool firstHit   = true,
          firstPrint = true;
-    std::size_t i;
-    for (i = 0; i < size && i < __lsan_callstackSize; ++i) {
+    std::size_t i, printed;
+    for (i = printed = 0; i < size && printed < __lsan_callstackSize; ++i) {
         const auto binaryFile = frames[i]->binaryFile;
         
         if (binaryFile == nullptr || isInLSan(binaryFile)) {
@@ -111,6 +111,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
             formatShared<Style::NONE>(*frames[i], stream);
         }
         firstPrint = false;
+        ++printed;
     }
     if (i < size) {
         stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more lines...") << std::endl;
