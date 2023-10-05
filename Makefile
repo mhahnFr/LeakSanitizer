@@ -28,13 +28,11 @@ LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
 LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true' 'CXX_OPTIMIZED=true'
 
 SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
-SRC_C = $(shell find src -name \*.c \! -path $(LIBCALLSTACK_DIR)\*)
-OBJS  = $(patsubst %.cpp, %.o, $(SRC)) $(patsubst %.c, %.o, $(SRC_C))
-DEPS  = $(patsubst %.cpp, %.d, $(SRC)) $(patsubst %.c, %.d, $(SRC_C))
+OBJS  = $(patsubst %.cpp, %.o, $(SRC))
+DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 
 LDFLAGS  = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
-CFLAGS   = -std=gnu11 -Wall -Wextra -fPIC -Ofast
 
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
 
@@ -92,9 +90,6 @@ $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
 
 $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
-
-%.o: %.c
-	$(CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
