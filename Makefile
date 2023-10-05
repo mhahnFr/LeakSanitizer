@@ -36,11 +36,15 @@ LDFLAGS  = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
 CFLAGS   = -std=gnu11 -Wall -Wextra -fPIC -Ofast
 
+LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
+
 ifeq ($(shell uname -s),Darwin)
  	LDFLAGS += -current_version 1.6 -compatibility_version 1 -install_name $(abspath $@)
  	
  	NAME = $(DYLIB_NA)
 else
+	LDFLAGS += $(LINUX_SONAME_FLAG)
+
 	NAME = $(SHARED_L)
 endif
 
@@ -71,11 +75,12 @@ default: $(NAME)
 all: $(SHARED_L) $(DYLIB_NA)
 
 install:
-	$(MAKE) NO_LICENSE=false NO_WEBSITE=false $(NAME)
+	- $(RM) $(NAME)
+	$(MAKE) NO_LICENSE=false NO_WEBSITE=false LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
 	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(INSTALL_PATH)/lib/$(NAME)" $(NAME); fi
 	mkdir -p $(INSTALL_PATH)/lib
 	mkdir -p "$(INSTALL_PATH)/include"
-	cp $(NAME) $(INSTALL_PATH)/lib
+	mv $(NAME) $(INSTALL_PATH)/lib
 	find "include" -name \*.h -exec cp {} "$(INSTALL_PATH)/include" \;
 
 uninstall:
