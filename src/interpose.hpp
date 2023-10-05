@@ -25,11 +25,17 @@ struct interpose {
     const void * oldFunc;
 };
 
+#ifdef __linux__
+#define INTERPOSE(NEW, OLD)
+
+#else
 #define INTERPOSE(NEW, OLD)                                                  \
 static const struct interpose interpose_##OLD                                \
     __attribute__((used, section("__DATA, __interpose"))) = {                \
         reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(NEW))), \
         reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(OLD)))  \
     }
+
+#endif /* __linux__ */
 
 #endif /* interpose_hpp */
