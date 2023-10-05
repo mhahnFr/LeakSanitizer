@@ -21,18 +21,18 @@
 
 #include "wrap_malloc.hpp"
 
-#include "LeakSani.hpp"
-#include "Formatter.hpp"
 #include "interpose.hpp"
 #include "realAlloc.hpp"
-#include "callstacks/callstackHelper.hpp"
-#include "crashWarner/crash.hpp"
-#include "crashWarner/warn.hpp"
+#include "../LeakSani.hpp"
+#include "../Formatter.hpp"
+#include "../callstacks/callstackHelper.hpp"
+#include "../crashWarner/crash.hpp"
+#include "../crashWarner/warn.hpp"
 
-#include "initialization/init.h"
+#include "../initialization/init.h"
 
-#include "../include/lsan_stats.h"
-#include "../include/lsan_internals.h"
+#include "../../include/lsan_stats.h"
+#include "../../include/lsan_internals.h"
 
 #ifdef __GLIBC__
 static bool __lsan_glibc = true;

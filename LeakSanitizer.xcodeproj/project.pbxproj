@@ -193,6 +193,7 @@
 		BF9DD3A428A6761400AEBC17 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BFBCAD8A2ACF611A00C6B69F /* allocations */,
 				BF3204F22AC5C625004EC77E /* callstacks */,
 				BFA41A3D2AB8BBBC00DF6FAC /* initialization */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
@@ -205,12 +206,8 @@
 				BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */,
 				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
 				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
-				BFBF736728832C3300BC4208 /* wrap_malloc.cpp */,
 				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
-				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
-				BF9623AC2AB36B86005FF2B7 /* interpose.hpp */,
-				BFBCAD892ACF376600C6B69F /* realAlloc.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -222,6 +219,17 @@
 				BFA41A412AB8BC4A00DF6FAC /* init.h */,
 			);
 			path = initialization;
+			sourceTree = "<group>";
+		};
+		BFBCAD8A2ACF611A00C6B69F /* allocations */ = {
+			isa = PBXGroup;
+			children = (
+				BFBF736728832C3300BC4208 /* wrap_malloc.cpp */,
+				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
+				BF9623AC2AB36B86005FF2B7 /* interpose.hpp */,
+				BFBCAD892ACF376600C6B69F /* realAlloc.hpp */,
+			);
+			path = allocations;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
