@@ -38,10 +38,9 @@ static inline auto isTotallyIgnored(const std::string & file) -> bool {
 }
 
 static inline auto isFirstParty(const std::string & file) -> bool {
-    // TODO: Platforms?
-    
     return file.rfind("/usr/lib", 0) != std::string::npos
-        || file.rfind("/System", 0) != std::string::npos;
+        || file.rfind("/lib", 0)     != std::string::npos
+        || file.rfind("/System", 0)  != std::string::npos;
 }
 
 auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
