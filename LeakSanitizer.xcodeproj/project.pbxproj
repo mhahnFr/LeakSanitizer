@@ -53,34 +53,6 @@
 		BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
 		BFBF736828832C3300BC4208 /* wrap_malloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736728832C3300BC4208 /* wrap_malloc.cpp */; };
 		BFBF736A28832F8100BC4208 /* wrap_malloc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736928832F8100BC4208 /* wrap_malloc.hpp */; };
-		BFC52FE52AB21F180025C1F1 /* zone.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FCF2AB21F180025C1F1 /* zone.h */; };
-		BFC52FE62AB21F180025C1F1 /* zone.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FCF2AB21F180025C1F1 /* zone.h */; };
-		BFC52FE72AB21F180025C1F1 /* zone_large.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD12AB21F180025C1F1 /* zone_large.h */; };
-		BFC52FE82AB21F180025C1F1 /* zone_large.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD12AB21F180025C1F1 /* zone_large.h */; };
-		BFC52FE92AB21F180025C1F1 /* zone_large.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FD22AB21F180025C1F1 /* zone_large.c */; };
-		BFC52FEA2AB21F180025C1F1 /* zone_large.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FD22AB21F180025C1F1 /* zone_large.c */; };
-		BFC52FEB2AB21F180025C1F1 /* chunk.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD32AB21F180025C1F1 /* chunk.h */; };
-		BFC52FEC2AB21F180025C1F1 /* chunk.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD32AB21F180025C1F1 /* chunk.h */; };
-		BFC52FED2AB21F180025C1F1 /* zone_medium.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD52AB21F180025C1F1 /* zone_medium.h */; };
-		BFC52FEE2AB21F180025C1F1 /* zone_medium.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD52AB21F180025C1F1 /* zone_medium.h */; };
-		BFC52FEF2AB21F180025C1F1 /* chunk_medium.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD62AB21F180025C1F1 /* chunk_medium.h */; };
-		BFC52FF02AB21F180025C1F1 /* chunk_medium.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD62AB21F180025C1F1 /* chunk_medium.h */; };
-		BFC52FF12AB21F180025C1F1 /* zone_medium.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FD72AB21F180025C1F1 /* zone_medium.c */; };
-		BFC52FF22AB21F180025C1F1 /* zone_medium.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FD72AB21F180025C1F1 /* zone_medium.c */; };
-		BFC52FF32AB21F180025C1F1 /* zone_small.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD92AB21F180025C1F1 /* zone_small.h */; };
-		BFC52FF42AB21F180025C1F1 /* zone_small.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FD92AB21F180025C1F1 /* zone_small.h */; };
-		BFC52FF52AB21F180025C1F1 /* zone_small.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FDA2AB21F180025C1F1 /* zone_small.c */; };
-		BFC52FF62AB21F180025C1F1 /* zone_small.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FDA2AB21F180025C1F1 /* zone_small.c */; };
-		BFC52FF72AB21F180025C1F1 /* zone.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FDB2AB21F180025C1F1 /* zone.c */; };
-		BFC52FF82AB21F180025C1F1 /* zone.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FDB2AB21F180025C1F1 /* zone.c */; };
-		BFC52FF92AB21F180025C1F1 /* zones.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FDC2AB21F180025C1F1 /* zones.h */; };
-		BFC52FFA2AB21F180025C1F1 /* zones.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FDC2AB21F180025C1F1 /* zones.h */; };
-		BFC52FFF2AB21F180025C1F1 /* pageHeader.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FDF2AB21F180025C1F1 /* pageHeader.h */; };
-		BFC530002AB21F180025C1F1 /* pageHeader.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC52FDF2AB21F180025C1F1 /* pageHeader.h */; };
-		BFC530012AB21F180025C1F1 /* pageHeader.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FE02AB21F180025C1F1 /* pageHeader.c */; };
-		BFC530022AB21F180025C1F1 /* pageHeader.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FE02AB21F180025C1F1 /* pageHeader.c */; };
-		BFC530052AB21F180025C1F1 /* allocator.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FE22AB21F180025C1F1 /* allocator.c */; };
-		BFC530062AB21F180025C1F1 /* allocator.c in Sources */ = {isa = PBXBuildFile; fileRef = BFC52FE22AB21F180025C1F1 /* allocator.c */; };
 		BFC5300D2AB228E50025C1F1 /* crashWarner.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC5300B2AB228E50025C1F1 /* crashWarner.h */; };
 		BFC5300E2AB228E50025C1F1 /* crashWarner.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC5300B2AB228E50025C1F1 /* crashWarner.h */; };
 /* End PBXBuildFile section */
@@ -122,21 +94,6 @@
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
 		BFBF736728832C3300BC4208 /* wrap_malloc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wrap_malloc.cpp; sourceTree = "<group>"; };
 		BFBF736928832F8100BC4208 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
-		BFC52FCF2AB21F180025C1F1 /* zone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zone.h; sourceTree = "<group>"; };
-		BFC52FD12AB21F180025C1F1 /* zone_large.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zone_large.h; sourceTree = "<group>"; };
-		BFC52FD22AB21F180025C1F1 /* zone_large.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zone_large.c; sourceTree = "<group>"; };
-		BFC52FD32AB21F180025C1F1 /* chunk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chunk.h; sourceTree = "<group>"; };
-		BFC52FD52AB21F180025C1F1 /* zone_medium.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zone_medium.h; sourceTree = "<group>"; };
-		BFC52FD62AB21F180025C1F1 /* chunk_medium.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chunk_medium.h; sourceTree = "<group>"; };
-		BFC52FD72AB21F180025C1F1 /* zone_medium.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zone_medium.c; sourceTree = "<group>"; };
-		BFC52FD92AB21F180025C1F1 /* zone_small.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zone_small.h; sourceTree = "<group>"; };
-		BFC52FDA2AB21F180025C1F1 /* zone_small.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zone_small.c; sourceTree = "<group>"; };
-		BFC52FDB2AB21F180025C1F1 /* zone.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zone.c; sourceTree = "<group>"; };
-		BFC52FDC2AB21F180025C1F1 /* zones.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zones.h; sourceTree = "<group>"; };
-		BFC52FDF2AB21F180025C1F1 /* pageHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pageHeader.h; sourceTree = "<group>"; };
-		BFC52FE02AB21F180025C1F1 /* pageHeader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pageHeader.c; sourceTree = "<group>"; };
-		BFC52FE22AB21F180025C1F1 /* allocator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = allocator.c; sourceTree = "<group>"; };
-		BFC530072AB2225B0025C1F1 /* allocator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = allocator.h; sourceTree = "<group>"; };
 		BFC5300B2AB228E50025C1F1 /* crashWarner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crashWarner.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -238,7 +195,6 @@
 			children = (
 				BF3204F22AC5C625004EC77E /* callstacks */,
 				BFA41A3D2AB8BBBC00DF6FAC /* initialization */,
-				BFC52F912AB21E4D0025C1F1 /* allocator */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
 				BFAFADC528B4FDA40060076C /* Formatter.hpp */,
@@ -268,60 +224,6 @@
 			path = initialization;
 			sourceTree = "<group>";
 		};
-		BFC52F912AB21E4D0025C1F1 /* allocator */ = {
-			isa = PBXGroup;
-			children = (
-				BFC52FE22AB21F180025C1F1 /* allocator.c */,
-				BFC52FE02AB21F180025C1F1 /* pageHeader.c */,
-				BFC52FDF2AB21F180025C1F1 /* pageHeader.h */,
-				BFC52FCE2AB21F180025C1F1 /* zone */,
-				BFC530072AB2225B0025C1F1 /* allocator.h */,
-			);
-			path = allocator;
-			sourceTree = "<group>";
-		};
-		BFC52FCE2AB21F180025C1F1 /* zone */ = {
-			isa = PBXGroup;
-			children = (
-				BFC52FCF2AB21F180025C1F1 /* zone.h */,
-				BFC52FD02AB21F180025C1F1 /* large */,
-				BFC52FD32AB21F180025C1F1 /* chunk.h */,
-				BFC52FD42AB21F180025C1F1 /* medium */,
-				BFC52FD82AB21F180025C1F1 /* small */,
-				BFC52FDB2AB21F180025C1F1 /* zone.c */,
-				BFC52FDC2AB21F180025C1F1 /* zones.h */,
-			);
-			path = zone;
-			sourceTree = "<group>";
-		};
-		BFC52FD02AB21F180025C1F1 /* large */ = {
-			isa = PBXGroup;
-			children = (
-				BFC52FD12AB21F180025C1F1 /* zone_large.h */,
-				BFC52FD22AB21F180025C1F1 /* zone_large.c */,
-			);
-			path = large;
-			sourceTree = "<group>";
-		};
-		BFC52FD42AB21F180025C1F1 /* medium */ = {
-			isa = PBXGroup;
-			children = (
-				BFC52FD52AB21F180025C1F1 /* zone_medium.h */,
-				BFC52FD62AB21F180025C1F1 /* chunk_medium.h */,
-				BFC52FD72AB21F180025C1F1 /* zone_medium.c */,
-			);
-			path = medium;
-			sourceTree = "<group>";
-		};
-		BFC52FD82AB21F180025C1F1 /* small */ = {
-			isa = PBXGroup;
-			children = (
-				BFC52FD92AB21F180025C1F1 /* zone_small.h */,
-				BFC52FDA2AB21F180025C1F1 /* zone_small.c */,
-			);
-			path = small;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -329,24 +231,16 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFC52FF42AB21F180025C1F1 /* zone_small.h in Headers */,
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
 				BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */,
 				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
-				BFC52FE62AB21F180025C1F1 /* zone.h in Headers */,
 				BF0F1350291947C0008F0FCD /* Formatter.hpp in Headers */,
-				BFC52FEC2AB21F180025C1F1 /* chunk.h in Headers */,
 				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
-				BFC52FE82AB21F180025C1F1 /* zone_large.h in Headers */,
-				BFC52FEE2AB21F180025C1F1 /* zone_medium.h in Headers */,
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
 				BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */,
-				BFC52FFA2AB21F180025C1F1 /* zones.h in Headers */,
 				BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */,
 				BFC5300E2AB228E50025C1F1 /* crashWarner.h in Headers */,
 				BF378FA52919484800A4DAA9 /* wrap_malloc.hpp in Headers */,
-				BFC52FF02AB21F180025C1F1 /* chunk_medium.h in Headers */,
-				BFC530002AB21F180025C1F1 /* pageHeader.h in Headers */,
 				BF378FAB2919484C00A4DAA9 /* leaksan.h in Headers */,
 				BF378F9F2919484100A4DAA9 /* signalHandlers.hpp in Headers */,
 			);
@@ -356,24 +250,16 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFC52FF32AB21F180025C1F1 /* zone_small.h in Headers */,
 				BF23A2DF289ECE6A00B17349 /* lsan_stats.h in Headers */,
 				BF621FDE28A291DE00414EE4 /* lsan_internals.h in Headers */,
 				BF72C3CF2885CB9E00C7AE5C /* leaksan.h in Headers */,
-				BFC52FE52AB21F180025C1F1 /* zone.h in Headers */,
 				BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */,
-				BFC52FEB2AB21F180025C1F1 /* chunk.h in Headers */,
 				BF3204F02AC5C614004EC77E /* callstackHelper.hpp in Headers */,
-				BFC52FE72AB21F180025C1F1 /* zone_large.h in Headers */,
-				BFC52FED2AB21F180025C1F1 /* zone_medium.h in Headers */,
 				BF72C3CD2885CB9E00C7AE5C /* LeakSani.hpp in Headers */,
 				BF621FE328A2B61E00414EE4 /* bytePrinter.hpp in Headers */,
-				BFC52FF92AB21F180025C1F1 /* zones.h in Headers */,
 				BFBF736A28832F8100BC4208 /* wrap_malloc.hpp in Headers */,
 				BFC5300D2AB228E50025C1F1 /* crashWarner.h in Headers */,
 				BF49A5DA2899599300BC1FFD /* signalHandlers.hpp in Headers */,
-				BFC52FEF2AB21F180025C1F1 /* chunk_medium.h in Headers */,
-				BFC52FFF2AB21F180025C1F1 /* pageHeader.h in Headers */,
 				BF23A2E3289ED24200B17349 /* Stats.hpp in Headers */,
 				BFAFADC728B4FDA40060076C /* Formatter.hpp in Headers */,
 			);
@@ -459,22 +345,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
-				BFC530022AB21F180025C1F1 /* pageHeader.c in Sources */,
-				BFC530062AB21F180025C1F1 /* allocator.c in Sources */,
-				BFC52FF22AB21F180025C1F1 /* zone_medium.c in Sources */,
 				BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */,
 				BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */,
-				BFC52FF62AB21F180025C1F1 /* zone_small.c in Sources */,
 				BF0F133B29194791008F0FCD /* LeakSani.cpp in Sources */,
 				BF0F133E29194794008F0FCD /* Stats.cpp in Sources */,
 				BF0F134129194797008F0FCD /* MallocInfo.cpp in Sources */,
-				BFC52FF82AB21F180025C1F1 /* zone.c in Sources */,
 				BF0F1347291947A2008F0FCD /* wrap_malloc.cpp in Sources */,
 				BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */,
 				BF3204EF2AC5C614004EC77E /* callstackHelper.cpp in Sources */,
 				BFA41A402AB8BC1800DF6FAC /* init.cpp in Sources */,
 				BF0F134D291947A8008F0FCD /* signalHandlers.cpp in Sources */,
-				BFC52FEA2AB21F180025C1F1 /* zone_large.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -483,22 +363,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF49A5D92899599300BC1FFD /* signalHandlers.cpp in Sources */,
-				BFC530012AB21F180025C1F1 /* pageHeader.c in Sources */,
-				BFC530052AB21F180025C1F1 /* allocator.c in Sources */,
-				BFC52FF12AB21F180025C1F1 /* zone_medium.c in Sources */,
 				BF23A2E2289ED24200B17349 /* Stats.cpp in Sources */,
 				BF621FE228A2B61E00414EE4 /* bytePrinter.cpp in Sources */,
-				BFC52FF52AB21F180025C1F1 /* zone_small.c in Sources */,
 				BF23A2DE289ECE6A00B17349 /* lsan_stats.cpp in Sources */,
 				BF621FDD28A291DE00414EE4 /* lsan_internals.cpp in Sources */,
 				BFBF736528831FC200BC4208 /* MallocInfo.cpp in Sources */,
-				BFC52FF72AB21F180025C1F1 /* zone.c in Sources */,
 				BF72C3CE2885CB9E00C7AE5C /* LeakSani.cpp in Sources */,
 				BF4368F42AACF04700252E2A /* crashWarner.cpp in Sources */,
 				BF3204EE2AC5C614004EC77E /* callstackHelper.cpp in Sources */,
 				BFA41A3F2AB8BC1800DF6FAC /* init.cpp in Sources */,
 				BFBF736828832C3300BC4208 /* wrap_malloc.cpp in Sources */,
-				BFC52FE92AB21F180025C1F1 /* zone_large.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
