@@ -21,7 +21,6 @@
 
 #include "crash.hpp"
 #include "warn.hpp"
-#include "crashWarner.h"
 
 #include "../Formatter.hpp"
 #include "../callstacks/callstackHelper.hpp"
@@ -164,13 +163,4 @@ void crash(const std::string &                                     message,
         printer<false>(message, info, callstack);
         std::terminate();
     });
-}
-
-void __lsan_warn(const char * message) {
-    warn(message, __builtin_return_address(0));
-}
-
-void __lsan_crash(const char * message) {
-    crash(message, __builtin_return_address(0));
-    std::terminate();
 }

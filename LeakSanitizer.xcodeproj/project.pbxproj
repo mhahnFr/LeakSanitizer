@@ -53,8 +53,6 @@
 		BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
 		BFBF736828832C3300BC4208 /* wrap_malloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736728832C3300BC4208 /* wrap_malloc.cpp */; };
 		BFBF736A28832F8100BC4208 /* wrap_malloc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736928832F8100BC4208 /* wrap_malloc.hpp */; };
-		BFC5300D2AB228E50025C1F1 /* crashWarner.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC5300B2AB228E50025C1F1 /* crashWarner.h */; };
-		BFC5300E2AB228E50025C1F1 /* crashWarner.h in Headers */ = {isa = PBXBuildFile; fileRef = BFC5300B2AB228E50025C1F1 /* crashWarner.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -94,7 +92,6 @@
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
 		BFBF736728832C3300BC4208 /* wrap_malloc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wrap_malloc.cpp; sourceTree = "<group>"; };
 		BFBF736928832F8100BC4208 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
-		BFC5300B2AB228E50025C1F1 /* crashWarner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crashWarner.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,7 +144,6 @@
 		BF4368F22AACEFFE00252E2A /* crashWarner */ = {
 			isa = PBXGroup;
 			children = (
-				BFC5300B2AB228E50025C1F1 /* crashWarner.h */,
 				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
 				BF4368F62AACF06F00252E2A /* crash.hpp */,
 				BF4368F72AACF07700252E2A /* warn.hpp */,
@@ -247,7 +243,6 @@
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
 				BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */,
 				BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */,
-				BFC5300E2AB228E50025C1F1 /* crashWarner.h in Headers */,
 				BF378FA52919484800A4DAA9 /* wrap_malloc.hpp in Headers */,
 				BF378FAB2919484C00A4DAA9 /* leaksan.h in Headers */,
 				BF378F9F2919484100A4DAA9 /* signalHandlers.hpp in Headers */,
@@ -266,7 +261,6 @@
 				BF72C3CD2885CB9E00C7AE5C /* LeakSani.hpp in Headers */,
 				BF621FE328A2B61E00414EE4 /* bytePrinter.hpp in Headers */,
 				BFBF736A28832F8100BC4208 /* wrap_malloc.hpp in Headers */,
-				BFC5300D2AB228E50025C1F1 /* crashWarner.h in Headers */,
 				BF49A5DA2899599300BC1FFD /* signalHandlers.hpp in Headers */,
 				BF23A2E3289ED24200B17349 /* Stats.hpp in Headers */,
 				BFAFADC728B4FDA40060076C /* Formatter.hpp in Headers */,
