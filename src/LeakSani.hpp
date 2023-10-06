@@ -50,7 +50,10 @@ class LSan {
     Stats                                    stats;
     /// Indicates whether the set callstack size has been exceeded during the printing.
     bool                                     callstackSizeExceeded = false;
+    /// The mutex used to synchronize the allocations and tracking.
     std::recursive_mutex                     mutex;
+    
+    /// The runtime name of this sanitizer.
     const std::string libName;
     
     /**
@@ -73,10 +76,20 @@ public:
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
     
+    /**
+     * Returns the runtime library name of this sanitizer.
+     *
+     * @return the runtime library name
+     */
     constexpr inline auto getLibName() const -> const std::string & {
         return libName;
     }
     
+    /**
+     * Returns the mutex for the allocations and tracking.
+     *
+     * @return the mutex
+     */
     constexpr inline auto getMutex() -> std::recursive_mutex & {
         return mutex;
     }
@@ -84,8 +97,6 @@ public:
     /**
      * @brief Attempts to exchange the allocation record associated with the given
      * allocation record by the given allocation record.
-     *
-     * The allocation record is searched for globally and in all running threads.
      *
      * @param info the allocation record to be exchanged
      * @return whether an allocation record was exchanged
@@ -99,8 +110,8 @@ public:
      * @param omitAddress the callstack frame delimiter
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    auto removeMalloc(      void * pointer,
-                      const void * omitAddress = __builtin_return_address(0)) -> MallocInfoRemoved;
+    auto removeMalloc(void * pointer,
+                      void * omitAddress = __builtin_return_address(0)) -> MallocInfoRemoved;
     
     /**
      * Adds the given allocation record.
@@ -119,7 +130,7 @@ public:
     }
     
     /**
-     * Returns whether to ignore subsequent alloctiona managements requests.
+     * Returns whether to ignore subsequent alloction management requests.
      *
      * @return whether to ignore allocations
      */
@@ -135,6 +146,12 @@ public:
      */
     auto getTotalAllocatedBytes() -> std::size_t;
     
+    /**
+     * Calculates the relevant leak information.
+     *
+     * @return a tuple containing the count of the leaks, the amount of leaked bytes and
+     * and a list with the leaked allocation records
+     */
     auto getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>>;
     
     /**
