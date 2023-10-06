@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022 - 2023  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -36,12 +36,14 @@ void   __wrap_free(void *, const char *, int);
 #ifndef __linux__
 namespace lsan {
 #endif /* __linux__ */
-auto malloc(std::size_t size) -> void *;
-auto calloc(std::size_t count, std::size_t size) -> void *;
-auto realloc(void * pointer, std::size_t size) -> void *;
-void free(void * pointer);
+
+auto malloc(std::size_t)              -> void *;
+auto calloc(std::size_t, std::size_t) -> void *;
+auto realloc(void *, std::size_t)     -> void *;
+void free(void *);
+
 #ifndef __linux__
-}
+} /* namespace lsan */
 #endif /* __linux__ */
 
 #endif /* wrap_malloc_h */
