@@ -26,7 +26,7 @@
 
 #include "../../include/lsan_internals.h"
 
-namespace callstackHelper {
+namespace lsan::callstackHelper {
 static inline auto isInLSan(const std::string & name) -> bool {
     return LSan::getInstance().getLibName() == name;
 }

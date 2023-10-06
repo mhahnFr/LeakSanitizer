@@ -22,19 +22,26 @@
 
 #include <cstddef>
 
-#ifdef __cplusplus
+namespace lsan {
 extern "C" {
-#endif
-
 void * __wrap_malloc(size_t, const char *, int);
 void * __wrap_calloc(size_t, size_t, const char *, int);
 void * __wrap_realloc(void *, size_t, const char *, int);
 void   __wrap_free(void *, const char *, int);
 
 [[ noreturn ]] void __wrap_exit(int, const char *, int);
+}
+}
 
-#ifdef __cplusplus
-} // extern "C"
-#endif
+#ifndef __linux__
+namespace lsan {
+#endif /* __linux__ */
+auto malloc(std::size_t size) -> void *;
+auto calloc(std::size_t count, std::size_t size) -> void *;
+auto realloc(void * pointer, std::size_t size) -> void *;
+void free(void * pointer);
+#ifndef __linux__
+}
+#endif /* __linux__ */
 
 #endif /* wrap_malloc_h */

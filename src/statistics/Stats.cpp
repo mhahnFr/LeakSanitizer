@@ -19,6 +19,7 @@
 
 #include "Stats.hpp"
 
+namespace lsan {
 Stats::Stats(const Stats & other)
     : mutex(),
       currentMallocCount(other.currentMallocCount),
@@ -149,4 +150,5 @@ void Stats::addFree(std::size_t size) {
     
     --currentMallocCount;
     currentBytes -= size;
+}
 }

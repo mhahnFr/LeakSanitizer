@@ -25,6 +25,7 @@
 
 #include "../MallocInfo.hpp"
 
+namespace lsan {
 /// This class contains all statistics that this sanitizer produces.
 class Stats {
     /// The mutex used to protect the statistics.
@@ -76,7 +77,7 @@ public:
      * @param other the other instance to be moved into this instance
      */
     Stats & operator=(Stats && other);
-
+    
     /**
      * Returns the count of currently active allocations.
      *
@@ -185,5 +186,6 @@ public:
         return *this;
     }
 };
+}
 
 #endif /* Stats_hpp */

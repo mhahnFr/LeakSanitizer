@@ -29,6 +29,7 @@
 
 #include "../CallstackLibrary/include/callstack.h"
 
+namespace lsan {
 /**
  * @brief This class acts as a allocation record: all information about the allocation process
  * that is available is stored.
@@ -48,7 +49,7 @@ class MallocInfo {
     std::optional<int>         createdOnLine;
     /// The callstack where this allocation happened.
     mutable lcs::callstack     createdCallstack;
-
+    
     /// The filename in which this allocation was deallocated.
     std::optional<std::string>            deletedInFile;
     /// The line number in which this allocation was deallocated.
@@ -57,7 +58,7 @@ class MallocInfo {
     bool                                  deleted;
     /// The callstack where the deallocation happened.
     mutable std::optional<lcs::callstack> deletedCallstack;
-        
+    
 public:
     /**
      * Initializes this allocation record using the given information.
@@ -228,5 +229,6 @@ public:
     
     friend auto operator<<(std::ostream &, const MallocInfo &) -> std::ostream &;
 };
+}
 
 #endif /* MallocInfo_hpp */

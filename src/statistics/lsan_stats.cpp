@@ -28,6 +28,8 @@
 #include "../../include/lsan_internals.h"
 #include "../../include/lsan_stats.h"
 
+using namespace lsan;
+
 auto __lsan_getTotalMallocs() -> std::size_t { return LSan::getStats().getTotalMallocCount(); }
 auto __lsan_getTotalBytes()   -> std::size_t { return LSan::getStats().getTotalBytes();       }
 auto __lsan_getTotalFrees()   -> std::size_t { return LSan::getStats().getTotalFreeCount();   }

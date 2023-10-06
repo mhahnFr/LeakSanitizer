@@ -22,6 +22,7 @@
 
 #include <string>
 
+namespace lsan {
 /**
  * @brief Returns a human readable representation of the given byte amount.
  *
@@ -32,5 +33,6 @@
  * @return a string representation of the given byte amount
  */
 std::string bytesToString(unsigned long long amount);
+}
 
 #endif /* bytePrinter_hpp */

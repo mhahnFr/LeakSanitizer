@@ -36,6 +36,7 @@
 
 #include "../include/lsan_internals.h"
 
+namespace lsan {
 /**
  * This class manages everything this sanitizer is capable to do.
  */
@@ -188,7 +189,7 @@ public:
      * It prints all informations tracked by the sanitizer and performs internal cleaning.
      */
     static void __exit_hook();
-
+    
     friend void           internalCleanUp();
     friend std::ostream & operator<<(std::ostream &, LSan &);
 };
@@ -197,5 +198,6 @@ public:
  * Deletes the currently active instance of the sanitizer.
  */
 void internalCleanUp();
+}
 
 #endif /* LeakSani_hpp */

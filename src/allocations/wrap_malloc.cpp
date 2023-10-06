@@ -40,6 +40,7 @@ static bool __lsan_glibc = true;
 static bool __lsan_glibc = false;
 #endif
 
+namespace lsan {
 auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
     auto ret = lsan::real::malloc(size);
     
@@ -150,6 +151,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
     LSan::printInformations();
     internalCleanUp();
     _Exit(code);
+}
 }
 
 #ifndef __linux__

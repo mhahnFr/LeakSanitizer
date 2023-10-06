@@ -25,6 +25,7 @@
 
 #include "../include/lsan_internals.h"
 
+namespace lsan {
 auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
     using formatter::Style;
     
@@ -40,4 +41,5 @@ auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream 
     stream << std::endl;
     self.printCreatedCallstack(stream);
     return stream;
+}
 }

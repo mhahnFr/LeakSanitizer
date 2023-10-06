@@ -35,6 +35,7 @@
 
 #include "../CallstackLibrary/include/callstack_internals.h"
 
+namespace lsan {
 LSan & LSan::getInstance() {
     static LSan * instance = new LSan();
     return *instance;
@@ -251,4 +252,5 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     callstack_clearCaches();
     callstack_autoClearCaches = true;
     return stream;
+}
 }

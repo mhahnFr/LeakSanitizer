@@ -27,6 +27,7 @@
 
 #include "../MallocInfo.hpp"
 
+namespace lsan {
 /**
  * Terminates the linked program and prints the given message, the file name
  * and the line number and a callstack up to the given omitting address.
@@ -64,5 +65,6 @@ void crashForce(const std::string & message, void * omitAddress = __builtin_retu
 void crash(const std::string &                                     message,
            std::optional<std::reference_wrapper<const MallocInfo>> info,
            void *                                                  omitAddress = __builtin_return_address(0));
+}
 
 #endif /* crash_hpp */

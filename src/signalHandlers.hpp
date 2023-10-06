@@ -22,6 +22,7 @@
 
 #include <csignal>
 
+namespace lsan {
 /// This function acts as a signal handler for access violation signals.
 [[ noreturn ]] void crashHandler(int, siginfo_t *, void *);
 
@@ -29,5 +30,6 @@
 void statsSignal(int);
 /// This function acts as a general signal handler. It prints the current callstack.
 void callstackSignal(int);
+}
 
 #endif /* signalHandlers_hpp */

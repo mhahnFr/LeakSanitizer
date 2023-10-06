@@ -25,6 +25,7 @@
 #include "../Formatter.hpp"
 #include "../callstacks/callstackHelper.hpp"
 
+namespace lsan {
 /**
  * Prints the given message and a callstack up to the provided omit address.
  *
@@ -37,7 +38,7 @@ static inline void printer(const std::string & message, lcs::callstack & callsta
     using formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
-
+    
     std::cerr << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
     callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
@@ -163,4 +164,5 @@ void crash(const std::string &                                     message,
         printer<false>(message, info, callstack);
         std::terminate();
     });
+}
 }

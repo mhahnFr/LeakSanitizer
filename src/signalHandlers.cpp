@@ -36,6 +36,7 @@
  #include <sstream>
 #endif
 
+namespace lsan {
 /**
  * Returns a string representation for the given signal code.
  *
@@ -84,4 +85,5 @@ void callstackSignal(int) {
 
 void statsSignal(int) {
     __lsan_printStats();
+}
 }

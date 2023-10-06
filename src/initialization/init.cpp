@@ -24,8 +24,8 @@
 bool inited = false;
 
 void onLoad() {
-    (void) LSan::getIgnoreMalloc();
-    (void) LSan::getInstance();
+    (void) lsan::LSan::getIgnoreMalloc();
+    (void) lsan::LSan::getInstance();
     
     inited = true;
 }

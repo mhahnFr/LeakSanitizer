@@ -25,7 +25,7 @@
 
 #include "../../CallstackLibrary/include/callstack.h"
 
-namespace callstackHelper {
+namespace lsan::callstackHelper {
 enum class CallstackType {
     HARD_IGNORE,
     FIRST_PARTY,
