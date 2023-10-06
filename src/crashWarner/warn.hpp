@@ -29,8 +29,10 @@
 
 namespace lsan {
 /**
- * Prints the given message, the file name, the line number and a callstack up
+ * @brief Prints the given message, the file name, the line number and a callstack up
  * to the given omitting address.
+ *
+ * This function does nothing if the generated callstack is not user relevant.
  *
  * @param message the message to be printed
  * @param file the file name
@@ -43,7 +45,9 @@ void warn(const std::string & message,
                 void *        omitAddress = __builtin_return_address(0));
 
 /**
- * Prints the given message and a callstack up to the given omitting address.
+ * @brief Prints the given message and a callstack up to the given omitting address.
+ *
+ * This function does nothing if the generated callstack is not user relevant.
  *
  * @param message the message to be printed
  * @param omitAddress the address beyond which frames are omitted from the generated callstack
@@ -51,8 +55,10 @@ void warn(const std::string & message,
 void warn(const std::string & message, void * omitAddress = __builtin_return_address(0));
 
 /**
- * Prints the given message, the information provided by the optional allocation
+ * @brief Prints the given message, the information provided by the optional allocation
  * record and a callstack up to the given omitting address.
+ *
+ * This function does nothing if the generated callstack is not user relevant.
  *
  * @param message the message to be printed
  * @param info the optional allocation record
