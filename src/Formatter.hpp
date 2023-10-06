@@ -49,6 +49,7 @@ enum class Style {
     BAR_FILLED,
     /// Represents an empty element inside a bar.
     BAR_EMPTY,
+    /// Represents no style.
     NONE
 };
     
@@ -126,6 +127,12 @@ constexpr inline auto clearAll() -> const char * {
     return "\033[0m";
 }
 
+/**
+ * Returns a string with the formatting codes for the given styles.
+ *
+ * @return the string with the format codes
+ * @tparam S the requested styles
+ */
 template<Style... S>
 inline auto getString() -> std::string {
     std::string toReturn {};
@@ -133,12 +140,25 @@ inline auto getString() -> std::string {
     return toReturn;
 }
 
+/**
+ * Sends the format codes of the given styles to the given output stream.
+ *
+ * @param out the output stream
+ * @return the output stream
+ * @tparam S the requested styles
+ */
 template<Style... S>
 inline auto get(std::ostream & out) -> std::ostream & {
     ((out << get<S>()), ...);
     return out;
 }
 
+/**
+ * Returns a string with the clearing codes for the given styles.
+ *
+ * @return the string with the clear codes
+ * @tparam S the requested styles
+ */
 template<Style... S>
 inline auto clearString() -> std::string {
     std::string toReturn {};
@@ -146,12 +166,27 @@ inline auto clearString() -> std::string {
     return toReturn;
 }
 
+/**
+ * Sends the clear codes of the given styles to the given output stream.
+ *
+ * @param out the output stream
+ * @return the output stream
+ * @tparam S the requested styles
+ */
 template<Style... S>
 inline auto clear(std::ostream & out) -> std::ostream & {
     ((out << clear<S>()), ...);
     return out;
 }
 
+/**
+ * Formats the given string with the given styles onto the given output stream.
+ *
+ * @param out the output stream to print to
+ * @param str the string to be formatted
+ * @return the output stream
+ * @tparam S the requested styles
+ */
 template<Style... S>
 inline auto get(std::ostream & out, const std::string & str) -> std::ostream & {
     out << get<S...>
@@ -160,6 +195,9 @@ inline auto get(std::ostream & out, const std::string & str) -> std::ostream & {
     return out;
 }
 
+/**
+ * Formats the given string using the given styles.
+ */
 template<Style... S>
 struct format {
     const std::string & str;
@@ -173,6 +211,14 @@ auto operator<<(std::ostream & out, const format<S...> & f) -> std::ostream & {
     return out;
 }
 
+/**
+ * Returns a string containing the format and clear codes for the given styles
+ * and the given string.
+ *
+ * @param str the string to be formatted
+ * @return a new string with the format, the given string and the clear codes
+ * @tparam S the requested styles
+ */
 template<Style... S>
 inline auto formatString(const std::string & str) -> std::string {
     return getString<S...>() + str + clearString<S...>();
