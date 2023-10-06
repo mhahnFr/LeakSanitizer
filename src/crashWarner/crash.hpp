@@ -29,8 +29,10 @@
 
 namespace lsan {
 /**
- * Terminates the linked program and prints the given message, the file name
+ * @brief Terminates the linked program and prints the given message, the file name
  * and the line number and a callstack up to the given omitting address.
+ *
+ * This function does nothing if the generated callstack is not user relevant.
  *
  * @param message the message to be printed
  * @param file the file name
@@ -43,20 +45,33 @@ void crash(const std::string & message,
                  void *        omitAddress = __builtin_return_address(0));
 
 /**
- * Terminates the linked program and prints the given message and a callstack
+ * @brief Terminates the linked program and prints the given message and a callstack
  * up to the given omitting address.
+ *
+ * This function does nothing if the generated callstack is not user relevant.
  *
  * @param message the message to be printed
  * @param omitAddress the address beyond which frames are omitted from the generated callstack
  */
 void crash(const std::string & message, void * omitAddress = __builtin_return_address(0));
 
-void crashForce(const std::string & message, void * omitAddress = __builtin_return_address(0));
+/**
+ * @brief Terminates the linked program and prints the given message and a callstack
+ * up to the given omitting address.
+ *
+ * This function performs the termination in any case.
+ *
+ * @param message the message to be printed
+ * @param omitAddress the address beyond which frames are omitted from the generated callstack
+ */
+[[ noreturn ]] void crashForce(const std::string & message, void * omitAddress = __builtin_return_address(0));
 
 /**
- * Terminates the linked program and prints the given message, the information
+ * @brief Terminates the linked program and prints the given message, the information
  * provided by the optional allocation record and a callstack up to the given omitting
  * address.
+ *
+ * This function does nothing if the generated callstack is not user relevant.
  *
  * @param message the message to be printed
  * @param info the optional allocation record

@@ -26,8 +26,12 @@ extern "C" {
 
 #include <stdbool.h>
 
+/** Indicates whether this sanitizer has been fully initialized. */
 extern bool inited;
 
+/**
+ * Initializes this sanitizer.
+ */
 void onLoad(void) __attribute__((constructor));
 
 #ifdef __cplusplus
