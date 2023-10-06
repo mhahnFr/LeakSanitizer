@@ -42,7 +42,7 @@ static bool __lsan_glibc = false;
 
 namespace lsan {
 auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
-    auto ret = lsan::real::malloc(size);
+    auto ret = real::malloc(size);
     
     if (ret != nullptr && inited) {
         std::lock_guard lock(LSan::getInstance().getMutex());
@@ -63,7 +63,7 @@ auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
 }
 
 auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file, int line) -> void * {
-    auto ret = lsan::real::calloc(objectSize, count);
+    auto ret = real::calloc(objectSize, count);
     
     if (ret != nullptr && inited) {
         std::lock_guard lock(LSan::getInstance().getMutex());
@@ -84,7 +84,7 @@ auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file,
 }
 
 auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int line) -> void * {
-    if (!inited) return lsan::real::realloc(pointer, size);
+    if (!inited) return real::realloc(pointer, size);
     
     std::lock_guard lock(LSan::getInstance().getMutex());
     
@@ -92,7 +92,7 @@ auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int lin
     if (!ignored) {
         LSan::setIgnoreMalloc(true);
     }
-    void * ptr = lsan::real::realloc(pointer, size);
+    void * ptr = real::realloc(pointer, size);
     if (!ignored) {
         if (ptr != nullptr) {
             if (pointer != ptr) {
@@ -129,7 +129,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
             LSan::setIgnoreMalloc(false);
         }
     }
-    lsan::real::free(pointer);
+    real::free(pointer);
 }
 
 [[ noreturn ]] void __wrap_exit(int code, const char * file, int line) {
@@ -249,8 +249,9 @@ void free(void * pointer) {
     }
     lsan::real::free(pointer);
 }
+
 #ifndef __linux__
-}
+} /* namespace lsan */
 
 INTERPOSE(lsan::malloc,  malloc);
 INTERPOSE(lsan::calloc,  calloc);
