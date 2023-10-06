@@ -60,20 +60,20 @@ static std::string signalString(int signal) {
     s << info->si_addr;
     std::string address = s.str();
 #endif
-    using Formatter::Style;
-    crashForce(Formatter::formatString<Style::BOLD, Style::RED>(signalString(signal))
-          + " on address " + Formatter::formatString<Style::BOLD>(address), __builtin_return_address(0));
+    using formatter::Style;
+    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalString(signal))
+               + " on address " + formatter::formatString<Style::BOLD>(address), __builtin_return_address(0));
     std::terminate();
 }
 
 void callstackSignal(int) {
-    using Formatter::Style;
+    using formatter::Style;
     
     bool ignore = LSan::getIgnoreMalloc();
     LSan::setIgnoreMalloc(true);
     
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << Formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
+    out << formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
     
     callstackHelper::format(lcs::callstack(), out);
     out << std::endl;

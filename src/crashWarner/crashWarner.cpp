@@ -34,11 +34,11 @@
  */
 template<bool Warning>
 static inline void printer(const std::string & message, lcs::callstack & callstack) {
-    using Formatter::Style;
+    using formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
 
-    std::cerr << Formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
+    std::cerr << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
     callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
 }
@@ -63,14 +63,14 @@ static inline void printer(const std::string & message,
                            const std::string & file,
                            const int           line,
                            lcs::callstack &    callstack) {
-    using Formatter::Style;
+    using formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
     
-    std::cerr << Formatter::get<Style::BOLD>
-              << Formatter::format<colour>((Warning ? "Warning: " : "") + message) << ", at "
-              << Formatter::get<Style::UNDERLINED> << file << ":" << line
-              << Formatter::clear<Style::BOLD, Style::UNDERLINED>
+    std::cerr << formatter::get<Style::BOLD>
+              << formatter::format<colour>((Warning ? "Warning: " : "") + message) << ", at "
+              << formatter::get<Style::UNDERLINED> << file << ":" << line
+              << formatter::clear<Style::BOLD, Style::UNDERLINED>
               << std::endl;
     callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
@@ -90,7 +90,7 @@ template<bool Warning>
 static inline void printer(const std::string &                                     message,
                            std::optional<std::reference_wrapper<const MallocInfo>> info,
                            lcs::callstack &                                        callstack) {
-    using Formatter::Style;
+    using formatter::Style;
     
     printer<Warning>(message, callstack);
     
@@ -98,11 +98,11 @@ static inline void printer(const std::string &                                  
         const auto   colour = Warning ? Style::MAGENTA : Style::RED;
         const auto & record = info.value().get();
         
-        std::cerr << Formatter::format<Style::ITALIC, colour>("Previously allocated here:") << std::endl;
+        std::cerr << formatter::format<Style::ITALIC, colour>("Previously allocated here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
         if (record.getDeletedCallstack().has_value()) {
-            std::cerr << std::endl << Formatter::format<Style::ITALIC, colour>("Previously freed here:") << std::endl;
+            std::cerr << std::endl << formatter::format<Style::ITALIC, colour>("Previously freed here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
         }

@@ -136,7 +136,7 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
         if (__lsan_printFormatted) {
             char buffer[6] {};
             std::snprintf(buffer, 6, "%05.2f", static_cast<double>(i) / total * 100);
-            out << "\rCollecting the leaks: " << Formatter::format<Formatter::Style::BOLD>(buffer) << " %";
+            out << "\rCollecting the leaks: " << formatter::format<formatter::Style::BOLD>(buffer) << " %";
         }
         
         if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
@@ -155,14 +155,14 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
 }
 
 void LSan::__exit_hook() {
-    using Formatter::Style;
+    using formatter::Style;
     
     setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << std::endl << Formatter::format<Style::GREEN>("Exiting");
+    out << std::endl << formatter::format<Style::GREEN>("Exiting");
     
     if (__lsan_printExitPoint) {
-        out << Formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
+        out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
         callstackHelper::format(lcs::callstack(__builtin_return_address(0)), out);
     }
     out << std::endl << std::endl
@@ -176,11 +176,11 @@ void internalCleanUp() {
 }
 
 void LSan::printInformations() {
-    using Formatter::Style;
+    using formatter::Style;
     
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << "Report by " << Formatter::format<Style::BOLD>("LeakSanitizer ")
-        << Formatter::format<Style::ITALIC>(VERSION)
+    out << "Report by " << formatter::format<Style::BOLD>("LeakSanitizer ")
+        << formatter::format<Style::ITALIC>(VERSION)
         << std::endl << std::endl;
     if (__lsan_printLicense) { printLicense(); }
     if (__lsan_printWebsite) { printWebsite(); }
@@ -194,37 +194,37 @@ void LSan::printLicense() {
 }
 
 void LSan::printWebsite() {
-    using Formatter::Style;
+    using formatter::Style;
     
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << Formatter::get<Style::ITALIC>
+    out << formatter::get<Style::ITALIC>
         << "For more information, visit "
-        << Formatter::format<Style::UNDERLINED>("github.com/mhahnFr/LeakSanitizer")
-        << Formatter::clear<Style::ITALIC>
+        << formatter::format<Style::UNDERLINED>("github.com/mhahnFr/LeakSanitizer")
+        << formatter::clear<Style::ITALIC>
         << std::endl << std::endl;
 }
 
 static inline void printCallstackSizeExceeded(std::ostream & stream) {
-    using Formatter::Style;
+    using formatter::Style;
     
-    stream << "Hint:" << Formatter::get<Style::GREYED>
-           << Formatter::format<Style::ITALIC>(" to see longer callstacks, increase the value of ")
-           << Formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << Formatter::get<Style::GREYED>
-           << " (__lsan_callstackSize)" << Formatter::format<Style::ITALIC>(" (currently ")
-           << Formatter::clear<Style::GREYED> << __lsan_callstackSize
-           << Formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
+    stream << "Hint:" << formatter::get<Style::GREYED>
+           << formatter::format<Style::ITALIC>(" to see longer callstacks, increase the value of ")
+           << formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << formatter::get<Style::GREYED>
+           << " (__lsan_callstackSize)" << formatter::format<Style::ITALIC>(" (currently ")
+           << formatter::clear<Style::GREYED> << __lsan_callstackSize
+           << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
 }
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
-    using Formatter::Style;
+    using formatter::Style;
     
     std::lock_guard lock(self.mutex);
     
     const auto & [count, bytes, leaks] = self.getLeakNumbers();
     if (count == 0) return stream;
     
-    stream << Formatter::get<Style::ITALIC>;
-    stream << count << " leaks total, " << bytesToString(bytes) << " total" << std::endl << std::endl;
+    stream << formatter::get<Style::ITALIC>
+           << count << " leaks total, " << bytesToString(bytes) << " total" << std::endl << std::endl;
     callstack_autoClearCaches = false;
     std::size_t i = 0;
     for (auto & leakInfo : leaks) {
@@ -233,11 +233,11 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                 printCallstackSizeExceeded(stream);
                 self.callstackSizeExceeded = false;
             }
-            stream << std::endl << Formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(count - i) + " more...") << std::endl << std::endl
-                   << "Hint:" << Formatter::format<Style::GREYED, Style::ITALIC>(" to see more, increase the value of ")
-                   << "LSAN_LEAK_COUNT" << Formatter::get<Style::GREYED> << " (__lsan_leakCount)"
-                   << Formatter::format<Style::ITALIC>(" (currently ") << Formatter::clear<Style::GREYED>
-                   << __lsan_leakCount << Formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
+            stream << std::endl << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(count - i) + " more...") << std::endl << std::endl
+                   << "Hint:" << formatter::format<Style::GREYED, Style::ITALIC>(" to see more, increase the value of ")
+                   << "LSAN_LEAK_COUNT" << formatter::get<Style::GREYED> << " (__lsan_leakCount)"
+                   << formatter::format<Style::ITALIC>(" (currently ") << formatter::clear<Style::GREYED>
+                   << __lsan_leakCount << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
             break;
         }
         stream << leakInfo << std::endl;
@@ -247,7 +247,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         printCallstackSizeExceeded(stream);
         self.callstackSizeExceeded = false;
     }
-    stream << Formatter::clear<Style::ITALIC>;
+    stream << formatter::clear<Style::ITALIC>;
     callstack_clearCaches();
     callstack_autoClearCaches = true;
     return stream;

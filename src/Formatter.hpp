@@ -28,7 +28,7 @@
  * A namespace containing helper functions and classes for formatting
  * output on terminals.
  */
-namespace Formatter {
+namespace formatter {
 /// An enumeration containing possible formats.
 enum class Style {
     /// Represents the text color green.

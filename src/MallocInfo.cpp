@@ -26,14 +26,14 @@
 #include "../include/lsan_internals.h"
 
 auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
-    using Formatter::Style;
+    using formatter::Style;
     
-    stream << Formatter::get<Style::ITALIC>
-           << Formatter::format<Style::BOLD, Style::RED>("Leak") << " of size "
-           << Formatter::clear<Style::ITALIC>
-           << bytesToString(self.size) << Formatter::get<Style::ITALIC> << ", ";
+    stream << formatter::get<Style::ITALIC>
+           << formatter::format<Style::BOLD, Style::RED>("Leak") << " of size "
+           << formatter::clear<Style::ITALIC>
+           << bytesToString(self.size) << formatter::get<Style::ITALIC> << ", ";
     if (self.createdInFile.has_value() && self.createdOnLine.has_value()) {
-        stream << "allocated at " << Formatter::format<Style::UNDERLINED>(self.createdInFile.value() + ":" + std::to_string(self.createdOnLine.value()));
+        stream << "allocated at " << formatter::format<Style::UNDERLINED>(self.createdInFile.value() + ":" + std::to_string(self.createdOnLine.value()));
     } else {
         stream << "allocation stacktrace:";
     }

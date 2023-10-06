@@ -132,13 +132,13 @@ void __wrap_free(void * pointer, const char * file, int line) {
 }
 
 [[ noreturn ]] void __wrap_exit(int code, const char * file, int line) {
-    using Formatter::Style;
+    using formatter::Style;
     
     LSan::setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << std::endl
-        << Formatter::format<Style::GREEN>("Exiting") << " at "
-        << Formatter::get<Style::UNDERLINED> << file << ":" << line << Formatter::clear<Style::UNDERLINED>
+        << formatter::format<Style::GREEN>("Exiting") << " at "
+        << formatter::get<Style::UNDERLINED> << file << ":" << line << formatter::clear<Style::UNDERLINED>
         << std::endl;
     
     if (__lsan_printExitPoint) {
