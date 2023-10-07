@@ -69,7 +69,7 @@ static inline void __lsan_printStatsCore(const std::string & statsName, std::siz
         << __lsan_getCurrentMallocCount() << " objects"
         << formatter::clear<Style::BOLD>
         << " currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl;
-     printBarObjects(width, out);
+    printBarObjects(width, out);
 }
 
 /**
@@ -101,7 +101,6 @@ static inline void __lsan_printBar(std::size_t         current,
     out << formatter::clear<Style::GREYED, Style::UNDERLINED>
         << formatter::format<Style::BOLD>("]") << " of " << formatter::format<Style::BOLD>(peekText) << " peek"
         << std::endl << std::endl;
-
 }
 
 /**
@@ -117,7 +116,6 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
         << formatter::get<Style::GREYED, Style::UNDERLINED>;
     
     const auto & infos = LSan::getInstance().getFragmentationInfos();
-//    std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
     auto it = infos.cbegin();
     if (infos.size() < width) {
         const float step = static_cast<float>(width) / infos.size();
@@ -196,11 +194,10 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
         << formatter::get<Style::GREYED, Style::UNDERLINED>;
     
     const auto & infos = LSan::getInstance().getFragmentationInfos();
-//    std::lock_guard lock(LSan::getInstance().getFragmentationInfoMutex());
     auto it = infos.cbegin();
     std::size_t currentBlockBegin = 0,
-           currentBlockEnd   = it->second.getSize(),
-           b                 = 0;
+                currentBlockEnd   = it->second.getSize(),
+                b                 = 0;
     
     std::size_t total       = 0;
     for (const auto & [_, info] : infos) {

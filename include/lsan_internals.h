@@ -17,8 +17,8 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef lsan_internals_hpp
-#define lsan_internals_hpp
+#ifndef lsan_internals_h
+#define lsan_internals_h
 
 #include "deprecation.h"
 
@@ -164,7 +164,7 @@ extern size_t __lsan_firstPartyThreshold;
 #endif
 
 #ifndef VERSION
-# define VERSION "clean build"
+ #define VERSION "clean build"
 #endif
 
-#endif /* lsan_internals_hpp */
+#endif /* lsan_internals_h */
