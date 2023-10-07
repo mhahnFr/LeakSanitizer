@@ -27,16 +27,35 @@
 #include "../../include/lsan_internals.h"
 
 namespace lsan::callstackHelper {
+/**
+ * Returns whether the given binary file name is this library.
+ *
+ * @param name the name to be checked
+ * @return whether the given name is this library
+ */
 static inline auto isInLSan(const std::string & name) -> bool {
     return LSan::getInstance().getLibName() == name;
 }
 
+/**
+ * Returns whether the given binary file name should be ignored totally.
+ *
+ * @param file the binary file name to be checked
+ * @return whether to totally ignore the binary
+ */
 static inline auto isTotallyIgnored(const std::string & file) -> bool {
     // So far totally ignored: Everything Objective-C and Swift (using ARC -> no leak).
-    return file.find("libobjc.A.dylib") != std::string::npos
+    return file.find("libobjc.A.dylib")    != std::string::npos
         || file.rfind("/usr/lib/swift", 0) != std::string::npos;
 }
 
+/**
+ * Returns whether the given binary file name represents a first party
+ * (system) binary.
+ *
+ * @param file the binary file name to be checked
+ * @return whether the given binary file name is first party
+ */
 static inline auto isFirstParty(const std::string & file) -> bool {
     return file.rfind("/usr/lib", 0) != std::string::npos
         || file.rfind("/lib", 0)     != std::string::npos
@@ -66,6 +85,13 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
     return CallstackType::FIRST_PARTY;
 }
 
+/**
+ * Formats the given callstack frame onto the given output stream using the given style.
+ *
+ * @param frame the callstack frame to be formatted
+ * @param out the output stream
+ * @tparam S the style to be used
+ */
 template<formatter::Style S>
 static inline void formatShared(const struct callstack_frame & frame, std::ostream & out) {
     using formatter::Style;
