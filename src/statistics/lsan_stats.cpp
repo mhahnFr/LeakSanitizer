@@ -21,7 +21,7 @@
 #include <iostream>
 #include <functional>
 
-#include "../Formatter.hpp"
+#include "../formatter.hpp"
 #include "../bytePrinter.hpp"
 #include "../LeakSani.hpp"
 

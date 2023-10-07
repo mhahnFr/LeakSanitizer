@@ -21,7 +21,7 @@
 
 #include "callstackHelper.hpp"
 
-#include "../Formatter.hpp"
+#include "../formatter.hpp"
 #include "../LeakSani.hpp"
 
 #include "../../include/lsan_internals.h"

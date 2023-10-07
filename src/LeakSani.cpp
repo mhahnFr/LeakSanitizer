@@ -25,7 +25,7 @@
 
 #include "LeakSani.hpp"
 
-#include "Formatter.hpp"
+#include "formatter.hpp"
 #include "bytePrinter.hpp"
 #include "signalHandlers.hpp"
 #include "callstacks/callstackHelper.hpp"

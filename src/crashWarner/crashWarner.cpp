@@ -22,7 +22,7 @@
 #include "crash.hpp"
 #include "warn.hpp"
 
-#include "../Formatter.hpp"
+#include "../formatter.hpp"
 #include "../callstacks/callstackHelper.hpp"
 
 namespace lsan {

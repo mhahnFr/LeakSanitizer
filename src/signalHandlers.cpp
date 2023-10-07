@@ -21,7 +21,7 @@
 
 #include "signalHandlers.hpp"
 
-#include "Formatter.hpp"
+#include "formatter.hpp"
 #include "LeakSani.hpp"
 #include "MallocInfo.hpp"
 #include "callstacks/callstackHelper.hpp"
@@ -43,7 +43,7 @@ namespace lsan {
  * @param signal the signal code
  * @return a string representation of the given signal
  */
-static std::string signalString(int signal) {
+static inline std::string signalString(int signal) {
     switch (signal) {
         case SIGBUS:  return "Bus error";
         case SIGABRT: return "Abort";
@@ -64,7 +64,6 @@ static std::string signalString(int signal) {
     using formatter::Style;
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalString(signal))
                + " on address " + formatter::formatString<Style::BOLD>(address), __builtin_return_address(0));
-    std::terminate();
 }
 
 void callstackSignal(int) {

@@ -20,7 +20,7 @@
 #include "MallocInfo.hpp"
 
 #include "LeakSani.hpp"
-#include "Formatter.hpp"
+#include "formatter.hpp"
 #include "bytePrinter.hpp"
 
 #include "../include/lsan_internals.h"

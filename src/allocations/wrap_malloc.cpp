@@ -24,7 +24,7 @@
 #include "interpose.hpp"
 #include "realAlloc.hpp"
 #include "../LeakSani.hpp"
-#include "../Formatter.hpp"
+#include "../formatter.hpp"
 #include "../callstacks/callstackHelper.hpp"
 #include "../crashWarner/crash.hpp"
 #include "../crashWarner/warn.hpp"
