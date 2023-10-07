@@ -41,6 +41,11 @@ LSan & LSan::getInstance() {
     return *instance;
 }
 
+/**
+ * Returns an optional containing the runtime name of this library.
+ *
+ * @return the runtime name of this library if available
+ */
 static inline auto lsanName() -> std::optional<const std::string> {
     Dl_info info;
     if (!dladdr(reinterpret_cast<const void *>(&lsanName), &info)) {
@@ -60,7 +65,7 @@ LSan::LSan(): libName(lsanName().value()) {
     signal(SIGUSR2, callstackSignal);
 }
 
-auto LSan::removeMalloc(void * pointer, const void * omitAddress) -> MallocInfoRemoved {
+auto LSan::removeMalloc(void * pointer, void * omitAddress) -> MallocInfoRemoved {
     auto it = infos.find(pointer);
     if (it == infos.end()) {
         return MallocInfoRemoved(false, std::nullopt);
@@ -115,6 +120,12 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
     return ret;
 }
 
+/**
+ * Signal handler used to exit this sanitizer and to reset the visibility
+ * of the terminal cursor.
+ *
+ * @param signal the signal code, passed to the exit function
+ */
 static inline void resetCursorSignal(int signal) {
     (__lsan_printCout ? std::cout : std::cerr) << "\033[?25h";
     std::_Exit(signal);
@@ -205,6 +216,11 @@ void LSan::printWebsite() {
         << std::endl << std::endl;
 }
 
+/**
+ * Prints the callstack size exceeded hint onto the given output stream.
+ *
+ * @param stream the output stream to print to
+ */
 static inline void printCallstackSizeExceeded(std::ostream & stream) {
     using formatter::Style;
     
