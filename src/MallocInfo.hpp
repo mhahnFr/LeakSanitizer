@@ -218,7 +218,7 @@ public:
      *
      * @return the deleted callstack
      */
-    inline auto getDeletedCallstack() -> std::optional<lcs::callstack> {
+    inline auto getDeletedCallstack() -> std::optional<lcs::callstack> & {
         return deletedCallstack;
     }
     /**
