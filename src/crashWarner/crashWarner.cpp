@@ -27,7 +27,7 @@
 
 namespace lsan {
 /**
- * Prints the given message and a callstack up to the provided omit address.
+ * Prints the given message and the given callstack.
  *
  * @param message the message to be printed
  * @param callstack the callstack to be printed
@@ -44,14 +44,20 @@ static inline void printer(const std::string & message, lcs::callstack & callsta
     std::cerr << std::endl;
 }
 
+/**
+ * Prints the given message and the given callstack.
+ *
+ * @param message the message to be printed
+ * @param callstack the callstack to be printed
+ * @tparam Warning whether to use warning formatting
+ */
 template<bool Warning>
 static inline void printer(const std::string & message, lcs::callstack && callstack) {
     printer<Warning>(message, callstack);
 }
 
 /**
- * Prints the given message, the file with line number and a callstack up to+
- * the provided omit address.
+ * Prints the given message, the file with line number and the given callstack.
  *
  * @param message the message to be printed
  * @param file the file name
@@ -79,8 +85,7 @@ static inline void printer(const std::string & message,
 
 /**
  * Prints the given message, the allocation information found in the
- * optionally provided allocation record and a callstack up to the given
- * omit address.
+ * optionally provided allocation record and the given callstack.
  *
  * @param message the message to be printed
  * @param info the optional allocation record
@@ -110,6 +115,14 @@ static inline void printer(const std::string &                                  
     }
 }
 
+/**
+ * Executes the given function with a callstack up to the given omit address
+ * if the generated callstack is user relevant.
+ *
+ * @param omitAddress the callstack delimiter
+ * @param function the function to be executed
+ * @tparam F the function's type - it will get a lcs::callstack as the only argument
+ */
 template<typename F>
 static inline void withCallstack(void * omitAddress, const F & function) {
     auto callstack = lcs::callstack(omitAddress);
