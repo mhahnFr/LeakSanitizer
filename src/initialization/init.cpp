@@ -17,15 +17,17 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "init.h"
+#include "init.hpp"
 
 #include "../LeakSani.hpp"
 
+namespace lsan {
 bool inited = false;
 
-void onLoad() {
-    (void) lsan::LSan::getIgnoreMalloc();
-    (void) lsan::LSan::getInstance();
+void __lsan_onLoad() {
+    (void) LSan::getIgnoreMalloc();
+    (void) LSan::getInstance();
     
     inited = true;
+}
 }
