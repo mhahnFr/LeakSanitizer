@@ -22,6 +22,7 @@
 #include "callstackHelper.hpp"
 
 #include "../formatter.hpp"
+#include "../lsanMisc.hpp"
 #include "../LeakSani.hpp"
 
 #include "../../include/lsan_internals.h"
@@ -34,7 +35,7 @@ namespace lsan::callstackHelper {
  * @return whether the given name is this library
  */
 static inline auto isInLSan(const std::string & name) -> bool {
-    return LSan::getInstance().getLibName() == name;
+    return getInstance().getLibName() == name;
 }
 
 /**
@@ -140,7 +141,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     }
     if (i < size) {
         stream << std::endl << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more lines...") << std::endl;
-        LSan::getInstance().setCallstackSizeExceeded(true);
+        getInstance().setCallstackSizeExceeded(true);
     }
 }
 }

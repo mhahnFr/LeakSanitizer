@@ -19,14 +19,14 @@
 
 #include "init.hpp"
 
-#include "../LeakSani.hpp"
+#include "../lsanMisc.hpp"
 
 namespace lsan {
 bool inited = false;
 
 void __lsan_onLoad() {
-    (void) LSan::getIgnoreMalloc();
-    (void) LSan::getInstance();
+    (void) getIgnoreMalloc();
+    (void) getInstance();
     
     inited = true;
 }

@@ -55,14 +55,6 @@ class LSan {
     /// The runtime name of this sanitizer.
     const std::string libName;
     
-    /**
-     * Returns a reference to a boolean value indicating
-     * whether to ignore allocations.
-     *
-     * @return the ignoration flag
-     */
-    static auto _getIgnoreMalloc() -> bool &;
-    
 public:
     /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
     LSan();
@@ -120,24 +112,6 @@ public:
     void addMalloc(MallocInfo && info);
     
     /**
-     * Sets whether to ignore subsequent allocation management requests.
-     *
-     * @param ignoreMalloc whether to ignore allocations
-     */
-    static inline void setIgnoreMalloc(const bool ignoreMalloc) {
-        _getIgnoreMalloc() = ignoreMalloc;
-    }
-    
-    /**
-     * Returns whether to ignore subsequent alloction management requests.
-     *
-     * @return whether to ignore allocations
-     */
-    static inline auto getIgnoreMalloc() -> bool {
-        return _getIgnoreMalloc();
-    }
-    
-    /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
      * principal list containing the allocation records.
      *
@@ -172,48 +146,16 @@ public:
     }
     
     /**
-     * Returns the current instance of this sanitizer.
-     *
-     * @return the current instance
-     */
-    static auto getInstance() -> LSan &;
-    
-    /**
-     * Returns the current instance of the statitcs object.
+     * Returns the current instance of the statistics object.
      *
      * @return the current statistics instance
      */
-    inline static auto getStats() -> const Stats & {
-        return getInstance().stats;
+    constexpr inline auto getStats() -> const Stats & {
+        return stats;
     }
-    
-    /**
-     * Prints the informations of this sanitizer.
-     */
-    static void printInformations();
-    /**
-     * Prints the license information of this sanitizer.
-     */
-    static void printLicense();
-    /**
-     * Prints the link to the website of this sanitizer.
-     */
-    static void printWebsite();
-    /**
-     * @brief The hook to be called on exit.
-     *
-     * It prints all informations tracked by the sanitizer and performs internal cleaning.
-     */
-    static void __exit_hook();
-    
-    friend void           internalCleanUp();
+
     friend std::ostream & operator<<(std::ostream &, LSan &);
 };
-
-/**
- * Deletes the currently active instance of the sanitizer.
- */
-void internalCleanUp();
 }
 
 #endif /* LeakSani_hpp */

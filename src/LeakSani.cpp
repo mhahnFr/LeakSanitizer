@@ -25,8 +25,9 @@
 
 #include "LeakSani.hpp"
 
-#include "formatter.hpp"
 #include "bytePrinter.hpp"
+#include "formatter.hpp"
+#include "lsanMisc.hpp"
 #include "signalHandlers.hpp"
 #include "callstacks/callstackHelper.hpp"
 
@@ -36,11 +37,6 @@
 #include "../CallstackLibrary/include/callstack_internals.h"
 
 namespace lsan {
-LSan & LSan::getInstance() {
-    static LSan * instance = new LSan();
-    return *instance;
-}
-
 /**
  * Returns an optional containing the runtime name of this library.
  *
@@ -56,7 +52,7 @@ static inline auto lsanName() -> std::optional<const std::string> {
 }
 
 LSan::LSan(): libName(lsanName().value()) {
-    atexit(reinterpret_cast<void (*)()>(__exit_hook));
+    atexit(reinterpret_cast<void (*)()>(exitHook));
     struct sigaction s{};
     s.sa_sigaction = crashHandler;
     sigaction(SIGSEGV, &s, nullptr);
@@ -105,11 +101,6 @@ void LSan::addMalloc(MallocInfo && info) {
     }
     
     infos.insert_or_assign(info.getPointer(), info);
-}
-
-auto LSan::_getIgnoreMalloc() -> bool & {
-    static bool ignoreMalloc = false;
-    return ignoreMalloc;
 }
 
 auto LSan::getTotalAllocatedBytes() -> std::size_t {
@@ -164,56 +155,6 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
         std::signal(SIGTERM, SIG_DFL);
     }
     return std::make_tuple(count, bytes, buffer);
-}
-
-void LSan::__exit_hook() {
-    using formatter::Style;
-    
-    setIgnoreMalloc(true);
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << std::endl << formatter::format<Style::GREEN>("Exiting");
-    
-    if (__lsan_printExitPoint) {
-        out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
-        callstackHelper::format(lcs::callstack(__builtin_return_address(0)), out);
-    }
-    out << std::endl << std::endl
-        << getInstance() << std::endl;
-    printInformations();
-    internalCleanUp();
-}
-
-void internalCleanUp() {
-    delete &LSan::getInstance();
-}
-
-void LSan::printInformations() {
-    using formatter::Style;
-    
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << "Report by " << formatter::format<Style::BOLD>("LeakSanitizer ")
-        << formatter::format<Style::ITALIC>(VERSION)
-        << std::endl << std::endl;
-    if (__lsan_printLicense) { printLicense(); }
-    if (__lsan_printWebsite) { printWebsite(); }
-}
-
-void LSan::printLicense() {
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << "Copyright (C) 2022 - 2023 mhahnFr and contributors" << std::endl
-        << "Licensed under the terms of the GPL 3.0."           << std::endl
-        << std::endl;
-}
-
-void LSan::printWebsite() {
-    using formatter::Style;
-    
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << formatter::get<Style::ITALIC>
-        << "For more information, visit "
-        << formatter::format<Style::UNDERLINED>("github.com/mhahnFr/LeakSanitizer")
-        << formatter::clear<Style::ITALIC>
-        << std::endl << std::endl;
 }
 
 /**

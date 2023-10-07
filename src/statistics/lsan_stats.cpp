@@ -23,6 +23,7 @@
 
 #include "../formatter.hpp"
 #include "../bytePrinter.hpp"
+#include "../lsanMisc.hpp"
 #include "../LeakSani.hpp"
 
 #include "../../include/lsan_internals.h"
@@ -30,15 +31,15 @@
 
 using namespace lsan;
 
-auto __lsan_getTotalMallocs() -> std::size_t { return LSan::getStats().getTotalMallocCount(); }
-auto __lsan_getTotalBytes()   -> std::size_t { return LSan::getStats().getTotalBytes();       }
-auto __lsan_getTotalFrees()   -> std::size_t { return LSan::getStats().getTotalFreeCount();   }
+auto __lsan_getTotalMallocs() -> std::size_t { return getStats().getTotalMallocCount(); }
+auto __lsan_getTotalBytes()   -> std::size_t { return getStats().getTotalBytes();       }
+auto __lsan_getTotalFrees()   -> std::size_t { return getStats().getTotalFreeCount();   }
 
-auto __lsan_getCurrentMallocCount() -> std::size_t { return LSan::getStats().getCurrentMallocCount(); }
-auto __lsan_getCurrentByteCount()   -> std::size_t { return LSan::getStats().getCurrentBytes();       }
+auto __lsan_getCurrentMallocCount() -> std::size_t { return getStats().getCurrentMallocCount(); }
+auto __lsan_getCurrentByteCount()   -> std::size_t { return getStats().getCurrentBytes();       }
 
-auto __lsan_getMallocPeek() -> std::size_t { return LSan::getStats().getMallocPeek(); }
-auto __lsan_getBytePeek()   -> std::size_t { return LSan::getStats().getBytePeek();   }
+auto __lsan_getMallocPeek() -> std::size_t { return getStats().getMallocPeek(); }
+auto __lsan_getBytePeek()   -> std::size_t { return getStats().getBytePeek();   }
 
 /**
  * @brief Prints the statistics using the given parameters.
@@ -115,7 +116,7 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
     out << formatter::format<Style::BOLD>("[")
         << formatter::get<Style::GREYED, Style::UNDERLINED>;
     
-    const auto & infos = LSan::getInstance().getFragmentationInfos();
+    const auto & infos = getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
     if (infos.size() < width) {
         const float step = static_cast<float>(width) / infos.size();
@@ -193,7 +194,7 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
     out << formatter::format<Style::BOLD>("[")
         << formatter::get<Style::GREYED, Style::UNDERLINED>;
     
-    const auto & infos = LSan::getInstance().getFragmentationInfos();
+    const auto & infos = getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
     std::size_t currentBlockBegin = 0,
                 currentBlockEnd   = it->second.getSize(),
@@ -281,9 +282,9 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
 void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
     using formatter::Style;
     
-    std::lock_guard lock(LSan::getInstance().getMutex());
-    bool ignore = LSan::getIgnoreMalloc();
-    LSan::setIgnoreMalloc(true);
+    std::lock_guard lock(getInstance().getMutex());
+    bool ignore = getIgnoreMalloc();
+    setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_statsActive) {
         __lsan_printStatsCore("memory fragmentation", width, out,
@@ -301,16 +302,16 @@ void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
             << std::endl << std::endl;
     }
     if (!ignore) {
-        LSan::setIgnoreMalloc(false);
+        setIgnoreMalloc(false);
     }
 }
 
 void __lsan_printStatsWithWidth(std::size_t width) {
     using formatter::Style;
     
-    std::lock_guard lock(LSan::getInstance().getMutex());
-    bool ignore = LSan::getIgnoreMalloc();
-    LSan::setIgnoreMalloc(true);
+    std::lock_guard lock(getInstance().getMutex());
+    bool ignore = getIgnoreMalloc();
+    setIgnoreMalloc(true);
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     if (__lsan_statsActive) {
         __lsan_printStatsCore("memory usage", width, out,
@@ -327,6 +328,6 @@ void __lsan_printStatsWithWidth(std::size_t width) {
             << std::endl << std::endl;
     }
     if (!ignore) {
-        LSan::setIgnoreMalloc(false);
+        setIgnoreMalloc(false);
     }
 }
