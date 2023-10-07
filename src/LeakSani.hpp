@@ -30,9 +30,8 @@
 
 #include "MallocInfo.hpp"
 
+#include "initialization/init.hpp"
 #include "statistics/Stats.hpp"
-
-#include "initialization/init.h"
 
 #include "../include/lsan_internals.h"
 

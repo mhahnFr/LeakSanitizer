@@ -82,10 +82,10 @@
 		BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeakSani.cpp; sourceTree = "<group>"; };
 		BF72C3CB2885CB9E00C7AE5C /* leaksan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = leaksan.h; sourceTree = "<group>"; };
 		BF72C3CC2885CB9E00C7AE5C /* stdlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdlib.h; sourceTree = "<group>"; };
+		BF84625A2AD1B2D3003B05F5 /* init.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = init.hpp; sourceTree = "<group>"; };
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
 		BF97EB5628831E5B00DAF1FE /* liblsan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblsan.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFA41A3E2AB8BC1800DF6FAC /* init.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = init.cpp; sourceTree = "<group>"; };
-		BFA41A412AB8BC4A00DF6FAC /* init.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = init.h; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFBCAD892ACF376600C6B69F /* realAlloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = realAlloc.hpp; sourceTree = "<group>"; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
@@ -212,7 +212,7 @@
 			isa = PBXGroup;
 			children = (
 				BFA41A3E2AB8BC1800DF6FAC /* init.cpp */,
-				BFA41A412AB8BC4A00DF6FAC /* init.h */,
+				BF84625A2AD1B2D3003B05F5 /* init.hpp */,
 			);
 			path = initialization;
 			sourceTree = "<group>";

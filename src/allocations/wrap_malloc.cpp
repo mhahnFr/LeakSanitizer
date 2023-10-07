@@ -24,12 +24,11 @@
 #include "interpose.hpp"
 #include "realAlloc.hpp"
 #include "../LeakSani.hpp"
-#include "../formatter.hpp"
 #include "../callstacks/callstackHelper.hpp"
 #include "../crashWarner/crash.hpp"
 #include "../crashWarner/warn.hpp"
-
-#include "../initialization/init.h"
+#include "../formatter.hpp"
+#include "../initialization/init.hpp"
 
 #include "../../include/lsan_stats.h"
 #include "../../include/lsan_internals.h"
