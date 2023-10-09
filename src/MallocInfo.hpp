@@ -38,25 +38,25 @@ namespace lsan {
  * pointer are stored as well.
  */
 class MallocInfo {
-    /// The pointer to the allocated piece of memory.
+    /** The pointer to the allocated piece of memory.             */
     void * pointer;
-    /// The size of the allocated piece of memory.
+    /** The size of the allocated piece of memory.                */
     std::size_t size;
     
-    /// The filename in which this allocation happened.
+    /** The filename in which this allocation happened.           */
     std::optional<std::string> createdInFile;
-    /// The line number in which this allocation happened.
+    /** The line number in which this allocation happened.        */
     std::optional<int>         createdOnLine;
-    /// The callstack where this allocation happened.
+    /** The callstack where this allocation happened.             */
     mutable lcs::callstack     createdCallstack;
     
-    /// The filename in which this allocation was deallocated.
+    /** The filename in which this allocation was deallocated.    */
     std::optional<std::string>            deletedInFile;
-    /// The line number in which this allocation was deallocated.
+    /** The line number in which this allocation was deallocated. */
     std::optional<int>                    deletedOnLine;
-    /// Indicating whether this allocation has been deallocated.
+    /** Indicating whether this allocation has been deallocated.  */
     bool                                  deleted;
-    /// The callstack where the deallocation happened.
+    /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
     
 public:

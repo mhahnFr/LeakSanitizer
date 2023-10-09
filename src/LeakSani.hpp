@@ -40,23 +40,22 @@ namespace lsan {
  * This class manages everything this sanitizer is capable to do.
  */
 class LSan {
-    /** A pair consisting of a boolean and an optional allocation record. */
+    /** A pair consisting of a boolean and an optional allocation record.               */
     using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
     
-    /// A map containing all allocation records, sorted by their allocated pointers.
+    /** A map containing all allocation records, sorted by their allocated pointers.    */
     std::map<const void * const, MallocInfo> infos;
-    /// An object holding all statistics.
+    /** An object holding all statistics.                                               */
     Stats                                    stats;
-    /// Indicates whether the set callstack size has been exceeded during the printing.
+    /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool                                     callstackSizeExceeded = false;
-    /// The mutex used to synchronize the allocations and tracking.
+    /** The mutex used to synchronize the allocations and tracking.                     */
     std::recursive_mutex                     mutex;
     
-    /// The runtime name of this sanitizer.
+    /** The runtime name of this sanitizer.                                             */
     const std::string libName;
     
 public:
-    /// Constructs the sanitizer manager. Initializes all variables and sets up the hooks and signal handlers.
     LSan();
    ~LSan() {
         inited = false;

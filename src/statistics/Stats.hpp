@@ -26,56 +26,38 @@
 #include "../MallocInfo.hpp"
 
 namespace lsan {
-/// This class contains all statistics that this sanitizer produces.
+/**
+ * This class contains all statistics that this sanitizer produces.
+ */
 class Stats {
-    /// The mutex used to protect the statistics.
+    /** The mutex used to protect the statistics.                     */
     mutable std::mutex mutex;
     
-    /// The count of currently active allocations.
+    /** The count of currently active allocations.                    */
     std::size_t currentMallocCount = 0,
-    /// The total count of allocations tracked by this sanitizer.
+    /** The total count of allocations tracked by this sanitizer.     */
                   totalMallocCount = 0,
-    /// The maximal count of active allocations at one time.
+    /** The maximal count of active allocations at one time.          */
                    peekMallocCount = 0;
 
-    /// The count of currently allocated bytes.
+    /** The count of currently allocated bytes.                       */
     std::size_t currentBytes = 0,
-    /// The total count of allocated bytes tracked by this sanitizer.
+    /** The total count of allocated bytes tracked by this sanitizer. */
                   totalBytes = 0,
-    /// The maximal count of active allocated bytes at one time.
+    /** The maximal count of active allocated bytes at one time.      */
                    peekBytes = 0;
     
-    /// The count of deallocations tracked by this sanitizer.
+    /** The count of deallocations tracked by this sanitizer.         */
     std::size_t freeCount = 0;
     
 public:
     Stats() = default;
    ~Stats() = default;
     
-    /**
-     * Trivial copy constructor.
-     *
-     * @param other the other instance to be copied
-     */
     Stats(const Stats & other);
-    /**
-     * Trivial move constructor.
-     *
-     * @param other the other instance to be moved into this instance
-     */
     Stats(Stats && other);
     
-    /**
-     * Trivial copy assign operator.
-     *
-     * @param other the other instance to be copied
-     */
     Stats & operator=(const Stats & other);
-    /**
-     * Trivial move assign operator.
-     *
-     * @param other the other instance to be moved into this instance
-     */
     Stats & operator=(Stats && other);
     
     /**
