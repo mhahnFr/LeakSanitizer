@@ -20,6 +20,6 @@ _Coming soon_
 ## Final notes
 This project is licensed under the terms of the GPL 3.0.
 
-© Copyright 2022 - 2023  [mhahnFr][1] and contributors
+© Copyright 2022 - 2023 [mhahnFr][1] and contributors
 
 [1]: https://github.com/mhahnFr
