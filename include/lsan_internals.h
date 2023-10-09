@@ -157,6 +157,15 @@ extern size_t __lsan_leakCount;
  */
 extern size_t __lsan_callstackSize;
 
+/**
+ * @brief This value defines the number of first party frames upon which callstacks
+ * are considered to be first party.
+ *
+ * Up to this amount of frames callstacks are considered to be user initiated.
+ * Defaults to `3`.
+ *
+ * @since 1.7
+ */
 extern size_t __lsan_firstPartyThreshold;
 
 #ifdef __cplusplus
