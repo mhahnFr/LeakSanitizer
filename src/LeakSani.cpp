@@ -211,13 +211,10 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     
     stream << std::endl << formatter::format<Style::BOLD>("Summary: ");
     if (i == __lsan_leakCount) {
-        stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of "
-               << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
-               << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
-    } else {
-        stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
-               << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
+        stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of ";
     }
+    stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
+           << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
     stream << std::endl;
     
     stream << formatter::clear<Style::ITALIC>;
