@@ -170,7 +170,7 @@ static inline void printCallstackSizeExceeded(std::ostream & stream) {
            << formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << formatter::get<Style::GREYED>
            << " (__lsan_callstackSize)" << formatter::format<Style::ITALIC>(" (currently ")
            << formatter::clear<Style::GREYED> << __lsan_callstackSize
-           << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
+           << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
 }
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
@@ -179,7 +179,10 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard lock(self.mutex);
     
     const auto & [count, bytes, leaks] = self.getLeakNumbers();
-    if (count == 0) return stream;
+    if (count == 0) {
+        stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
+        return stream;
+    }
     
     stream << formatter::get<Style::ITALIC>
            << count << " leaks total, " << bytesToString(bytes) << " total" << std::endl << std::endl;
