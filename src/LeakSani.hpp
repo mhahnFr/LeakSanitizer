@@ -51,6 +51,7 @@ class LSan {
     bool                                     callstackSizeExceeded = false;
     /** The mutex used to synchronize the allocations and tracking.                     */
     std::recursive_mutex                     mutex;
+    std::mutex infoMutex;
     
     /** The runtime name of this sanitizer.                                             */
     const std::string libName;
@@ -82,6 +83,10 @@ public:
      */
     constexpr inline auto getMutex() -> std::recursive_mutex & {
         return mutex;
+    }
+    
+    constexpr inline auto getInfoMutex() -> std::mutex & {
+        return infoMutex;
     }
     
     /**

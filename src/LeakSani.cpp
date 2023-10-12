@@ -62,6 +62,8 @@ LSan::LSan(): libName(lsanName().value()) {
 }
 
 auto LSan::removeMalloc(void * pointer, void * omitAddress) -> MallocInfoRemoved {
+    std::lock_guard lock(infoMutex);
+    
     auto it = infos.find(pointer);
     if (it == infos.end()) {
         return MallocInfoRemoved(false, std::nullopt);
@@ -78,6 +80,8 @@ auto LSan::removeMalloc(void * pointer, void * omitAddress) -> MallocInfoRemoved
 }
 
 auto LSan::changeMalloc(const MallocInfo & info) -> bool {
+    std::lock_guard lock(infoMutex);
+
     auto it = infos.find(info.getPointer());
     if (it == infos.end()) {
         return false;
@@ -96,6 +100,8 @@ auto LSan::changeMalloc(const MallocInfo & info) -> bool {
 }
 
 void LSan::addMalloc(MallocInfo && info) {
+    std::lock_guard lock(infoMutex);
+    
     if (__lsan_statsActive) {
         stats += info;
     }
@@ -104,6 +110,8 @@ void LSan::addMalloc(MallocInfo && info) {
 }
 
 auto LSan::getTotalAllocatedBytes() -> std::size_t {
+    std::lock_guard lock(infoMutex);
+    
     std::size_t ret = 0;
     for (const auto & [ptr, info] : infos) {
         ret += info.getSize();
@@ -176,7 +184,7 @@ static inline void printCallstackSizeExceeded(std::ostream & stream) {
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     using formatter::Style;
     
-    std::lock_guard lock(self.mutex);
+    std::lock_guard lock(self.infoMutex);
     
     const auto & [count, bytes, leaks] = self.getLeakNumbers();
     if (count == 0) {
