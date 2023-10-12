@@ -18,7 +18,7 @@ to their indicated values:
 | `LSAN_PRINT_COUT`              | Print to the default output stream                    | `true`, `false`   | `false`       |
 | `LSAN_PRINT_FORMATTED`         | Print using ANSI escape codes                         | `true`, `false`   | `true`        |
 | `LSAN_PRINT_LICENSE`           | Print the license notice on exit                      | `true`, `false`   | `true`        |
-| `LSAN_PRINT_WEBSITE`           | Print to print the link to the website                | `true`, `false`   | `true`        |
+| `LSAN_PRINT_WEBSITE`           | Print the link to the website                         | `true`, `false`   | `true`        |
 | `LSAN_INVALID_CRASH`           | Terminate if an invalid action is detected            | `true`, `false`   | `true`        |
 | `LSAN_INVALID_FREE`            | Detect invalid de-allocations                         | `true`, `false`   | `false`       |
 | `LSAN_FREE_NULL`               | Issue a warning if `NULL` is `free`d                  | `true`, `false`   | `false`       |
