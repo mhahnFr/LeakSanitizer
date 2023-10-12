@@ -116,6 +116,8 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
     out << formatter::format<Style::BOLD>("[")
         << formatter::get<Style::GREYED, Style::UNDERLINED>;
     
+    std::lock_guard lock(getInstance().getInfoMutex());
+    
     const auto & infos = getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
     if (infos.size() < width) {
@@ -193,6 +195,8 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
     
     out << formatter::format<Style::BOLD>("[")
         << formatter::get<Style::GREYED, Style::UNDERLINED>;
+    
+    std::lock_guard lock(getInstance().getInfoMutex());
     
     const auto & infos = getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
