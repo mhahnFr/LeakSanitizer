@@ -137,8 +137,8 @@ auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward
     }
     for (auto & [ptr, info] : infos) {
         if (__lsan_printFormatted) {
-            char buffer[6] {};
-            std::snprintf(buffer, 6, "%05.2f", static_cast<double>(i) / total * 100);
+            char buffer[7] {};
+            std::snprintf(buffer, 7, "%05.2f", static_cast<double>(i) / total * 100);
             out << "\rCollecting the leaks: " << formatter::format<formatter::Style::BOLD>(buffer) << " %";
         }
         
