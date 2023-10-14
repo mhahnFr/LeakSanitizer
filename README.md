@@ -48,7 +48,66 @@ Add this sanitizers library to the dynamic loader preload environment variable:
 > LD_PRELOAD=/usr/local/lib/liblsan.so ./a.out
 > ```
 
-_Leaks_
+### Leaks
+Once this sanitizer is bundled with your application the detected memory leaks are
+printed upon termination.
+
+```C
+// main.c
+
+#include <string.h>
+#include <stdlib.h>
+
+int main(void) {
+    void * a = malloc(1023);
+    a = strdup("Hello World!");
+    a = NULL;
+    a = malloc(1000);
+    free(a);
+}
+```
+Compiled and linked on macOS with: `cc main.c -L<path/to/library> -llsan`
+creates the following output:
+```
+Exiting
+
+2 leaks total, 1.01 KiB total          
+
+Leak of size 1023 B, allocation stacktrace:
+In: main + 18
+at: start + 1903
+
+Leak of size 13 B, allocation stacktrace:
+At: strdup + 32
+in: main + 34
+at: start + 1903
+
+
+Summary: 2 leaks, 1.01 KiB lost.
+```
+
+#### Line numbers
+To (partially) add line numbers, you can add `-Wno-gnu-include-next -I<path/to/library>/include` to the compiling flags.
+
+The previous example compiled and linked on macOS with:
+`cc main.c -Wno-gnu-include-next -I<path/to/library>/include -L<path/to/library> -llsan` creates the following output:
+```
+Exiting
+
+2 leaks total, 1.01 KiB total       
+
+Leak of size 1023 B, allocated at main.c:7
+In: main + 30
+at: start + 1903
+
+Leak of size 13 B, allocation stacktrace:
+At: strdup + 32
+in: main + 46
+at: start + 1903
+
+
+Summary: 2 leaks, 1.01 KiB lost.
+```
 
 ### Behaviour
 Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the 
