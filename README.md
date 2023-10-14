@@ -22,6 +22,31 @@ If you downloaded a release you can simply move the headers and the library anyw
 you like.
 
 ### How to use
+To use this sanitizer simply link your application against it or preload its library.
+
+#### Linking
+- Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default
+directories.
+- On Linux add `-rdynamic` to the linking flags.
+ 
+Link with: `-llsan`.
+ 
+> Example **macOS**: `-L<path/to/library> -llsan`
+
+> Example **Linux**: `-rdynamic -L<path/to/library> -llsan`
+
+#### Preloading
+Add this sanitizers library to the dynamic loader preload environment variable:
+- **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/library>`
+> Example:
+> ```shell
+> DYLD_INSERT_LIBRARIES=/usr/local/lib/liblsan.dylib ./a.out
+> ```
+- **Linux**: `LD_PRELOAD=<path/to/library`
+> Example:
+> ```shell
+> LD_PRELOAD=/usr/local/lib/liblsan.so ./a.out
+> ```
 
 _Leaks_
 
