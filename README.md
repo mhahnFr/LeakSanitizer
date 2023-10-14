@@ -44,7 +44,7 @@ This sanitizer comes with handlers for the following signals:
 More on the signal handlers here.
 
 ### Statistics
-The statistics of the tracked memory can be queried at runtime. To do so, activate the statistical
+The statistics of the tracked memory can be queried at runtime. To do so activate the statistical
 bookkeeping by setting either the environment variable `LSAN_STATS_ACTIVE` or the variable `__lsan_statsActive`
 to `true`.  
 The statistics then can be queried using the following API:
@@ -62,7 +62,17 @@ The statistics then can be queried using the following API:
 | `__lsan_printFStats()`           | Prints the fragmentation statistics to the output stream specified by `LSAN_PRINT_COUT`. |
 
 ## Behind the scenes or: How does it work?
-_Coming soon_
+In order to track the memory allocations this sanitizer replaces the four allocation management functions
+`malloc`, `calloc`, `realloc` and `free`. Every allocation and de-allocation is registered and a backtrace
+is stored for it.  
+Its own allocations are not tracked.
+
+The signal handlers and the wrapper functions are installed once the sanitizer has been loaded by the
+dynamic loader.
+
+When the exit handler registered using `atexit` is invoked the allocated memory is examined and
+the detected memory leaks are printed.  
+The backtraces are translated using the CallstackLibrary.
 
 ## Final notes
 This project is licensed under the terms of the GPL 3.0.
