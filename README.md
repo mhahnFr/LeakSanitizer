@@ -1,5 +1,12 @@
 # Welcome to the LeakSanitizer!
-_TODO: What's that?_
+The LeakSanitizer is a tool designed to debug memory leaks.
+
+It can be used with almost any programming language that compiles to native
+machine code.  
+Officially supported are currently: C, C++, Objective-C, Swift.
+
+> Note for Swift and Objective-C:
+> This sanitizer does not check for strong reference cycles.
 
 ## Usage
 ### Installation
