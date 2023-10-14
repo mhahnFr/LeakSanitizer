@@ -9,8 +9,8 @@ _How to install_
 _Leaks_
 
 ### Behaviour
-Since version 1.6 the behaviour can be adjusted by setting the following environment variables
-to their indicated values:
+Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the 
+following environment variables to their indicated values:
 
 | Name                           | Description                                           | Values            | Default value |
 |--------------------------------|-------------------------------------------------------|-------------------|---------------|
@@ -43,7 +43,23 @@ This sanitizer comes with handlers for the following signals:
 
 More on the signal handlers here.
 
-_Stats_
+### Statistics
+The statistics of the tracked memory can be queried at runtime. To do so, activate the statistical
+bookkeeping by setting either the environment variable `LSAN_STATS_ACTIVE` or the variable `__lsan_statsActive`
+to `true`.  
+The statistics then can be queried using the following API:
+
+| Function                         | Description                                                                              |
+|----------------------------------|------------------------------------------------------------------------------------------|
+| `__lsan_getTotalMallocs()`       | Returns the total count of allocations registered.                                       |
+| `__lsan_getTotalBytes()`         | Returns the total count of allocated bytes.                                              |
+| `__lsan_getTotalFrees()`         | Returns the total count of registered and `free`d objects.                               |
+| `__lsan_getCurrentMallocCount()` | Returns the count of currently active allocations.                                       |
+| `__lsan_getCurrentByteCount()`   | Returns the amount of currently allocated bytes.                                         |
+| `__lsan_getMallocPeek()`         | Returns the highest amount of allocations at the same time.                              |
+| `__lsan_getBytePeek()`           | Returns the highest amount of bytes allocated at the same time.                          |
+| `__lsan_printStats()`            | Prints the statistics to the output stream specified by `LSAN_PRINT_COUT`.               |
+| `__lsan_printFStats()`           | Prints the fragmentation statistics to the output stream specified by `LSAN_PRINT_COUT`. |
 
 ## Behind the scenes or: How does it work?
 _Coming soon_
