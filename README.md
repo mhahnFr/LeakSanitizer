@@ -9,7 +9,7 @@ _How to install_
 _Leaks_
 
 ### Behaviour
-Since v1.6? the behaviour can be adjusted by setting the following environment variables
+Since version 1.6 the behaviour can be adjusted by setting the following environment variables
 to their indicated values:
 
 | Name                           | Description                                           | Values            | Default value |
@@ -29,7 +29,19 @@ to their indicated values:
 | `LSAN_PRINT_EXIT_POINT`        | **Since v1.7:** Print the callstack of the exit point | `true`, `false`   | `false`       |
 | ~~`LSAN_PRINT_STATS_ON_EXIT`~~ | **Deprecated** since v1.7, will be removed in v2      | `true`, `false`   | `false`       |
 
-_Signals_
+More on the environment variables here.
+
+### Signals
+This sanitizer comes with handlers for the following signals:
+
+| Signal  | Action                             |
+|---------|------------------------------------|
+| SIGSEGV | Printing callstack of the crash    |
+| SIGBUS  | Printing callstack of the crash    |
+| SIGUSR1 | Printing the statistics if enabled |
+| SIGUSR2 | Printing the current callstack     |
+
+More on the signal handlers here.
 
 _Stats_
 
