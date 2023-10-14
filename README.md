@@ -2,9 +2,26 @@
 _TODO: What's that?_
 
 ## Usage
-_Usage coming soon_  
-_Download or compile_  
-_How to install_
+### Installation
+Get started by either downloading a prebuilt version of this sanitizer here.
+Alternatively you can also build it from source:
+1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
+2. go into the cloned repository: `cd LeakSanitizer`
+3. and build the library: `make`.
+
+Or in one step:
+```shell
+git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make
+```
+
+Once you have a copy of this sanitizer you can install it using the following command:
+```shell
+make INSTALL_PATH=/usr/local install
+```
+If you downloaded a release you can simply move the headers and the library anywhere
+you like.
+
+### How to use
 
 _Leaks_
 
@@ -34,12 +51,12 @@ More on the environment variables here.
 ### Signals
 This sanitizer comes with handlers for the following signals:
 
-| Signal  | Action                             |
-|---------|------------------------------------|
-| SIGSEGV | Printing callstack of the crash    |
-| SIGBUS  | Printing callstack of the crash    |
-| SIGUSR1 | Printing the statistics if enabled |
-| SIGUSR2 | Printing the current callstack     |
+| Signal  | Action                                                                                |
+|---------|---------------------------------------------------------------------------------------|
+| SIGSEGV | Printing the callstack of the crash.                                                  |
+| SIGBUS  | Printing the callstack of the crash.                                                  |
+| SIGUSR1 | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
+| SIGUSR2 | Printing the current callstack.                                                       |
 
 More on the signal handlers here.
 
