@@ -3,14 +3,14 @@ The LeakSanitizer is a tool designed to debug memory leaks.
 
 It can be used with almost any programming language that compiles to native
 machine code.  
-Officially supported are currently: C, C++, Objective-C, Swift.
+Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 
 > Note for Swift and Objective-C:
 > This sanitizer does not check for strong reference cycles.
 
 ## Usage
 ### Installation
-Get started by either downloading a prebuilt version of this sanitizer here.
+Get started by either downloading a prebuilt version of this sanitizer [here][1].
 Alternatively you can also build it from source:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
 2. go into the cloned repository: `cd LeakSanitizer`
@@ -73,7 +73,7 @@ int main(void) {
     free(a);
 }
 ```
-Compiled and linked on macOS with: `cc main.c -L<path/to/library> -llsan`
+Compiled and linked on macOS with `cc main.c -L<path/to/library> -llsan`
 creates the following output:
 ```
 Exiting
@@ -96,7 +96,7 @@ Summary: 2 leaks, 1.01 KiB lost.
 #### Line numbers
 To (partially) add line numbers, you can add `-Wno-gnu-include-next -I<path/to/library>/include` to the compiling flags.
 
-The previous example compiled and linked on macOS with:
+The previous example compiled and linked on macOS with
 `cc main.c -Wno-gnu-include-next -I<path/to/library>/include -L<path/to/library> -llsan` creates the following output:
 ```
 Exiting
@@ -137,7 +137,7 @@ following environment variables to their indicated values:
 | `LSAN_PRINT_EXIT_POINT`        | **Since v1.7:** Print the callstack of the exit point | `true`, `false`   | `false`       |
 | ~~`LSAN_PRINT_STATS_ON_EXIT`~~ | **Deprecated** since v1.7, will be removed in v2      | `true`, `false`   | `false`       |
 
-More on the environment variables here.
+More on the environment variables [here][2].
 
 ### Signals
 This sanitizer comes with handlers for the following signals:
@@ -149,7 +149,7 @@ This sanitizer comes with handlers for the following signals:
 | SIGUSR1 | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
 | SIGUSR2 | Printing the current callstack.                                                       |
 
-More on the signal handlers here.
+More on the signal handlers [here][3].
 
 ### Statistics
 The statistics of the tracked memory can be queried at runtime. To do so activate the statistical
@@ -169,6 +169,8 @@ The statistics then can be queried using the following API:
 | `__lsan_printStats()`            | Prints the statistics to the output stream specified by `LSAN_PRINT_COUT`.               |
 | `__lsan_printFStats()`           | Prints the fragmentation statistics to the output stream specified by `LSAN_PRINT_COUT`. |
 
+More on the statistics [here][4].
+
 ## Behind the scenes or: How does it work?
 In order to track the memory allocations this sanitizer replaces the four allocation management functions
 `malloc`, `calloc`, `realloc` and `free`. Every allocation and de-allocation is registered and a backtrace
@@ -180,11 +182,14 @@ dynamic loader.
 
 When the exit handler registered using `atexit` is invoked the allocated memory is examined and
 the detected memory leaks are printed.  
-The backtraces are translated using the CallstackLibrary.
+The backtraces are translated using the [CallstackLibrary][5].
 
 ## Final notes
 This project is licensed under the terms of the GPL 3.0.
 
-© Copyright 2022 - 2023 [mhahnFr][1] and contributors
+© Copyright 2022 - 2023 [mhahnFr][6] and contributors
 
-[1]: https://github.com/mhahnFr
+[1]: https://github.com/mhahnFr/LeakSanitizer/releases
+[3]: https://github.com/mhahnFr/LeakSanitizer/wiki/Signal-handlers
+[5]: https://github.com/mhahnFr/CallstackLibrary
+[6]: https://github.com/mhahnFr
