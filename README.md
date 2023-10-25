@@ -5,7 +5,7 @@ It can be used with almost any programming language that compiles to native
 machine code.  
 Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 
-> Note for Swift and Objective-C:
+> **Note** for Swift and Objective-C:  
 > This sanitizer does not check for strong reference cycles.
 
 ## Usage
@@ -142,12 +142,12 @@ More on the environment variables [here][2].
 ### Signals
 This sanitizer comes with handlers for the following signals:
 
-| Signal  | Action                                                                                |
-|---------|---------------------------------------------------------------------------------------|
-| SIGSEGV | Printing the callstack of the crash.                                                  |
-| SIGBUS  | Printing the callstack of the crash.                                                  |
-| SIGUSR1 | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
-| SIGUSR2 | Printing the current callstack.                                                       |
+| Signal    | Action                                                                                |
+|-----------|---------------------------------------------------------------------------------------|
+| `SIGSEGV` | Printing the callstack of the crash.                                                  |
+| `SIGBUS`  | Printing the callstack of the crash.                                                  |
+| `SIGUSR1` | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
+| `SIGUSR2` | Printing the current callstack.                                                       |
 
 More on the signal handlers [here][3].
 
