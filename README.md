@@ -8,6 +8,14 @@ Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 > **Note** for Swift and Objective-C:  
 > This sanitizer does not check for strong reference cycles.
 
+## Quickstart
+Use the LeakSanitizer to check for memory leaks as follows:
+1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
+2. Build it: `cd LeakSanitizer && make`
+3. Link your code with: `-L<path/to/library> -llsan`
+
+More explanation can be found in the [wiki][7]; the detailed explanation follows below.
+
 ## Usage
 ### Installation
 Get started by either downloading a prebuilt version of this sanitizer [here][1].
@@ -195,3 +203,4 @@ This project is licensed under the terms of the GPL 3.0.
 [4]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h
 [5]: https://github.com/mhahnFr/CallstackLibrary
 [6]: https://github.com/mhahnFr
+[7]: httos://github.com/mhahnFr/LeakSanitizer/wiki
