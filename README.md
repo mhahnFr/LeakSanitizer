@@ -203,4 +203,4 @@ This project is licensed under the terms of the GPL 3.0.
 [4]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h
 [5]: https://github.com/mhahnFr/CallstackLibrary
 [6]: https://github.com/mhahnFr
-[7]: httos://github.com/mhahnFr/LeakSanitizer/wiki
+[7]: https://github.com/mhahnFr/LeakSanitizer/wiki
