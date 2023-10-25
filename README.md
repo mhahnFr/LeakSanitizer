@@ -22,7 +22,7 @@ Get started by either downloading a prebuilt version of this sanitizer [here][1]
 Alternatively you can also build it from source:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
 2. go into the cloned repository: `cd LeakSanitizer`
-3. and build the library: `make`.
+3. and build the library: `make`
 
 Or in one step:
 ```shell
@@ -44,7 +44,7 @@ To use this sanitizer simply link your application against it or preload its lib
 directories.
 - On Linux add `-rdynamic` to the linking flags.
  
-Link with: `-llsan`.
+Link with: `-llsan`
  
 > Example **macOS**: `-L<path/to/library> -llsan`
 
@@ -150,12 +150,11 @@ More on the environment variables [here][2].
 ### Signals
 This sanitizer comes with handlers for the following signals:
 
-| Signal    | Action                                                                                |
-|-----------|---------------------------------------------------------------------------------------|
-| `SIGSEGV` | Printing the callstack of the crash.                                                  |
-| `SIGBUS`  | Printing the callstack of the crash.                                                  |
-| `SIGUSR1` | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
-| `SIGUSR2` | Printing the current callstack.                                                       |
+| Signal               | Action                                                                                |
+|----------------------|---------------------------------------------------------------------------------------|
+| `SIGSEGV` & `SIGBUS` | Printing the callstack of the crash.                                                  |
+| `SIGUSR1`            | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
+| `SIGUSR2`            | Printing the current callstack.                                                       |
 
 More on the signal handlers [here][3].
 
