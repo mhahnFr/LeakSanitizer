@@ -199,7 +199,7 @@ This project is licensed under the terms of the GPL 3.0.
 [1]: https://github.com/mhahnFr/LeakSanitizer/releases
 [2]: https://github.com/mhahnFr/LeakSanitizer/wiki/Behaviour
 [3]: https://github.com/mhahnFr/LeakSanitizer/wiki/Signal-handlers
-[4]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h
+[4]: https://github.com/mhahnFr/LeakSanitizer/wiki/Home#Statistics
 [5]: https://github.com/mhahnFr/CallstackLibrary
 [6]: https://github.com/mhahnFr
 [7]: https://github.com/mhahnFr/LeakSanitizer/wiki
