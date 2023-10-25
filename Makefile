@@ -85,6 +85,11 @@ uninstall:
 	- $(RM) $(INSTALL_PATH)/lib/$(NAME)
 	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -name \*.h))
 
+release:
+	- $(RM) $(NAME)
+	$(MAKE) NO_LICENSE=false NO_WEBSITE=false LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
+	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(NAME)" $(NAME); fi
+
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -shared -fPIC $(OBJS) $(LDFLAGS) -o $(SHARED_L)
 
