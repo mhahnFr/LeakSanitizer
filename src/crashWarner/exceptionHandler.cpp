@@ -27,6 +27,8 @@
 #include "crash.hpp"
 #include "../lsanMisc.hpp"
 
+#include "../../CallstackLibrary/include/callstack_exception.hpp"
+
 namespace lsan {
 static inline auto demangle(const char * string) noexcept -> std::string {
     int status;
@@ -41,7 +43,16 @@ static inline auto demangle(const char * string) noexcept -> std::string {
 
 [[ noreturn ]] static inline void handleException(std::exception & exception) noexcept {
     std::stringstream stream;
-    stream << demangle(typeid(exception).name()) << ": " << exception.what();
+    stream << "Uncaught exception of type " << demangle(typeid(exception).name()) << ": \"" << exception.what() << "\"";
+    
+    crashForce(stream.str());
+}
+
+[[ noreturn ]] static inline void handleException(lcs::exception & exception) noexcept {
+    exception.setPrintStacktrace(false);
+    
+    std::stringstream stream;
+    stream << "Uncaught exception of type " << exception.what();
     
     crashForce(stream.str());
 }
@@ -50,6 +61,8 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     setIgnoreMalloc(true);
     try {
         std::rethrow_exception(std::current_exception());
+    } catch (lcs::exception & exception) {
+        handleException(exception);
     } catch (std::exception & exception) {
         handleException(exception);
     } catch (...) {
