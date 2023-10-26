@@ -17,6 +17,7 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cxxabi.h>
 #include <exception>
 #include <sstream>
 #include <typeinfo>
@@ -24,17 +25,30 @@
 #include "exceptionHandler.hpp"
 
 #include "crash.hpp"
+#include "../lsanMisc.hpp"
 
 namespace lsan {
+static inline auto demangle(const char * string) noexcept -> std::string {
+    int status;
+    const char * result = abi::__cxa_demangle(string, nullptr, nullptr, &status);
+    if (result == nullptr || result == string) {
+        return string;
+    }
+    std::string toReturn = result;
+    std::free(const_cast<char *>(result));
+    return toReturn;
+}
+
 [[ noreturn ]] static inline void handleException(std::exception & exception) noexcept {
     std::stringstream stream;
     stream << "Terminating due to uncaught exception of type ";
-    stream << typeid(exception).name();
+    stream << demangle(typeid(exception).name());
     
     crashForce(stream.str());
 }
 
 [[ noreturn ]] void exceptionHandler() noexcept {
+    setIgnoreMalloc(true);
     try {
         std::rethrow_exception(std::current_exception());
     } catch (std::exception & exception) {
