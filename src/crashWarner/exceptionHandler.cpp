@@ -41,8 +41,7 @@ static inline auto demangle(const char * string) noexcept -> std::string {
 
 [[ noreturn ]] static inline void handleException(std::exception & exception) noexcept {
     std::stringstream stream;
-    stream << "Terminating due to uncaught exception of type ";
-    stream << demangle(typeid(exception).name());
+    stream << demangle(typeid(exception).name()) << ": " << exception.what();
     
     crashForce(stream.str());
 }
