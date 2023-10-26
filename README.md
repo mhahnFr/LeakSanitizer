@@ -102,7 +102,8 @@ Summary: 2 leaks, 1.01 KiB lost.
 ```
 
 #### Line numbers
-To (partially) add line numbers, you can add `-Wno-gnu-include-next -I<path/to/library>/include` to the compiling flags.
+To (partially) add line numbers, you can add `-Wno-gnu-include-next -I<path/to/library>/include` to the compiling flags
+of your code.
 
 The previous example compiled and linked on macOS with
 `cc main.c -Wno-gnu-include-next -I<path/to/library>/include -L<path/to/library> -llsan` creates the following output:
