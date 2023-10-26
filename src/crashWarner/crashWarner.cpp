@@ -22,6 +22,8 @@
 #include "crash.hpp"
 #include "warn.hpp"
 
+#include "../LeakSani.hpp"
+#include "../lsanMisc.hpp"
 #include "../formatter.hpp"
 #include "../callstacks/callstackHelper.hpp"
 
@@ -42,6 +44,10 @@ static inline void printer(const std::string & message, lcs::callstack & callsta
     std::cerr << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
     callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
+    
+    if (!Warning) {
+        getInstance().maybeHintCallstackSize(std::cerr);
+    }
 }
 
 /**

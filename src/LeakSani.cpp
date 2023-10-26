@@ -181,6 +181,12 @@ static inline void printCallstackSizeExceeded(std::ostream & stream) {
            << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
 }
 
+void LSan::maybeHintCallstackSize(std::ostream & out) const {
+    if (callstackSizeExceeded) {
+        printCallstackSizeExceeded(out);
+    }
+}
+
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     using formatter::Style;
     

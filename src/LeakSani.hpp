@@ -137,6 +137,8 @@ public:
      */
     auto getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>>;
     
+    void maybeHintCallstackSize(std::ostream & out) const;
+    
     /**
      * Returns the globally tracked allocations.
      *
