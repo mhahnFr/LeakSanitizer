@@ -66,8 +66,8 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     } catch (std::exception & exception) {
         handleException(exception);
     } catch (...) {
-        // TODO: Implement
+        // Unknown type...
     }
-    crashForce("Unknown uncaught exception!");
+    crashForce("Unknown uncaught exception");
 }
 }
