@@ -25,7 +25,7 @@ DYLIB_NA = $(CORE_NAME).dylib
 LIBCALLSTACK_NAME = libcallstack
 LIBCALLSTACK_DIR  = ./CallstackLibrary
 LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
-LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true' 'CXX_OPTIMIZED=true'
+LIBCALLSTACK_FLAG = 'CXX_DEMANGLER=true' 'CXX_FUNCTIONS=true'
 
 SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
 OBJS  = $(patsubst %.cpp, %.o, $(SRC))
