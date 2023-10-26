@@ -17,19 +17,11 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "init.hpp"
-
-#include "../lsanMisc.hpp"
-#include "../crashWarner/exceptionHandler.hpp"
+#ifndef exceptionHandler_hpp
+#define exceptionHandler_hpp
 
 namespace lsan {
-bool inited = false;
+[[ noreturn ]] void exceptionHandler() noexcept;
+}
 
-void __lsan_onLoad() {
-    (void) getIgnoreMalloc();
-    (void) getInstance();
-    (void) std::set_terminate(exceptionHandler);
-    
-    inited = true;
-}
-}
+#endif /* exceptionHandler_hpp */

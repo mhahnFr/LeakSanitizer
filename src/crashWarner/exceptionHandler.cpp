@@ -17,19 +17,31 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "init.hpp"
+#include <exception>
+#include <sstream>
+#include <typeinfo>
 
-#include "../lsanMisc.hpp"
-#include "../crashWarner/exceptionHandler.hpp"
+#include "exceptionHandler.hpp"
+
+#include "crash.hpp"
 
 namespace lsan {
-bool inited = false;
-
-void __lsan_onLoad() {
-    (void) getIgnoreMalloc();
-    (void) getInstance();
-    (void) std::set_terminate(exceptionHandler);
+[[ noreturn ]] static inline void handleException(std::exception & exception) noexcept {
+    std::stringstream stream;
+    stream << "Terminating due to uncaught exception of type ";
+    stream << typeid(exception).name();
     
-    inited = true;
+    crashForce(stream.str());
+}
+
+[[ noreturn ]] void exceptionHandler() noexcept {
+    try {
+        std::rethrow_exception(std::current_exception());
+    } catch (std::exception & exception) {
+        handleException(exception);
+    } catch (...) {
+        // TODO: Implement
+    }
+    crashForce("Unknown uncaught exception!");
 }
 }

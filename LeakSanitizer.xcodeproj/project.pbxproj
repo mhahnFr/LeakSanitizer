@@ -21,6 +21,10 @@
 		BF23A2DF289ECE6A00B17349 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF23A2E2289ED24200B17349 /* Stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2E0289ED24200B17349 /* Stats.cpp */; };
 		BF23A2E3289ED24200B17349 /* Stats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2E1289ED24200B17349 /* Stats.hpp */; };
+		BF2C5CB22AEAB75100DE2224 /* exceptionHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */; };
+		BF2C5CB32AEAB75B00DE2224 /* exceptionHandler.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */; };
+		BF2C5CB42AEAB76A00DE2224 /* exceptionHandler.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */; };
+		BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */; };
 		BF3204EE2AC5C614004EC77E /* callstackHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */; };
 		BF3204EF2AC5C614004EC77E /* callstackHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */; };
 		BF3204F02AC5C614004EC77E /* callstackHelper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */; };
@@ -66,6 +70,8 @@
 		BF23A2DD289ECE6A00B17349 /* lsan_stats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_stats.h; sourceTree = "<group>"; };
 		BF23A2E0289ED24200B17349 /* Stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Stats.cpp; sourceTree = "<group>"; };
 		BF23A2E1289ED24200B17349 /* Stats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Stats.hpp; sourceTree = "<group>"; };
+		BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = exceptionHandler.cpp; sourceTree = "<group>"; };
+		BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = exceptionHandler.hpp; sourceTree = "<group>"; };
 		BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = callstackHelper.cpp; sourceTree = "<group>"; };
 		BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = callstackHelper.hpp; sourceTree = "<group>"; };
 		BF34157C2A8405AD00DEEF10 /* deprecation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deprecation.h; sourceTree = "<group>"; };
@@ -153,6 +159,8 @@
 				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
 				BF4368F62AACF06F00252E2A /* crash.hpp */,
 				BF4368F72AACF07700252E2A /* warn.hpp */,
+				BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */,
+				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
 			);
 			path = crashWarner;
 			sourceTree = "<group>";
@@ -245,6 +253,7 @@
 			files = (
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
 				BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */,
+				BF2C5CB42AEAB76A00DE2224 /* exceptionHandler.hpp in Headers */,
 				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
 				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
 				BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */,
@@ -264,6 +273,7 @@
 			files = (
 				BF23A2DF289ECE6A00B17349 /* lsan_stats.h in Headers */,
 				BF621FDE28A291DE00414EE4 /* lsan_internals.h in Headers */,
+				BF2C5CB32AEAB75B00DE2224 /* exceptionHandler.hpp in Headers */,
 				BF72C3CF2885CB9E00C7AE5C /* leaksan.h in Headers */,
 				BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */,
 				BF84625F2AD1B489003B05F5 /* lsanMisc.hpp in Headers */,
@@ -356,6 +366,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */,
 				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
 				BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */,
 				BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */,
@@ -375,6 +386,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF2C5CB22AEAB75100DE2224 /* exceptionHandler.cpp in Sources */,
 				BF49A5D92899599300BC1FFD /* signalHandlers.cpp in Sources */,
 				BF23A2E2289ED24200B17349 /* Stats.cpp in Sources */,
 				BF621FE228A2B61E00414EE4 /* bytePrinter.cpp in Sources */,
