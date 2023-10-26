@@ -154,19 +154,19 @@ void warn(const std::string &                                     message,
 void crash(const std::string & message, void * omitAddress) {
     withCallstack(omitAddress, [&] (auto & callstack) {
         printer<false>(message, callstack);
-        std::terminate();
+        std::abort();
     });
 }
 
 void crashForce(const std::string & message, void * omitAddress) {
     printer<false>(message, lcs::callstack(omitAddress));
-    std::terminate();
+    std::abort();
 }
 
 void crash(const std::string & message, const std::string & file, int line, void * omitAddress) {
     withCallstack(omitAddress, [&] (auto & callstack) {
         printer<false>(message, file, line, callstack);
-        std::terminate();
+        std::abort();
     });
 }
 
@@ -175,7 +175,7 @@ void crash(const std::string &                                     message,
            void *                                                  omitAddress) {
     withCallstack(omitAddress, [&] (auto & callstack) {
         printer<false>(message, info, callstack);
-        std::terminate();
+        std::abort();
     });
 }
 }
