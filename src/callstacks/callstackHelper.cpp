@@ -99,7 +99,7 @@ static inline void formatShared(const struct callstack_frame & frame, std::ostre
     
     out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
     if (frame.sourceFile != nullptr) {
-        out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED> << frame.sourceFile
+        out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED> << callstack_frame_getShortestSourceFile(&frame)
             << ":" << frame.sourceLine << formatter::clear<Style::GREYED, Style::UNDERLINED>;
         if (S == Style::GREYED || S == Style::BOLD) {
             out << formatter::get<S>;
