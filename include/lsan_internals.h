@@ -135,6 +135,14 @@ extern bool __lsan_statsActive;
  */
 extern bool __lsan_printExitPoint;
 
+/**
+ * @brief If this value is set to `true`, the name of the binary file a given
+ * callstack frame comes from is printed as well.
+ *
+ * Defaults to `true`.
+ *
+ * @since 1.8
+ */
 extern bool __lsan_printBinaries;
 
 /**
