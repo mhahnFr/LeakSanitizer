@@ -97,6 +97,13 @@ template<formatter::Style S>
 static inline void formatShared(const struct callstack_frame & frame, std::ostream & out) {
     using formatter::Style;
     
+    if (__lsan_printBinaries) {
+        bool reset = false;
+        if (S == Style::GREYED || S == Style::BOLD) {
+            reset = true;
+        }
+        out << formatter::format<Style::ITALIC>("(" + std::string(callstack_frame_getShortestName(&frame)) + ")") << (reset ? formatter::get<S>() : "") << " ";
+    }
     out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
     if (frame.sourceFile != nullptr) {
         out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED> << callstack_frame_getShortestSourceFile(&frame)

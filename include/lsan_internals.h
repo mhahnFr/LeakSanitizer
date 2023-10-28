@@ -135,6 +135,8 @@ extern bool __lsan_statsActive;
  */
 extern bool __lsan_printExitPoint;
 
+extern bool __lsan_printBinaries;
+
 /**
  * @brief This value defines the count of leaks that are printed at the exit of the program.
  *
