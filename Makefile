@@ -90,6 +90,12 @@ release:
 	$(MAKE) NO_LICENSE=false NO_WEBSITE=false LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
 	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(NAME)" $(NAME); fi
 
+update:
+	git pull
+	git submodule update
+	git -C $(LIBCALLSTACK_DIR) submodule update
+	$(MAKE) re
+
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -shared -fPIC $(OBJS) $(LDFLAGS) -o $(SHARED_L)
 
@@ -113,6 +119,6 @@ fclean: clean
 re: fclean
 	$(MAKE) default
 
-.PHONY: re fclean clean all install uninstall
+.PHONY: re fclean clean all install uninstall release default update
 
 -include $(DEPS)
