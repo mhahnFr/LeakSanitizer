@@ -14,6 +14,12 @@ Use the LeakSanitizer to check for memory leaks as follows:
 2. Build it: `cd LeakSanitizer && make`
 3. Link your code with: `-L<path/to/library> -llsan`
 
+> **Update** the LeakSanitizer using:
+> 
+> ```shell
+> make update
+> ```
+
 More explanation can be found in the [wiki][7]; the detailed explanation follows below.
 
 ## Usage
@@ -35,6 +41,13 @@ make INSTALL_PATH=/usr/local install
 ```
 If you downloaded a release you can simply move the headers and the library anywhere
 you like.
+
+### Updating
+Update the LeakSanitizer by either downloading the new release or, when cloned from the repository, using:
+```shell
+make update
+```
+Install it again as described above.
 
 ### How to use
 To use this sanitizer simply link your application against it or preload its library.
