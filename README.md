@@ -5,8 +5,10 @@ It can be used with almost any programming language that compiles to native
 machine code.  
 Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 
-> **Note** for Swift and Objective-C:  
-> This sanitizer does not check for strong reference cycles.
+> **Note** for Swift and Objective-C:
+> 
+> Objective-C and Swift objects are never considered to become memory leaks - 
+> even in the case of strong reference cycles.
 
 ## Quickstart
 Use the LeakSanitizer to check for memory leaks as follows:
