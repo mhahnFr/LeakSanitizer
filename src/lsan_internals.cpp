@@ -155,3 +155,5 @@ std::size_t __lsan_leakCount = getSize_t("LSAN_LEAK_COUNT").value_or(100);
 std::size_t __lsan_callstackSize = getSize_t("LSAN_CALLSTACK_SIZE").value_or(20);
 
 std::size_t __lsan_firstPartyThreshold = getSize_t("LSAN_FIRST_PARTY_THRESHOLD").value_or(3);
+
+const char * __lsan_firstPartyRegex = getVariable("LSAN_FIRST_PARTY_REGEX").value_or(nullptr);

@@ -178,6 +178,17 @@ extern size_t __lsan_callstackSize;
  */
 extern size_t __lsan_firstPartyThreshold;
 
+/**
+ * @brief This string defines the regex pattern for which binary file
+ * names are considered to be first party.
+ *
+ * These regular expressions are applied to the absolute path of the
+ * binary files.
+ *
+ * @since 1.8
+ */
+extern const char * __lsan_firstPartyRegex;
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
