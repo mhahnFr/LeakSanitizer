@@ -91,6 +91,7 @@ release:
 	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(NAME)" $(NAME); fi
 
 update:
+	$(MAKE) fclean
 	git pull
 	git submodule update
 	git -C $(LIBCALLSTACK_DIR) submodule update
