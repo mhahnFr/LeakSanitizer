@@ -10,6 +10,9 @@ Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 > Objective-C and Swift objects are never considered to become memory leaks - 
 > even in the case of strong reference cycles.
 
+This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are
+detected on both platforms.
+
 ## Quickstart
 Use the LeakSanitizer to check for memory leaks as follows:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
@@ -49,12 +52,12 @@ Update the LeakSanitizer by either downloading the new release or, when cloned f
 ```shell
 make update
 ```
-Install it again as described above.
+Install it again as described [above][8].
 
 ### How to use
-To use this sanitizer simply link your application against it or preload its library.
+To use this sanitizer simply link your application against it (recommended) or preload its library.
 
-#### Linking
+#### Linking (_recommended_)
 - Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default
 directories.
 - On Linux add `-rdynamic` to the linking flags.
@@ -66,7 +69,7 @@ Link with: `-llsan`
 > Example **Linux**: `-rdynamic -L<path/to/library> -llsan`
 
 #### Preloading
-Add this sanitizers library to the dynamic loader preload environment variable:
+Add this sanitizer's library to the dynamic loader preload environment variable:
 - **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/library>`
 > Example:
 > ```shell
@@ -160,7 +163,6 @@ following environment variables to their indicated values:
 | `LSAN_FIRST_PARTY_THRESHOLD`   | **Since v1.7:** The amount of first party frames      | `0` to `SIZE_MAX` | `3`           |
 | `LSAN_PRINT_EXIT_POINT`        | **Since v1.7:** Print the callstack of the exit point | `true`, `false`   | `false`       |
 | `LSAN_PRINT_BINARIES`          | **Since v1.8:** Print the binary file names           | `true`, `false`   | `true`        |
-| ~~`LSAN_PRINT_STATS_ON_EXIT`~~ | **Deprecated** since v1.7, will be removed in v2      | `true`, `false`   | `false`       |
 
 More on the environment variables [here][2].
 
@@ -220,3 +222,4 @@ This project is licensed under the terms of the GPL 3.0.
 [5]: https://github.com/mhahnFr/CallstackLibrary
 [6]: https://github.com/mhahnFr
 [7]: https://github.com/mhahnFr/LeakSanitizer/wiki
+[8]: #installation
