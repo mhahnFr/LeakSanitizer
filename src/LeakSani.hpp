@@ -25,6 +25,7 @@
 #include <mutex>
 #include <optional>
 #include <ostream>
+#include <regex>
 #include <utility>
 #include <vector>
 
@@ -53,9 +54,12 @@ class LSan {
     std::recursive_mutex                     mutex;
     /** This mutex is used to strictly synchronize the access to the infos.             */
     std::mutex                               infoMutex;
+    std::optional<std::optional<std::regex>> userRegex;
     
     /** The runtime name of this sanitizer.                                             */
     const std::string libName;
+    
+    void loadUserRegex();
     
 public:
     LSan();
@@ -67,6 +71,13 @@ public:
     LSan(const LSan &&)             = delete;
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
+    
+    inline auto getUserRegex() -> const std::optional<std::regex> & {
+        if (!userRegex.has_value()) {
+            loadUserRegex();
+        }
+        return userRegex.value();
+    }
     
     /**
      * Returns the runtime library name of this sanitizer.

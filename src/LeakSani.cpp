@@ -51,6 +51,22 @@ static inline auto lsanName() -> std::optional<const std::string> {
     return info.dli_fname;
 }
 
+static inline auto generateRegex(const char * regex) -> std::optional<std::regex> {
+    if (regex == nullptr) {
+        return std::nullopt;
+    }
+    
+    try {
+        return std::regex(regex);
+    } catch (std::regex_error &) {
+        return std::nullopt;
+    }
+}
+
+void LSan::loadUserRegex() {
+    userRegex = generateRegex(__lsan_firstPartyRegex);
+}
+
 LSan::LSan(): libName(lsanName().value()) {
     atexit(reinterpret_cast<void (*)()>(exitHook));
     struct sigaction s{};

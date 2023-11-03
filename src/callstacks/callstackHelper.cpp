@@ -18,6 +18,7 @@
  */
 
 #include <optional>
+#include <regex>
 
 #include "callstackHelper.hpp"
 
@@ -50,6 +51,15 @@ static inline auto isTotallyIgnored(const std::string & file) -> bool {
         || file.rfind("/usr/lib/swift", 0) != std::string::npos;
 }
 
+static inline auto isUserDefinedFirstParty(const std::string & file) -> bool {
+    const auto & regex = getInstance().getUserRegex();
+    if (!regex.has_value()) {
+        return false;
+    }
+    
+    return regex_search(file, regex.value());
+}
+
 /**
  * Returns whether the given binary file name represents a first party
  * (system) binary.
@@ -60,7 +70,8 @@ static inline auto isTotallyIgnored(const std::string & file) -> bool {
 static inline auto isFirstParty(const std::string & file) -> bool {
     return file.rfind("/usr/lib", 0) != std::string::npos
         || file.rfind("/lib", 0)     != std::string::npos
-        || file.rfind("/System", 0)  != std::string::npos;
+        || file.rfind("/System", 0)  != std::string::npos
+        || isUserDefinedFirstParty(file);
 }
 
 auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
