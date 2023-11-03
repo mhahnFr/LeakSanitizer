@@ -49,12 +49,12 @@ Update the LeakSanitizer by either downloading the new release or, when cloned f
 ```shell
 make update
 ```
-Install it again as described above.
+Install it again as described [above][8].
 
 ### How to use
-To use this sanitizer simply link your application against it or preload its library.
+To use this sanitizer simply link your application against it (recommended) or preload its library.
 
-#### Linking
+#### Linking (_recommended_)
 - Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default
 directories.
 - On Linux add `-rdynamic` to the linking flags.
@@ -66,7 +66,7 @@ Link with: `-llsan`
 > Example **Linux**: `-rdynamic -L<path/to/library> -llsan`
 
 #### Preloading
-Add this sanitizers library to the dynamic loader preload environment variable:
+Add this sanitizer's library to the dynamic loader preload environment variable:
 - **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/library>`
 > Example:
 > ```shell
@@ -220,3 +220,4 @@ This project is licensed under the terms of the GPL 3.0.
 [5]: https://github.com/mhahnFr/CallstackLibrary
 [6]: https://github.com/mhahnFr
 [7]: https://github.com/mhahnFr/LeakSanitizer/wiki
+[8]: #installation
