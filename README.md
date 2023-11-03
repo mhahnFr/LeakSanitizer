@@ -10,6 +10,9 @@ Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 > Objective-C and Swift objects are never considered to become memory leaks - 
 > even in the case of strong reference cycles.
 
+This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are
+detected on both platforms.
+
 ## Quickstart
 Use the LeakSanitizer to check for memory leaks as follows:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
