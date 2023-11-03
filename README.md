@@ -160,7 +160,6 @@ following environment variables to their indicated values:
 | `LSAN_FIRST_PARTY_THRESHOLD`   | **Since v1.7:** The amount of first party frames      | `0` to `SIZE_MAX` | `3`           |
 | `LSAN_PRINT_EXIT_POINT`        | **Since v1.7:** Print the callstack of the exit point | `true`, `false`   | `false`       |
 | `LSAN_PRINT_BINARIES`          | **Since v1.8:** Print the binary file names           | `true`, `false`   | `true`        |
-| ~~`LSAN_PRINT_STATS_ON_EXIT`~~ | **Deprecated** since v1.7, will be removed in v2      | `true`, `false`   | `false`       |
 
 More on the environment variables [here][2].
 
