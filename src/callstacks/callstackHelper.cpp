@@ -51,6 +51,12 @@ static inline auto isTotallyIgnored(const std::string & file) -> bool {
         || file.rfind("/usr/lib/swift", 0) != std::string::npos;
 }
 
+/**
+ * Returns whether the given file name is matched by the user defined regex.
+ *
+ * @param file the file name to be checked
+ * @return whether the name was matched
+ */
 static inline auto isUserDefinedFirstParty(const std::string & file) -> bool {
     const auto & regex = getInstance().getUserRegex();
     if (!regex.has_value()) {
