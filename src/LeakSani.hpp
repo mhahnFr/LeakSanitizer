@@ -54,14 +54,27 @@ class LSan {
     std::recursive_mutex                     mutex;
     /** This mutex is used to strictly synchronize the access to the infos.             */
     std::mutex                               infoMutex;
+    /** The optional user regular expression.                                           */
     std::optional<std::optional<std::regex>> userRegex;
+    /** The user regex error message.                                                   */
     std::optional<std::string> userRegexError;
     
     /** The runtime name of this sanitizer.                                             */
     const std::string libName;
     
+    /**
+     * @brief Generates and returns a regular expression object for the given string.
+     *
+     * Sets the regex error message if the given string was not a valid regular expression.
+     *
+     * @param regex the string with the regular expression
+     * @return an optional regex object
+     */
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
     
+    /**
+     * Loads the user first party regular expression.
+     */
     inline void loadUserRegex() {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
@@ -77,6 +90,11 @@ public:
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
     
+    /**
+     * Returns the user first party regular expression.
+     *
+     * @return the user regular expression
+     */
     inline auto getUserRegex() -> const std::optional<std::regex> & {
         if (!userRegex.has_value()) {
             loadUserRegex();
@@ -153,6 +171,11 @@ public:
      */
     auto getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>>;
     
+    /**
+     * Prints a hint about the exceeded callstack size if it was exceeded.
+     *
+     * @param out the output stream to print to
+     */
     void maybeHintCallstackSize(std::ostream & out) const;
     
     /**
