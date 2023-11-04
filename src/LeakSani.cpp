@@ -51,20 +51,17 @@ static inline auto lsanName() -> std::optional<const std::string> {
     return info.dli_fname;
 }
 
-static inline auto generateRegex(const char * regex) -> std::optional<std::regex> {
+auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
     if (regex == nullptr) {
         return std::nullopt;
     }
     
     try {
         return std::regex(regex);
-    } catch (std::regex_error &) {
+    } catch (std::regex_error & e) {
+        userRegexError = e.what();
         return std::nullopt;
     }
-}
-
-void LSan::loadUserRegex() {
-    userRegex = generateRegex(__lsan_firstPartyRegex);
 }
 
 LSan::LSan(): libName(lsanName().value()) {
@@ -237,6 +234,15 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     if (self.callstackSizeExceeded) {
         printCallstackSizeExceeded(stream);
         self.callstackSizeExceeded = false;
+    }
+    
+    if (self.userRegexError.has_value()) {
+        stream << std::endl << formatter::get<Style::RED>
+               << formatter::format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
+               << formatter::format<Style::ITALIC>("__lsan_firstPartyRegex") << ") "
+               << formatter::format<Style::BOLD>("ignored: ")
+               << formatter::format<Style::ITALIC, Style::BOLD>("\"" + self.userRegexError.value() + "\"")
+               << formatter::clear<Style::RED> << std::endl;
     }
     
     stream << std::endl << formatter::format<Style::BOLD>("Summary: ");

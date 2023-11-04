@@ -55,11 +55,16 @@ class LSan {
     /** This mutex is used to strictly synchronize the access to the infos.             */
     std::mutex                               infoMutex;
     std::optional<std::optional<std::regex>> userRegex;
+    std::optional<std::string> userRegexError;
     
     /** The runtime name of this sanitizer.                                             */
     const std::string libName;
     
-    void loadUserRegex();
+    auto generateRegex(const char * regex) -> std::optional<std::regex>;
+    
+    inline void loadUserRegex() {
+        userRegex = generateRegex(__lsan_firstPartyRegex);
+    }
     
 public:
     LSan();
