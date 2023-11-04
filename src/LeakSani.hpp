@@ -27,7 +27,6 @@
 #include <ostream>
 #include <regex>
 #include <utility>
-#include <vector>
 
 #include "MallocInfo.hpp"
 
