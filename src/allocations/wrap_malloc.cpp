@@ -40,6 +40,16 @@ static bool __lsan_glibc = true;
 static bool __lsan_glibc = false;
 #endif
 
+#ifdef __linux__
+auto operator new(std::size_t size) -> void * {
+    if (size == 0) {
+        size = 1;
+    }
+    
+    return malloc(size);
+}
+#endif
+
 namespace lsan {
 auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
     auto ret = real::malloc(size);
