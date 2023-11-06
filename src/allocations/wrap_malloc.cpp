@@ -48,7 +48,7 @@ auto operator new(std::size_t size) -> void * {
     
     return malloc(size);
 }
-#endif
+#endif /* __linux__ */
 
 namespace lsan {
 auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
@@ -166,7 +166,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
 
 #ifndef __linux__
 namespace lsan {
-#endif /* __linux__ */
+#endif /* !__linux__ */
 
 auto malloc(std::size_t size) -> void * {
     auto ptr = lsan::real::malloc(size);
@@ -268,4 +268,4 @@ INTERPOSE(lsan::calloc,  calloc);
 INTERPOSE(lsan::realloc, realloc);
 INTERPOSE(lsan::free,    free);
 
-#endif /* __linux__ */
+#endif /* !__linux__ */
