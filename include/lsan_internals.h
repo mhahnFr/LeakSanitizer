@@ -47,7 +47,7 @@ extern bool __lsan_humanPrint;
 extern bool __lsan_printCout;
 
 /**
- * @brief If this value is set to `true`, ANSII escape codes are used to format the output of this sanitizer.
+ * @brief If this value is set to `true`, ANSI escape codes are used to format the output of this sanitizer.
  *
  * Otherwise, the output is not formatted using escape codes.
  * Defaults to `true`.
@@ -57,7 +57,7 @@ extern bool __lsan_printCout;
 extern bool __lsan_printFormatted;
 
 /**
- * @brief If this value is set to `true`, the license informations are printed upon normal termination
+ * @brief If this value is set to `true`, the license information is printed upon normal termination
  * of the program.
  *
  * Defaults value is set by the Makefile.
@@ -98,7 +98,7 @@ extern bool __lsan_invalidFree;
  * @brief If this value is set to `true`, a warning is issued when a null pointer is freed.
  *
  * It does not cause a termination of the program, regardless of `__lsan_invalidCrash`.
- * Default value is system dependedly set.
+ * Default value is system dependently set.
  */
 extern bool __lsan_freeNull;
 
