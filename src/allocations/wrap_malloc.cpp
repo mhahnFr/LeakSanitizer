@@ -42,6 +42,10 @@ static bool __lsan_glibc = false;
 
 #ifdef __linux__
 auto operator new(std::size_t size) -> void * {
+    if (size == 0) {
+        size = 1;
+    }
+    
     return malloc(size);
 }
 #endif
