@@ -51,7 +51,7 @@ static inline auto lsanName() -> std::optional<const std::string> {
 }
 
 auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
-    if (regex == nullptr) {
+    if (regex == nullptr || *regex == '\0') {
         return std::nullopt;
     }
     
