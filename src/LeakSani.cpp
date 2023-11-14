@@ -199,6 +199,10 @@ void LSan::maybeHintCallstackSize(std::ostream & out) const {
     }
 }
 
+/**
+ * This function prints the deprecation warnings for deprecated variables
+ * found in the environment.
+ */
 static inline void maybeShowDeprecationWarnings() {
     using formatter::Style;
     
