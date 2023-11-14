@@ -199,6 +199,19 @@ void LSan::maybeHintCallstackSize(std::ostream & out) const {
     }
 }
 
+static inline void maybeShowDeprecationWarnings() {
+    using formatter::Style;
+    
+    auto & out = __lsan_printCout ? std::cout : std::cerr;
+    
+    if (getenv("LSAN_PRINT_STATS_ON_EXIT") != nullptr) {
+        out << std::endl << formatter::format<Style::RED, Style::BOLD>("LSAN_PRINT_STATS_ON_EXIT")
+            << formatter::format<Style::RED>(" (" + formatter::formatString<Style::ITALIC>("__lsan_printStatsOnExit")
+                                             + ") is no longer supported and ")
+            << formatter::format<Style::RED, Style::BOLD>("deprecated since version 1.7!") << std::endl;
+    }
+}
+
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     using formatter::Style;
     
@@ -235,6 +248,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         self.callstackSizeExceeded = false;
     }
     
+    maybeShowDeprecationWarnings();
     if (self.userRegexError.has_value()) {
         stream << std::endl << formatter::get<Style::RED>
                << formatter::format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
