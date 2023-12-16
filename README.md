@@ -75,7 +75,7 @@ Add this sanitizer's library to the dynamic loader preload environment variable:
 > ```shell
 > DYLD_INSERT_LIBRARIES=/usr/local/lib/liblsan.dylib ./a.out
 > ```
-- **Linux**: `LD_PRELOAD=<path/to/library`
+- **Linux**: `LD_PRELOAD=<path/to/library>`
 > Example:
 > ```shell
 > LD_PRELOAD=/usr/local/lib/liblsan.so ./a.out
