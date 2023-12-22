@@ -222,9 +222,9 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard lock(self.infoMutex);
     
     callstack_autoClearCaches = false;
-    std::size_t i = 0,
-    bytes = 0,
-    count = 0;
+    std::size_t i     = 0,
+                bytes = 0,
+                count = 0;
     for (auto & [ptr, info] : self.infos) {
         if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
             ++count;
