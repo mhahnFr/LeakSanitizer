@@ -223,17 +223,28 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     
     callstack_autoClearCaches = false;
     std::size_t i     = 0,
+                j     = 0,
                 bytes = 0,
-                count = 0;
+                count = 0,
+                total = self.infos.size();
     for (auto & [ptr, info] : self.infos) {
+        if (__lsan_printFormatted) {
+            char buffer[7] {};
+            std::snprintf(buffer, 7, "%05.2f", static_cast<double>(j) / total * 100);
+            stream << "\rCollecting the leaks: " << formatter::format<Style::BOLD>(buffer) << " %";
+        }
         if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
             ++count;
             bytes += info.getSize();
             if (i < __lsan_leakCount) {
-                stream << info << std::endl;
+                stream << "\r" << info << std::endl;
                 ++i;
             }
         }
+        ++j;
+    }
+    if (__lsan_printFormatted) {
+        stream << "\r                                    \r";
     }
     if (self.callstackSizeExceeded) {
         printCallstackSizeExceeded(stream);
