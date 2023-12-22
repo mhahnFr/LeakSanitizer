@@ -265,7 +265,6 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
            << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
     stream << std::endl;
     
-    stream << formatter::clear<Style::ITALIC>;
     callstack_clearCaches();
     callstack_autoClearCaches = true;
     return stream;
