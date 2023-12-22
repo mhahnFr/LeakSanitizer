@@ -132,52 +132,6 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
 }
 
 /**
- * Signal handler used to exit this sanitizer and to reset the visibility
- * of the terminal cursor.
- *
- * @param signal the signal code, passed to the exit function
- */
-static inline void resetCursorSignal(int signal) {
-    (__lsan_printCout ? std::cout : std::cerr) << "\033[?25h";
-    std::_Exit(signal);
-}
-
-auto LSan::getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>> {
-    std::forward_list<std::reference_wrapper<const MallocInfo>> buffer;
-    std::size_t count = 0,
-                bytes = 0,
-                i     = 0,
-                total = infos.size();
-    
-    auto & out = __lsan_printCout ? std::cout : std::cerr;
-    if (__lsan_printFormatted) {
-        out << "\033[?25l";
-        std::signal(SIGINT,  resetCursorSignal);
-        std::signal(SIGTERM, resetCursorSignal);
-    }
-    for (auto & [ptr, info] : infos) {
-        if (__lsan_printFormatted) {
-            char buffer[7] {};
-            std::snprintf(buffer, 7, "%05.2f", static_cast<double>(i) / total * 100);
-            out << "\rCollecting the leaks: " << formatter::format<formatter::Style::BOLD>(buffer) << " %";
-        }
-        
-        if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
-            ++count;
-            bytes += info.getSize();
-            buffer.push_front(info);
-        }
-        ++i;
-    }
-    if (__lsan_printFormatted) {
-        out << "\r\033[?25h                                    \r";
-        std::signal(SIGINT,  SIG_DFL);
-        std::signal(SIGTERM, SIG_DFL);
-    }
-    return std::make_tuple(count, bytes, buffer);
-}
-
-/**
  * Prints the callstack size exceeded hint onto the given output stream.
  *
  * @param stream the output stream to print to

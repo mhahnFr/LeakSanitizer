@@ -163,14 +163,6 @@ public:
     auto getTotalAllocatedBytes() -> std::size_t;
     
     /**
-     * Calculates the relevant leak information.
-     *
-     * @return a tuple containing the count of the leaks, the amount of leaked bytes and
-     * and a list with the leaked allocation records
-     */
-    auto getLeakNumbers() -> std::tuple<std::size_t, std::size_t, std::forward_list<std::reference_wrapper<const MallocInfo>>>;
-    
-    /**
      * Prints a hint about the exceeded callstack size if it was exceeded.
      *
      * @param out the output stream to print to
