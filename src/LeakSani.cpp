@@ -247,6 +247,9 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                << __lsan_leakCount << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
     }
     
+    if (count == 0) {
+        stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
+    }
     maybeShowDeprecationWarnings();
     if (self.userRegexError.has_value()) {
         stream << std::endl << formatter::get<Style::RED>
@@ -257,13 +260,15 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                << formatter::clear<Style::RED> << std::endl;
     }
     
-    stream << std::endl << formatter::format<Style::BOLD>("Summary: ");
-    if (i == __lsan_leakCount && i < count) {
-        stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of ";
+    if (count > 0) {
+        stream << std::endl << formatter::format<Style::BOLD>("Summary: ");
+        if (i == __lsan_leakCount && i < count) {
+            stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of ";
+        }
+        stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
+        << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
+        stream << std::endl;
     }
-    stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
-           << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
-    stream << std::endl;
     
     callstack_clearCaches();
     callstack_autoClearCaches = true;
