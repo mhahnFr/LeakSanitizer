@@ -221,35 +221,30 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     
     std::lock_guard lock(self.infoMutex);
     
-    const auto & [count, bytes, leaks] = self.getLeakNumbers();
-    if (count == 0) {
-        stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
-        return stream;
-    }
-    
-    stream << formatter::get<Style::ITALIC>
-           << count << " leaks total, " << bytesToString(bytes) << " total" << std::endl << std::endl;
     callstack_autoClearCaches = false;
-    std::size_t i = 0;
-    for (auto & leakInfo : leaks) {
-        if (i + 1 > __lsan_leakCount) {
-            if (self.callstackSizeExceeded) {
-                printCallstackSizeExceeded(stream);
-                self.callstackSizeExceeded = false;
+    std::size_t i = 0,
+    bytes = 0,
+    count = 0;
+    for (auto & [ptr, info] : self.infos) {
+        if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
+            ++count;
+            bytes += info.getSize();
+            if (i < __lsan_leakCount) {
+                stream << info << std::endl;
+                ++i;
             }
-            stream << std::endl << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(count - i) + " more...") << std::endl << std::endl
-                   << "Hint:" << formatter::format<Style::GREYED, Style::ITALIC>(" to see more, increase the value of ")
-                   << "LSAN_LEAK_COUNT" << formatter::get<Style::GREYED> << " (__lsan_leakCount)"
-                   << formatter::format<Style::ITALIC>(" (currently ") << formatter::clear<Style::GREYED>
-                   << __lsan_leakCount << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
-            break;
         }
-        stream << leakInfo << std::endl;
-        ++i;
     }
     if (self.callstackSizeExceeded) {
         printCallstackSizeExceeded(stream);
         self.callstackSizeExceeded = false;
+    }
+    if (i < count) {
+        stream << std::endl << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(count - i) + " more...") << std::endl << std::endl
+               << "Hint:" << formatter::format<Style::GREYED, Style::ITALIC>(" to see more, increase the value of ")
+               << "LSAN_LEAK_COUNT" << formatter::get<Style::GREYED> << " (__lsan_leakCount)"
+               << formatter::format<Style::ITALIC>(" (currently ") << formatter::clear<Style::GREYED>
+               << __lsan_leakCount << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl;
     }
     
     maybeShowDeprecationWarnings();
@@ -263,7 +258,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     }
     
     stream << std::endl << formatter::format<Style::BOLD>("Summary: ");
-    if (i == __lsan_leakCount) {
+    if (i == __lsan_leakCount && i < count) {
         stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of ";
     }
     stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
