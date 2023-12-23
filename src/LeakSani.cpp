@@ -215,7 +215,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     if (count == 0) {
         stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
     }
-    if (__lsan_relativePaths) {
+    if (__lsan_relativePaths && count > 0) {
         stream << std::endl;
         printWorkingDirectory(stream);
     }
