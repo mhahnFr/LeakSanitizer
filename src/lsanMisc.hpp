@@ -50,8 +50,19 @@ void printInformation();
  */
 void exitHook();
 
+/**
+ * Prints the note about the relative paths if relative paths are
+ * allowed by `__lsan_relativePaths` on the given output stream.
+ *
+ * @param out the output stream to print to
+ */
 void maybeHintRelativePaths(std::ostream & out);
 
+/**
+ * Prints the hint about the relative paths, including the current working directory.
+ *
+ * @param out the output stream to print to
+ */
 void printWorkingDirectory(std::ostream & out);
 
 /**
