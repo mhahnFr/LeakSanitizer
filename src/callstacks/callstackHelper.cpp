@@ -103,6 +103,14 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
     return CallstackType::FIRST_PARTY;
 }
 
+/**
+ * @brief Returns the name of the binary file of the given callstack frame.
+ *
+ * The file name is allowed to be a relative if `__lsan_relativePaths` is `true`.
+ *
+ * @param frame the callstack frame
+ * @return the name of the binary file of the given callstack frame
+ */
 static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::string {
     if (frame.binaryFile == nullptr) {
         return "<< Unknown >>";
@@ -111,6 +119,14 @@ static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::
     return __lsan_relativePaths ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
 }
 
+/**
+ * @brief Returns the name of the source file of the given callstack frame.
+ *
+ * The file name is allowed to be relative if `__lsan_relativePaths` is `true`.
+ *
+ * @param frame the callstack frame
+ * @return the name of the source file name of the given callstack frame
+ */
 static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) -> std::string {
     return __lsan_relativePaths ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
 }
