@@ -103,6 +103,14 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
     return CallstackType::FIRST_PARTY;
 }
 
+static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::string {
+    return __lsan_relativePaths ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
+}
+
+static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) -> std::string {
+    return __lsan_relativePaths ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
+}
+
 /**
  * Formats the given callstack frame onto the given output stream using the given style.
  *
@@ -119,11 +127,11 @@ static inline void formatShared(const struct callstack_frame & frame, std::ostre
         if (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
         }
-        out << formatter::format<Style::ITALIC>("(" + std::string(callstack_frame_getShortestName(&frame)) + ")") << (reset ? formatter::get<S>() : "") << " ";
+        out << formatter::format<Style::ITALIC>("(" + getCallstackFrameName(frame) + ")") << (reset ? formatter::get<S>() : "") << " ";
     }
     out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
     if (frame.sourceFile != nullptr) {
-        out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED> << callstack_frame_getShortestSourceFile(&frame)
+        out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED> << getCallstackFrameSourceFile(frame)
             << ":" << frame.sourceLine << formatter::clear<Style::GREYED, Style::UNDERLINED>;
         if (S == Style::GREYED || S == Style::BOLD) {
             out << formatter::get<S>;
