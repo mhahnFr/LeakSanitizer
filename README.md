@@ -163,6 +163,7 @@ following environment variables to their indicated values:
 | `LSAN_FIRST_PARTY_THRESHOLD` | **Since v1.7:** The amount of first party frames                               | `0` to `SIZE_MAX` | `3`           |
 | `LSAN_PRINT_EXIT_POINT`      | **Since v1.7:** Print the callstack of the exit point                          | `true`, `false`   | `false`       |
 | `LSAN_PRINT_BINARIES`        | **Since v1.8:** Print the binary file names                                    | `true`, `false`   | `true`        |
+| `LSAN_RELATIVE_PATHS`        | **Since v1.8:** Allow relative paths to be printed                             | `true`, `false`   | `true`        |
 | `LSAN_FIRST_PARTY_REGEX`     | **Since v1.8:** Binary files matching this regex are considered "first party". | *Any regex*       | *None*        |
 
 More on the environment variables [here][2].
