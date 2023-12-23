@@ -104,6 +104,10 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
 }
 
 static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::string {
+    if (frame.binaryFile == nullptr) {
+        return "<< Unknown >>";
+    }
+    
     return __lsan_relativePaths ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
 }
 
