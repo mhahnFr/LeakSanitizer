@@ -67,8 +67,8 @@ void printInformation() {
     
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << "Report by " << formatter::format<Style::BOLD>("LeakSanitizer ")
-    << formatter::format<Style::ITALIC>(VERSION)
-    << std::endl << std::endl;
+        << formatter::format<Style::ITALIC>(VERSION)
+        << std::endl << std::endl;
     if (__lsan_printLicense) printLicense();
     if (__lsan_printWebsite) printWebsite();
 }
