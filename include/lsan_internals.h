@@ -145,6 +145,14 @@ extern bool __lsan_printExitPoint;
  */
 extern bool __lsan_printBinaries;
 
+/**
+ * @brief If this value is set to `true`, the printed file paths are allowed to
+ * be relative paths.
+ *
+ * Defaults to `true`.
+ *
+ * @since v1.8
+ */
 extern bool __lsan_relativePaths; // @since v1.8
 
 /**
