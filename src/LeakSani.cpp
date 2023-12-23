@@ -20,7 +20,6 @@
 #include <dlfcn.h>
 
 #include <algorithm>
-#include <filesystem>
 #include <iostream>
 
 #include "LeakSani.hpp"
@@ -217,8 +216,8 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
     }
     if (__lsan_relativePaths) {
-        stream << std::endl << "Note: " << formatter::format<Style::GREYED>("Paths are relative to the") << " working directory: "
-               << std::filesystem::current_path() << std::endl;
+        stream << std::endl;
+        printWorkingDirectory(stream);
     }
     maybeShowDeprecationWarnings();
     if (self.userRegexError.has_value()) {

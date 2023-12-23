@@ -47,6 +47,7 @@ static inline void printer(const std::string & message, lcs::callstack & callsta
     
     if (!Warning) {
         getInstance().maybeHintCallstackSize(std::cerr);
+        maybeHintRelativePaths(std::cerr);
     }
 }
 

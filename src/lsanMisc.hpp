@@ -50,6 +50,10 @@ void printInformation();
  */
 void exitHook();
 
+void maybeHintRelativePaths(std::ostream & out);
+
+void printWorkingDirectory(std::ostream & out);
+
 /**
  * Sets whether to ignore subsequent allocation management requests.
  *

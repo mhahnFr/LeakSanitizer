@@ -17,6 +17,7 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <filesystem>
 #include <iostream>
 
 #include "lsanMisc.hpp"
@@ -88,5 +89,17 @@ void exitHook() {
         << getInstance() << std::endl;
     printInformation();
     internalCleanUp();
+}
+
+void maybeHintRelativePaths(std::ostream & out) {
+    if (__lsan_relativePaths) {
+        printWorkingDirectory(out);
+        out << std::endl;
+    }
+}
+
+void printWorkingDirectory(std::ostream & out) {
+    out << "Note: " << formatter::format<formatter::Style::GREYED>("Paths are relative to the") << " working directory: "
+        << std::filesystem::current_path() << std::endl;
 }
 }
