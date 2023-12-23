@@ -149,6 +149,7 @@ bool __lsan_printStatsOnExit = getBool("LSAN_PRINT_STATS_ON_EXIT").value_or(fals
 bool __lsan_printExitPoint   = getBool("LSAN_PRINT_EXIT_POINT").value_or(false);
 
 bool __lsan_printBinaries    = getBool("LSAN_PRINT_BINARIES").value_or(true);
+bool __lsan_relativePaths    = getBool("LSAN_RELATIVE_PATHS").value_or(true);
 
 std::size_t __lsan_leakCount = getSize_t("LSAN_LEAK_COUNT").value_or(100);
 
