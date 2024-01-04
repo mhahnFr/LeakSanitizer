@@ -215,7 +215,7 @@ The backtraces are translated using the [CallstackLibrary][5].
 ## Final notes
 This project is licensed under the terms of the GPL 3.0.
 
-© Copyright 2022 - 2023 [mhahnFr][6] and contributors
+© Copyright 2022 - 2024 [mhahnFr][6] and contributors
 
 [1]: https://github.com/mhahnFr/LeakSanitizer/releases
 [2]: https://github.com/mhahnFr/LeakSanitizer/wiki/Behaviour

@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -64,6 +64,8 @@ void maybeHintRelativePaths(std::ostream & out);
  * @param out the output stream to print to
  */
 void printWorkingDirectory(std::ostream & out);
+
+auto isATTY() -> bool;
 
 /**
  * Sets whether to ignore subsequent allocation management requests.

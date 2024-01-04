@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -19,6 +19,10 @@
 
 #include <filesystem>
 #include <iostream>
+
+#if __has_include(<unistd.h>)
+ #include <unistd.h>
+#endif
 
 #include "lsanMisc.hpp"
 
@@ -44,7 +48,7 @@ auto getInstance() -> LSan & {
  */
 static inline void printLicense() {
     std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
-    out << "Copyright (C) 2022 - 2023  mhahnFr and contributors" << std::endl
+    out << "Copyright (C) 2022 - 2024  mhahnFr and contributors" << std::endl
         << "Licensed under the terms of the GPL 3.0."            << std::endl
         << std::endl;
 }
@@ -101,5 +105,13 @@ void maybeHintRelativePaths(std::ostream & out) {
 void printWorkingDirectory(std::ostream & out) {
     out << "Note: " << formatter::format<formatter::Style::GREYED>("Paths are relative to the") << " working directory: "
         << std::filesystem::current_path() << std::endl;
+}
+
+auto isATTY() -> bool {
+#if __has_include(<unistd.h>)
+    return isatty(__lsan_printCout ? STDOUT_FILENO : STDERR_FILENO);
+#else
+    return true;
+#endif
 }
 }
