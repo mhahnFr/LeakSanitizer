@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2023  mhahnFr and contributors
+ * Copyright (C) 2022 - 2024  mhahnFr and contributors
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -182,7 +182,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                 count = 0,
                 total = self.infos.size();
     for (auto & [ptr, info] : self.infos) {
-        if (__lsan_printFormatted) {
+        if (isATTY()) {
             char buffer[7] {};
             std::snprintf(buffer, 7, "%05.2f", static_cast<double>(j) / total * 100);
             stream << "\rCollecting the leaks: " << formatter::format<Style::BOLD>(buffer) << " %";
@@ -197,7 +197,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         }
         ++j;
     }
-    if (__lsan_printFormatted) {
+    if (isATTY()) {
         stream << "\r                                    \r";
     }
     if (self.callstackSizeExceeded) {
