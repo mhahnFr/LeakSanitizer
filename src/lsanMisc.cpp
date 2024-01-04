@@ -111,7 +111,7 @@ auto isATTY() -> bool {
 #if __has_include(<unistd.h>)
     return isatty(__lsan_printCout ? STDOUT_FILENO : STDERR_FILENO);
 #else
-    return true;
+    return __lsan_printFormatted;
 #endif
 }
 }
