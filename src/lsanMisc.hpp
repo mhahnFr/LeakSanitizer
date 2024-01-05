@@ -100,6 +100,10 @@ static inline auto getStats() -> const Stats & {
 static inline void internalCleanUp() {
     delete std::addressof(getInstance());
 }
+
+static inline auto printFormatted() -> bool {
+    return __lsan_printFormatted && isATTY();
+}
 }
 
 #endif /* lsanMisc_hpp */
