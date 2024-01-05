@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2023  mhahnFr and contributors
+ * Copyright (C) 2022 - 2024  mhahnFr and contributors
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -17,10 +17,12 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef Formatter_hpp
-#define Formatter_hpp
+#ifndef formatter_hpp
+#define formatter_hpp
 
 #include <string>
+
+#include "lsanMisc.hpp"
 
 #include "../include/lsan_internals.h"
 
@@ -64,7 +66,7 @@ enum class Style {
  */
 template<Style S>
 constexpr inline auto get() -> const char * {
-    if (!__lsan_printFormatted) {
+    if (!printFormatted()) {
         switch (S) {
             case Style::BAR_EMPTY:  return ".";
             case Style::BAR_FILLED: return "=";
@@ -98,7 +100,7 @@ constexpr inline auto get() -> const char * {
  */
 template<Style S>
 constexpr inline auto clear() -> const char * {
-    if (!__lsan_printFormatted) {
+    if (!printFormatted()) {
         return "";
     }
     switch (S) {
@@ -225,4 +227,4 @@ inline auto formatString(const std::string & str) -> std::string {
 }
 }
 
-#endif /* Formatter_hpp */
+#endif /* formatter_hpp */
