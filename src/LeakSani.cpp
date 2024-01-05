@@ -191,7 +191,10 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
             ++count;
             bytes += info.getSize();
             if (i < __lsan_leakCount) {
-                stream << "\r" << info << std::endl;
+                if (isATTY()) {
+                    stream << "\r";
+                }
+                stream << info << std::endl;
                 ++i;
             }
         }
