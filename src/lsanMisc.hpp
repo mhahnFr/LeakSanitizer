@@ -69,6 +69,13 @@ void maybeHintRelativePaths(std::ostream & out);
  */
 void printWorkingDirectory(std::ostream & out);
 
+/**
+ * @brief Returns whether the output stream to print to is a TTY.
+ *
+ * If the POSIX function `isatty` is not available, `__lsan_printFormatted` is returned.
+ *
+ * @return whether the output stream to print to is an interactive terminal
+ */
 auto isATTY() -> bool;
 
 /**
@@ -105,10 +112,21 @@ static inline void internalCleanUp() {
     delete std::addressof(getInstance());
 }
 
+/**
+ * Returns whether to print formatted, that is, whether `__lsan_printFormatted` is
+ * `true` and the output stream is an interactive terminal.
+ *
+ * @return whether to print formatted
+ */
 static inline auto printFormatted() -> bool {
     return __lsan_printFormatted && isATTY();
 }
 
+/**
+ * Returns the appropriate output stream to print to.
+ *
+ * @return the output stream to print to
+ */
 static inline auto getOutputStream() -> std::ostream & {
     return __lsan_printCout ? std::cout : std::clog;
 }
