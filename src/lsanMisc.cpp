@@ -45,9 +45,10 @@ auto getInstance() -> LSan & {
 
 /**
  * Prints the license information of this sanitizer.
+ *
+ * @param out the output stream to print to
  */
-static inline void printLicense() {
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+static inline void printLicense(std::ostream & out) {
     out << "Copyright (C) 2022 - 2024  mhahnFr and contributors" << std::endl
         << "Licensed under the terms of the GPL 3.0."            << std::endl
         << std::endl;
@@ -55,11 +56,12 @@ static inline void printLicense() {
 
 /**
  * Prints the link to the website of this sanitizer.
+ *
+ * @param out the output stream to print to
  */
-static inline void printWebsite() {
+static inline void printWebsite(std::ostream & out) {
     using formatter::Style;
     
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << formatter::get<Style::ITALIC>
         << "For more information, visit "
         << formatter::format<Style::UNDERLINED>("github.com/mhahnFr/LeakSanitizer")
@@ -67,15 +69,14 @@ static inline void printWebsite() {
         << std::endl << std::endl;
 }
 
-void printInformation() {
+void printInformation(std::ostream & out) {
     using formatter::Style;
     
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
     out << "Report by " << formatter::format<Style::BOLD>("LeakSanitizer ")
         << formatter::format<Style::ITALIC>(VERSION)
         << std::endl << std::endl;
-    if (__lsan_printLicense) printLicense();
-    if (__lsan_printWebsite) printWebsite();
+    if (__lsan_printLicense) printLicense(out);
+    if (__lsan_printWebsite) printWebsite(out);
 }
 
 void exitHook() {
@@ -91,7 +92,7 @@ void exitHook() {
     }
     out << std::endl     << std::endl
         << getInstance() << std::endl;
-    printInformation();
+    printInformation(out);
     internalCleanUp();
 }
 

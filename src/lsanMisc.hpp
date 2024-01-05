@@ -40,8 +40,10 @@ auto getInstance() -> LSan &;
 
 /**
  * Prints the additional information about this sanitizer.
+ *
+ * @param out the output stream to print to
  */
-void printInformation();
+void printInformation(std::ostream & out);
 
 /**
  * @brief The hook to be called on exit.

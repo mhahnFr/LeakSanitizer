@@ -156,11 +156,11 @@ void LSan::maybeHintCallstackSize(std::ostream & out) const {
 /**
  * This function prints the deprecation warnings for deprecated variables
  * found in the environment.
+ *
+ * @param out the output stream to print to
  */
-static inline void maybeShowDeprecationWarnings() {
+static inline void maybeShowDeprecationWarnings(std::ostream & out) {
     using formatter::Style;
-    
-    auto & out = __lsan_printCout ? std::cout : std::cerr;
     
     if (getenv("LSAN_PRINT_STATS_ON_EXIT") != nullptr) {
         out << std::endl << formatter::format<Style::RED, Style::BOLD>("LSAN_PRINT_STATS_ON_EXIT")
@@ -222,7 +222,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         stream << std::endl;
         printWorkingDirectory(stream);
     }
-    maybeShowDeprecationWarnings();
+    maybeShowDeprecationWarnings(stream);
     if (self.userRegexError.has_value()) {
         stream << std::endl << formatter::get<Style::RED>
                << formatter::format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
