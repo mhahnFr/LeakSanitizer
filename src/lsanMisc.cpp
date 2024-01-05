@@ -83,7 +83,7 @@ void exitHook() {
     using formatter::Style;
     
     setIgnoreMalloc(true);
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    auto & out = getOutputStream();
     out << std::endl << formatter::format<Style::GREEN>("Exiting");
     
     if (__lsan_printExitPoint) {

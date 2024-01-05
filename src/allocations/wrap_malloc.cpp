@@ -146,7 +146,7 @@ void __wrap_free(void * pointer, const char * file, int line) {
     using formatter::Style;
     
     setIgnoreMalloc(true);
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    auto & out = getOutputStream();
     out << std::endl
         << formatter::format<Style::GREEN>("Exiting") << " at "
         << formatter::get<Style::UNDERLINED> << file << ":" << line << formatter::clear<Style::UNDERLINED>

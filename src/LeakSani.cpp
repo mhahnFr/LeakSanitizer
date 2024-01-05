@@ -20,7 +20,6 @@
 #include <dlfcn.h>
 
 #include <algorithm>
-#include <iostream>
 
 #include "LeakSani.hpp"
 
@@ -238,7 +237,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
             stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of ";
         }
         stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
-        << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
+               << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
         stream << std::endl;
     }
     

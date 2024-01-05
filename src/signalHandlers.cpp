@@ -72,7 +72,7 @@ void callstackSignal(int) {
     bool ignore = getIgnoreMalloc();
     setIgnoreMalloc(true);
     
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    auto & out = getOutputStream();
     out << formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
     
     callstackHelper::format(lcs::callstack(), out);

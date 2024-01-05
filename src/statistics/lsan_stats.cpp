@@ -289,7 +289,7 @@ void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
     std::lock_guard lock(getInstance().getMutex());
     bool ignore = getIgnoreMalloc();
     setIgnoreMalloc(true);
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    auto & out = getOutputStream();
     if (__lsan_statsActive) {
         __lsan_printStatsCore("memory fragmentation", width, out,
                               __lsan_printFragmentationByteBar,
@@ -316,7 +316,7 @@ void __lsan_printStatsWithWidth(std::size_t width) {
     std::lock_guard lock(getInstance().getMutex());
     bool ignore = getIgnoreMalloc();
     setIgnoreMalloc(true);
-    std::ostream & out = __lsan_printCout ? std::cout : std::cerr;
+    auto & out = getOutputStream();
     if (__lsan_statsActive) {
         __lsan_printStatsCore("memory usage", width, out,
                               std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
