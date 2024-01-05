@@ -20,6 +20,8 @@
 #ifndef lsanMisc_hpp
 #define lsanMisc_hpp
 
+#include <iostream>
+
 #include "LeakSani.hpp"
 
 namespace lsan {
@@ -105,6 +107,10 @@ static inline void internalCleanUp() {
 
 static inline auto printFormatted() -> bool {
     return __lsan_printFormatted && isATTY();
+}
+
+static inline auto getOutputStream() -> std::ostream & {
+    return __lsan_printCout ? std::cout : std::clog;
 }
 }
 
