@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2023  mhahnFr and contributors
+ * Copyright (C) 2022 - 2024  mhahnFr and contributors
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -57,6 +57,8 @@ extern bool __lsan_printCout;
 extern bool __lsan_printFormatted;
 
 /**
+ * @deprecated Since v1.8: This option will disappear in version 2.
+ *
  * @brief If this value is set to `true`, the license information is printed upon normal termination
  * of the program.
  *
@@ -64,15 +66,19 @@ extern bool __lsan_printFormatted;
  *
  * @since 1.1
  */
+DEPRECATED("Since v1.8: To be removed in v2")
 extern bool __lsan_printLicense;
 
 /**
+ * @deprecated Since v1.8: This option will disappear in version 2.
+ *
  * @brief If this value is set to `true`, the link to the home page of the LeakSanitizer is printed.
  *
  * Default value is set by the Makefile.
  *
  * @since 1.4
  */
+DEPRECATED("Since v1.8: To be removed in v2")
 extern bool __lsan_printWebsite;
 
 /**

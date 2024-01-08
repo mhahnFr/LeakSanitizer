@@ -186,10 +186,22 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     using formatter::Style;
     
     if (has("LSAN_PRINT_STATS_ON_EXIT")) {
-        out << std::endl << formatter::format<Style::RED, Style::BOLD>("LSAN_PRINT_STATS_ON_EXIT")
-            << formatter::format<Style::RED>(" (" + formatter::formatString<Style::ITALIC>("__lsan_printStatsOnExit")
-                                             + ") is no longer supported and ")
-            << formatter::format<Style::RED, Style::BOLD>("deprecated since version 1.7!") << std::endl;
+        printDeprecation(out,
+                         "LSAN_PRINT_STATS_ON_EXIT",
+                         "__lsan_printStatsOnExit",
+                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.7"));
+    }
+    if (has("LSAN_PRINT_LICENSE")) {
+        printDeprecation(out,
+                         "LSAN_PRINT_LICENSE",
+                         "__lsan_printLicense",
+                         formatter::formatString<Style::BOLD>("is deprecated since version 1.8"));
+    }
+    if (has("LSAN_PRINT_WEBSITE")) {
+        printDeprecation(out,
+                         "LSAN_PRINT_WEBSITE",
+                         "__lsan_printWebsite",
+                         formatter::formatString<Style::BOLD>("is deprecated since version 1.8"));
     }
     return out;
 }
