@@ -104,9 +104,19 @@ extern bool __lsan_invalidFree;
  * @brief If this value is set to `true`, a warning is issued when a null pointer is freed.
  *
  * It does not cause a termination of the program, regardless of `__lsan_invalidCrash`.
- * Default value is system dependently set.
+ * Defaults to `false`.
  */
 extern bool __lsan_freeNull;
+
+/**
+ * @brief If this value is set to `true`, a warning is issued when zero bytes are allocated.
+ *
+ * It does not cause a termination of the program, regardless of `__lsan_invalidCrash`.
+ * Defaults to `false`.
+ *
+ * @since 1.8
+ */
+extern bool __lsan_zeroAllocation;
 
 /**
  * @deprecated Since 1.5, replaced by `__lsan_statsActive`. Will be removed in v2.

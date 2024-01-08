@@ -123,18 +123,19 @@ static inline auto getBool(const char * name) -> std::optional<bool> {
 bool __lsan_humanPrint       = getBool("LSAN_HUMAN_PRINT")    .value_or(true);
 bool __lsan_printCout        = getBool("LSAN_PRINT_COUT")     .value_or(false);
 bool __lsan_printFormatted   = getBool("LSAN_PRINT_FORMATTED").value_or(true);
-bool __lsan_printLicense     = getBool("LSAN_PRINT_LICENSE").value_or(true);
-bool __lsan_printWebsite     = getBool("LSAN_PRINT_WEBSITE").value_or(true);
+bool __lsan_printLicense     = getBool("LSAN_PRINT_LICENSE")  .value_or(true);
+bool __lsan_printWebsite     = getBool("LSAN_PRINT_WEBSITE")  .value_or(true);
 
-bool __lsan_invalidCrash     = getBool("LSAN_INVALID_CRASH").value_or(true);
-bool __lsan_invalidFree      = getBool("LSAN_INVALID_FREE").value_or(false);
-bool __lsan_freeNull         = getBool("LSAN_FREE_NULL")   .value_or(false);
+bool __lsan_invalidCrash     = getBool("LSAN_INVALID_CRASH")  .value_or(true);
+bool __lsan_invalidFree      = getBool("LSAN_INVALID_FREE")   .value_or(false);
+bool __lsan_freeNull         = getBool("LSAN_FREE_NULL")      .value_or(false);
+bool __lsan_zeroAllocation   = getBool("LSAN_ZERO_ALLOCATION").value_or(false);
 
 bool __lsan_trackMemory      = false; // Deprecated: No need to further allow usage. - mhahnFr
 bool __lsan_statsActive      = getBool("LSAN_STATS_ACTIVE").value_or(false);
 
 bool __lsan_printStatsOnExit = getBool("LSAN_PRINT_STATS_ON_EXIT").value_or(false);
-bool __lsan_printExitPoint   = getBool("LSAN_PRINT_EXIT_POINT").value_or(false);
+bool __lsan_printExitPoint   = getBool("LSAN_PRINT_EXIT_POINT")   .value_or(false);
 
 bool __lsan_printBinaries    = getBool("LSAN_PRINT_BINARIES").value_or(true);
 bool __lsan_relativePaths    = getBool("LSAN_RELATIVE_PATHS").value_or(true);
