@@ -22,6 +22,8 @@
 
 #if __has_include(<unistd.h>)
  #include <unistd.h>
+
+ #define LSAN_HAS_UNISTD
 #endif
 
 #include "lsanMisc.hpp"
@@ -119,7 +121,7 @@ auto printWorkingDirectory(std::ostream & out) -> std::ostream & {
 }
 
 auto isATTY() -> bool {
-#if __has_include(<unistd.h>)
+#ifdef LSAN_HAS_UNISTD
     return isatty(__lsan_printCout ? STDOUT_FILENO : STDERR_FILENO);
 #else
     return __lsan_printFormatted;
