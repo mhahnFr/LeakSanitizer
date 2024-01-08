@@ -78,6 +78,12 @@ void printWorkingDirectory(std::ostream & out);
  */
 auto isATTY() -> bool;
 
+/**
+ * Returns whether the given variable has been set in the environment.
+ *
+ * @param var the variable to be checked
+ * @return whether the variable name is in the environment
+ */
 auto has(const std::string & var) -> bool;
 
 /**
