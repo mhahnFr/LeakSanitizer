@@ -153,7 +153,7 @@ extern bool __lsan_printBinaries;
  *
  * @since v1.8
  */
-extern bool __lsan_relativePaths; // @since v1.8
+extern bool __lsan_relativePaths;
 
 /**
  * @brief This value defines the count of leaks that are printed at the exit of the program.
