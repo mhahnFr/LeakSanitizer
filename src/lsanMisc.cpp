@@ -80,9 +80,9 @@ auto printInformation(std::ostream & out) -> std::ostream & {
     
     out << "Report by " << formatter::format<Style::BOLD>("LeakSanitizer ")
         << formatter::format<Style::ITALIC>(VERSION)
-        << std::endl << std::endl;
-    if (__lsan_printLicense) out << printLicense;
-    if (__lsan_printWebsite) out << printWebsite;
+        << std::endl << std::endl
+        << printLicense
+        << printWebsite;
     
     return out;
 }

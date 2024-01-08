@@ -66,7 +66,7 @@ extern bool __lsan_printFormatted;
  *
  * @since 1.1
  */
-DEPRECATED("Since v1.8: To be removed in v2")
+DEPRECATED("Since version 1.8 this is no longer supported")
 extern bool __lsan_printLicense;
 
 /**
@@ -78,7 +78,7 @@ extern bool __lsan_printLicense;
  *
  * @since 1.4
  */
-DEPRECATED("Since v1.8: To be removed in v2")
+DEPRECATED("Since version 1.8 this is no longer supported")
 extern bool __lsan_printWebsite;
 
 /**

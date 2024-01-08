@@ -195,13 +195,13 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
         printDeprecation(out,
                          "LSAN_PRINT_LICENSE",
                          "__lsan_printLicense",
-                         formatter::formatString<Style::BOLD>("is deprecated since version 1.8"));
+                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     if (has("LSAN_PRINT_WEBSITE")) {
         printDeprecation(out,
                          "LSAN_PRINT_WEBSITE",
                          "__lsan_printWebsite",
-                         formatter::formatString<Style::BOLD>("is deprecated since version 1.8"));
+                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     return out;
 }
