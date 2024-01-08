@@ -157,8 +157,8 @@ void __wrap_free(void * pointer, const char * file, int line) {
         out << std::endl;
     }
     
-    out << std::endl << getInstance() << std::endl;
-    printInformation(out);
+    out << std::endl << getInstance()
+        << std::endl << printInformation;
     internalCleanUp();
     _Exit(code);
 }

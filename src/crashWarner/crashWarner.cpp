@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -47,7 +47,7 @@ static inline void printer(const std::string & message, lcs::callstack & callsta
     
     if (!Warning) {
         getInstance().maybeHintCallstackSize(std::cerr);
-        maybeHintRelativePaths(std::cerr);
+        std::cerr << maybeHintRelativePaths;
     }
 }
 
