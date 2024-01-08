@@ -115,4 +115,8 @@ auto isATTY() -> bool {
     return __lsan_printFormatted;
 #endif
 }
+
+auto has(const std::string & var) -> bool {
+    return getenv(var.c_str()) != nullptr;
+}
 }

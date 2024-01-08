@@ -78,6 +78,8 @@ void printWorkingDirectory(std::ostream & out);
  */
 auto isATTY() -> bool;
 
+auto has(const std::string & var) -> bool;
+
 /**
  * Sets whether to ignore subsequent allocation management requests.
  *
