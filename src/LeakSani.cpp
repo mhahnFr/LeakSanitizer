@@ -161,7 +161,7 @@ void LSan::maybeHintCallstackSize(std::ostream & out) const {
 static inline void maybeShowDeprecationWarnings(std::ostream & out) {
     using formatter::Style;
     
-    if (getenv("LSAN_PRINT_STATS_ON_EXIT") != nullptr) {
+    if (has("LSAN_PRINT_STATS_ON_EXIT")) {
         out << std::endl << formatter::format<Style::RED, Style::BOLD>("LSAN_PRINT_STATS_ON_EXIT")
             << formatter::format<Style::RED>(" (" + formatter::formatString<Style::ITALIC>("__lsan_printStatsOnExit")
                                              + ") is no longer supported and ")
