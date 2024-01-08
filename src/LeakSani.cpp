@@ -134,8 +134,9 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
  * Prints the callstack size exceeded hint onto the given output stream.
  *
  * @param stream the output stream to print to
+ * @return the given output stream
  */
-static inline void printCallstackSizeExceeded(std::ostream & stream) {
+static inline auto printCallstackSizeExceeded(std::ostream & stream) -> std::ostream & {
     using formatter::Style;
     
     stream << "Hint:" << formatter::get<Style::GREYED>
@@ -144,12 +145,15 @@ static inline void printCallstackSizeExceeded(std::ostream & stream) {
            << " (__lsan_callstackSize)" << formatter::format<Style::ITALIC>(" (currently ")
            << formatter::clear<Style::GREYED> << __lsan_callstackSize
            << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
+    
+    return stream;
 }
 
-void LSan::maybeHintCallstackSize(std::ostream & out) const {
+auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
     if (callstackSizeExceeded) {
-        printCallstackSizeExceeded(out);
+        out << printCallstackSizeExceeded;
     }
+    return out;
 }
 
 /**
@@ -157,8 +161,9 @@ void LSan::maybeHintCallstackSize(std::ostream & out) const {
  * found in the environment.
  *
  * @param out the output stream to print to
+ * @return the given output stream
  */
-static inline void maybeShowDeprecationWarnings(std::ostream & out) {
+static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostream & {
     using formatter::Style;
     
     if (has("LSAN_PRINT_STATS_ON_EXIT")) {
@@ -167,6 +172,7 @@ static inline void maybeShowDeprecationWarnings(std::ostream & out) {
                                              + ") is no longer supported and ")
             << formatter::format<Style::RED, Style::BOLD>("deprecated since version 1.7!") << std::endl;
     }
+    return out;
 }
 
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
@@ -203,7 +209,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         stream << "\r                                    \r";
     }
     if (self.callstackSizeExceeded) {
-        printCallstackSizeExceeded(stream);
+        stream << printCallstackSizeExceeded;
         self.callstackSizeExceeded = false;
     }
     if (i < count) {
@@ -221,7 +227,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         stream << std::endl;
         printWorkingDirectory(stream);
     }
-    maybeShowDeprecationWarnings(stream);
+    stream << maybeShowDeprecationWarnings;
     if (self.userRegexError.has_value()) {
         stream << std::endl << formatter::get<Style::RED>
                << formatter::format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
