@@ -157,6 +157,25 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
 }
 
 /**
+ * Prints a deprecation notice using the given information.
+ *
+ * @param out the output stream to print to
+ * @param envName the name of the variable in the environment
+ * @param apiName the name of the variable in the C API
+ * @param message the deprecation message
+ */
+static inline void printDeprecation(      std::ostream & out,
+                                    const std::string &  envName,
+                                    const std::string &  apiName,
+                                    const std::string &  message) {
+    using formatter::Style;
+    
+    out << std::endl << formatter::format<Style::RED>(formatter::formatString<Style::BOLD>(envName) + " ("
+                                                      + formatter::formatString<Style::ITALIC>(apiName) + ") " + message + "!")
+        << std::endl;
+}
+
+/**
  * This function prints the deprecation warnings for deprecated variables
  * found in the environment.
  *
