@@ -34,12 +34,6 @@
 #include "../../include/lsan_stats.h"
 #include "../../include/lsan_internals.h"
 
-#ifdef __GLIBC__
-static bool __lsan_glibc = true;
-#else
-static bool __lsan_glibc = false;
-#endif
-
 #ifdef __linux__
 auto operator new(std::size_t size) -> void * {
     if (size == 0) {
@@ -58,12 +52,8 @@ auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
         std::lock_guard lock(getInstance().getMutex());
         if (!getIgnoreMalloc()) {
             setIgnoreMalloc(true);
-            if (size == 0) {
-                if (!__lsan_invalidCrash || __lsan_glibc) {
-                    warn("Invalid allocation of size 0", file, line, __builtin_return_address(0));
-                } else {
-                    crash("Invalid allocation of size 0", file, line, __builtin_return_address(0));
-                }
+            if (__lsan_zeroAllocation && size == 0) {
+                warn("Implementation-defined allocation of size 0", file, line, __builtin_return_address(0));
             }
             getInstance().addMalloc(MallocInfo(ret, size, file, line, __builtin_return_address(0)));
             setIgnoreMalloc(false);
@@ -79,12 +69,8 @@ auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file,
         std::lock_guard lock(getInstance().getMutex());
         if (!getIgnoreMalloc()) {
             setIgnoreMalloc(true);
-            if (objectSize * count == 0) {
-                if (!__lsan_invalidCrash || __lsan_glibc) {
-                    warn("Invalid allocation of size 0", file, line, __builtin_return_address(0));
-                } else {
-                    crash("Invalid allocation of size 0", file, line, __builtin_return_address(0));
-                }
+            if (__lsan_zeroAllocation && objectSize * count == 0) {
+                warn("Implementation-defined allocation of size 0", file, line, __builtin_return_address(0));
             }
             getInstance().addMalloc(MallocInfo(ret, objectSize * count, file, line, __builtin_return_address(0)));
             setIgnoreMalloc(false);
@@ -175,12 +161,8 @@ auto malloc(std::size_t size) -> void * {
         std::lock_guard lock(lsan::getInstance().getMutex());
         if (!lsan::getIgnoreMalloc()) {
             lsan::setIgnoreMalloc(true);
-            if (size == 0) {
-                if (!__lsan_invalidCrash || __lsan_glibc) {
-                    lsan::warn("Invalid allocation of size 0", __builtin_return_address(0));
-                } else {
-                    lsan::crash("Invalid allocation of size 0", __builtin_return_address(0));
-                }
+            if (__lsan_zeroAllocation && size == 0) {
+                lsan::warn("Implementation-defined allocation of size 0", __builtin_return_address(0));
             }
             lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size, __builtin_return_address(0)));
             lsan::setIgnoreMalloc(false);
@@ -197,12 +179,8 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What
         
         if (!lsan::getIgnoreMalloc()) {
             lsan::setIgnoreMalloc(true);
-            if (objectSize * count == 0) {
-                if (!__lsan_invalidCrash || __lsan_glibc) {
-                    lsan::warn("Invalid allocation of size 0", __builtin_return_address(0));
-                } else {
-                    lsan::crash("Invalid allocation of size 0", __builtin_return_address(0));
-                }
+            if (__lsan_zeroAllocation && objectSize * count == 0) {
+                lsan::warn("Implementation-defined allocation of size 0", __builtin_return_address(0));
             }
             lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, objectSize * count, __builtin_return_address(0)));
             lsan::setIgnoreMalloc(false);
