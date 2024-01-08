@@ -1,7 +1,7 @@
 #
 # LeakSanitizer - Small library showing information about lost memory.
 #
-# Copyright (C) 2022 - 2023  mhahnFr
+# Copyright (C) 2022 - 2024  mhahnFr
 #
 # This file is part of the LeakSanitizer. This library is free software:
 # you can redistribute it and/or modify it under the terms of the
@@ -46,16 +46,6 @@ else
 	NAME = $(SHARED_L)
 endif
 
-NO_LICENSE = false
-ifeq ($(NO_LICENSE),true)
-	CXXFLAGS += -DNO_LICENSE
-endif
-
-NO_WEBSITE = false
-ifeq ($(NO_WEBSITE),true)
-	CXXFLAGS += -DNO_WEBSITE
-endif
-
 VERSION = "clean build"
 ifneq ($(shell git describe --tags --abbrev=0),)
 	VERSION = $(shell git describe --tags --abbrev=0)
@@ -74,7 +64,7 @@ all: $(SHARED_L) $(DYLIB_NA)
 
 install:
 	- $(RM) $(NAME)
-	$(MAKE) NO_LICENSE=false NO_WEBSITE=false LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
+	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
 	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(INSTALL_PATH)/lib/$(NAME)" $(NAME); fi
 	mkdir -p $(INSTALL_PATH)/lib
 	mkdir -p "$(INSTALL_PATH)/include"
@@ -87,7 +77,7 @@ uninstall:
 
 release:
 	- $(RM) $(NAME)
-	$(MAKE) NO_LICENSE=false NO_WEBSITE=false LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
+	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
 	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(NAME)" $(NAME); fi
 
 update:
