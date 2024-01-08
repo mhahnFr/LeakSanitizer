@@ -224,8 +224,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
         stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
     }
     if (__lsan_relativePaths && count > 0) {
-        stream << std::endl;
-        printWorkingDirectory(stream);
+        stream << std::endl << printWorkingDirectory;
     }
     stream << maybeShowDeprecationWarnings;
     if (self.userRegexError.has_value()) {

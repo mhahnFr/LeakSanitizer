@@ -44,8 +44,9 @@ auto getInstance() -> LSan &;
  * Prints the additional information about this sanitizer.
  *
  * @param out the output stream to print to
+ * @return the given output stream
  */
-void printInformation(std::ostream & out);
+auto printInformation(std::ostream & out) -> std::ostream &;
 
 /**
  * @brief The hook to be called on exit.
@@ -59,15 +60,17 @@ void exitHook();
  * allowed by `__lsan_relativePaths` on the given output stream.
  *
  * @param out the output stream to print to
+ * @return the given output stream
  */
-void maybeHintRelativePaths(std::ostream & out);
+auto maybeHintRelativePaths(std::ostream & out) -> std::ostream &;
 
 /**
  * Prints the hint about the relative paths, including the current working directory.
  *
  * @param out the output stream to print to
+ * @return the given output stream
  */
-void printWorkingDirectory(std::ostream & out);
+auto printWorkingDirectory(std::ostream & out) -> std::ostream &;
 
 /**
  * @brief Returns whether the output stream to print to is a TTY.

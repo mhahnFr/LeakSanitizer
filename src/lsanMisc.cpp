@@ -47,19 +47,23 @@ auto getInstance() -> LSan & {
  * Prints the license information of this sanitizer.
  *
  * @param out the output stream to print to
+ * @return the given output stream
  */
-static inline void printLicense(std::ostream & out) {
+static inline auto printLicense(std::ostream & out) -> std::ostream & {
     out << "Copyright (C) 2022 - 2024  mhahnFr and contributors" << std::endl
         << "Licensed under the terms of the GPL 3.0."            << std::endl
         << std::endl;
+    
+    return out;
 }
 
 /**
  * Prints the link to the website of this sanitizer.
  *
  * @param out the output stream to print to
+ * @return the given output stream
  */
-static inline void printWebsite(std::ostream & out) {
+static inline auto printWebsite(std::ostream & out) -> std::ostream & {
     using formatter::Style;
     
     out << formatter::get<Style::ITALIC>
@@ -67,16 +71,20 @@ static inline void printWebsite(std::ostream & out) {
         << formatter::format<Style::UNDERLINED>("github.com/mhahnFr/LeakSanitizer")
         << formatter::clear<Style::ITALIC>
         << std::endl << std::endl;
+    
+    return out;
 }
 
-void printInformation(std::ostream & out) {
+auto printInformation(std::ostream & out) -> std::ostream & {
     using formatter::Style;
     
     out << "Report by " << formatter::format<Style::BOLD>("LeakSanitizer ")
         << formatter::format<Style::ITALIC>(VERSION)
         << std::endl << std::endl;
-    if (__lsan_printLicense) printLicense(out);
-    if (__lsan_printWebsite) printWebsite(out);
+    if (__lsan_printLicense) out << printLicense;
+    if (__lsan_printWebsite) out << printWebsite;
+    
+    return out;
 }
 
 void exitHook() {
@@ -91,21 +99,23 @@ void exitHook() {
         callstackHelper::format(lcs::callstack(__builtin_return_address(0)), out);
     }
     out << std::endl     << std::endl
-        << getInstance() << std::endl;
-    printInformation(out);
+        << getInstance() << std::endl
+        << printInformation;
     internalCleanUp();
 }
 
-void maybeHintRelativePaths(std::ostream & out) {
+auto maybeHintRelativePaths(std::ostream & out) -> std::ostream & {
     if (__lsan_relativePaths) {
-        printWorkingDirectory(out);
-        out << std::endl;
+        out << printWorkingDirectory << std::endl;
     }
+    return out;
 }
 
-void printWorkingDirectory(std::ostream & out) {
+auto printWorkingDirectory(std::ostream & out) -> std::ostream & {
     out << "Note: " << formatter::format<formatter::Style::GREYED>("Paths are relative to the") << " working directory: "
         << std::filesystem::current_path() << std::endl;
+    
+    return out;
 }
 
 auto isATTY() -> bool {
