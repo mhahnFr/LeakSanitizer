@@ -121,6 +121,9 @@ static inline void internalCleanUp() {
  * @return whether to print formatted
  */
 static inline auto printFormatted() -> bool {
+    if (has("LSAN_PRINT_FORMATTED")) {
+        return __lsan_printFormatted;
+    }
     return __lsan_printFormatted && isATTY();
 }
 
