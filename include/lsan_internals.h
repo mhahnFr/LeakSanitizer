@@ -57,7 +57,7 @@ extern bool __lsan_printCout;
 extern bool __lsan_printFormatted;
 
 /**
- * @deprecated Since v1.8: This option will disappear in version 2.
+ * @deprecated Since v1.8 this option is no longer supported. Will be removed in v2.
  *
  * @brief If this value is set to `true`, the license information is printed upon normal termination
  * of the program.
@@ -70,7 +70,7 @@ DEPRECATED("Since version 1.8 this is no longer supported")
 extern bool __lsan_printLicense;
 
 /**
- * @deprecated Since v1.8: This option will disappear in version 2.
+ * @deprecated Since v1.8 this option is no longer supported. Will be removed in v2.
  *
  * @brief If this value is set to `true`, the link to the home page of the LeakSanitizer is printed.
  *
