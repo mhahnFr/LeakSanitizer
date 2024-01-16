@@ -149,18 +149,26 @@ static inline void formatShared(const struct callstack_frame & frame, std::ostre
         }
         out << formatter::format<Style::ITALIC>("(" + getCallstackFrameName(frame) + ")") << (reset ? formatter::get<S>() : "") << " ";
     }
-    out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
+    bool needsBrackets = false;
+    if (frame.sourceFile == nullptr || __lsan_printFunctions) {
+        out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
+        needsBrackets = true;
+    }
     if (frame.sourceFile != nullptr) {
-        out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED> << getCallstackFrameSourceFile(frame)
-            << ":" << frame.sourceLine;
+        if (needsBrackets) {
+            out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED>;
+        }
+        out << getCallstackFrameSourceFile(frame);
         if (frame.sourceLineColumn.has_value) {
             out << ":" << frame.sourceLineColumn.value;
         }
-        out << formatter::clear<Style::GREYED, Style::UNDERLINED>;
-        if (S == Style::GREYED || S == Style::BOLD) {
-            out << formatter::get<S>;
+        if (needsBrackets) {
+            out << formatter::clear<Style::GREYED, Style::UNDERLINED>;
+            if (S == Style::GREYED || S == Style::BOLD) {
+                out << formatter::get<S>;
+            }
+            out << ")";
         }
-        out << ")";
     }
     out << formatter::clear<S> << std::endl;
 }
