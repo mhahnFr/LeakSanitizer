@@ -162,6 +162,16 @@ extern bool __lsan_printExitPoint;
 extern bool __lsan_printBinaries;
 
 /**
+ * @brief If this value is set to `false` the function names are omitted if source
+ * file and line information is available.
+ *
+ * Defaults to `true`.
+ *
+ * @since 1.8
+ */
+extern bool __lsan_printFunctions;
+
+/**
  * @brief If this value is set to `true`, the printed file paths are allowed to
  * be relative paths.
  *
