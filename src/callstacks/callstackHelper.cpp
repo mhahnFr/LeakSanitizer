@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -152,7 +152,11 @@ static inline void formatShared(const struct callstack_frame & frame, std::ostre
     out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
     if (frame.sourceFile != nullptr) {
         out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED> << getCallstackFrameSourceFile(frame)
-            << ":" << frame.sourceLine << formatter::clear<Style::GREYED, Style::UNDERLINED>;
+            << ":" << frame.sourceLine;
+        if (frame.sourceLineColumn.has_value) {
+            out << ":" << frame.sourceLineColumn.value;
+        }
+        out << formatter::clear<Style::GREYED, Style::UNDERLINED>;
         if (S == Style::GREYED || S == Style::BOLD) {
             out << formatter::get<S>;
         }
