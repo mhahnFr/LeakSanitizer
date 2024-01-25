@@ -158,7 +158,7 @@ static inline void formatShared(const struct callstack_frame & frame, std::ostre
         if (needsBrackets) {
             out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED>;
         }
-        out << getCallstackFrameSourceFile(frame);
+        out << getCallstackFrameSourceFile(frame) << ":" << frame.sourceLine;
         if (frame.sourceLineColumn.has_value) {
             out << ":" << frame.sourceLineColumn.value;
         }
