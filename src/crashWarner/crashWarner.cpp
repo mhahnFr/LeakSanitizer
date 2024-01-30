@@ -166,6 +166,7 @@ void crash(const std::string & message, void * omitAddress) {
 }
 
 void crashForce(const std::string & message, void * omitAddress) {
+    std::cerr << formatter::clearAll() << std::endl;
     printer<false>(message, lcs::callstack(omitAddress));
     std::abort();
 }
