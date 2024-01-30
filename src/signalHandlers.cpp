@@ -43,7 +43,7 @@ namespace lsan {
  * @param signal the signal code
  * @return a string representation of the given signal
  */
-static inline std::string signalString(int signal) {
+constexpr static inline auto signalString(int signal) -> const char* {
     switch (signal) {
         case SIGBUS:  return "Bus error";
         case SIGABRT: return "Abort";
@@ -53,7 +53,13 @@ static inline std::string signalString(int signal) {
     return "<Unknown>";
 }
 
-[[ noreturn ]] void crashHandler(int signal, siginfo_t * info, void *) {
+[[ noreturn ]] static inline void aborter(int) {
+    std::abort();
+}
+
+[[ noreturn ]] void crashHandler(int signalCode, siginfo_t * info, void *) {
+    signal(signalCode, aborter);
+    
 #if __cplusplus >= 202002L
     std::string address = std::format("{:#x}", info->si_addr);
 #else
@@ -62,7 +68,7 @@ static inline std::string signalString(int signal) {
     std::string address = s.str();
 #endif
     using formatter::Style;
-    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalString(signal))
+    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalString(signalCode))
                + " on address " + formatter::formatString<Style::BOLD>(address), __builtin_return_address(0));
 }
 
