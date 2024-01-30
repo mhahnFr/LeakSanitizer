@@ -43,21 +43,68 @@ namespace lsan {
  * @param signal the signal code
  * @return a string representation of the given signal
  */
+constexpr static inline auto signalDescription(int signal) -> const char* {
+    switch (signal) {
+        case SIGHUP:    return "Terminal line hangup";
+        case SIGINT:    return "Interrupt";
+        case SIGQUIT:   return "Quit";
+        case SIGILL:    return "Illegal instruction";
+        case SIGTRAP:   return "Trapping instruction";
+        case SIGABRT:   return "Abort";
+        case SIGEMT:    return "Emulate instruction executed";
+        case SIGFPE:    return "Floating-point exception";
+        case SIGKILL:   return "Killed";
+        case SIGBUS:    return "Bus error";
+        case SIGSEGV:   return "Segmentation fault";
+        case SIGSYS:    return "Non-existent system call";
+        case SIGPIPE:   return "Broken pipe";
+        case SIGALRM:   return "Timer expired";
+        case SIGTERM:   return "Terminated";
+        case SIGXCPU:   return "CPU time limit exceeded";
+        case SIGXFSZ:   return "File size limit exceeded";
+        case SIGVTALRM: return "Virtual time alarm";
+        case SIGPROF:   return "Profiling timer alarm";
+    }
+    return "Unknown signal";
+}
+
 constexpr static inline auto signalString(int signal) -> const char* {
     switch (signal) {
-        case SIGBUS:  return "Bus error";
-        case SIGABRT: return "Abort";
-        case SIGTRAP: return "Trapping instruction";
-        case SIGSEGV: return "Segmentation fault";
+        case SIGHUP:    return "SIGHUP";
+        case SIGINT:    return "SIGINT";
+        case SIGQUIT:   return "SIGQUIT";
+        case SIGILL:    return "SIGILL";
+        case SIGTRAP:   return "SIGTRAP";
+        case SIGABRT:   return "SIGABRT";
+        case SIGEMT:    return "SIGEMT";
+        case SIGFPE:    return "SIGFPE";
+        case SIGKILL:   return "SIGKILL";
+        case SIGBUS:    return "SIGBUS";
+        case SIGSEGV:   return "SIGSEGV";
+        case SIGSYS:    return "SIGSYS";
+        case SIGPIPE:   return "SIGPIPE";
+        case SIGALRM:   return "SIGALRM";
+        case SIGTERM:   return "SIGTERM";
+        case SIGXCPU:   return "SIGXCPU";
+        case SIGXFSZ:   return "SIGXFSZ";
+        case SIGVTALRM: return "SIGVTALRM";
+        case SIGPROF:   return "SIGPROF";
     }
-    return "<Unknown>";
+    return "Unkown";
 }
 
 [[ noreturn ]] static inline void aborter(int) {
-    std::abort();
+    abort();
 }
 
-[[ noreturn ]] void crashHandler(int signalCode, siginfo_t * info, void *) {
+[[ noreturn ]] void crashHandler(int signalCode) {
+    using formatter::Style;
+    
+    signal(signalCode, aborter);
+    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalDescription(signalCode)) + " (" + signalString(signalCode) + ")");
+}
+
+[[ noreturn ]] void crashHandlerWithAddress(int signalCode, siginfo_t * info, void *) {
     signal(signalCode, aborter);
     
 #if __cplusplus >= 202002L
@@ -68,7 +115,7 @@ constexpr static inline auto signalString(int signal) -> const char* {
     std::string address = s.str();
 #endif
     using formatter::Style;
-    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalString(signalCode))
+    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalDescription(signalCode)) + " (" + signalString(signalCode) + ")"
                + " on address " + formatter::formatString<Style::BOLD>(address));
 }
 

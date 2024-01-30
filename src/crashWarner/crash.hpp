@@ -74,6 +74,8 @@ void crash(const std::string & message);
  */
 void crash(const std::string &                                     message,
            std::optional<std::reference_wrapper<const MallocInfo>> info);
+
+[[ noreturn ]] void abort();
 }
 
 #endif /* crash_hpp */

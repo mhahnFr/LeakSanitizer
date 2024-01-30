@@ -159,20 +159,20 @@ void warn(const std::string &                                     message,
 void crash(const std::string & message) {
     withCallstack([&] (auto & callstack) {
         printer<false>(message, callstack);
-        std::abort();
+        abort();
     });
 }
 
 void crashForce(const std::string & message) {
     std::cerr << formatter::clearAll() << std::endl;
     printer<false>(message, lcs::callstack());
-    std::abort();
+    abort();
 }
 
 void crash(const std::string & message, const std::string & file, int line) {
     withCallstack([&] (auto & callstack) {
         printer<false>(message, file, line, callstack);
-        std::abort();
+        abort();
     });
 }
 
@@ -180,7 +180,12 @@ void crash(const std::string &                                     message,
            std::optional<std::reference_wrapper<const MallocInfo>> info) {
     withCallstack([&] (auto & callstack) {
         printer<false>(message, info, callstack);
-        std::abort();
+        abort();
     });
+}
+
+[[ noreturn ]] void abort() {
+    signal(SIGABRT, SIG_DFL);
+    std::abort();
 }
 }

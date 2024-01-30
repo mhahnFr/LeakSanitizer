@@ -65,9 +65,27 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
 LSan::LSan(): libName(lsanName().value()) {
     atexit(reinterpret_cast<void (*)()>(exitHook));
     struct sigaction s{};
-    s.sa_sigaction = crashHandler;
+    s.sa_sigaction = crashHandlerWithAddress;
     sigaction(SIGSEGV, &s, nullptr);
     sigaction(SIGBUS, &s, nullptr);
+    
+    signal(SIGABRT,   crashHandler);
+    signal(SIGXFSZ,   crashHandler);
+    signal(SIGXCPU,   crashHandler);
+    signal(SIGTERM,   crashHandler);
+    signal(SIGALRM,   crashHandler);
+    signal(SIGPIPE,   crashHandler);
+    signal(SIGSYS,    crashHandler);
+    signal(SIGKILL,   crashHandler);
+    signal(SIGFPE,    crashHandler);
+    signal(SIGILL,    crashHandler);
+    signal(SIGQUIT,   crashHandler);
+    signal(SIGHUP,    crashHandler);
+    signal(SIGVTALRM, crashHandler);
+    signal(SIGPROF,   crashHandler);
+    signal(SIGEMT,    crashHandler);
+    signal(SIGTRAP,   crashHandler);
+    
     signal(SIGUSR1, statsSignal);
     signal(SIGUSR2, callstackSignal);
 }
