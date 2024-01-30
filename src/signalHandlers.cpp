@@ -97,7 +97,14 @@ constexpr static inline auto signalString(int signal) -> const char* {
     abort();
 }
 
-[[ noreturn ]] void crashHandler(int signalCode, siginfo_t * info, void *) {
+[[ noreturn ]] void crashHandler(int signalCode) {
+    using formatter::Style;
+    
+    signal(signalCode, aborter);
+    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalDescription(signalCode)) + " (" + signalString(signalCode) + ")");
+}
+
+[[ noreturn ]] void crashHandlerWithAddress(int signalCode, siginfo_t * info, void *) {
     signal(signalCode, aborter);
     
 #if __cplusplus >= 202002L
