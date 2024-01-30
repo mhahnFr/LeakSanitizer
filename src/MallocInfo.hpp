@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2023  mhahnFr
+ * Copyright (C) 2022 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -176,10 +176,10 @@ public:
      *
      * @param deleted whether this allocation is deallocated
      */
-    inline void setDeleted(bool deleted, const void * omitAddress = __builtin_return_address(0)) {
+    inline void setDeleted(bool deleted) {
         this->deleted = deleted;
         
-        deletedCallstack = lcs::callstack(omitAddress);
+        deletedCallstack = lcs::callstack();
     }
     
     /**

@@ -141,11 +141,9 @@ public:
      * Removes the allocation record acossiated with the given pointer.
      *
      * @param pointer the allocation pointer
-     * @param omitAddress the callstack frame delimiter
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    auto removeMalloc(void * pointer,
-                      void * omitAddress = __builtin_return_address(0)) -> MallocInfoRemoved;
+    auto removeMalloc(void* pointer) -> MallocInfoRemoved;
     
     /**
      * Adds the given allocation record.

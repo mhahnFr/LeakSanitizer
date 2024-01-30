@@ -126,62 +126,59 @@ static inline void printer(const std::string &                                  
  * Executes the given function with a callstack up to the given omit address
  * if the generated callstack is user relevant.
  *
- * @param omitAddress the callstack delimiter
  * @param function the function to be executed
  * @tparam F the function's type - it will get a lcs::callstack as the only argument
  */
 template<typename F>
-static inline void withCallstack(void * omitAddress, const F & function) {
-    auto callstack = lcs::callstack(omitAddress);
+static inline void withCallstack(const F & function) {
+    auto callstack = lcs::callstack();
     if (callstackHelper::getCallstackType(callstack) == callstackHelper::CallstackType::USER) {
         function(callstack);
     }
 }
 
-void warn(const std::string & message, void * omitAddress) {
-    withCallstack(omitAddress, [&] (auto & callstack) {
+void warn(const std::string & message) {
+    withCallstack([&] (auto & callstack) {
         printer<true>(message, callstack);
     });
 }
 
-void warn(const std::string & message, const std::string & file, int line, void * omitAddress) {
-    withCallstack(omitAddress, [&] (auto & callstack) {
+void warn(const std::string & message, const std::string & file, int line) {
+    withCallstack([&] (auto & callstack) {
         printer<true>(message, file, line, callstack);
     });
 }
 
 void warn(const std::string &                                     message,
-          std::optional<std::reference_wrapper<const MallocInfo>> info,
-          void *                                                  omitAddress) {
-    withCallstack(omitAddress, [&] (auto & callstack) {
+          std::optional<std::reference_wrapper<const MallocInfo>> info) {
+    withCallstack([&] (auto & callstack) {
         printer<true>(message, info, callstack);
     });
 }
 
-void crash(const std::string & message, void * omitAddress) {
-    withCallstack(omitAddress, [&] (auto & callstack) {
+void crash(const std::string & message) {
+    withCallstack([&] (auto & callstack) {
         printer<false>(message, callstack);
         std::abort();
     });
 }
 
-void crashForce(const std::string & message, void * omitAddress) {
+void crashForce(const std::string & message) {
     std::cerr << formatter::clearAll() << std::endl;
-    printer<false>(message, lcs::callstack(omitAddress));
+    printer<false>(message, lcs::callstack());
     std::abort();
 }
 
-void crash(const std::string & message, const std::string & file, int line, void * omitAddress) {
-    withCallstack(omitAddress, [&] (auto & callstack) {
+void crash(const std::string & message, const std::string & file, int line) {
+    withCallstack([&] (auto & callstack) {
         printer<false>(message, file, line, callstack);
         std::abort();
     });
 }
 
 void crash(const std::string &                                     message,
-           std::optional<std::reference_wrapper<const MallocInfo>> info,
-           void *                                                  omitAddress) {
-    withCallstack(omitAddress, [&] (auto & callstack) {
+           std::optional<std::reference_wrapper<const MallocInfo>> info) {
+    withCallstack([&] (auto & callstack) {
         printer<false>(message, info, callstack);
         std::abort();
     });

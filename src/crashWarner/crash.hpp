@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -37,12 +37,10 @@ namespace lsan {
  * @param message the message to be printed
  * @param file the file name
  * @param line the line number
- * @param omitAddress the address byond which frames are omitted from the generated callstack
  */
 void crash(const std::string & message,
            const std::string & file,
-           const int           line,
-                 void *        omitAddress = __builtin_return_address(0));
+           const int           line);
 
 /**
  * @brief Terminates the linked program and prints the given message and a callstack
@@ -51,9 +49,8 @@ void crash(const std::string & message,
  * This function does nothing if the generated callstack is not user relevant.
  *
  * @param message the message to be printed
- * @param omitAddress the address beyond which frames are omitted from the generated callstack
  */
-void crash(const std::string & message, void * omitAddress = __builtin_return_address(0));
+void crash(const std::string & message);
 
 /**
  * @brief Terminates the linked program and prints the given message and a callstack
@@ -62,9 +59,8 @@ void crash(const std::string & message, void * omitAddress = __builtin_return_ad
  * This function performs the termination in any case.
  *
  * @param message the message to be printed
- * @param omitAddress the address beyond which frames are omitted from the generated callstack
  */
-[[ noreturn ]] void crashForce(const std::string & message, void * omitAddress = __builtin_return_address(0));
+[[ noreturn ]] void crashForce(const std::string & message);
 
 /**
  * @brief Terminates the linked program and prints the given message, the information
@@ -75,11 +71,9 @@ void crash(const std::string & message, void * omitAddress = __builtin_return_ad
  *
  * @param message the message to be printed
  * @param info the optional allocation record
- * @param omitAddress the address beyond which frames are omitted from the generated callstack
  */
 void crash(const std::string &                                     message,
-           std::optional<std::reference_wrapper<const MallocInfo>> info,
-           void *                                                  omitAddress = __builtin_return_address(0));
+           std::optional<std::reference_wrapper<const MallocInfo>> info);
 }
 
 #endif /* crash_hpp */

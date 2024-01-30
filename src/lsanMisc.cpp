@@ -98,7 +98,7 @@ void exitHook() {
     
     if (__lsan_printExitPoint) {
         out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
-        callstackHelper::format(lcs::callstack(__builtin_return_address(0)), out);
+        callstackHelper::format(lcs::callstack(), out);
     }
     out << std::endl     << std::endl
         << getInstance() << std::endl

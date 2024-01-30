@@ -69,7 +69,7 @@ constexpr static inline auto signalString(int signal) -> const char* {
 #endif
     using formatter::Style;
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalString(signalCode))
-               + " on address " + formatter::formatString<Style::BOLD>(address), __builtin_return_address(0));
+               + " on address " + formatter::formatString<Style::BOLD>(address));
 }
 
 void callstackSignal(int) {

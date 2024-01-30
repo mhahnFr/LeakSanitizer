@@ -72,7 +72,7 @@ LSan::LSan(): libName(lsanName().value()) {
     signal(SIGUSR2, callstackSignal);
 }
 
-auto LSan::removeMalloc(void * pointer, void * omitAddress) -> MallocInfoRemoved {
+auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
     std::lock_guard lock(infoMutex);
     
     auto it = infos.find(pointer);
@@ -83,7 +83,7 @@ auto LSan::removeMalloc(void * pointer, void * omitAddress) -> MallocInfoRemoved
     }
     if (__lsan_statsActive) {
         stats -= it->second;
-        it->second.setDeleted(true, omitAddress);
+        it->second.setDeleted(true);
     } else {
         infos.erase(it);
     }
