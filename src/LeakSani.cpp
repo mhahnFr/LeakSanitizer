@@ -69,25 +69,40 @@ LSan::LSan(): libName(lsanName().value()) {
     sigaction(SIGSEGV, &s, nullptr);
     sigaction(SIGBUS, &s, nullptr);
     
+    signal(SIGUSR1, statsSignal);
+    signal(SIGUSR2, callstackSignal);
+    
     signal(SIGABRT,   crashHandler);
-    signal(SIGXFSZ,   crashHandler);
-    signal(SIGXCPU,   crashHandler);
     signal(SIGTERM,   crashHandler);
     signal(SIGALRM,   crashHandler);
     signal(SIGPIPE,   crashHandler);
-    signal(SIGSYS,    crashHandler);
     signal(SIGKILL,   crashHandler);
     signal(SIGFPE,    crashHandler);
     signal(SIGILL,    crashHandler);
     signal(SIGQUIT,   crashHandler);
     signal(SIGHUP,    crashHandler);
-    signal(SIGVTALRM, crashHandler);
-    signal(SIGPROF,   crashHandler);
-    signal(SIGEMT,    crashHandler);
-    signal(SIGTRAP,   crashHandler);
     
-    signal(SIGUSR1, statsSignal);
-    signal(SIGUSR2, callstackSignal);
+#if defined(__APPLE__) || defined(SIGXFSZ)
+    signal(SIGXFSZ,   crashHandler);
+#endif
+#if defined(__APPLE__) || defined(SIGXCPU)
+    signal(SIGXCPU,   crashHandler);
+#endif
+#if defined(__APPLE__) || defined(SIGSYS)
+    signal(SIGSYS,    crashHandler);
+#endif
+#if defined(__APPLE__) || defined(SIGVTALRM)
+    signal(SIGVTALRM, crashHandler);
+#endif
+#if defined(__APPLE__) || defined(SIGPROF)
+    signal(SIGPROF,   crashHandler);
+#endif
+#if defined(__APPLE__) || defined(SIGEMT)
+    signal(SIGEMT,    crashHandler);
+#endif
+#if defined(__APPLE__) || defined(SIGTRAP)
+    signal(SIGTRAP,   crashHandler);
+#endif
 }
 
 auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {

@@ -49,30 +49,26 @@ constexpr static inline auto signalDescription(int signal) -> const char* {
         case SIGINT:    return "Interrupt";
         case SIGQUIT:   return "Quit";
         case SIGILL:    return "Illegal instruction";
-            
-#if defined(__APPLE__) || defined(SIGTRAP)
-        case SIGTRAP:   return "Trapping instruction";
-#endif
-            
         case SIGABRT:   return "Abort";
-            
-#if defined(__APPLE__) || defined(SIGEMT)
-        case SIGEMT:    return "Emulate instruction executed";
-#endif
-            
         case SIGFPE:    return "Floating-point exception";
         case SIGKILL:   return "Killed";
-            
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS:    return "Bus error";
-#endif
-            
         case SIGSEGV:   return "Segmentation fault";
-        case SIGSYS:    return "Non-existent system call";
         case SIGPIPE:   return "Broken pipe";
         case SIGALRM:   return "Timer expired";
         case SIGTERM:   return "Terminated";
             
+#if defined(__APPLE__) || defined(SIGTRAP)
+        case SIGTRAP:   return "Trapping instruction";
+#endif
+#if defined(__APPLE__) || defined(SIGEMT)
+        case SIGEMT:    return "Emulate instruction executed";
+#endif
+#if defined(__APPLE__) || defined(SIGBUS)
+        case SIGBUS:    return "Bus error";
+#endif
+#if defined(__APPLE__) || defined(SIGSYS)
+        case SIGSYS:    return "Non-existent system call";
+#endif
 #if defined(__APPLE__) || defined(SIGXCPU)
         case SIGXCPU:   return "CPU time limit exceeded";
 #endif
@@ -95,30 +91,26 @@ constexpr static inline auto signalString(int signal) -> const char* {
         case SIGINT:    return "SIGINT";
         case SIGQUIT:   return "SIGQUIT";
         case SIGILL:    return "SIGILL";
-            
-#if defined(__APPLE__) || defined(SIGTRAP)
-        case SIGTRAP:   return "SIGTRAP";
-#endif
-            
         case SIGABRT:   return "SIGABRT";
-      
-#if defined(__APPLE__) || defined(SIGEMT)
-        case SIGEMT:    return "SIGEMT";
-#endif
-            
         case SIGFPE:    return "SIGFPE";
         case SIGKILL:   return "SIGKILL";
-      
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS:    return "SIGBUS";
-#endif
-            
         case SIGSEGV:   return "SIGSEGV";
-        case SIGSYS:    return "SIGSYS";
         case SIGPIPE:   return "SIGPIPE";
         case SIGALRM:   return "SIGALRM";
         case SIGTERM:   return "SIGTERM";
             
+#if defined(__APPLE__) || defined(SIGTRAP)
+        case SIGTRAP:   return "SIGTRAP";
+#endif
+#if defined(__APPLE__) || defined(SIGEMT)
+        case SIGEMT:    return "SIGEMT";
+#endif
+#if defined(__APPLE__) || defined(SIGBUS)
+        case SIGBUS:    return "SIGBUS";
+#endif
+#if defined(__APPLE__) || defined(SIGSYS)
+        case SIGSYS:    return "SIGSYS";
+#endif
 #if defined(__APPLE__) || defined(SIGXCPU)
         case SIGXCPU:   return "SIGXCPU";
 #endif
