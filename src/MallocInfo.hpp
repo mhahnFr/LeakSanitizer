@@ -67,18 +67,16 @@ public:
      * @param size the size of the allocated piece of memory
      * @param file the filename where the allocation happened
      * @param line the line number inside the file where the allocation happened
-     * @param omitAddress the return address upon which function calls are ignored
      */
     inline MallocInfo(void * const                     pointer,
                       const std::size_t                size,
                       std::optional<const std::string> file,
-                      std::optional<const int>         line,
-                      const void *                     omitAddress = __builtin_return_address(0))
+                      std::optional<const int>         line)
         : pointer(pointer),
           size(size),
           createdInFile(file),
           createdOnLine(line),
-          createdCallstack(omitAddress),
+          createdCallstack(),
           deletedInFile(std::nullopt),
           deletedOnLine(std::nullopt),
           deleted(false),
@@ -90,10 +88,9 @@ public:
      *
      * @param pointer the pointer to the allocated piece of memory
      * @param size the size of the allocated piece of memory
-     * @param omitAddress the return address upon which function calls are ignored
      */
-    inline MallocInfo(void * const pointer, std::size_t size, void * omitAddress = __builtin_return_address(0))
-        : MallocInfo(pointer, size, std::nullopt, std::nullopt, omitAddress)
+    inline MallocInfo(void * const pointer, std::size_t size)
+        : MallocInfo(pointer, size, std::nullopt, std::nullopt)
     {}
     
     /**

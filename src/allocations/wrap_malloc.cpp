@@ -55,7 +55,7 @@ auto __wrap_malloc(std::size_t size, const char * file, int line) -> void * {
             if (__lsan_zeroAllocation && size == 0) {
                 warn("Implementation-defined allocation of size 0", file, line);
             }
-            getInstance().addMalloc(MallocInfo(ret, size, file, line, __builtin_return_address(0)));
+            getInstance().addMalloc(MallocInfo(ret, size, file, line));
             setIgnoreMalloc(false);
         }
     }
@@ -72,7 +72,7 @@ auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char * file,
             if (__lsan_zeroAllocation && objectSize * count == 0) {
                 warn("Implementation-defined allocation of size 0", file, line);
             }
-            getInstance().addMalloc(MallocInfo(ret, objectSize * count, file, line, __builtin_return_address(0)));
+            getInstance().addMalloc(MallocInfo(ret, objectSize * count, file, line));
             setIgnoreMalloc(false);
         }
     }
@@ -95,9 +95,9 @@ auto __wrap_realloc(void * pointer, std::size_t size, const char * file, int lin
                 if (pointer != nullptr) {
                     getInstance().removeMalloc(pointer);
                 }
-                getInstance().addMalloc(MallocInfo(ptr, size, file, line, __builtin_return_address(0)));
+                getInstance().addMalloc(MallocInfo(ptr, size, file, line));
             } else {
-                getInstance().changeMalloc(MallocInfo(ptr, size, file, line, __builtin_return_address(0)));
+                getInstance().changeMalloc(MallocInfo(ptr, size, file, line));
             }
         }
         setIgnoreMalloc(false);
@@ -164,7 +164,7 @@ auto malloc(std::size_t size) -> void * {
             if (__lsan_zeroAllocation && size == 0) {
                 lsan::warn("Implementation-defined allocation of size 0");
             }
-            lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size, __builtin_return_address(0)));
+            lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size));
             lsan::setIgnoreMalloc(false);
         }
     }
@@ -182,7 +182,7 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What
             if (__lsan_zeroAllocation && objectSize * count == 0) {
                 lsan::warn("Implementation-defined allocation of size 0");
             }
-            lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, objectSize * count, __builtin_return_address(0)));
+            lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, objectSize * count));
             lsan::setIgnoreMalloc(false);
         }
     }
@@ -205,9 +205,9 @@ auto realloc(void * pointer, std::size_t size) -> void * {
                 if (pointer != nullptr) {
                     lsan::getInstance().removeMalloc(pointer);
                 }
-                lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size, __builtin_return_address(0)));
+                lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size));
             } else {
-                lsan::getInstance().changeMalloc(lsan::MallocInfo(ptr, size, __builtin_return_address(0)));
+                lsan::getInstance().changeMalloc(lsan::MallocInfo(ptr, size));
             }
         }
         lsan::setIgnoreMalloc(false);
