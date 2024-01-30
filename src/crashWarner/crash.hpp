@@ -80,6 +80,8 @@ void crash(const std::string & message, void * omitAddress = __builtin_return_ad
 void crash(const std::string &                                     message,
            std::optional<std::reference_wrapper<const MallocInfo>> info,
            void *                                                  omitAddress = __builtin_return_address(0));
+
+[[ noreturn ]] void abort();
 }
 
 #endif /* crash_hpp */

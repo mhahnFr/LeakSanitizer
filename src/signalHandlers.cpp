@@ -54,7 +54,7 @@ constexpr static inline auto signalString(int signal) -> const char* {
 }
 
 [[ noreturn ]] static inline void aborter(int) {
-    std::abort();
+    abort();
 }
 
 [[ noreturn ]] void crashHandler(int signalCode, siginfo_t * info, void *) {
