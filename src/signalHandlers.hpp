@@ -24,13 +24,13 @@
 
 namespace lsan::signals::handlers {
 /// This function acts as a signal handler for access violation signals.
-[[ noreturn ]] void crashHandlerWithAddress(int, siginfo_t*, void*);
-[[ noreturn ]] void crashHandler(int);
+[[ noreturn ]] void crashWithAddress(int, siginfo_t*, void*);
+[[ noreturn ]] void crash(int);
 
 /// This function acts as a general signal handler. It prints the statistics.
-void statsSignal(int);
+void stats(int);
 /// This function acts as a general signal handler. It prints the current callstack.
-void callstackSignal(int);
+void callstack(int);
 }
 
 #endif /* signalHandlers_hpp */

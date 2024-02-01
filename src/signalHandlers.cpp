@@ -42,7 +42,7 @@ namespace lsan::signals::handlers {
     abort();
 }
 
-[[ noreturn ]] void crashHandler(int signalCode) {
+[[ noreturn ]] void crash(int signalCode) {
     using formatter::Style;
     
     registerFunction(reinterpret_cast<void*>(aborter), signalCode);
@@ -50,7 +50,7 @@ namespace lsan::signals::handlers {
                + " (" + stringify(signalCode) + ")");
 }
 
-[[ noreturn ]] void crashHandlerWithAddress(int signalCode, siginfo_t * info, void *) {
+[[ noreturn ]] void crashWithAddress(int signalCode, siginfo_t * info, void *) {
     registerFunction(reinterpret_cast<void*>(aborter), signalCode);
     
 #if __cplusplus >= 202002L
@@ -66,7 +66,7 @@ namespace lsan::signals::handlers {
                + " on address " + formatter::formatString<Style::BOLD>(address));
 }
 
-void callstackSignal(int) {
+void callstack(int) {
     using formatter::Style;
     
     bool ignore = getIgnoreMalloc();
@@ -82,7 +82,7 @@ void callstackSignal(int) {
     }
 }
 
-void statsSignal(int) {
+void stats(int) {
     __lsan_printStats();
 }
 }
