@@ -19,17 +19,17 @@
 
 #include <iostream>
 
+#include "signals.hpp"
 #include "signalHandlers.hpp"
 
-#include "formatter.hpp"
-#include "lsanMisc.hpp"
-#include "MallocInfo.hpp"
-#include "signals.hpp"
-#include "callstacks/callstackHelper.hpp"
-#include "crashWarner/crash.hpp"
+#include "../formatter.hpp"
+#include "../lsanMisc.hpp"
+#include "../MallocInfo.hpp"
+#include "../callstacks/callstackHelper.hpp"
+#include "../crashWarner/crash.hpp"
 
-#include "../include/lsan_internals.h"
-#include "../include/lsan_stats.h"
+#include "../../include/lsan_internals.h"
+#include "../../include/lsan_stats.h"
 
 #if __cplusplus >= 202002L
  #include <format>

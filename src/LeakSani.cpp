@@ -26,9 +26,9 @@
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
-#include "signals.hpp"
-#include "signalHandlers.hpp"
 #include "callstacks/callstackHelper.hpp"
+#include "signals/signals.hpp"
+#include "signals/signalHandlers.hpp"
 
 #include "../include/lsan_internals.h"
 #include "../include/lsan_stats.h"

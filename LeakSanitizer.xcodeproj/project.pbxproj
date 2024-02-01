@@ -209,6 +209,7 @@
 		BF9DD3A428A6761400AEBC17 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BFAA94582B6C1E52007FC130 /* signals */,
 				BFBCAD8A2ACF611A00C6B69F /* allocations */,
 				BF3204F22AC5C625004EC77E /* callstacks */,
 				BFA41A3D2AB8BBBC00DF6FAC /* initialization */,
@@ -222,12 +223,8 @@
 				BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */,
 				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
 				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
-				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
-				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
 				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
-				BFAA94522B6C12FF007FC130 /* signals.cpp */,
-				BFAA94532B6C12FF007FC130 /* signals.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -239,6 +236,17 @@
 				BF84625A2AD1B2D3003B05F5 /* init.hpp */,
 			);
 			path = initialization;
+			sourceTree = "<group>";
+		};
+		BFAA94582B6C1E52007FC130 /* signals */ = {
+			isa = PBXGroup;
+			children = (
+				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
+				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
+				BFAA94522B6C12FF007FC130 /* signals.cpp */,
+				BFAA94532B6C12FF007FC130 /* signals.hpp */,
+			);
+			path = signals;
 			sourceTree = "<group>";
 		};
 		BFBCAD8A2ACF611A00C6B69F /* allocations */ = {
