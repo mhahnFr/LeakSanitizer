@@ -22,7 +22,7 @@
 #include "signals.hpp"
 
 namespace lsan::signals {
-bool registerFunction(void* function, int signalCode) {
+auto registerFunction(void* function, int signalCode) -> bool {
     switch (signalCode) {
 #if defined(__APPLE__) || defined(SIGBUS)
         case SIGBUS:

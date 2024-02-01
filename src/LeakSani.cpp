@@ -26,6 +26,7 @@
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
+#include "signals.hpp"
 #include "signalHandlers.hpp"
 #include "callstacks/callstackHelper.hpp"
 
@@ -64,44 +65,45 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
 
 LSan::LSan(): libName(lsanName().value()) {
     atexit(reinterpret_cast<void (*)()>(exitHook));
-    struct sigaction s{};
-    s.sa_sigaction = crashHandlerWithAddress;
-    sigaction(SIGSEGV, &s, nullptr);
-    sigaction(SIGBUS, &s, nullptr);
     
-    signal(SIGUSR1, statsSignal);
-    signal(SIGUSR2, callstackSignal);
+#if defined(__APPLE__) || defined(SIGBUS)
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandlerWithAddress), SIGBUS);
+#endif
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandlerWithAddress), SIGSEGV);
     
-    signal(SIGABRT,   crashHandler);
-    signal(SIGTERM,   crashHandler);
-    signal(SIGALRM,   crashHandler);
-    signal(SIGPIPE,   crashHandler);
-    signal(SIGKILL,   crashHandler);
-    signal(SIGFPE,    crashHandler);
-    signal(SIGILL,    crashHandler);
-    signal(SIGQUIT,   crashHandler);
-    signal(SIGHUP,    crashHandler);
+    signals::registerFunction(signals::asHandler(signals::handlers::statsSignal),     SIGUSR1);
+    signals::registerFunction(signals::asHandler(signals::handlers::callstackSignal), SIGUSR2);
+    
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGABRT);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGTERM);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGALRM);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGPIPE);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGKILL);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGFPE);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGILL);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGQUIT);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGHUP);
     
 #if defined(__APPLE__) || defined(SIGXFSZ)
-    signal(SIGXFSZ,   crashHandler);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGXFSZ);
 #endif
 #if defined(__APPLE__) || defined(SIGXCPU)
-    signal(SIGXCPU,   crashHandler);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGXCPU);
 #endif
 #if defined(__APPLE__) || defined(SIGSYS)
-    signal(SIGSYS,    crashHandler);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGSYS);
 #endif
 #if defined(__APPLE__) || defined(SIGVTALRM)
-    signal(SIGVTALRM, crashHandler);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGVTALRM);
 #endif
 #if defined(__APPLE__) || defined(SIGPROF)
-    signal(SIGPROF,   crashHandler);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGPROF);
 #endif
 #if defined(__APPLE__) || defined(SIGEMT)
-    signal(SIGEMT,    crashHandler);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGEMT);
 #endif
 #if defined(__APPLE__) || defined(SIGTRAP)
-    signal(SIGTRAP,   crashHandler);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashHandler), SIGTRAP);
 #endif
 }
 

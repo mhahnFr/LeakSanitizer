@@ -45,13 +45,13 @@ namespace lsan::signals::handlers {
 [[ noreturn ]] void crashHandler(int signalCode) {
     using formatter::Style;
     
-    signal(signalCode, aborter);
+    registerFunction(reinterpret_cast<void*>(aborter), signalCode);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")");
 }
 
 [[ noreturn ]] void crashHandlerWithAddress(int signalCode, siginfo_t * info, void *) {
-    signal(signalCode, aborter);
+    registerFunction(reinterpret_cast<void*>(aborter), signalCode);
     
 #if __cplusplus >= 202002L
     std::string address = std::format("{:#x}", info->si_addr);

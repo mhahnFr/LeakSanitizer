@@ -21,7 +21,12 @@
 #define signals_hpp
 
 namespace lsan::signals {
-bool registerFunction(void* function, int signal);
+template<typename F>
+static inline auto asHandler(F function) noexcept -> void* {
+    return reinterpret_cast<void*>(function);
+}
+
+auto registerFunction(void* function, int signal) -> bool;
 
 /**
  * Returns a string description for the given signal code.
