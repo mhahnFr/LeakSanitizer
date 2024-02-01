@@ -24,6 +24,7 @@
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
 #include "MallocInfo.hpp"
+#include "signals.hpp"
 #include "callstacks/callstackHelper.hpp"
 #include "crashWarner/crash.hpp"
 
@@ -36,97 +37,7 @@
  #include <sstream>
 #endif
 
-namespace lsan {
-/**
- * Returns a string representation for the given signal code.
- *
- * @param signal the signal code
- * @return a string representation of the given signal
- */
-constexpr static inline auto signalDescription(int signal) -> const char* {
-    switch (signal) {
-        case SIGHUP:    return "Terminal line hangup";
-        case SIGINT:    return "Interrupt";
-        case SIGQUIT:   return "Quit";
-        case SIGILL:    return "Illegal instruction";
-        case SIGABRT:   return "Abort";
-        case SIGFPE:    return "Floating-point exception";
-        case SIGKILL:   return "Killed";
-        case SIGSEGV:   return "Segmentation fault";
-        case SIGPIPE:   return "Broken pipe";
-        case SIGALRM:   return "Timer expired";
-        case SIGTERM:   return "Terminated";
-            
-#if defined(__APPLE__) || defined(SIGTRAP)
-        case SIGTRAP:   return "Trapping instruction";
-#endif
-#if defined(__APPLE__) || defined(SIGEMT)
-        case SIGEMT:    return "Emulate instruction executed";
-#endif
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS:    return "Bus error";
-#endif
-#if defined(__APPLE__) || defined(SIGSYS)
-        case SIGSYS:    return "Non-existent system call";
-#endif
-#if defined(__APPLE__) || defined(SIGXCPU)
-        case SIGXCPU:   return "CPU time limit exceeded";
-#endif
-#if defined(__APPLE__) || defined(SIGXFSZ)
-        case SIGXFSZ:   return "File size limit exceeded";
-#endif
-#if defined(__APPLE__) || defined(SIGVTALRM)
-        case SIGVTALRM: return "Virtual time alarm";
-#endif
-#if defined(__APPLE__) || defined(SIGPROF)
-        case SIGPROF:   return "Profiling timer alarm";
-#endif
-    }
-    return "Unknown signal";
-}
-
-constexpr static inline auto signalString(int signal) -> const char* {
-    switch (signal) {
-        case SIGHUP:    return "SIGHUP";
-        case SIGINT:    return "SIGINT";
-        case SIGQUIT:   return "SIGQUIT";
-        case SIGILL:    return "SIGILL";
-        case SIGABRT:   return "SIGABRT";
-        case SIGFPE:    return "SIGFPE";
-        case SIGKILL:   return "SIGKILL";
-        case SIGSEGV:   return "SIGSEGV";
-        case SIGPIPE:   return "SIGPIPE";
-        case SIGALRM:   return "SIGALRM";
-        case SIGTERM:   return "SIGTERM";
-            
-#if defined(__APPLE__) || defined(SIGTRAP)
-        case SIGTRAP:   return "SIGTRAP";
-#endif
-#if defined(__APPLE__) || defined(SIGEMT)
-        case SIGEMT:    return "SIGEMT";
-#endif
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS:    return "SIGBUS";
-#endif
-#if defined(__APPLE__) || defined(SIGSYS)
-        case SIGSYS:    return "SIGSYS";
-#endif
-#if defined(__APPLE__) || defined(SIGXCPU)
-        case SIGXCPU:   return "SIGXCPU";
-#endif
-#if defined(__APPLE__) || defined(SIGXFSZ)
-        case SIGXFSZ:   return "SIGXFSZ";
-#endif
-#if defined(__APPLE__) || defined(SIGVTALRM)
-        case SIGVTALRM: return "SIGVTALRM";
-#endif
-#if defined(__APPLE__) || defined(SIGPROF)
-        case SIGPROF:   return "SIGPROF";
-#endif
-    }
-    return "Unkown";
-}
-
+namespace lsan::signals::handlers {
 [[ noreturn ]] static inline void aborter(int) {
     abort();
 }
@@ -135,7 +46,8 @@ constexpr static inline auto signalString(int signal) -> const char* {
     using formatter::Style;
     
     signal(signalCode, aborter);
-    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalDescription(signalCode)) + " (" + signalString(signalCode) + ")");
+    crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
+               + " (" + stringify(signalCode) + ")");
 }
 
 [[ noreturn ]] void crashHandlerWithAddress(int signalCode, siginfo_t * info, void *) {
@@ -149,7 +61,8 @@ constexpr static inline auto signalString(int signal) -> const char* {
     std::string address = s.str();
 #endif
     using formatter::Style;
-    crashForce(formatter::formatString<Style::BOLD, Style::RED>(signalDescription(signalCode)) + " (" + signalString(signalCode) + ")"
+    crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
+               + " (" + stringify(signalCode) + ")"
                + " on address " + formatter::formatString<Style::BOLD>(address));
 }
 

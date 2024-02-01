@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -17,20 +17,20 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef signalHandlers_hpp
-#define signalHandlers_hpp
+#ifndef signals_hpp
+#define signals_hpp
 
-#include <csignal>
+namespace lsan::signals {
+bool registerFunction(void* function, int signal);
 
-namespace lsan::signals::handlers {
-/// This function acts as a signal handler for access violation signals.
-[[ noreturn ]] void crashHandlerWithAddress(int, siginfo_t*, void*);
-[[ noreturn ]] void crashHandler(int);
-
-/// This function acts as a general signal handler. It prints the statistics.
-void statsSignal(int);
-/// This function acts as a general signal handler. It prints the current callstack.
-void callstackSignal(int);
+/**
+ * Returns a string description for the given signal code.
+ *
+ * @param signal the signal code
+ * @return a string description of the given signal
+ */
+auto getDescriptionFor(int signal) noexcept -> const char*;
+auto stringify(int signal) noexcept -> const char*;
 }
 
-#endif /* signalHandlers_hpp */
+#endif /* signals_hpp */

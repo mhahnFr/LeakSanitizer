@@ -56,6 +56,10 @@
 		BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
 		BFA41A3F2AB8BC1800DF6FAC /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA41A3E2AB8BC1800DF6FAC /* init.cpp */; };
 		BFA41A402AB8BC1800DF6FAC /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA41A3E2AB8BC1800DF6FAC /* init.cpp */; };
+		BFAA94542B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
+		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
+		BFAA94562B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
+		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
 		BFAFADC728B4FDA40060076C /* formatter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAFADC528B4FDA40060076C /* formatter.hpp */; };
 		BFBF736528831FC200BC4208 /* MallocInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736328831FC200BC4208 /* MallocInfo.cpp */; };
 		BFBF736628831FC200BC4208 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
@@ -98,6 +102,8 @@
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
 		BF97EB5628831E5B00DAF1FE /* liblsan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblsan.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFA41A3E2AB8BC1800DF6FAC /* init.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = init.cpp; sourceTree = "<group>"; };
+		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
+		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFBCAD892ACF376600C6B69F /* realAlloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = realAlloc.hpp; sourceTree = "<group>"; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
@@ -220,6 +226,8 @@
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
 				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
+				BFAA94522B6C12FF007FC130 /* signals.cpp */,
+				BFAA94532B6C12FF007FC130 /* signals.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -251,6 +259,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
 				BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */,
 				BF2C5CB42AEAB76A00DE2224 /* exceptionHandler.hpp in Headers */,
@@ -271,6 +280,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFAA94562B6C12FF007FC130 /* signals.hpp in Headers */,
 				BF23A2DF289ECE6A00B17349 /* lsan_stats.h in Headers */,
 				BF621FDE28A291DE00414EE4 /* lsan_internals.h in Headers */,
 				BF2C5CB32AEAB75B00DE2224 /* exceptionHandler.hpp in Headers */,
@@ -371,6 +381,7 @@
 				BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */,
 				BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */,
 				BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */,
+				BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */,
 				BF0F133B29194791008F0FCD /* LeakSani.cpp in Sources */,
 				BF0F133E29194794008F0FCD /* Stats.cpp in Sources */,
 				BF0F134129194797008F0FCD /* MallocInfo.cpp in Sources */,
@@ -391,6 +402,7 @@
 				BF23A2E2289ED24200B17349 /* Stats.cpp in Sources */,
 				BF621FE228A2B61E00414EE4 /* bytePrinter.cpp in Sources */,
 				BF84625D2AD1B489003B05F5 /* lsanMisc.cpp in Sources */,
+				BFAA94542B6C12FF007FC130 /* signals.cpp in Sources */,
 				BF23A2DE289ECE6A00B17349 /* lsan_stats.cpp in Sources */,
 				BF621FDD28A291DE00414EE4 /* lsan_internals.cpp in Sources */,
 				BFBF736528831FC200BC4208 /* MallocInfo.cpp in Sources */,
