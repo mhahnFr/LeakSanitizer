@@ -32,7 +32,7 @@ OBJS  = $(patsubst %.cpp, %.o, $(SRC))
 DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 
 LDFLAGS  = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
-CXXFLAGS = -std=c++17 -Wall -pedantic -fPIC -Ofast
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast
 
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
 
