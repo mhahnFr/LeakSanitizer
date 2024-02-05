@@ -170,6 +170,12 @@ void crashForce(const std::string & message) {
     abort();
 }
 
+void crashForce(const std::string& message, lcs::callstack&& callstack) {
+    std::cerr << formatter::clearAll() << std::endl;
+    printer<false>(message, callstack);
+    abort();
+}
+
 void crash(const std::string & message, const std::string & file, int line) {
     withCallstack([&] (auto & callstack) {
         printer<false>(message, file, line, callstack);

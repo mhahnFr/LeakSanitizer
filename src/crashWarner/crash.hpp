@@ -62,6 +62,8 @@ void crash(const std::string & message);
  */
 [[ noreturn ]] void crashForce(const std::string & message);
 
+[[ noreturn ]] void crashForce(const std::string& message, lcs::callstack&& callstack);
+
 /**
  * @brief Terminates the linked program and prints the given message, the information
  * provided by the optional allocation record and a callstack up to the given omitting
