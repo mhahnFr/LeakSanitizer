@@ -19,6 +19,12 @@
 
 #include <iostream>
 
+#ifdef __APPLE__
+ #define _XOPEN_SOURCE
+ #include <ucontext.h>
+ #undef _XOPEN_SOURCE
+#endif /* __APPLE__ */
+
 #include "signals.hpp"
 #include "signalHandlers.hpp"
 
@@ -48,6 +54,59 @@ namespace lsan::signals::handlers {
     registerFunction(reinterpret_cast<void*>(aborter), signalCode);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")");
+}
+
+static inline auto toString(void* ptr) -> std::string {
+    std::stringstream stream;
+    stream << ptr;
+    return stream.str();
+}
+
+static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
+    auto toReturn = lcs::callstack(false);
+    
+#if defined(__APPLE__) && (defined(__x86_64__) || defined(__i386__))
+    const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
+    
+    size_t ip, bp;
+#ifdef __x86_64__
+    ip = context->uc_mcontext->__ss.__rip;
+    bp = context->uc_mcontext->__ss.__rbp;
+#elif defined(__i386__)
+    ip = context->uc_mcontext->__ss.__eip;
+    bp = context->uc_mcontext->__ss.__ebp;
+#endif
+    
+    void** frameBasePointer           = reinterpret_cast<void**>(bp);
+    void*  extendedInstructionPointer = reinterpret_cast<void*>(ip);
+
+    auto addresses = std::vector<void*>();
+    do {
+        addresses.push_back(extendedInstructionPointer);
+        
+        extendedInstructionPointer = frameBasePointer[1];
+        frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
+    } while (extendedInstructionPointer != nullptr);
+    
+    toReturn = lcs::callstack(addresses.data(), static_cast<int>(addresses.size()));
+#elif defined(__APPLE__) && (defined(__arm64__) || defined(__arm__))
+    // TODO: Properly implement
+    toReturn = lcs::callstack();
+#else
+    toReturn = lcs::callstack();
+#endif
+    return toReturn;
+}
+
+[[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
+    using formatter::Style;
+    
+    registerFunction(reinterpret_cast<void*>(aborter), signalCode);
+        
+    crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
+               + " (" + stringify(signalCode) + ")" 
+               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : ""),
+               createCallstackFor(ptr));
 }
 
 [[ noreturn ]] void crashWithAddress(int signalCode, siginfo_t * info, void *) {

@@ -122,4 +122,15 @@ auto stringify(int signal) noexcept -> const char* {
     }
     return "Unkown";
 }
+
+auto hasAddress(int signal) noexcept -> bool {
+    switch (signal) {
+        case SIGSEGV: return true;
+            
+#if defined(__APPLE__) || defined(SIGBUS)
+        case SIGBUS: return true;
+#endif
+    }
+    return false;
+}
 }

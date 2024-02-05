@@ -36,6 +36,7 @@ auto registerFunction(void* function, int signal) -> bool;
  */
 auto getDescriptionFor(int signal) noexcept -> const char*;
 auto stringify(int signal) noexcept -> const char*;
+auto hasAddress(int signal) noexcept -> bool;
 }
 
 #endif /* signals_hpp */
