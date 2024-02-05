@@ -22,21 +22,14 @@
 #include "signals.hpp"
 
 namespace lsan::signals {
+auto registerFunction(void (*function)(int), int signalCode) -> bool {
+    return signal(signalCode, function) != SIG_ERR;
+}
+
 auto registerFunction(void* function, int signalCode) -> bool {
-    switch (signalCode) {
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS:
-#endif
-        case SIGSEGV: {
-            struct sigaction s{};
-            s.sa_sigaction = reinterpret_cast<void (*)(int, siginfo_t*, void*)>(function);
-            return sigaction(signalCode, &s, nullptr) == 0;
-        }
-            
-        default:
-            return signal(signalCode, reinterpret_cast<void (*)(int)>(function)) != SIG_ERR;
-    }
-    return false;
+    struct sigaction s{};
+    s.sa_sigaction = reinterpret_cast<void (*)(int, siginfo_t*, void*)>(function);
+    return sigaction(signalCode, &s, nullptr);
 }
 
 auto getDescriptionFor(int signal) noexcept -> const char* {

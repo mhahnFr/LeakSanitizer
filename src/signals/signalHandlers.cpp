@@ -51,7 +51,7 @@ namespace lsan::signals::handlers {
 [[ noreturn ]] void crash(int signalCode) {
     using formatter::Style;
     
-    registerFunction(reinterpret_cast<void*>(aborter), signalCode);
+    registerFunction(aborter, signalCode);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")");
 }

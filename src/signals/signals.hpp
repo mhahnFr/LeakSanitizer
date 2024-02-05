@@ -27,6 +27,7 @@ static inline auto asHandler(F function) noexcept -> void* {
 }
 
 auto registerFunction(void* function, int signal) -> bool;
+auto registerFunction(void (*function)(int), int signal) -> bool;
 
 /**
  * Returns a string description for the given signal code.
