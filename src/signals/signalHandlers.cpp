@@ -37,23 +37,11 @@
 #include "../../include/lsan_internals.h"
 #include "../../include/lsan_stats.h"
 
-#if __cplusplus >= 202002L
- #include <format>
-#else
- #include <sstream>
-#endif
+#include <sstream>
 
 namespace lsan::signals::handlers {
 [[ noreturn ]] static inline void aborter(int) {
     abort();
-}
-
-[[ noreturn ]] void crash(int signalCode) {
-    using formatter::Style;
-    
-    registerFunction(aborter, signalCode);
-    crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
-               + " (" + stringify(signalCode) + ")");
 }
 
 static inline auto toString(void* ptr) -> std::string {
@@ -107,22 +95,6 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
                + " (" + stringify(signalCode) + ")" 
                + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : ""),
                createCallstackFor(ptr));
-}
-
-[[ noreturn ]] void crashWithAddress(int signalCode, siginfo_t * info, void *) {
-    registerFunction(reinterpret_cast<void*>(aborter), signalCode);
-    
-#if __cplusplus >= 202002L
-    std::string address = std::format("{:#x}", info->si_addr);
-#else
-    std::stringstream s;
-    s << info->si_addr;
-    std::string address = s.str();
-#endif
-    using formatter::Style;
-    crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
-               + " (" + stringify(signalCode) + ")"
-               + " on address " + formatter::formatString<Style::BOLD>(address));
 }
 
 void callstack(int) {

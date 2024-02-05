@@ -23,10 +23,7 @@
 #include <csignal>
 
 namespace lsan::signals::handlers {
-/// This function acts as a signal handler for access violation signals.
-[[ noreturn ]] void crashWithAddress(int, siginfo_t*, void*);
 [[ noreturn ]] void crashWithTrace(int, siginfo_t*, void*);
-[[ noreturn ]] void crash(int);
 
 /// This function acts as a general signal handler. It prints the statistics.
 void stats(int);
