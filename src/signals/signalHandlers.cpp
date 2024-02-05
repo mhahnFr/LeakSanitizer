@@ -17,6 +17,7 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <array>
 #include <iostream>
 
 #ifdef __APPLE__
@@ -68,15 +69,16 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     void** frameBasePointer           = reinterpret_cast<void**>(bp);
     void*  extendedInstructionPointer = reinterpret_cast<void*>(ip);
 
-    auto addresses = std::vector<void*>();
+    auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
+    std::size_t i = 0;
     do {
-        addresses.push_back(extendedInstructionPointer);
+        addresses[i++] = extendedInstructionPointer;
         
         extendedInstructionPointer = frameBasePointer[1];
         frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
     } while (extendedInstructionPointer != nullptr);
     
-    toReturn = lcs::callstack(addresses.data(), static_cast<int>(addresses.size()));
+    toReturn = lcs::callstack(addresses.data(), static_cast<int>(i));
 #elif defined(__APPLE__) && (defined(__arm64__) || defined(__arm__))
     // TODO: Properly implement
     toReturn = lcs::callstack();
