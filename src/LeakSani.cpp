@@ -66,44 +66,43 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
 LSan::LSan(): libName(lsanName().value()) {
     atexit(reinterpret_cast<void (*)()>(exitHook));
     
+    signals::registerFunction(signals::handlers::stats,     SIGUSR1);
+    signals::registerFunction(signals::handlers::callstack, SIGUSR2);
+    
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSEGV);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGABRT);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTERM);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGALRM);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGPIPE);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGKILL);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGFPE);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGILL);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGQUIT);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGHUP);
+    
 #if defined(__APPLE__) || defined(SIGBUS)
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithAddress), SIGBUS);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGBUS);
 #endif
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithAddress), SIGSEGV);
-    
-    signals::registerFunction(signals::asHandler(signals::handlers::stats),     SIGUSR1);
-    signals::registerFunction(signals::asHandler(signals::handlers::callstack), SIGUSR2);
-    
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGABRT);
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGTERM);
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGALRM);
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGPIPE);
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGKILL);
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGFPE);
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGILL);
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGQUIT);
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGHUP);
-    
 #if defined(__APPLE__) || defined(SIGXFSZ)
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGXFSZ);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGXFSZ);
 #endif
 #if defined(__APPLE__) || defined(SIGXCPU)
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGXCPU);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGXCPU);
 #endif
 #if defined(__APPLE__) || defined(SIGSYS)
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGSYS);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSYS);
 #endif
 #if defined(__APPLE__) || defined(SIGVTALRM)
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGVTALRM);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGVTALRM);
 #endif
 #if defined(__APPLE__) || defined(SIGPROF)
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGPROF);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGPROF);
 #endif
 #if defined(__APPLE__) || defined(SIGEMT)
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGEMT);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGEMT);
 #endif
 #if defined(__APPLE__) || defined(SIGTRAP)
-    signals::registerFunction(signals::asHandler(signals::handlers::crash), SIGTRAP);
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTRAP);
 #endif
 }
 
