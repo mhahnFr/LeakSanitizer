@@ -41,7 +41,7 @@
 #include <sstream>
 
 namespace lsan::signals::handlers {
-[[ noreturn ]] static inline void aborter(int) {
+[[ noreturn ]] static inline void aborter(int, siginfo_t*, void*) {
     abort();
 }
 
