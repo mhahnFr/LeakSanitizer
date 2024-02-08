@@ -99,17 +99,17 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
                createCallstackFor(ptr));
 }
 
-void callstack(int) {
+void callstack(int, siginfo_t*, void* context) {
     using formatter::Style;
     
     bool ignore = getIgnoreMalloc();
     setIgnoreMalloc(true);
     
-    auto & out = getOutputStream();
+    auto& out = getOutputStream();
     out << formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
-    
-    callstackHelper::format(lcs::callstack(), out);
+    callstackHelper::format(createCallstackFor(context), out);
     out << std::endl;
+    
     if (!ignore) {
         setIgnoreMalloc(false);
     }

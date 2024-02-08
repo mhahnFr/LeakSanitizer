@@ -28,7 +28,7 @@ namespace lsan::signals::handlers {
 /// This function acts as a general signal handler. It prints the statistics.
 void stats(int);
 /// This function acts as a general signal handler. It prints the current callstack.
-void callstack(int);
+void callstack(int, siginfo_t*, void*);
 }
 
 #endif /* signalHandlers_hpp */

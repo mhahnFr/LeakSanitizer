@@ -66,8 +66,9 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
 LSan::LSan(): libName(lsanName().value()) {
     atexit(reinterpret_cast<void (*)()>(exitHook));
     
-    signals::registerFunction(signals::handlers::stats,     SIGUSR1);
-    signals::registerFunction(signals::handlers::callstack, SIGUSR2);
+    signals::registerFunction(signals::handlers::stats, SIGUSR1);
+    
+    signals::registerFunction(signals::asHandler(signals::handlers::callstack), SIGUSR2);
     
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSEGV);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGABRT);
