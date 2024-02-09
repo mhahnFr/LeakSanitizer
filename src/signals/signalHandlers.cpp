@@ -108,10 +108,25 @@ static inline auto getReasonILL(int code) -> std::optional<std::string> {
     return std::nullopt;
 }
 
+static inline auto getReasonFPE(int code) -> std::optional<std::string> {
+    switch (code) {
+        case FPE_FLTDIV: return "Floating point divide by zero";
+        case FPE_FLTOVF: return "Floating point overflow";
+        case FPE_FLTUND: return "Floating point underflow";
+        case FPE_FLTRES: return "Floating point inexact result";
+        case FPE_FLTINV: return "Invalid floating point operation";
+        case FPE_FLTSUB: return "Subscript out of range";
+        case FPE_INTDIV: return "Integer divide by zero";
+        case FPE_INTOVF: return "Integer overflow";
+    }
+    return std::nullopt;
+}
+
 static inline auto getReason(int signalCode, int code) -> std::optional<std::string> {
     switch (signalCode) {
         case SIGSEGV: return getReasonSEGV(code);
         case SIGILL:  return getReasonILL(code);
+        case SIGFPE:  return getReasonFPE(code);
     }
     return std::nullopt;
 }
