@@ -165,6 +165,21 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
     return std::nullopt;
 }
 
+constexpr static inline auto stringifyReasonSEGV(const int code) -> const char* {
+    switch (code) {
+        case SEGV_ACCERR: return "ACCERR";
+        case SEGV_MAPERR: return "MAPERR";
+    }
+    return "<< Unknown >>";
+}
+
+constexpr static inline auto stringifyReason(const int signalCode, const int code) -> const char* {
+    switch (signalCode) {
+        case SIGSEGV: return stringifyReasonSEGV(code);
+    }
+    return "<< Unknown >>";
+}
+
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
         
@@ -172,7 +187,8 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
                + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : "")
-               + (reason.has_value() ? " (" + formatter::formatString<Style::ITALIC>(*reason) + ")" : ""),
+               + (reason.has_value() ? " (" + formatter::formatString<Style::ITALIC>(*reason)
+                                            + " (" + stringifyReason(signalCode, info->si_code) + "))" : ""),
                createCallstackFor(ptr));
 }
 
