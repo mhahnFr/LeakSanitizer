@@ -94,9 +94,24 @@ static inline auto getReasonSEGV(int code) -> std::optional<std::string> {
     return std::nullopt;
 }
 
+static inline auto getReasonILL(int code) -> std::optional<std::string> {
+    switch (code) {
+        case ILL_ILLOPC: return "Illegal opcode";
+        case ILL_ILLTRP: return "Illegal trap";
+        case ILL_PRVOPC: return "Privileged opcode";
+        case ILL_ILLOPN: return "Illegal operand";
+        case ILL_ILLADR: return "Illegal addressing mode";
+        case ILL_PRVREG: return "Privileged register";
+        case ILL_COPROC: return "Coprocessor error";
+        case ILL_BADSTK: return "Internal stack error";
+    }
+    return std::nullopt;
+}
+
 static inline auto getReason(int signalCode, int code) -> std::optional<std::string> {
     switch (signalCode) {
         case SIGSEGV: return getReasonSEGV(code);
+        case SIGILL:  return getReasonILL(code);
     }
     return std::nullopt;
 }
