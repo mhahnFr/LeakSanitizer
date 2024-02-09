@@ -201,11 +201,45 @@ constexpr static inline auto stringifyReasonFPE(const int code) -> const char* {
     return "<< Unknown >>";
 }
 
+constexpr static inline auto stringifyReasonBUS(const int code) -> const char* {
+    switch (code) {
+#if defined(__APPLE__) || defined(BUS_ADRALN)
+        case BUS_ADRALN: return "ADRALN";
+#endif
+#if defined(__APPLE__) || defined(BUS_ADRERR)
+        case BUS_ADRERR: return "ADRERR";
+#endif
+#if defined(__APPLE__) || defined(BUS_OBJERR)
+        case BUS_OBJERR: return "OBJERR";
+#endif
+    }
+    return "<< Unknown >>";
+}
+
+constexpr static inline auto stringifyReasonTRAP(const int code) -> const char* {
+    switch (code) {
+#if defined(__APPLE__) || defined(TRAP_BRKPT)
+        case TRAP_BRKPT: return "BRKPT";
+#endif
+#if defined(__APPLE__) || defined(TRAP_TRACE)
+        case TRAP_TRACE: return "TRACE";
+#endif
+    }
+    return "<< Unknown >>";
+}
+
 constexpr static inline auto stringifyReason(const int signalCode, const int code) -> const char* {
     switch (signalCode) {
         case SIGSEGV: return stringifyReasonSEGV(code);
         case SIGILL:  return stringifyReasonILL(code);
         case SIGFPE:  return stringifyReasonFPE(code);
+            
+#if defined(__APPLE__) || defined(SIGBUS)
+        case SIGBUS: return stringifyReasonBUS(code);
+#endif
+#if defined(__APPLE__) || defined(SIGTRAP)
+        case SIGTRAP: return stringifyReasonTRAP(code);
+#endif
     }
     return "<< Unknown >>";
 }
