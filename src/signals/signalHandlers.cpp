@@ -122,11 +122,45 @@ static inline auto getReasonFPE(int code) -> std::optional<std::string> {
     return std::nullopt;
 }
 
+static inline auto getReasonBUS(int code) -> std::optional<std::string> {
+    switch (code) {
+#if defined(__APPLE__) || defined(BUS_ADRALN)
+        case BUS_ADRALN: return "Invalid address alignment";
+#endif
+#if defined(__APPLE__) || defined(BUS_ADRERR)
+        case BUS_ADRERR: return "Physical address not existent";
+#endif
+#if defined(__APPLE__) || defined(BUS_OBJERR)
+        case BUS_OBJERR: return "Object-specific HW error";
+#endif
+    }
+    return std::nullopt;
+}
+
+static inline auto getReasonTRAP(int code) -> std::optional<std::string> {
+    switch (code) {
+#if defined(__APPLE__) || defined(TRAP_BRKPT)
+        case TRAP_BRKPT: return "Process breakpoint";
+#endif
+#if defined(__APPLE__) || defined(TRAP_TRACE)
+        case TRAP_TRACE: return "Process trace trap";
+#endif
+    }
+    return std::nullopt;
+}
+
 static inline auto getReason(int signalCode, int code) -> std::optional<std::string> {
     switch (signalCode) {
         case SIGSEGV: return getReasonSEGV(code);
         case SIGILL:  return getReasonILL(code);
         case SIGFPE:  return getReasonFPE(code);
+            
+#if defined(__APPLE__) || defined(SIGBUS)
+        case SIGBUS: return getReasonBUS(code);
+#endif
+#if defined(__APPLE__) || defined(SIGTRAP)
+        case SIGTRAP: return getReasonTRAP(code);
+#endif
     }
     return std::nullopt;
 }
