@@ -68,7 +68,7 @@ LSan::LSan(): libName(lsanName().value()) {
     
     signals::registerFunction(signals::handlers::stats, SIGUSR1);
     
-    signals::registerFunction(signals::asHandler(signals::handlers::callstack), SIGUSR2);
+    signals::registerFunction(signals::asHandler(signals::handlers::callstack), SIGUSR2, false);
     
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSEGV);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGABRT);

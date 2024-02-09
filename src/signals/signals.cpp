@@ -26,9 +26,15 @@ auto registerFunction(void (*function)(int), int signalCode) -> bool {
     return signal(signalCode, function) != SIG_ERR;
 }
 
-auto registerFunction(void* function, int signalCode) -> bool {
+auto registerFunction(void* function, int signalCode, bool forCrash) -> bool {
     struct sigaction s{};
     s.sa_sigaction = reinterpret_cast<void (*)(int, siginfo_t*, void*)>(function);
+    s.sa_flags = SA_SIGINFO;
+    if (forCrash) {
+        s.sa_flags |= SA_RESETHAND;
+    } else {
+        s.sa_flags |= SA_RESTART;
+    }
     return sigaction(signalCode, &s, nullptr);
 }
 
@@ -118,11 +124,12 @@ auto stringify(int signal) noexcept -> const char* {
 
 auto hasAddress(int signal) noexcept -> bool {
     switch (signal) {
-        case SIGSEGV: return true;
-            
 #if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS: return true;
+        case SIGBUS:
 #endif
+        case SIGFPE:
+        case SIGILL:
+        case SIGSEGV: return true;
     }
     return false;
 }

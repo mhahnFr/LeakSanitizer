@@ -26,7 +26,7 @@ static inline auto asHandler(F function) noexcept -> void* {
     return reinterpret_cast<void*>(function);
 }
 
-auto registerFunction(void* function, int signal) -> bool;
+auto registerFunction(void* function, int signal, bool forCrash = true) -> bool;
 auto registerFunction(void (*function)(int), int signal) -> bool;
 
 /**
