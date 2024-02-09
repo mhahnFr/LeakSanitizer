@@ -173,9 +173,24 @@ constexpr static inline auto stringifyReasonSEGV(const int code) -> const char* 
     return "<< Unknown >>";
 }
 
+constexpr static inline auto stringifyReasonILL(const int code) -> const char* {
+    switch (code) {
+        case ILL_ILLOPC: return "ILLOPC";
+        case ILL_ILLTRP: return "ILLTRP";
+        case ILL_PRVOPC: return "PRVOPC";
+        case ILL_ILLOPN: return "ILLOPN";
+        case ILL_ILLADR: return "ILLADR";
+        case ILL_PRVREG: return "PRVREG";
+        case ILL_COPROC: return "COPROC";
+        case ILL_BADSTK: return "BADSTK";
+    }
+    return "<< Unknown >>";
+}
+
 constexpr static inline auto stringifyReason(const int signalCode, const int code) -> const char* {
     switch (signalCode) {
         case SIGSEGV: return stringifyReasonSEGV(code);
+        case SIGILL:  return stringifyReasonILL(code);
     }
     return "<< Unknown >>";
 }
