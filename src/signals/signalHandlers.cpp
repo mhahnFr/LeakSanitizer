@@ -19,6 +19,8 @@
 
 #include <array>
 #include <iostream>
+#include <optional>
+#include <string>
 
 #ifdef __APPLE__
  #define _XOPEN_SOURCE
@@ -84,12 +86,29 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     return toReturn;
 }
 
+static inline auto getReasonSEGV(int code) -> std::optional<std::string> {
+    switch (code) {
+        case SEGV_MAPERR: return "Address not existent";
+        case SEGV_ACCERR: return "Access to address denied";
+    }
+    return std::nullopt;
+}
+
+static inline auto getReason(int signalCode, int code) -> std::optional<std::string> {
+    switch (signalCode) {
+        case SIGSEGV: return getReasonSEGV(code);
+    }
+    return std::nullopt;
+}
+
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
         
+    const auto reason = getReason(signalCode, info->si_code);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
-               + " (" + stringify(signalCode) + ")" 
-               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : ""),
+               + " (" + stringify(signalCode) + ")"
+               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : "")
+               + (reason.has_value() ? " (" + formatter::formatString<Style::ITALIC>(*reason) + ")" : ""),
                createCallstackFor(ptr));
 }
 
