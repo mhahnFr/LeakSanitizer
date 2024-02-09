@@ -187,10 +187,25 @@ constexpr static inline auto stringifyReasonILL(const int code) -> const char* {
     return "<< Unknown >>";
 }
 
+constexpr static inline auto stringifyReasonFPE(const int code) -> const char* {
+    switch (code) {
+        case FPE_FLTDIV: return "FLTDIV";
+        case FPE_FLTOVF: return "FLTOVF";
+        case FPE_FLTUND: return "FLTUND";
+        case FPE_FLTRES: return "FLTRES";
+        case FPE_FLTINV: return "FLTINV";
+        case FPE_FLTSUB: return "FLTSUB";
+        case FPE_INTDIV: return "INTDIV";
+        case FPE_INTOVF: return "INTOVF";
+    }
+    return "<< Unknown >>";
+}
+
 constexpr static inline auto stringifyReason(const int signalCode, const int code) -> const char* {
     switch (signalCode) {
         case SIGSEGV: return stringifyReasonSEGV(code);
         case SIGILL:  return stringifyReasonILL(code);
+        case SIGFPE:  return stringifyReasonFPE(code);
     }
     return "<< Unknown >>";
 }
