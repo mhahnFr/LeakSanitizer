@@ -41,10 +41,6 @@
 #include <sstream>
 
 namespace lsan::signals::handlers {
-[[ noreturn ]] static inline void aborter(int, siginfo_t*, void*) {
-    abort();
-}
-
 static inline auto toString(void* ptr) -> std::string {
     std::stringstream stream;
     stream << ptr;
@@ -90,8 +86,6 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
-    
-    registerFunction(reinterpret_cast<void*>(aborter), signalCode);
         
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")" 
