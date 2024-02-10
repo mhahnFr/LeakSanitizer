@@ -27,6 +27,7 @@ auto registerFunction(void (*function)(int), int signalCode) -> bool {
 }
 
 auto registerFunction(void* function, int signalCode, bool forCrash) -> bool {
+    // TODO: Optionally use sigaltstack
     struct sigaction s{};
     s.sa_sigaction = reinterpret_cast<void (*)(int, siginfo_t*, void*)>(function);
     s.sa_flags = SA_SIGINFO;
@@ -51,30 +52,16 @@ auto getDescriptionFor(int signal) noexcept -> const char* {
         case SIGPIPE:   return "Broken pipe";
         case SIGALRM:   return "Timer expired";
         case SIGTERM:   return "Terminated";
-            
-#if defined(__APPLE__) || defined(SIGTRAP)
         case SIGTRAP:   return "Trapping instruction";
-#endif
+        case SIGBUS:    return "Bus error";
+        case SIGSYS:    return "Non-existent system call";
+        case SIGXCPU:   return "CPU time limit exceeded";
+        case SIGXFSZ:   return "File size limit exceeded";
+        case SIGVTALRM: return "Virtual time alarm";
+        case SIGPROF:   return "Profiling timer alarm";
+            
 #if defined(__APPLE__) || defined(SIGEMT)
         case SIGEMT:    return "Emulate instruction executed";
-#endif
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS:    return "Bus error";
-#endif
-#if defined(__APPLE__) || defined(SIGSYS)
-        case SIGSYS:    return "Non-existent system call";
-#endif
-#if defined(__APPLE__) || defined(SIGXCPU)
-        case SIGXCPU:   return "CPU time limit exceeded";
-#endif
-#if defined(__APPLE__) || defined(SIGXFSZ)
-        case SIGXFSZ:   return "File size limit exceeded";
-#endif
-#if defined(__APPLE__) || defined(SIGVTALRM)
-        case SIGVTALRM: return "Virtual time alarm";
-#endif
-#if defined(__APPLE__) || defined(SIGPROF)
-        case SIGPROF:   return "Profiling timer alarm";
 #endif
     }
     return "Unknown signal";
@@ -93,30 +80,16 @@ auto stringify(int signal) noexcept -> const char* {
         case SIGPIPE:   return "SIGPIPE";
         case SIGALRM:   return "SIGALRM";
         case SIGTERM:   return "SIGTERM";
-            
-#if defined(__APPLE__) || defined(SIGTRAP)
         case SIGTRAP:   return "SIGTRAP";
-#endif
+        case SIGBUS:    return "SIGBUS";
+        case SIGSYS:    return "SIGSYS";
+        case SIGXCPU:   return "SIGXCPU";
+        case SIGXFSZ:   return "SIGXFSZ";
+        case SIGVTALRM: return "SIGVTALRM";
+        case SIGPROF:   return "SIGPROF";
+            
 #if defined(__APPLE__) || defined(SIGEMT)
         case SIGEMT:    return "SIGEMT";
-#endif
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS:    return "SIGBUS";
-#endif
-#if defined(__APPLE__) || defined(SIGSYS)
-        case SIGSYS:    return "SIGSYS";
-#endif
-#if defined(__APPLE__) || defined(SIGXCPU)
-        case SIGXCPU:   return "SIGXCPU";
-#endif
-#if defined(__APPLE__) || defined(SIGXFSZ)
-        case SIGXFSZ:   return "SIGXFSZ";
-#endif
-#if defined(__APPLE__) || defined(SIGVTALRM)
-        case SIGVTALRM: return "SIGVTALRM";
-#endif
-#if defined(__APPLE__) || defined(SIGPROF)
-        case SIGPROF:   return "SIGPROF";
 #endif
     }
     return "Unkown";
@@ -124,9 +97,7 @@ auto stringify(int signal) noexcept -> const char* {
 
 auto hasAddress(int signal) noexcept -> bool {
     switch (signal) {
-#if defined(__APPLE__) || defined(SIGBUS)
         case SIGBUS:
-#endif
         case SIGFPE:
         case SIGILL:
         case SIGSEGV: return true;

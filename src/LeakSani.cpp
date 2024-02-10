@@ -80,30 +80,16 @@ LSan::LSan(): libName(lsanName().value()) {
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGILL);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGQUIT);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGHUP);
-    
-#if defined(__APPLE__) || defined(SIGBUS)
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGBUS);
-#endif
-#if defined(__APPLE__) || defined(SIGXFSZ)
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGXFSZ);
-#endif
-#if defined(__APPLE__) || defined(SIGXCPU)
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGXCPU);
-#endif
-#if defined(__APPLE__) || defined(SIGSYS)
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSYS);
-#endif
-#if defined(__APPLE__) || defined(SIGVTALRM)
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGVTALRM);
-#endif
-#if defined(__APPLE__) || defined(SIGPROF)
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGPROF);
-#endif
+    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTRAP);
+
 #if defined(__APPLE__) || defined(SIGEMT)
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGEMT);
-#endif
-#if defined(__APPLE__) || defined(SIGTRAP)
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTRAP);
 #endif
 }
 

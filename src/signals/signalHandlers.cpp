@@ -124,27 +124,17 @@ static inline auto getReasonFPE(int code) -> std::optional<std::string> {
 
 static inline auto getReasonBUS(int code) -> std::optional<std::string> {
     switch (code) {
-#if defined(__APPLE__) || defined(BUS_ADRALN)
         case BUS_ADRALN: return "Invalid address alignment";
-#endif
-#if defined(__APPLE__) || defined(BUS_ADRERR)
         case BUS_ADRERR: return "Physical address not existent";
-#endif
-#if defined(__APPLE__) || defined(BUS_OBJERR)
         case BUS_OBJERR: return "Object-specific HW error";
-#endif
     }
     return std::nullopt;
 }
 
 static inline auto getReasonTRAP(int code) -> std::optional<std::string> {
     switch (code) {
-#if defined(__APPLE__) || defined(TRAP_BRKPT)
         case TRAP_BRKPT: return "Process breakpoint";
-#endif
-#if defined(__APPLE__) || defined(TRAP_TRACE)
         case TRAP_TRACE: return "Process trace trap";
-#endif
     }
     return std::nullopt;
 }
@@ -154,13 +144,8 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
         case SIGSEGV: return getReasonSEGV(code);
         case SIGILL:  return getReasonILL(code);
         case SIGFPE:  return getReasonFPE(code);
-            
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS: return getReasonBUS(code);
-#endif
-#if defined(__APPLE__) || defined(SIGTRAP)
+        case SIGBUS:  return getReasonBUS(code);
         case SIGTRAP: return getReasonTRAP(code);
-#endif
     }
     return std::nullopt;
 }
@@ -203,27 +188,17 @@ constexpr static inline auto stringifyReasonFPE(const int code) -> const char* {
 
 constexpr static inline auto stringifyReasonBUS(const int code) -> const char* {
     switch (code) {
-#if defined(__APPLE__) || defined(BUS_ADRALN)
         case BUS_ADRALN: return "ADRALN";
-#endif
-#if defined(__APPLE__) || defined(BUS_ADRERR)
         case BUS_ADRERR: return "ADRERR";
-#endif
-#if defined(__APPLE__) || defined(BUS_OBJERR)
         case BUS_OBJERR: return "OBJERR";
-#endif
     }
     return "<< Unknown >>";
 }
 
 constexpr static inline auto stringifyReasonTRAP(const int code) -> const char* {
     switch (code) {
-#if defined(__APPLE__) || defined(TRAP_BRKPT)
         case TRAP_BRKPT: return "BRKPT";
-#endif
-#if defined(__APPLE__) || defined(TRAP_TRACE)
         case TRAP_TRACE: return "TRACE";
-#endif
     }
     return "<< Unknown >>";
 }
@@ -233,13 +208,8 @@ constexpr static inline auto stringifyReason(const int signalCode, const int cod
         case SIGSEGV: return stringifyReasonSEGV(code);
         case SIGILL:  return stringifyReasonILL(code);
         case SIGFPE:  return stringifyReasonFPE(code);
-            
-#if defined(__APPLE__) || defined(SIGBUS)
-        case SIGBUS: return stringifyReasonBUS(code);
-#endif
-#if defined(__APPLE__) || defined(SIGTRAP)
+        case SIGBUS:  return stringifyReasonBUS(code);
         case SIGTRAP: return stringifyReasonTRAP(code);
-#endif
     }
     return "<< Unknown >>";
 }
