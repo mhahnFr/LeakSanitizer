@@ -142,6 +142,14 @@ static inline auto getReasonTRAP(int code) -> std::optional<std::string> {
 static inline auto getReason(int signalCode, int code) -> std::optional<std::string> {
     using formatter::Style;
     
+    switch (signalCode) {
+        case SIGSEGV: return getReasonSEGV(code);
+        case SIGILL:  return getReasonILL(code);
+        case SIGFPE:  return getReasonFPE(code);
+        case SIGBUS:  return getReasonBUS(code);
+        case SIGTRAP: return getReasonTRAP(code);
+    }
+    
     switch (code) {
         case SI_USER:  return "Sent by " + formatter::formatString<Style::BOLD>("kill")     + "(2)";
         case SI_QUEUE: return "Sent by " + formatter::formatString<Style::BOLD>("sigqueue") + "(3)";
@@ -156,13 +164,6 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
 #endif
     }
     
-    switch (signalCode) {
-        case SIGSEGV: return getReasonSEGV(code);
-        case SIGILL:  return getReasonILL(code);
-        case SIGFPE:  return getReasonFPE(code);
-        case SIGBUS:  return getReasonBUS(code);
-        case SIGTRAP: return getReasonTRAP(code);
-    }
     return std::nullopt;
 }
 
@@ -220,6 +221,14 @@ constexpr static inline auto stringifyReasonTRAP(const int code) -> const char* 
 }
 
 constexpr static inline auto stringifyReason(const int signalCode, const int code) -> const char* {
+    switch (signalCode) {
+        case SIGSEGV: return stringifyReasonSEGV(code);
+        case SIGILL:  return stringifyReasonILL(code);
+        case SIGFPE:  return stringifyReasonFPE(code);
+        case SIGBUS:  return stringifyReasonBUS(code);
+        case SIGTRAP: return stringifyReasonTRAP(code);
+    }
+    
     switch (code) {
         case SI_USER:  return "SI_USER";
         case SI_QUEUE: return "SI_QUEUE";
@@ -234,13 +243,6 @@ constexpr static inline auto stringifyReason(const int signalCode, const int cod
 #endif
     }
     
-    switch (signalCode) {
-        case SIGSEGV: return stringifyReasonSEGV(code);
-        case SIGILL:  return stringifyReasonILL(code);
-        case SIGFPE:  return stringifyReasonFPE(code);
-        case SIGBUS:  return stringifyReasonBUS(code);
-        case SIGTRAP: return stringifyReasonTRAP(code);
-    }
     return "<< Unknown >>";
 }
 
