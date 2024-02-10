@@ -148,10 +148,10 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
         case SI_TIMER: return "POSIX timer expired";
         case SI_MESGQ: return "POSIX message queue state changed";
             
-#if defined(SI_TKILL)
+#ifdef SI_TKILL
         case SI_TKILL: return formatter::formatString<Style::BOLD>("tkill") + "(2) or " + formatter::formatString<Style::BOLD>("tgkill") + "(2)";
 #endif
-#if defined(SI_KERNEL)
+#ifdef SI_KERNEL
         case SI_KERNEL: return "Sent by the kernel";
 #endif
     }
@@ -220,6 +220,20 @@ constexpr static inline auto stringifyReasonTRAP(const int code) -> const char* 
 }
 
 constexpr static inline auto stringifyReason(const int signalCode, const int code) -> const char* {
+    switch (code) {
+        case SI_USER:  return "SI_USER";
+        case SI_QUEUE: return "SI_QUEUE";
+        case SI_TIMER: return "SI_TIMER";
+        case SI_MESGQ: return "SI_MESGQ";
+            
+#ifdef SI_TKILL
+        case SI_TKILL: return "SI_TKILL";
+#endif
+#ifdef SI_KERNEL
+        case SI_KERNEL: return "SI_KERNEL";
+#endif
+    }
+    
     switch (signalCode) {
         case SIGSEGV: return stringifyReasonSEGV(code);
         case SIGILL:  return stringifyReasonILL(code);
