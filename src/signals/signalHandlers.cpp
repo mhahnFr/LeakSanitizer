@@ -167,15 +167,15 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
     return std::nullopt;
 }
 
-constexpr static inline auto stringifyReasonSEGV(const int code) -> const char* {
+static inline auto stringifyReasonSEGV(const int code) -> std::optional<std::string> {
     switch (code) {
         case SEGV_ACCERR: return "ACCERR";
         case SEGV_MAPERR: return "MAPERR";
     }
-    return "<< Unknown >>";
+    return std::nullopt;
 }
 
-constexpr static inline auto stringifyReasonILL(const int code) -> const char* {
+static inline auto stringifyReasonILL(const int code) -> std::optional<std::string> {
     switch (code) {
         case ILL_ILLOPC: return "ILLOPC";
         case ILL_ILLTRP: return "ILLTRP";
@@ -186,10 +186,10 @@ constexpr static inline auto stringifyReasonILL(const int code) -> const char* {
         case ILL_COPROC: return "COPROC";
         case ILL_BADSTK: return "BADSTK";
     }
-    return "<< Unknown >>";
+    return std::nullopt;
 }
 
-constexpr static inline auto stringifyReasonFPE(const int code) -> const char* {
+static inline auto stringifyReasonFPE(const int code) -> std::optional<std::string> {
     switch (code) {
         case FPE_FLTDIV: return "FLTDIV";
         case FPE_FLTOVF: return "FLTOVF";
@@ -200,24 +200,24 @@ constexpr static inline auto stringifyReasonFPE(const int code) -> const char* {
         case FPE_INTDIV: return "INTDIV";
         case FPE_INTOVF: return "INTOVF";
     }
-    return "<< Unknown >>";
+    return std::nullopt;
 }
 
-constexpr static inline auto stringifyReasonBUS(const int code) -> const char* {
+static inline auto stringifyReasonBUS(const int code) -> std::optional<std::string> {
     switch (code) {
         case BUS_ADRALN: return "ADRALN";
         case BUS_ADRERR: return "ADRERR";
         case BUS_OBJERR: return "OBJERR";
     }
-    return "<< Unknown >>";
+    return std::nullopt;
 }
 
-constexpr static inline auto stringifyReasonTRAP(const int code) -> const char* {
+static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::string> {
     switch (code) {
         case TRAP_BRKPT: return "BRKPT";
         case TRAP_TRACE: return "TRACE";
     }
-    return "<< Unknown >>";
+    return std::nullopt;
 }
 
 static inline auto stringifyReason(const int signalCode, const int code) -> std::optional<std::string> {
@@ -249,7 +249,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
         
-    const auto reason = getReason(signalCode, info->si_code); // TODO: Add to reason if sent by user
+    const auto reason = getReason(signalCode, info->si_code);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
                + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : ""),
