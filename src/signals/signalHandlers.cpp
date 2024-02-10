@@ -220,7 +220,7 @@ constexpr static inline auto stringifyReasonTRAP(const int code) -> const char* 
     return "<< Unknown >>";
 }
 
-constexpr static inline auto stringifyReason(const int signalCode, const int code) -> const char* {
+static inline auto stringifyReason(const int signalCode, const int code) -> std::optional<std::string> {
     switch (signalCode) {
         case SIGSEGV: return stringifyReasonSEGV(code);
         case SIGILL:  return stringifyReasonILL(code);
@@ -243,7 +243,7 @@ constexpr static inline auto stringifyReason(const int signalCode, const int cod
 #endif
     }
     
-    return "<< Unknown >>";
+    return std::nullopt;
 }
 
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
@@ -254,7 +254,7 @@ constexpr static inline auto stringifyReason(const int signalCode, const int cod
                + " (" + stringify(signalCode) + ")"
                + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : ""),
                reason.has_value()
-                ? std::optional(formatter::formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, info->si_code) + ")")
+                ? std::optional(formatter::formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, info->si_code).value_or("Unknown reason") + ")")
                 : std::nullopt,
                createCallstackFor(ptr));
 }
