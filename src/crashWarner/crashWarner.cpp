@@ -37,12 +37,15 @@ namespace lsan {
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
-static inline void printer(const std::string & message, lcs::callstack & callstack) {
+static inline void printer(const std::string& message, lcs::callstack& callstack, const std::optional<std::string>& reason = std::nullopt) {
     using formatter::Style;
     
     const auto colour = Warning ? Style::MAGENTA : Style::RED;
     
     std::cerr << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
+    if (reason.has_value()) {
+        std::cerr << *reason << "." << std::endl;
+    }
     callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
     
@@ -170,9 +173,9 @@ void crashForce(const std::string & message) {
     abort();
 }
 
-void crashForce(const std::string& message, lcs::callstack&& callstack) {
+void crashForce(const std::string& message, const std::optional<std::string>& reason, lcs::callstack&& callstack) {
     std::cerr << formatter::clearAll() << std::endl;
-    printer<false>(message, callstack);
+    printer<false>(message, callstack, reason);
     abort();
 }
 

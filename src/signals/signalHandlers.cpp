@@ -247,12 +247,13 @@ constexpr static inline auto stringifyReason(const int signalCode, const int cod
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
         
-    const auto reason = getReason(signalCode, info->si_code);
+    const auto reason = getReason(signalCode, info->si_code); // TODO: Add to reason if sent by user
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
-               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : "")
-               + (reason.has_value() ? " (" + formatter::formatString<Style::ITALIC>(*reason)
-                                            + " (" + stringifyReason(signalCode, info->si_code) + "))" : ""),
+               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : ""),
+               reason.has_value()
+                ? std::optional(formatter::formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, info->si_code) + ")")
+                : std::nullopt,
                createCallstackFor(ptr));
 }
 

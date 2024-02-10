@@ -62,7 +62,7 @@ void crash(const std::string & message);
  */
 [[ noreturn ]] void crashForce(const std::string & message);
 
-[[ noreturn ]] void crashForce(const std::string& message, lcs::callstack&& callstack);
+[[ noreturn ]] void crashForce(const std::string& message, const std::optional<std::string>& reason, lcs::callstack&& callstack);
 
 /**
  * @brief Terminates the linked program and prints the given message, the information
