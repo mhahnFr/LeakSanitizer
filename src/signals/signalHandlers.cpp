@@ -143,13 +143,13 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
     using formatter::Style;
     
     switch (code) {
-        case SI_USER:  return "Sent by kill(2)";
-        case SI_QUEUE: return "Sent by sigqueue(3)";
+        case SI_USER:  return "Sent by " + formatter::formatString<Style::BOLD>("kill")     + "(2)";
+        case SI_QUEUE: return "Sent by " + formatter::formatString<Style::BOLD>("sigqueue") + "(3)";
         case SI_TIMER: return "POSIX timer expired";
         case SI_MESGQ: return "POSIX message queue state changed";
             
 #if defined(SI_TKILL)
-        case SI_TKILL: return "tkill(2) or tgkill(2)";
+        case SI_TKILL: return formatter::formatString<Style::BOLD>("tkill") + "(2) or " + formatter::formatString<Style::BOLD>("tgkill") + "(2)";
 #endif
 #if defined(SI_KERNEL)
         case SI_KERNEL: return "Sent by the kernel";
