@@ -27,7 +27,6 @@ auto registerFunction(void (*function)(int), int signalCode) -> bool {
 }
 
 auto registerFunction(void* function, int signalCode, bool forCrash) -> bool {
-    // TODO: Optionally use sigaltstack
     struct sigaction s{};
     s.sa_sigaction = reinterpret_cast<void (*)(int, siginfo_t*, void*)>(function);
     s.sa_flags = SA_SIGINFO;
