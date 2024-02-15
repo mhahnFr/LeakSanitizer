@@ -52,16 +52,27 @@ static inline auto toString(void* ptr) -> std::string {
 static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     auto toReturn = lcs::callstack(false);
     
-#if defined(__APPLE__) && (defined(__x86_64__) || defined(__i386__))
+#if (defined(__APPLE__) || defined(__linux__)) \
+    && (defined(__x86_64__) || defined(__i386__))
     const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
     
     size_t ip, bp;
-#ifdef __x86_64__
+#ifdef __APPLE__
+ #ifdef __x86_64__
     ip = context->uc_mcontext->__ss.__rip;
     bp = context->uc_mcontext->__ss.__rbp;
-#elif defined(__i386__)
+ #elif defined(__i386__)
     ip = context->uc_mcontext->__ss.__eip;
     bp = context->uc_mcontext->__ss.__ebp;
+ #endif
+#elif defined(__linux__)
+ #ifdef __x86_64__
+    ip = context->uc_mcontext.gregs[REG_RIP];
+    bp = context->uc_mcontext.gregs[REG_RBP];
+ #elif defined(__i386__)
+    ip = context->uc_mcontext.gregs[REG_EIP];
+    bp = context->uc_mcontext.gregs[REG_EBP];
+ #endif
 #endif
     
     void** frameBasePointer           = reinterpret_cast<void**>(bp);
@@ -69,18 +80,21 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 
     auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
     std::size_t i = 0;
+    void** previousRBP = nullptr;
     do {
         addresses[i++] = extendedInstructionPointer;
         
         extendedInstructionPointer = frameBasePointer[1];
+        previousRBP = frameBasePointer;
         frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
-    } while (extendedInstructionPointer != nullptr);
+    } while (frameBasePointer > previousRBP);
     
     toReturn = lcs::callstack(addresses.data(), static_cast<int>(i));
 #elif defined(__APPLE__) && (defined(__arm64__) || defined(__arm__))
     // TODO: Properly implement
     toReturn = lcs::callstack();
 #else
+    (void) ptr;
     toReturn = lcs::callstack();
 #endif
     return toReturn;
