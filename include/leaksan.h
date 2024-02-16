@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022, 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -25,6 +25,10 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+
+#ifdef __APPLE__
+ #warning Simply compile your code with debug symbols for line numbers!
+#endif
 
 void * __wrap_malloc(size_t, const char *, int);
 void * __wrap_calloc(size_t, size_t, const char *, int);
