@@ -75,7 +75,6 @@ LSan::LSan(): libName(lsanName().value()) {
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTERM);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGALRM);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGPIPE);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGKILL);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGFPE);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGILL);
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGQUIT);
