@@ -99,45 +99,67 @@ int main(void) {
     free(a);
 }
 ```
-Compiled and linked on macOS with `cc main.c -L<path/to/library> -llsan`
-creates the following output:
+Compiled and linked on macOS with `cc main.c -L<path/to/library> -llsan` creates the following output:
 ```
 Exiting
 
-2 leaks total, 1.01 KiB total          
+Leak of size 13 B, allocation stacktrace:
+At: (/usr/lib/system/libsystem_c.dylib) strdup + 32
+in: (a.out) main + 34
+at: (/usr/lib/dyld) start + 1903
 
 Leak of size 1023 B, allocation stacktrace:
-In: main + 18
-at: start + 1903
-
-Leak of size 13 B, allocation stacktrace:
-At: strdup + 32
-in: main + 34
-at: start + 1903
+In: (a.out) main + 18
+at: (/usr/lib/dyld) start + 1903
 
 
 Summary: 2 leaks, 1.01 KiB lost.
 ```
 
 #### Line numbers
-To (partially) add line numbers, you can add `-Wno-gnu-include-next -I<path/to/library>/include` to the compiling flags
-of your code.
+##### macOS
+Simply compile your code with debug symbols to add line numbers to the output. Usually, the appropriate flag is `-g`.
 
-The previous example compiled and linked on macOS with
-`cc main.c -Wno-gnu-include-next -I<path/to/library>/include -L<path/to/library> -llsan` creates the following output:
+The previous example compiled and linked on macOS with `cc -g main.c -L<path/to/library> -llsan` creates the following output:
+
 ```
 Exiting
 
-2 leaks total, 1.01 KiB total       
+Leak of size 13 B, allocation stacktrace:
+At: (/usr/lib/system/libsystem_c.dylib) strdup + 32
+in: (a.out) main (main.c:8:9)
+at: (/usr/lib/dyld) start + 1903
+
+Leak of size 1023 B, allocation stacktrace:
+In: (a.out) main (main.c:7:16)
+at: (/usr/lib/dyld) start + 1903
+
+                                    
+Summary: 2 leaks, 1.01 KiB lost.
+```
+
+##### Linux
+To (partially) add line numbers, you can add `-Wno-gnu-include-next -I<path/to/library>/include` to the compiling flags
+of your code.
+
+The previous example compiled and linked on Debian with
+`gcc main.c -Wno-gnu-include-next -I<path/to/library>/include -rdynamic -L<path/to/library> -llsan` creates the following output:
+
+```
+Exiting
 
 Leak of size 1023 B, allocated at main.c:7
-In: main + 30
-at: start + 1903
+In: (a.out) main + 33
+at: (/usr/lib/x86_64-linux-gnu/libc.so.6) << Unknown >>
+at: (/usr/lib/x86_64-linux-gnu/libc.so.6) __libc_start_main + 133
+at: (a.out) _start + 33
 
 Leak of size 13 B, allocation stacktrace:
-At: strdup + 32
-in: main + 46
-at: start + 1903
+At: (/usr/lib/x86_64-linux-gnu/libc.so.6) __strdup + 26
+in: (a.out) main + 52
+at: (/usr/lib/x86_64-linux-gnu/libc.so.6) << Unknown >>
+at: (/usr/lib/x86_64-linux-gnu/libc.so.6) __libc_start_main + 133
+at: (a.out) _start + 33
 
 
 Summary: 2 leaks, 1.01 KiB lost.
@@ -173,11 +195,11 @@ More on the environment variables [here][2].
 ### Signals
 This sanitizer comes with handlers for the following signals:
 
-| Signal               | Action                                                                                |
-|----------------------|---------------------------------------------------------------------------------------|
-| `SIGSEGV` & `SIGBUS` | Printing the callstack of the crash.                                                  |
-| `SIGUSR1`            | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
-| `SIGUSR2`            | Printing the current callstack.                                                       |
+| Signal        | Action                                                                                |
+|---------------|---------------------------------------------------------------------------------------|
+| `SIGUSR1`     | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
+| `SIGUSR2`     | Printing the current callstack.                                                       |
+| Deadly signal | Printing the callstack of the crash.                                                  |
 
 More on the signal handlers [here][3].
 
