@@ -43,12 +43,24 @@
 #include <sstream>
 
 namespace lsan::signals::handlers {
+/**
+ * Stringifies the given pointer.
+ *
+ * @param ptr the pointer to be stringified
+ * @return the stringified pointer
+ */
 static inline auto toString(void* ptr) -> std::string {
     std::stringstream stream;
     stream << ptr;
     return stream.str();
 }
 
+/**
+ * Creates a callstack using the pointer to the `ucontext`.
+ *
+ * @param ptr the pointer to the context for which to create a callstack for
+ * @return the callstack
+ */
 static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     auto toReturn = lcs::callstack(false);
     
@@ -100,6 +112,12 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     return toReturn;
 }
 
+/**
+ * Returns an explanation for the given segmentation fault reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
 static inline auto getReasonSEGV(int code) -> std::optional<std::string> {
     switch (code) {
         case SEGV_MAPERR: return "Address not existent";
@@ -108,6 +126,12 @@ static inline auto getReasonSEGV(int code) -> std::optional<std::string> {
     return std::nullopt;
 }
 
+/**
+ * Returns an explanation for the given illegal instruction reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
 static inline auto getReasonILL(int code) -> std::optional<std::string> {
     switch (code) {
         case ILL_ILLOPC: return "Illegal opcode";
@@ -122,6 +146,12 @@ static inline auto getReasonILL(int code) -> std::optional<std::string> {
     return std::nullopt;
 }
 
+/**
+ * Returns an explanation for the given floating point exception reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
 static inline auto getReasonFPE(int code) -> std::optional<std::string> {
     switch (code) {
         case FPE_FLTDIV: return "Floating point divide by zero";
@@ -136,6 +166,12 @@ static inline auto getReasonFPE(int code) -> std::optional<std::string> {
     return std::nullopt;
 }
 
+/**
+ * Returns an explanation for the given bus error reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
 static inline auto getReasonBUS(int code) -> std::optional<std::string> {
     switch (code) {
         case BUS_ADRALN: return "Invalid address alignment";
@@ -145,6 +181,12 @@ static inline auto getReasonBUS(int code) -> std::optional<std::string> {
     return std::nullopt;
 }
 
+/**
+ * Returns an explanation for the given trapping instruction reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
 static inline auto getReasonTRAP(int code) -> std::optional<std::string> {
     switch (code) {
         case TRAP_BRKPT: return "Process breakpoint";
@@ -153,6 +195,13 @@ static inline auto getReasonTRAP(int code) -> std::optional<std::string> {
     return std::nullopt;
 }
 
+/**
+ * Returns an explanation for the reason code of the given signal code.
+ *
+ * @param signalCode the signal's code
+ * @param code the reason code
+ * @return the optional explanation
+ */
 static inline auto getReason(int signalCode, int code) -> std::optional<std::string> {
     using formatter::Style;
     
@@ -181,6 +230,12 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
     return std::nullopt;
 }
 
+/**
+ * Stringifies the given segmentation fault reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
 static inline auto stringifyReasonSEGV(const int code) -> std::optional<std::string> {
     switch (code) {
         case SEGV_ACCERR: return "ACCERR";
@@ -189,6 +244,12 @@ static inline auto stringifyReasonSEGV(const int code) -> std::optional<std::str
     return std::nullopt;
 }
 
+/**
+ * Stringifies the given illegal instruction reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
 static inline auto stringifyReasonILL(const int code) -> std::optional<std::string> {
     switch (code) {
         case ILL_ILLOPC: return "ILLOPC";
@@ -203,6 +264,12 @@ static inline auto stringifyReasonILL(const int code) -> std::optional<std::stri
     return std::nullopt;
 }
 
+/**
+ * Stringifies the given floating point exception reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
 static inline auto stringifyReasonFPE(const int code) -> std::optional<std::string> {
     switch (code) {
         case FPE_FLTDIV: return "FLTDIV";
@@ -217,6 +284,12 @@ static inline auto stringifyReasonFPE(const int code) -> std::optional<std::stri
     return std::nullopt;
 }
 
+/**
+ * Stringifies the given bus error reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
 static inline auto stringifyReasonBUS(const int code) -> std::optional<std::string> {
     switch (code) {
         case BUS_ADRALN: return "ADRALN";
@@ -226,6 +299,12 @@ static inline auto stringifyReasonBUS(const int code) -> std::optional<std::stri
     return std::nullopt;
 }
 
+/**
+ * Stringifies the given trapping instruction reason code.
+ *
+ * @param code the reason code
+ * @return the optional string represenation
+ */
 static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::string> {
     switch (code) {
         case TRAP_BRKPT: return "BRKPT";
@@ -234,6 +313,13 @@ static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::str
     return std::nullopt;
 }
 
+/**
+ * Stringifies the given reason code for the given signal code.
+ *
+ * @param signalCode the signal's code
+ * @param code the reason code
+ * @return the optional string representation
+ */
 static inline auto stringifyReason(const int signalCode, const int code) -> std::optional<std::string> {
     switch (signalCode) {
         case SIGSEGV: return stringifyReasonSEGV(code);
