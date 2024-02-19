@@ -1,7 +1,7 @@
 /*
- * LeakSanitizer - A small library showing informations about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022  mhahnFr
+ * Copyright (C) 2022, 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -34,6 +34,28 @@ void   __wrap_exit(int, const char *, int);
 
 #ifdef __cplusplus
 } // extern "C"
+
+namespace std {
+static inline void* __wrap_malloc(size_t size, const char* file, int line) {
+    ::__wrap_malloc(size, file, line);
+}
+
+static inline void* __wrap_calloc(size_t size, size_t count, const char* file, int line) {
+    ::__wrap_calloc(size, count, file, line);
+}
+
+static inline void* __wrap_realloc(void* pointer, size_t size, const char* file, int line) {
+    ::__wrap_realloc(pointer, size, file, line);
+}
+
+static inline void __wrap_free(void* pointer, const char* file, int line) {
+    ::__wrap_free(pointer, file, line);
+}
+
+static inline void __wrap_exit(int code, const char* file, int line) {
+    ::__wrap_exit(code, file, line);
+}
+}
 #endif
 
 #define malloc(size)       __wrap_malloc(size, __FILE__, __LINE__)
