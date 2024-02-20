@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -20,9 +20,14 @@
 #ifndef interpose_hpp
 #define interpose_hpp
 
+/**
+ * This structure contains the data for the `__interpose` Mach-O section.
+ */
 struct interpose {
-    const void * newFunc;
-    const void * oldFunc;
+    /** The new function. */
+    const void* newFunc;
+    /** The old function. */
+    const void* oldFunc;
 };
 
 #define INTERPOSE(NEW, OLD)                                                  \
