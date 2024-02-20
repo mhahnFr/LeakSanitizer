@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -21,6 +21,11 @@
 #define exceptionHandler_hpp
 
 namespace lsan {
+/**
+ * @brief Handles the current exception pointer that is available.
+ *
+ * Terminates the linked application.
+ */
 [[ noreturn ]] void exceptionHandler() noexcept;
 }
 
