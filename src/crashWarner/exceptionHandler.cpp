@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -30,6 +30,12 @@
 #include "../../CallstackLibrary/include/callstack_exception.hpp"
 
 namespace lsan {
+/**
+ * Demangles the given C string.
+ *
+ * @param string the string to be demangled
+ * @return the possibly demangled string
+ */
 static inline auto demangle(const char * string) noexcept -> std::string {
     int status;
     const char * result = abi::__cxa_demangle(string, nullptr, nullptr, &status);
@@ -41,6 +47,11 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     return toReturn;
 }
 
+/**
+ * Handles the given standard exception.
+ *
+ * @param exception the exception to be handled
+ */
 [[ noreturn ]] static inline void handleException(std::exception & exception) noexcept {
     std::stringstream stream;
     stream << "Uncaught exception of type " << demangle(typeid(exception).name()) << ": \"" << exception.what() << "\"";
@@ -48,6 +59,11 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     crashForce(stream.str());
 }
 
+/**
+ * Handles the given exception from the CallstackLibrary.
+ *
+ * @param exception the exception to be handled
+ */
 [[ noreturn ]] static inline void handleException(lcs::exception & exception) noexcept {
     exception.setPrintStacktrace(false);
     
