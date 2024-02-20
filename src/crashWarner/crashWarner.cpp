@@ -34,6 +34,7 @@ namespace lsan {
  *
  * @param message the message to be printed
  * @param callstack the callstack to be printed
+ * @param reason the optional reason for the message
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
