@@ -30,7 +30,7 @@
 namespace lsan {
 /**
  * @brief Terminates the linked program and prints the given message, the file name
- * and the line number and a callstack up to the given omitting address.
+ * and the line number and a callstack.
  *
  * This function does nothing if the generated callstack is not user relevant.
  *
@@ -43,8 +43,7 @@ void crash(const std::string & message,
            const int           line);
 
 /**
- * @brief Terminates the linked program and prints the given message and a callstack
- * up to the given omitting address.
+ * @brief Terminates the linked program and prints the given message and a callstack.
  *
  * This function does nothing if the generated callstack is not user relevant.
  *
@@ -53,8 +52,7 @@ void crash(const std::string & message,
 void crash(const std::string & message);
 
 /**
- * @brief Terminates the linked program and prints the given message and a callstack
- * up to the given omitting address.
+ * @brief Terminates the linked program and prints the given message and a callstack.
  *
  * This function performs the termination in any case.
  *
@@ -62,12 +60,23 @@ void crash(const std::string & message);
  */
 [[ noreturn ]] void crashForce(const std::string & message);
 
-[[ noreturn ]] void crashForce(const std::string& message, const std::optional<std::string>& reason, lcs::callstack&& callstack);
+/**
+ * @brief Terminates the linked program and prints the given message, the optionally given
+ * reason and the given callstack.
+ *
+ * This function performs the termination in any case.
+ *
+ * @param message the message to be printed
+ * @param reason the optional reason
+ * @param callstack the callstack
+ */
+[[ noreturn ]] void crashForce(const std::string&                message,
+                               const std::optional<std::string>& reason,
+                                     lcs::callstack&&            callstack);
 
 /**
  * @brief Terminates the linked program and prints the given message, the information
- * provided by the optional allocation record and a callstack up to the given omitting
- * address.
+ * provided by the optional allocation record and a callstack.
  *
  * This function does nothing if the generated callstack is not user relevant.
  *
@@ -77,6 +86,9 @@ void crash(const std::string & message);
 void crash(const std::string &                                     message,
            std::optional<std::reference_wrapper<const MallocInfo>> info);
 
+/**
+ * This function resets the signal handler for `SIGABRT` and performs the abort.
+ */
 [[ noreturn ]] void abort();
 }
 
