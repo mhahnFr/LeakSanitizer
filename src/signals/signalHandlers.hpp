@@ -22,13 +22,35 @@
 
 #include <csignal>
 
+/**
+ * This namespace contains the available signal handlers.
+ */
 namespace lsan::signals::handlers {
-[[ noreturn ]] void crashWithTrace(int, siginfo_t*, void*);
+/**
+ * A signal handler that terminates the program and prints out a trace created from
+ * the passed signal and execution context.
+ *
+ * @param signalCode the signal code
+ * @param signalContext the signal context
+ * @param executionContext the execution context where the signal was received
+ */
+[[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* signalContext, void* executionContext);
 
-/// This function acts as a general signal handler. It prints the statistics.
-void stats(int);
-/// This function acts as a general signal handler. It prints the current callstack.
-void callstack(int, siginfo_t*, void*);
+/**
+ * This signal handler prints the statistics.
+ *
+ * @param signalCode the signal code, ignored
+ */
+void stats(int signalCode);
+
+/**
+ * This signal handler prints the callstack where the signal was received.
+ *
+ * @param signalCode the signal code, ignored
+ * @param signalContext the signal context, ignored
+ * @param executionContext the execution context where the signal was received
+ */
+void callstack(int signalCode, siginfo_t* signalContext, void* executionContext);
 }
 
 #endif /* signalHandlers_hpp */
