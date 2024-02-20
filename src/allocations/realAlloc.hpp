@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023  mhahnFr
+ * Copyright (C) 2023 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer. This library is free software:
  * you can redistribute it and/or modify it under the terms of the
@@ -20,6 +20,8 @@
 #ifndef realAlloc_hpp
 #define realAlloc_hpp
 
+#include <cstddef>
+
 #ifdef __linux__
 extern "C" {
 void * __libc_malloc(std::size_t);
@@ -29,7 +31,16 @@ void   __libc_free(void *);
 }
 #endif
 
+/**
+ * This namespace contains wrapper to the real functions.
+ */
 namespace lsan::real {
+/**
+ * Calls the real `malloc` function.
+ *
+ * @param size the requested allocation size
+ * @return the allocated block of memory or `NULL` if no memory was available
+ */
 static inline auto malloc(std::size_t size) -> void * {
     void * toReturn;
 #ifdef __linux__
@@ -40,6 +51,13 @@ static inline auto malloc(std::size_t size) -> void * {
     return toReturn;
 }
 
+/**
+ * Calls the real `calloc` function.
+ *
+ * @param count the count of objects
+ * @param size the size an individual object
+ * @return the allocated block of memory or `NULL` if no memory was available
+ */
 static inline auto calloc(std::size_t count, std::size_t size) -> void * {
     void * toReturn;
 #ifdef __linux__
@@ -50,6 +68,13 @@ static inline auto calloc(std::size_t count, std::size_t size) -> void * {
     return toReturn;
 }
 
+/**
+ * Calls the real `realloc` function.
+ *
+ * @param pointer the pointer to the memory block to be reallocated
+ * @param size the requested new size the memory block
+ * @return the reallocated memory block
+ */
 static inline auto realloc(void * pointer, std::size_t size) -> void * {
     void * toReturn;
 #ifdef __linux__
@@ -60,6 +85,11 @@ static inline auto realloc(void * pointer, std::size_t size) -> void * {
     return toReturn;
 }
 
+/**
+ * Calls the real `free` function.
+ *
+ * @param pointer the pointer to be freed
+ */
 static inline void free(void * pointer) {
 #ifdef __linux__
     __libc_free(pointer);
