@@ -37,7 +37,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
 
 ifeq ($(shell uname -s),Darwin)
- 	LDFLAGS += -current_version 1.7 -compatibility_version 1 -install_name $(abspath $@)
+ 	LDFLAGS += -current_version 1.8 -compatibility_version 1 -install_name $(abspath $@)
  	
  	NAME = $(DYLIB_NA)
 else
