@@ -5,8 +5,7 @@ It can be used with almost any programming language that compiles to native
 machine code.  
 Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 
-> **Note** for Swift and Objective-C:
-> 
+> [!IMPORTANT]
 > Objective-C and Swift objects are never considered to become memory leaks - 
 > even in the case of strong reference cycles.
 
@@ -19,6 +18,7 @@ Use the LeakSanitizer to check for memory leaks as follows:
 2. Build it: `cd LeakSanitizer && make`
 3. Link your code with: `-L<path/to/library> -llsan`
 
+> [!TIP]
 > **Update** the LeakSanitizer using:
 > 
 > ```shell
@@ -61,22 +61,24 @@ To use this sanitizer simply link your application against it (recommended) or p
 - Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default
 directories.
 - On Linux add `-rdynamic` to the linking flags.
- 
-Link with: `-llsan`
- 
-> Example **macOS**: `-L<path/to/library> -llsan`
 
-> Example **Linux**: `-rdynamic -L<path/to/library> -llsan`
+Link with: `-llsan`
+
+> [!TIP]
+> - Example **macOS**: `-L<path/to/library> -llsan`
+> - Example **Linux**: `-rdynamic -L<path/to/library> -llsan`
 
 #### Preloading
 Add this sanitizer's library to the dynamic loader preload environment variable:
 - **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/library>`
-> Example:
+- **Linux**: `LD_PRELOAD=<path/to/library>`
+
+> [!TIP]
+> - Example **macOS**:
 > ```shell
 > DYLD_INSERT_LIBRARIES=/usr/local/lib/liblsan.dylib ./a.out
 > ```
-- **Linux**: `LD_PRELOAD=<path/to/library>`
-> Example:
+> - Example **Linux**:
 > ```shell
 > LD_PRELOAD=/usr/local/lib/liblsan.so ./a.out
 > ```
@@ -187,8 +189,6 @@ following environment variables to their indicated values:
 | `LSAN_RELATIVE_PATHS`        | **Since v1.8:** Allow relative paths to be printed                             | `true`, `false`   | `true`        |
 | `LSAN_ZERO_ALLOCATION`       | **Since v1.8:** Issue a warning when `0` byte are allocated                    | `true`, `false`   | `false`       |
 | `LSAN_FIRST_PARTY_REGEX`     | **Since v1.8:** Binary files matching this regex are considered "first party". | *Any regex*       | *None*        |
-| `LSAN_PRINT_LICENSE`         | *Deprecated in v1.8:* Print the license notice on exit                         | `true`, `false`   | `true`        |
-| `LSAN_PRINT_WEBSITE`         | *Deprecated in v1.8:* Print the link to the website                            | `true`, `false`   | `true`        |
 
 More on the environment variables [here][2].
 
