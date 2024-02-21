@@ -6,7 +6,7 @@ machine code.
 Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 
 > [!IMPORTANT]
-> Objective-C and Swift objects are never considered to become memory leaks - 
+> **Objective-C** and **Swift** objects are never considered to become memory leaks - 
 > even in the case of strong reference cycles.
 
 This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are
@@ -120,7 +120,9 @@ Summary: 2 leaks, 1.01 KiB lost.
 
 #### Line numbers
 ##### macOS
-Simply compile your code with debug symbols to add line numbers to the output. Usually, the appropriate flag is `-g`.
+Simply compile your code with debug symbols to add line numbers to the output.
+> [!TIP]
+> Usually, the appropriate flag is `-g`.
 
 The previous example compiled and linked on macOS with `cc -g main.c -L<path/to/library> -llsan` creates the following output:
 
