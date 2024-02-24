@@ -31,8 +31,14 @@ SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
 OBJS  = $(patsubst %.cpp, %.o, $(SRC))
 DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 
+BENCHMARK = false
+
 LDFLAGS  = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast
+
+ifeq ($(BENCHMARK),true)
+	CXXFLAGS += -DBENCHMARK
+endif
 
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
 
@@ -59,6 +65,9 @@ endif
 INSTALL_PATH ?= /usr/local
 
 default: $(NAME)
+
+bench:
+	$(MAKE) 'BENCHMARK=true'
 
 all: $(SHARED_L) $(DYLIB_NA)
 
@@ -110,6 +119,6 @@ fclean: clean
 re: fclean
 	$(MAKE) default
 
-.PHONY: re fclean clean all install uninstall release default update
+.PHONY: re fclean clean all install uninstall release default update bench
 
 -include $(DEPS)
