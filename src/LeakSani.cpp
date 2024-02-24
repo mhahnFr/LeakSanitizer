@@ -299,6 +299,10 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     
     callstack_clearCaches();
     callstack_autoClearCaches = true;
+    
+#ifdef BENCHMARK
+    stream << std::endl << timing::printTimings << std::endl;
+#endif
     return stream;
 }
 }

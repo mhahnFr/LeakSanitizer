@@ -31,6 +31,13 @@
 #include "../crashWarner/warn.hpp"
 #include "../initialization/init.hpp"
 
+#ifdef BENCHMARK
+#include "../timing.hpp"
+
+using namespace std::chrono;
+using namespace lsan::timing;
+#endif
+
 #include "../../include/lsan_stats.h"
 #include "../../include/lsan_internals.h"
 
@@ -155,16 +162,39 @@ namespace lsan {
 #endif /* !__linux__ */
 
 auto malloc(std::size_t size) -> void * {
+#ifdef BENCHMARK
+    const auto sysBeg { steady_clock::now() };
+#endif
     auto ptr = lsan::real::malloc(size);
+#ifdef BENCHMARK
+    const auto sysEnd { steady_clock::now() };
+#endif
     
     if (ptr != nullptr && lsan::inited) {
+#ifdef BENCHMARK
+        const auto locBeg { steady_clock::now() };
+#endif
         std::lock_guard lock(lsan::getInstance().getMutex());
+#ifdef BENCHMARK
+        const auto locEnd { steady_clock::now() };
+#endif
         if (!lsan::getIgnoreMalloc()) {
             lsan::setIgnoreMalloc(true);
+#ifdef BENCHMARK
+            const auto traBeg { steady_clock::now() };
+#endif
             if (__lsan_zeroAllocation && size == 0) {
                 lsan::warn("Implementation-defined allocation of size 0");
             }
             lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size));
+#ifdef BENCHMARK
+            const auto traEnd { steady_clock::now() };
+            
+            addTotalTime(duration_cast<nanoseconds>(sysEnd - sysBeg + locEnd - locBeg + traEnd - traBeg), AllocType::malloc);
+            addTrackingTime(duration_cast<nanoseconds>(traEnd - traBeg), AllocType::malloc);
+            addSystemTime(duration_cast<nanoseconds>(sysEnd - sysBeg), AllocType::malloc);
+            addLockingTime(duration_cast<nanoseconds>(locEnd - locBeg), AllocType::malloc);
+#endif
             lsan::setIgnoreMalloc(false);
         }
     }
