@@ -20,10 +20,6 @@
 #ifndef lsanMisc_hpp
 #define lsanMisc_hpp
 
-#ifdef BENCHMARK
- #include <chrono>
-#endif
-
 #include <iostream>
 
 #include "LeakSani.hpp"
@@ -92,18 +88,6 @@ auto isATTY() -> bool;
  * @return whether the variable name is in the environment
  */
 auto has(const std::string & var) -> bool;
-
-#ifdef BENCHMARK
-enum class AllocType {
-    malloc, calloc, realloc, free
-};
-
-void addSystemTime(std::chrono::nanoseconds duration, AllocType type);
-void addLockingTime(std::chrono::nanoseconds duration, AllocType type);
-void addTrackingTime(std::chrono::nanoseconds duration, AllocType type);
-void addTotalTime(std::chrono::nanoseconds duration, AllocType type);
-auto printTimings(std::ostream& out) -> std::ostream&;
-#endif
 
 /**
  * Sets whether to ignore subsequent allocation management requests.

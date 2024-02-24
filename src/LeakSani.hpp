@@ -30,6 +30,10 @@
 
 #include "MallocInfo.hpp"
 
+#ifdef BENCHMARK
+ #include "timing.hpp"
+#endif
+
 #include "initialization/init.hpp"
 #include "statistics/Stats.hpp"
 
@@ -61,6 +65,10 @@ class LSan {
     /** The runtime name of this sanitizer.                                             */
     const std::string libName;
     
+#ifdef BENCHMARK
+    std::map<timing::AllocType, timing::Timings> timingMap;
+#endif
+    
     /**
      * @brief Generates and returns a regular expression object for the given string.
      *
@@ -88,6 +96,12 @@ public:
     LSan(const LSan &&)             = delete;
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
+    
+#ifdef BENCHMARK
+    constexpr inline auto getTimingMap() -> std::map<timing::AllocType, timing::Timings>& {
+        return timingMap;
+    }
+#endif
     
     /**
      * Returns the user first party regular expression.
