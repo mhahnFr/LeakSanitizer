@@ -20,6 +20,11 @@
 #include <filesystem>
 #include <iostream>
 
+#ifdef BENCHMARK
+ #include <deque>
+ #include <map>
+#endif
+
 #if __has_include(<unistd.h>)
  #include <unistd.h>
 
@@ -44,6 +49,74 @@ auto getInstance() -> LSan & {
     static auto instance = new LSan();
     return *instance;
 }
+
+#ifdef BENCHMARK
+struct Timings {
+    std::deque<std::chrono::nanoseconds> system;
+    std::deque<std::chrono::nanoseconds> locking;
+    std::deque<std::chrono::nanoseconds> tracking;
+    std::deque<std::chrono::nanoseconds> total;
+};
+
+auto getTimingMap() -> std::map<AllocType, Timings>& {
+    static auto map = new std::map<AllocType, Timings>();
+    
+    return *map;
+}
+
+void addSystemTime(std::chrono::nanoseconds duration, AllocType type) {
+    getTimingMap()[type].system.push_back(duration);
+}
+
+void addLockingTime(std::chrono::nanoseconds duration, AllocType type) {
+    getTimingMap()[type].locking.push_back(duration);
+}
+
+void addTrackingTime(std::chrono::nanoseconds duration, AllocType type) {
+    getTimingMap()[type].tracking.push_back(duration);
+}
+
+void addTotalTime(std::chrono::nanoseconds duration, AllocType type) {
+    getTimingMap()[type].total.push_back(duration);
+}
+
+static inline auto operator<<(std::ostream& out, const std::deque<std::chrono::nanoseconds>& values) -> std::ostream& {
+    if (values.empty()) return out << formatter::format<formatter::Style::ITALIC>("(Not available)");
+    
+    std::chrono::nanoseconds total{0}, min{std::chrono::nanoseconds::max()}, max{0};
+    for (const auto value : values) {
+        total += value;
+        if (value < min) {
+            min = value;
+        }
+        if (value > max) {
+            max = value;
+        }
+    }
+    out << "(min, max, avg): " << min.count() << " ns, " << max.count() << " ns, " << (static_cast<double>(total.count()) / values.size()) << " ns";
+    return out;
+}
+
+static inline auto operator<<(std::ostream& out, const Timings& timings) -> std::ostream& {
+    out << "  System time " << timings.system   << std::endl
+        << " Locking time " << timings.locking  << std::endl
+        << "Tracking time " << timings.tracking << std::endl
+        << "   Total time " << timings.total    << std::endl;
+    
+    return out;
+}
+
+auto printTimings(std::ostream& out) -> std::ostream& {
+    using formatter::Style;
+    
+    out << formatter::format<Style::BOLD>("Malloc timings")  << std::endl << getTimingMap()[AllocType::malloc]  << std::endl
+        << formatter::format<Style::BOLD>("Calloc timings")  << std::endl << getTimingMap()[AllocType::calloc]  << std::endl
+        << formatter::format<Style::BOLD>("Realloc timings") << std::endl << getTimingMap()[AllocType::realloc] << std::endl
+        << formatter::format<Style::BOLD>("Free timings")    << std::endl << getTimingMap()[AllocType::free]    << std::endl;
+    
+    return out;
+}
+#endif
 
 /**
  * Prints the license information of this sanitizer.
