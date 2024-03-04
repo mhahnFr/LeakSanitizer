@@ -19,6 +19,11 @@
 
 #include "timing.hpp"
 
+#ifdef BENCHMARK
+
+#include <tuple>
+#include <optional>
+
 #include "formatter.hpp"
 
 namespace lsan::timing {
@@ -42,9 +47,7 @@ void addTotalTime(std::chrono::nanoseconds duration, AllocType type) {
     getTimingMap()[type].total.push_back(duration);
 }
 
-static inline auto operator<<(std::ostream& out, const std::deque<std::chrono::nanoseconds>& values) -> std::ostream& {
-    if (values.empty()) return out << formatter::format<formatter::Style::ITALIC>("(Not available)");
-    
+static inline auto getMinMaxAvg(const std::deque<std::chrono::nanoseconds>& values) -> std::tuple<std::chrono::nanoseconds, std::chrono::nanoseconds, double> {
     std::chrono::nanoseconds total{0}, min{std::chrono::nanoseconds::max()}, max{0};
     for (const auto value : values) {
         total += value;
@@ -55,15 +58,52 @@ static inline auto operator<<(std::ostream& out, const std::deque<std::chrono::n
             max = value;
         }
     }
-    out << "(min, max, avg): " << min.count() << " ns, " << max.count() << " ns, " << (static_cast<double>(total.count()) / values.size()) << " ns";
-    return out;
+    return std::make_tuple(min, max, static_cast<double>(total.count()) / values.size());
 }
 
 static inline auto operator<<(std::ostream& out, const Timings& timings) -> std::ostream& {
-    out << "  System time " << timings.system   << std::endl
-        << " Locking time " << timings.locking  << std::endl
-        << "Tracking time " << timings.tracking << std::endl
-        << "   Total time " << timings.total    << std::endl;
+    if (timings.tracking.empty() || timings.locking.empty() || timings.system.empty() || timings.total.empty()) {
+        return out << formatter::format<formatter::Style::ITALIC>("(Not available)") << std::endl;
+    }
+    
+    const auto system   = getMinMaxAvg(timings.system);
+    const auto locking  = getMinMaxAvg(timings.locking);
+    const auto tracking = getMinMaxAvg(timings.tracking);
+    const auto total    = getMinMaxAvg(timings.total);
+    
+    const double totalMin = static_cast<double>(std::get<0>(total).count()),
+                 totalMax = static_cast<double>(std::get<1>(total).count()),
+                 totalAvg = std::get<2>(total);
+    
+    const double sysPartMin   = (std::get<0>(system).count() / totalMin) * 100,
+                 sysPartMax   = (std::get<1>(system).count() / totalMax) * 100,
+                 sysPartAvg   = (std::get<2>(system) / totalAvg) * 100,
+                 lockPartMin  = (std::get<0>(locking).count() / totalMin) * 100,
+                 lockPartMax  = (std::get<1>(locking).count() / totalMax) * 100,
+                 lockPartAvg  = (std::get<2>(locking) / totalAvg) * 100,
+                 trackPartMin = (std::get<0>(tracking).count() / totalMin) * 100,
+                 trackPartMax = (std::get<1>(tracking).count() / totalMax) * 100,
+                 trackPartAvg = (std::get<2>(tracking) / totalAvg) * 100;
+    
+    out << "  System time (min, max, avg): "
+        << std::get<0>(system).count() << " ns (" << sysPartMin << " %), "
+        << std::get<1>(system).count() << " ns (" << sysPartMax << " %), "
+        << std::get<2>(system)         << " ns (" << sysPartAvg << " %)" << std::endl
+    
+        << " Locking time (min, max, avg): " 
+        << std::get<0>(locking).count() << " ns (" << lockPartMin << " %), "
+        << std::get<1>(locking).count() << " ns (" << lockPartMax << " %), "
+        << std::get<2>(locking)         << " ns (" << lockPartAvg << " %)" << std::endl
+    
+        << "Tracking time (min, max, avg): " 
+        << std::get<0>(tracking).count() << " ns (" << trackPartMin << " %), "
+        << std::get<1>(tracking).count() << " ns (" << trackPartMax << " %), "
+        << std::get<2>(tracking)         << " ns (" << trackPartAvg << " %)" << std::endl
+    
+        << "   Total time (min, max, avg): " 
+        << std::get<0>(total).count() << " ns, "
+        << std::get<1>(total).count() << " ns, "
+        << std::get<2>(total)         << " ns" << std::endl;
     
     return out;
 }
@@ -79,3 +119,5 @@ auto printTimings(std::ostream& out) -> std::ostream& {
     return out;
 }
 }
+
+#endif
