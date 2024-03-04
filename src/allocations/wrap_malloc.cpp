@@ -184,17 +184,26 @@ auto malloc(std::size_t size) -> void * {
 }
 
 auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What if calloc malloc's?
-    auto ptr = lsan::real::calloc(objectSize, count);
+    BENCH(auto ptr = lsan::real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
     
     if (ptr != nullptr && lsan::inited) {
-        std::lock_guard lock(lsan::getInstance().getMutex());
+        BENCH(std::lock_guard lock(lsan::getInstance().getMutex());, std::chrono::nanoseconds, lockingTime);
         
         if (!lsan::getIgnoreMalloc()) {
             lsan::setIgnoreMalloc(true);
-            if (__lsan_zeroAllocation && objectSize * count == 0) {
-                lsan::warn("Implementation-defined allocation of size 0");
-            }
-            lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, objectSize * count));
+            BENCH({
+                if (__lsan_zeroAllocation && objectSize * count == 0) {
+                    lsan::warn("Implementation-defined allocation of size 0");
+                }
+                lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, objectSize * count));
+            }, std::chrono::nanoseconds, trackingTime);
+            
+            BENCH_ONLY({
+                lsan::timing::addTotalTime(sysTime + lockingTime + trackingTime, lsan::timing::AllocType::calloc);
+                lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::calloc);
+                lsan::timing::addSystemTime(sysTime, lsan::timing::AllocType::calloc);
+                lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::calloc);
+            })
             lsan::setIgnoreMalloc(false);
         }
     }
