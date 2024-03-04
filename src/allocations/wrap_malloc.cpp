@@ -171,10 +171,10 @@ auto malloc(std::size_t size) -> void * {
             }, std::chrono::nanoseconds, trackingTime);
             
             BENCH_ONLY({
-                timing::addTotalTime(systemTime + lockingTime + trackingTime, timing::AllocType::malloc);
-                timing::addTrackingTime(trackingTime, timing::AllocType::malloc);
-                timing::addSystemTime(systemTime, timing::AllocType::malloc);
-                timing::addLockingTime(lockingTime, timing::AllocType::malloc);
+                lsan::timing::addTotalTime(systemTime + lockingTime + trackingTime, lsan::timing::AllocType::malloc);
+                lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::malloc);
+                lsan::timing::addSystemTime(systemTime, lsan::timing::AllocType::malloc);
+                lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::malloc);
             })
             
             lsan::setIgnoreMalloc(false);
@@ -213,24 +213,33 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What
 auto realloc(void * pointer, std::size_t size) -> void * {
     if (!lsan::inited) return lsan::real::realloc(pointer, size);
     
-    std::lock_guard lock(lsan::getInstance().getMutex());
+    BENCH(std::lock_guard lock(lsan::getInstance().getMutex());, std::chrono::nanoseconds, lockingTime);
     
     auto ignored = lsan::getIgnoreMalloc();
     if (!ignored) {
         lsan::setIgnoreMalloc(true);
     }
-    void * ptr = lsan::real::realloc(pointer, size);
+    BENCH(void * ptr = lsan::real::realloc(pointer, size);, std::chrono::nanoseconds, sysTime);
     if (!ignored) {
-        if (ptr != nullptr) {
-            if (pointer != ptr) {
-                if (pointer != nullptr) {
-                    lsan::getInstance().removeMalloc(pointer);
+        BENCH({
+            if (ptr != nullptr) {
+                if (pointer != ptr) {
+                    if (pointer != nullptr) {
+                        lsan::getInstance().removeMalloc(pointer);
+                    }
+                    lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size));
+                } else {
+                    lsan::getInstance().changeMalloc(lsan::MallocInfo(ptr, size));
                 }
-                lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size));
-            } else {
-                lsan::getInstance().changeMalloc(lsan::MallocInfo(ptr, size));
             }
-        }
+        }, std::chrono::nanoseconds, trackingTime);
+        
+        BENCH_ONLY({
+            lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::realloc);
+            lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::realloc);
+            lsan::timing::addSystemTime(sysTime, lsan::timing::AllocType::realloc);
+            lsan::timing::addTotalTime(sysTime + trackingTime + lockingTime, lsan::timing::AllocType::realloc);
+        })
         lsan::setIgnoreMalloc(false);
     }
     return ptr;
@@ -258,8 +267,8 @@ void free(void * pointer) {
                 }
             }, std::chrono::nanoseconds, trackingTime);
             BENCH_ONLY({
-                addTrackingTime(trackingTime, lsan::timing::AllocType::free);
-                addLockingTime(lockingTime, lsan::timing::AllocType::free);
+                lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::free);
+                lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::free);
                 
                 totalTime = lockingTime + trackingTime;
             })
@@ -274,8 +283,8 @@ void free(void * pointer) {
             if (!lsan::getIgnoreMalloc()) {
                 lsan::setIgnoreMalloc(true);
                 
-                addSystemTime(sysTime, lsan::timing::AllocType::free);
-                addTotalTime(totalTime + sysTime, lsan::timing::AllocType::free);
+                lsan::timing::addSystemTime(sysTime, lsan::timing::AllocType::free);
+                lsan::timing::addTotalTime(totalTime + sysTime, lsan::timing::AllocType::free);
                 
                 lsan::setIgnoreMalloc(false);
             }
