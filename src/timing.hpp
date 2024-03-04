@@ -20,12 +20,12 @@
 #ifndef timing_hpp
 #define timing_hpp
 
+#ifdef BENCHMARK
 #include <chrono>
 #include <deque>
 #include <map>
 #include <ostream>
 
-#ifdef BENCHMARK
 namespace lsan::timing {
 struct Timings {
     std::deque<std::chrono::nanoseconds> system;

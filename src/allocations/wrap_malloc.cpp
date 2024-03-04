@@ -30,13 +30,7 @@
 #include "../crashWarner/crash.hpp"
 #include "../crashWarner/warn.hpp"
 #include "../initialization/init.hpp"
-
-#ifdef BENCHMARK
 #include "../timing.hpp"
-
-using namespace std::chrono;
-using namespace lsan::timing;
-#endif
 
 #include "../../include/lsan_stats.h"
 #include "../../include/lsan_internals.h"
@@ -234,26 +228,50 @@ auto realloc(void * pointer, std::size_t size) -> void * {
 }
 
 void free(void * pointer) {
+    BENCH_ONLY(std::chrono::nanoseconds totalTime {0});
+    
     if (lsan::inited) {
-        std::lock_guard lock(lsan::getInstance().getMutex());
+        BENCH(std::lock_guard lock(lsan::getInstance().getMutex());, std::chrono::nanoseconds, lockingTime);
         
         if (!lsan::getIgnoreMalloc()) {
             lsan::setIgnoreMalloc(true);
-            if (pointer == nullptr && __lsan_freeNull) {
-                lsan::warn("Free of NULL");
-            }
-            auto [removed, record] = lsan::getInstance().removeMalloc(pointer);
-            if (__lsan_invalidFree && !removed) {
-                if (__lsan_invalidCrash) {
-                    lsan::crash("Invalid free", record);
-                } else {
-                    lsan::warn("Invalid free", record);
+            BENCH({
+                if (pointer == nullptr && __lsan_freeNull) {
+                    lsan::warn("Free of NULL");
                 }
-            }
+                auto it = lsan::getInstance().removeMalloc(pointer);
+                if (__lsan_invalidFree && !it.first) {
+                    if (__lsan_invalidCrash) {
+                        lsan::crash("Invalid free", it.second);
+                    } else {
+                        lsan::warn("Invalid free", it.second);
+                    }
+                }
+            }, std::chrono::nanoseconds, trackingTime);
+            BENCH_ONLY({
+                addTrackingTime(trackingTime, lsan::timing::AllocType::free);
+                addLockingTime(lockingTime, lsan::timing::AllocType::free);
+                
+                totalTime = lockingTime + trackingTime;
+            })
             lsan::setIgnoreMalloc(false);
         }
     }
-    lsan::real::free(pointer);
+    
+    BENCH(lsan::real::free(pointer);, std::chrono::nanoseconds, sysTime);
+    BENCH_ONLY({
+        if (lsan::inited) {
+            std::lock_guard lock { lsan::getInstance().getMutex() };
+            if (!lsan::getIgnoreMalloc()) {
+                lsan::setIgnoreMalloc(true);
+                
+                addSystemTime(sysTime, lsan::timing::AllocType::free);
+                addTotalTime(totalTime + sysTime, lsan::timing::AllocType::free);
+                
+                lsan::setIgnoreMalloc(false);
+            }
+        }
+    })
 }
 
 #ifndef __linux__
