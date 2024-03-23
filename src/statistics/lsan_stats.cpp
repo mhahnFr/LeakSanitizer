@@ -121,11 +121,18 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
     const auto & infos = getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
     if (infos.size() < width) {
-        const float step = static_cast<float>(width) / infos.size();
+        const float step = static_cast<float>(width) / infos.size(),
+                    loss = fmodf(step, static_cast<int>(step));
+        float    tmpLoss = 0.0f;
         for (; it != infos.cend(); ++it) {
             const std::string fill = it->second.isDeleted() ? formatter::get<Style::BAR_EMPTY>()
                                                             : formatter::get<Style::BAR_FILLED>();
-            for (std::size_t i = 0; i < step; ++i) {
+            tmpLoss += loss;
+            if (tmpLoss >= 1.0f) {
+                out << fill;
+                tmpLoss -= 1.0f;
+            }
+            for (std::size_t i = 0; i < static_cast<std::size_t>(step); ++i) {
                 out << fill;
             }
         }
