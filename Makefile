@@ -76,13 +76,13 @@ install:
 	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
 	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(INSTALL_PATH)/lib/$(NAME)" $(NAME); fi
 	mkdir -p $(INSTALL_PATH)/lib
-	mkdir -p "$(INSTALL_PATH)/include"
+	mkdir -p "$(INSTALL_PATH)/include/lsan"
 	mv $(NAME) $(INSTALL_PATH)/lib
-	find "include" -name \*.h -exec cp {} "$(INSTALL_PATH)/include" \;
+	find "include" -name \*.h \! -path \*/stdlib.h \! -path \*/leaksan.h -exec cp {} "$(INSTALL_PATH)/include/lsan" \;
 
 uninstall:
 	- $(RM) $(INSTALL_PATH)/lib/$(NAME)
-	- $(RM) $(addprefix $(INSTALL_PATH)/, $(shell find "include" -name \*.h))
+	- $(RM) -r "$(INSTALL_PATH)/include/lsan"
 
 release:
 	- $(RM) $(NAME)
