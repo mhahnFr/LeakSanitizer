@@ -47,6 +47,13 @@ make INSTALL_PATH=/usr/local install
 If you downloaded a release you can simply move the headers and the library anywhere
 you like.
 
+#### Uninstallation
+Uninstall the sanitizer by simply removing its library and its header files from the installation directory.  
+This can be done using the following command:
+```shell
+make INSTALL_PATH=/usr/local uninstall
+```
+
 ### Updating
 Update the LeakSanitizer by either downloading the new release or, when cloned from the repository, using:
 ```shell
