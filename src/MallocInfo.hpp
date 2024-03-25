@@ -24,6 +24,8 @@
 #include <ostream>
 #include <string>
 
+#include "LeakType.hpp"
+
 #include "callstacks/callstackHelper.hpp"
 
 #include "../CallstackLibrary/include/callstack.h"
@@ -41,6 +43,8 @@ class MallocInfo {
     void * pointer;
     /** The size of the allocated piece of memory.                */
     std::size_t size;
+    
+    LeakType leakType = LeakType::unclassified;
     
     /** The filename in which this allocation happened.           */
     std::optional<std::string> createdInFile;
@@ -232,6 +236,14 @@ public:
      */
     inline auto getCreatedCallstack() -> lcs::callstack & {
         return createdCallstack;
+    }
+    
+    constexpr inline auto getLeakType() const noexcept -> LeakType {
+        return leakType;
+    }
+    
+    constexpr inline void setLeakType(LeakType type) noexcept {
+        leakType = type;
     }
     
     friend auto operator<<(std::ostream &, const MallocInfo &) -> std::ostream &;
