@@ -69,6 +69,7 @@
 		BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeakSani.cpp; sourceTree = "<group>"; };
 		BF72C3CB2885CB9E00C7AE5C /* leaksan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = leaksan.h; sourceTree = "<group>"; };
 		BF72C3CC2885CB9E00C7AE5C /* stdlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdlib.h; sourceTree = "<group>"; };
+		BF7592282BB1799500891A55 /* LeakType.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LeakType.hpp; sourceTree = "<group>"; };
 		BF84625A2AD1B2D3003B05F5 /* init.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = init.hpp; sourceTree = "<group>"; };
 		BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsanMisc.cpp; sourceTree = "<group>"; };
 		BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lsanMisc.hpp; sourceTree = "<group>"; };
@@ -192,6 +193,7 @@
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
 				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
+				BF7592282BB1799500891A55 /* LeakType.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
