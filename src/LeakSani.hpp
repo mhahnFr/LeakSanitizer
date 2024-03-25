@@ -20,7 +20,6 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
-#include <forward_list>
 #include <map>
 #include <mutex>
 #include <optional>
