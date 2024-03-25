@@ -223,7 +223,9 @@ extern size_t __lsan_firstPartyThreshold;
  *
  * @since 1.8
  */
-extern const char * __lsan_firstPartyRegex;
+extern const char* __lsan_firstPartyRegex;
+
+extern const char* __lsan_leakKinds;
 
 #ifdef __cplusplus
 } // extern "C"
