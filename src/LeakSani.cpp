@@ -63,6 +63,10 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
     }
 }
 
+auto LSan::classifyLeaks() -> void {
+    
+}
+
 LSan::LSan(): libName(lsanName().value()) {
     atexit(reinterpret_cast<void (*)()>(exitHook));
     
@@ -232,6 +236,16 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     std::lock_guard lock(self.infoMutex);
     
     callstack_autoClearCaches = false;
+    
+    self.classifyLeaks();
+    
+    // classify the leaks
+    // create summary on the way
+    // print summary
+    // print lost memory - according to what types should be shown and with a note what kind of leak it is
+    // print summary again
+    // print hint for how to make the rest visible
+    
     std::size_t i     = 0,
                 j     = 0,
                 bytes = 0,

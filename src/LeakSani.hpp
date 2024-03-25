@@ -78,6 +78,8 @@ class LSan {
      */
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
     
+    auto classifyLeaks() -> void;
+    
     /**
      * Loads the user first party regular expression.
      */
