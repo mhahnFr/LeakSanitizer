@@ -64,7 +64,7 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
 }
 
 LSan::LSan(): libName(lsanName().value()) {
-    atexit(reinterpret_cast<void (*)()>(exitHook));
+    atexit(exitHook);
     
     signals::registerFunction(signals::handlers::stats, SIGUSR1);
     
