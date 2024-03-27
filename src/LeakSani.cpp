@@ -101,7 +101,8 @@ static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
     const auto  beginPtr = align(realBegin);
     const auto    endPtr = align(realBegin + info.getSize(), false);
     
-    // FIXME: Obj-C pointers
+    if (beginPtr > endPtr) return 0;
+    
     assert(endPtr - beginPtr <= info.getSize());
     return endPtr - beginPtr;
 }
@@ -112,7 +113,8 @@ auto LSan::classifyLeaks(const void* frameBasePointer) -> void {
     
     // for each allocation: go to the referenced allocation and classify it
     for (auto& [pointer, record] : infos) {
-        record.setLeakType(LeakType::unreachableDirect);
+        if (record.getLeakType() == LeakType::unclassified)
+            record.setLeakType(LeakType::unreachableDirect);
         if (record.isDeleted() || getAlignedSize(record) < sizeof(void*)) continue;
         
         classifyRecord(record, pointer);
