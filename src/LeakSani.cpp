@@ -108,12 +108,11 @@ static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
 
 auto LSan::classifyLeaks(const void* frameBasePointer) -> void {
     // TODO: Search on the given stack
-    // Iterate through the leaks, classifying them - but: DON'T RUN RECURSIVELY!!!
+    // FIXME: Iterate through the leaks, classifying them - but: DON'T RUN RECURSIVELY!!!
     
-    // for each allocation: go to the referenced allocation and classify it
     for (auto& [pointer, record] : infos) {
-        if (record.getLeakType() == LeakType::unclassified)
-            record.setLeakType(LeakType::unreachableDirect);
+        if (record.getLeakType() != LeakType::unclassified) continue;
+        record.setLeakType(LeakType::unreachableDirect);
         if (record.isDeleted() || getAlignedSize(record) < sizeof(void*)) continue;
         
         classifyRecord(record, pointer);
