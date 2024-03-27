@@ -250,7 +250,7 @@ This project is licensed under the terms of the GPL 3.0.
 
 © Copyright 2022 - 2024 [mhahnFr][6] and contributors
 
-[1]: https://github.com/mhahnFr/LeakSanitizer/releases
+[1]: https://github.com/mhahnFr/LeakSanitizer/releases/latest
 [2]: https://github.com/mhahnFr/LeakSanitizer/wiki/Behaviour
 [3]: https://github.com/mhahnFr/LeakSanitizer/wiki/Signal-handlers
 [4]: https://github.com/mhahnFr/LeakSanitizer/wiki/Home#Statistics
