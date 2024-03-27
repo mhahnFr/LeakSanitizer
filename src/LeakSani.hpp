@@ -48,6 +48,7 @@ class LSan {
     
     /** A map containing all allocation records, sorted by their allocated pointers.    */
     std::map<const void * const, MallocInfo> infos;
+    uintptr_t lowest = 0, highest = UINTPTR_MAX;
     /** An object holding all statistics.                                               */
     Stats                                    stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
@@ -86,6 +87,16 @@ class LSan {
      */
     inline void loadUserRegex() {
         userRegex = generateRegex(__lsan_firstPartyRegex);
+    }
+    
+    inline void maybeSetHighestOrLowest(const void* pointer) {
+        const auto ptr = reinterpret_cast<uintptr_t>(pointer);
+        if (ptr < lowest) {
+            lowest = ptr;
+        }
+        if (ptr > highest) {
+            highest = ptr;
+        }
     }
     
 public:

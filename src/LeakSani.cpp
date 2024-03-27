@@ -83,7 +83,6 @@ auto LSan::classifyRecord(const MallocInfo& info, const void* start) -> void {
     const auto   endPtr = align(beginPtr + info.getSize(), false);
     for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(beginPtr); reinterpret_cast<uintptr_t>(it) < endPtr; ++it) {
         const auto record = infos.find(reinterpret_cast<void*>(*it));
-        __builtin_printf("0x%lx, found: %s\n", *it, record == infos.end() ? "false" : "true");
         
         if (record == infos.end()) continue;
         
@@ -168,7 +167,7 @@ auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
     return MallocInfoRemoved(true, std::nullopt);
 }
 
-auto LSan::changeMalloc(const MallocInfo & info) -> bool {
+auto LSan::changeMalloc(const MallocInfo& info) -> bool {
     std::lock_guard lock(infoMutex);
 
     auto it = infos.find(info.getPointer());
@@ -184,17 +183,19 @@ auto LSan::changeMalloc(const MallocInfo & info) -> bool {
         }
         it->second.setDeleted(true);
     }
+    maybeSetHighestOrLowest(info.getPointer());
     infos.insert_or_assign(info.getPointer(), info);
     return true;
 }
 
-void LSan::addMalloc(MallocInfo && info) {
+void LSan::addMalloc(MallocInfo&& info) {
     std::lock_guard lock(infoMutex);
     
     if (__lsan_statsActive) {
         stats += info;
     }
     
+    maybeSetHighestOrLowest(info.getPointer());
     infos.insert_or_assign(info.getPointer(), info);
 }
 
