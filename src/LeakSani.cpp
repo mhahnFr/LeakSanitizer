@@ -82,8 +82,8 @@ auto LSan::classifyRecord(const MallocInfo& info, const void* start) -> void {
     const auto beginPtr = align(reinterpret_cast<uintptr_t>(info.getPointer()));
     const auto   endPtr = align(beginPtr + info.getSize(), false);
     for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(beginPtr); reinterpret_cast<uintptr_t>(it) < endPtr; ++it) {
+        if (*it < lowest || *it > highest) continue;
         const auto record = infos.find(reinterpret_cast<void*>(*it));
-        
         if (record == infos.end()) continue;
         
         if (record->first == start || record->first == info.getPointer()) continue; // TODO: Circle
