@@ -106,8 +106,8 @@ static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
     return endPtr - beginPtr;
 }
 
-auto LSan::classifyLeaks(const void* frameBasePointer) -> void {
-    // TODO: Search on the given stack
+void LSan::classifyLeaks() {
+    // TODO: Search on the stack(s) and in global space
     // FIXME: Iterate through the leaks, classifying them - but: DON'T RUN RECURSIVELY!!!
     
     for (auto& [pointer, record] : infos) {
@@ -274,14 +274,14 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
-std::ostream & operator<<(std::ostream & stream, LSan & self) {
+auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     using formatter::Style;
     
     std::lock_guard lock(self.infoMutex);
     
     callstack_autoClearCaches = false;
     
-    self.classifyLeaks(__builtin_frame_address(0));
+    self.classifyLeaks();
     
     // classify the leaks
     // create summary on the way

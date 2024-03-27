@@ -79,8 +79,8 @@ class LSan {
      */
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
     
-    auto classifyLeaks(const void* frameBasePointer) -> void;
-    auto classifyRecord(const MallocInfo& info, const void* start) -> void;
+    void classifyLeaks();
+    void classifyRecord(const MallocInfo& info, const void* start);
     
     /**
      * Loads the user first party regular expression.
