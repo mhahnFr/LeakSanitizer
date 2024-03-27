@@ -17,6 +17,8 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+
 #include <dlfcn.h>
 
 #include <algorithm>
@@ -63,8 +65,57 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
     }
 }
 
-auto LSan::classifyLeaks() -> void {
+constexpr static const auto alignment = sizeof(void*);
+
+static constexpr inline auto align(uintptr_t ptr, bool up = true) -> uintptr_t {
+    if (ptr % alignment != 0) {
+        if (up) {
+            ptr = ptr + alignment - ptr % alignment;
+        } else {
+            ptr = ptr - alignment + ptr % alignment;
+        }
+    }
+    return ptr;
+}
+
+auto LSan::classifyRecord(const MallocInfo& info, const void* start) -> void {
+    const auto beginPtr = align(reinterpret_cast<uintptr_t>(info.getPointer()));
+    const auto   endPtr = align(beginPtr + info.getSize(), false);
+    for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(beginPtr); reinterpret_cast<uintptr_t>(it) < endPtr; ++it) {
+        const auto record = infos.find(reinterpret_cast<void*>(*it));
+        __builtin_printf("0x%lx, found: %s\n", *it, record == infos.end() ? "false" : "true");
+        
+        if (record == infos.end()) continue;
+        
+        if (record->first == start || record->first == info.getPointer()) continue; // TODO: Circle
+        
+        // TODO: Marking
+        record->second.setLeakType(LeakType::unreachableIndirect);
+        
+        classifyRecord(record->second, start);
+    }
+}
+
+static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
+    const auto realBegin = reinterpret_cast<uintptr_t>(info.getPointer());
+    const auto  beginPtr = align(realBegin);
+    const auto    endPtr = align(realBegin + info.getSize(), false);
     
+    assert(endPtr - beginPtr <= info.getSize());
+    return endPtr - beginPtr;
+}
+
+auto LSan::classifyLeaks(const void* frameBasePointer) -> void {
+    // TODO: Search on the given stack
+    // Iterate through the leaks, classifying them - but: DON'T RUN RECURSIVELY!!!
+    
+    // for each allocation: go to the referenced allocation and classify it
+    for (auto& [pointer, record] : infos) {
+        if (record.isDeleted() || getAlignedSize(record) < sizeof(void*)) continue;
+        
+        record.setLeakType(LeakType::unreachableDirect);
+        classifyRecord(record, pointer);
+    }
 }
 
 LSan::LSan(): libName(lsanName().value()) {
@@ -144,7 +195,7 @@ void LSan::addMalloc(MallocInfo && info) {
     infos.insert_or_assign(info.getPointer(), info);
 }
 
-auto LSan::getTotalAllocatedBytes() -> std::size_t {
+auto LSan::getTotalAllocatedBytes() -> std::size_t { // TODO: Remove
     std::lock_guard lock(infoMutex);
     
     std::size_t ret = 0;
@@ -237,7 +288,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
     
     callstack_autoClearCaches = false;
     
-    self.classifyLeaks();
+    self.classifyLeaks(__builtin_frame_address(0));
     
     // classify the leaks
     // create summary on the way
@@ -264,6 +315,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                 if (isATTY()) {
                     stream << "\r";
                 }
+                __builtin_printf("Classified: %d                                     \n", info.getLeakType());
                 stream << info << std::endl;
                 ++i;
             }
