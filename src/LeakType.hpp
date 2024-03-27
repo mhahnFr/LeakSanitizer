@@ -20,6 +20,8 @@
 #ifndef LeakType_hpp
 #define LeakType_hpp
 
+#include <ostream>
+
 namespace lsan {
 enum class LeakType {
     unclassified,
@@ -30,6 +32,17 @@ enum class LeakType {
     unreachableDirect,
     unreachableIndirect,
 };
+
+static inline auto operator<<(std::ostream& out, LeakType type) -> std::ostream& {
+    switch (type) {
+        case LeakType::unclassified:        out << "unclassified";        break;
+        case LeakType::reachableDirect:     out << "reachableDirect";     break;
+        case LeakType::reachableIndirect:   out << "reachableIndirect";   break;
+        case LeakType::unreachableDirect:   out << "unreachableDirect";   break;
+        case LeakType::unreachableIndirect: out << "unreachableIndirect"; break;
+    }
+    return out;
+}
 }
 
 #endif /* LeakType_hpp */

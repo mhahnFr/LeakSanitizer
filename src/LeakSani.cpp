@@ -101,6 +101,7 @@ static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
     const auto  beginPtr = align(realBegin);
     const auto    endPtr = align(realBegin + info.getSize(), false);
     
+    // FIXME: Obj-C pointers
     assert(endPtr - beginPtr <= info.getSize());
     return endPtr - beginPtr;
 }
@@ -111,9 +112,9 @@ auto LSan::classifyLeaks(const void* frameBasePointer) -> void {
     
     // for each allocation: go to the referenced allocation and classify it
     for (auto& [pointer, record] : infos) {
+        record.setLeakType(LeakType::unreachableDirect);
         if (record.isDeleted() || getAlignedSize(record) < sizeof(void*)) continue;
         
-        record.setLeakType(LeakType::unreachableDirect);
         classifyRecord(record, pointer);
     }
 }
@@ -303,6 +304,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                 count = 0,
                 total = self.infos.size();
     for (auto & [ptr, info] : self.infos) {
+        assert(info.getLeakType() != LeakType::unclassified);
         if (isATTY()) {
             char buffer[7] {};
             std::snprintf(buffer, 7, "%05.2f", static_cast<double>(j) / total * 100);
@@ -315,7 +317,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
                 if (isATTY()) {
                     stream << "\r";
                 }
-                __builtin_printf("Classified: %d                                     \n", info.getLeakType());
+                stream << "Classified: " << info.getLeakType() << "                        " << std::endl;
                 stream << info << std::endl;
                 ++i;
             }
