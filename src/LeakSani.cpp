@@ -199,16 +199,6 @@ void LSan::addMalloc(MallocInfo&& info) {
     infos.insert_or_assign(info.getPointer(), info);
 }
 
-auto LSan::getTotalAllocatedBytes() -> std::size_t { // TODO: Remove
-    std::lock_guard lock(infoMutex);
-    
-    std::size_t ret = 0;
-    for (const auto & [ptr, info] : infos) {
-        ret += info.getSize();
-    }
-    return ret;
-}
-
 /**
  * Prints the callstack size exceeded hint onto the given output stream.
  *

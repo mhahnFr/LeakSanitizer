@@ -180,14 +180,6 @@ public:
     void addMalloc(MallocInfo && info);
     
     /**
-     * Calculates and returns the total count of allocated bytes that are stored inside the
-     * principal list containing the allocation records.
-     *
-     * @return the total count of bytes found in the principal list
-     */
-    auto getTotalAllocatedBytes() -> std::size_t;
-    
-    /**
      * Prints a hint about the exceeded callstack size if it was exceeded.
      *
      * @param out the output stream to print to
