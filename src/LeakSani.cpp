@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2022 - 2024  mhahnFr and contributors
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <cassert>
@@ -22,6 +24,7 @@
 #include <dlfcn.h>
 
 #include <algorithm>
+#include <stack>
 
 #include "LeakSani.hpp"
 
@@ -78,20 +81,34 @@ static constexpr inline auto align(uintptr_t ptr, bool up = true) -> uintptr_t {
     return ptr;
 }
 
-auto LSan::classifyRecord(const MallocInfo& info, const void* start) -> void {
-    const auto beginPtr = align(reinterpret_cast<uintptr_t>(info.getPointer()));
-    const auto   endPtr = align(beginPtr + info.getSize(), false);
-    for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(beginPtr); reinterpret_cast<uintptr_t>(it) < endPtr; ++it) {
-        if (*it < lowest || *it > highest) continue;
-        const auto record = infos.find(reinterpret_cast<void*>(*it));
-        if (record == infos.end()) continue;
+static inline auto align(const void* ptr, bool up = true) -> uintptr_t {
+    return align(reinterpret_cast<uintptr_t>(ptr), up);
+}
+
+void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
+    auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
+    stack.push(info);
+    while (!stack.empty()) {
+        auto& elem = stack.top();
+        stack.pop();
+        if (elem.get().getLeakType() > currentType) {
+            elem.get().setLeakType(currentType);
+        }
         
-        if (record->first == start || record->first == info.getPointer()) continue; // TODO: Circle
+        const auto beginPtr = align(info.getPointer());
+        const auto   endPtr = align(beginPtr + info.getSize(), false);
         
-        // TODO: Marking
-        record->second.setLeakType(LeakType::unreachableIndirect);
-        
-        classifyRecord(record->second, start);
+        for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(beginPtr); reinterpret_cast<uintptr_t>(it) < endPtr; ++it) {
+            if (*it < lowest || *it > highest) continue;
+            const auto& record = infos.find(reinterpret_cast<void*>(*it));
+            if (record == infos.end()
+                || record->second.getPointer() == info.getPointer()
+                || record->second.getPointer() == elem.get().getPointer()
+                || record->second.getLeakType() <= currentType) {
+                continue;
+            }
+            stack.push(record->second);
+        }
     }
 }
 
@@ -115,7 +132,7 @@ void LSan::classifyLeaks() {
         record.setLeakType(LeakType::unreachableDirect);
         if (record.isDeleted() || getAlignedSize(record) < sizeof(void*)) continue;
         
-        classifyRecord(record, pointer);
+        classifyRecord(record, LeakType::unreachableIndirect);
     }
 }
 
