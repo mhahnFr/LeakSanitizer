@@ -124,14 +124,30 @@ static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
 }
 
 static inline auto findStackBegin() -> void* {
-    return nullptr;
+    void* here = __builtin_frame_address(0);
+    
+    void* toReturn;
+    
+#if defined(__x86_64__) || defined(__i386__)
+    void** frameBasePointer = reinterpret_cast<void**>(here);
+    void** previousFBP = nullptr;
+    while (frameBasePointer > previousFBP) {
+        previousFBP = frameBasePointer;
+        frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
+    }
+    toReturn = previousFBP;
+#else
+    // TODO: Implement properly for ARM (64), implement fallback
+#error Unimplemented!
+#endif
+    
+    return toReturn;
 }
 
 void LSan::classifyLeaks() {
     // TODO: Search on the stack(s) and in global space
-    // FIXME: Iterate through the leaks, classifying them - but: DON'T RUN RECURSIVELY!!!
     
-    // Search on the stack
+    // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
     for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(here); reinterpret_cast<uintptr_t>(it) < begin; ++it) {
