@@ -40,6 +40,32 @@
 
 #include "../CallstackLibrary/include/callstack_internals.h"
 
+#if defined(__x86_64__) || defined(__i386__)
+ #define LSAN_CAN_WALK_STACK 1
+ #define LSAN_STACK_X86
+#elif defined(__arm64__) || defined(__arm__)
+ #define LSAN_CAN_WALK_STACK 0
+ #define LSAN_STACK_ARM
+#else
+ #define LSAN_CAN_WALK_STACK 0
+ #define LSAN_STACK_UNKNOWN
+#endif
+
+#ifdef __clang__
+ #define LSAN_DIAGNOSTIC_PUSH _Pragma("clang diagnostic push")
+ #define LSAN_DIAGNOSTIC_POP _Pragma("clang diagnostic pop")
+ #define LSAN_IGNORE_FRAME_ADDRESS _Pragma("clang diagnostic ignored \"-Wframe-address\"")
+
+#elif defined(__GNUG__)
+ #define LSAN_DIAGNOSTIC_PUSH _Pragma("GCC diagnostic push")
+ #define LSAN_DIAGNOSTIC_POP _Pragma("GCC diagnostic pop")
+ #define LSAN_IGNORE_FRAME_ADDRESS _Pragma("GCC diagnostic ignored \"-Wframe-address\"")
+
+#else
+ #define LSAN_DIAGNOSTIC_PUSH
+ #define LSAN_DIAGNSOTIC_POP
+#endif
+
 namespace lsan {
 /**
  * Returns an optional containing the runtime name of this library.
@@ -123,6 +149,9 @@ static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
     return endPtr - beginPtr;
 }
 
+#if !LSAN_CAN_WALK_STACK
+LSAN_DIAGNOSTIC_PUSH
+LSAN_IGNORE_FRAME_ADDRESS
 static inline auto getFrameAddress(unsigned level) -> void* {
     switch (level) {
         case   0: return __builtin_frame_address  (0);
@@ -256,13 +285,15 @@ static inline auto getFrameAddress(unsigned level) -> void* {
     }
     return nullptr;
 }
+LSAN_DIAGNOSTIC_POP
+#endif
 
 static inline auto findStackBegin() -> void* {
     void* here = __builtin_frame_address(0);
     
     void* toReturn;
     
-#if defined(__x86_64__) || defined(__i386__)
+#ifdef LSAN_STACK_X86
     void** frameBasePointer = reinterpret_cast<void**>(here);
     void** previousFBP = nullptr;
     while (frameBasePointer > previousFBP) {
