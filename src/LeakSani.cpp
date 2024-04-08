@@ -123,10 +123,30 @@ static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
     return endPtr - beginPtr;
 }
 
+static inline auto findStackBegin() -> void* {
+    return nullptr;
+}
+
 void LSan::classifyLeaks() {
     // TODO: Search on the stack(s) and in global space
     // FIXME: Iterate through the leaks, classifying them - but: DON'T RUN RECURSIVELY!!!
     
+    // Search on the stack
+    const auto  here = align(__builtin_frame_address(0), false);
+    const auto begin = align(findStackBegin());
+    for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(here); reinterpret_cast<uintptr_t>(it) < begin; ++it) {
+        if (*it < lowest || *it > highest) continue;
+        const auto& record = infos.find(reinterpret_cast<void*>(*it));
+        if (record == infos.end()) { // TODO: Circles: Possible? Detect?
+            continue;
+        }
+        record->second.setLeakType(LeakType::reachableDirect);
+        classifyRecord(record->second, LeakType::reachableIndirect);
+    }
+    
+    // TODO: Search in global space
+    
+    // All leaks still unclassified are unreachable, search for reachability inside them
     for (auto& [pointer, record] : infos) {
         if (record.getLeakType() != LeakType::unclassified) continue;
         record.setLeakType(LeakType::unreachableDirect);
