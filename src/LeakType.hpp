@@ -29,6 +29,9 @@ enum class LeakType {
     reachableDirect,
     reachableIndirect,
     
+    globalDirect,
+    globalIndirect,
+    
     unreachableDirect,
     unreachableIndirect,
     
@@ -42,6 +45,8 @@ static inline auto operator<<(std::ostream& out, LeakType type) -> std::ostream&
         case LeakType::reachableIndirect:   out << "reachableIndirect";   break;
         case LeakType::unreachableDirect:   out << "unreachableDirect";   break;
         case LeakType::unreachableIndirect: out << "unreachableIndirect"; break;
+        case LeakType::globalDirect:        out << "globalDirect";        break;
+        case LeakType::globalIndirect:      out << "globalIndirect";      break;
     }
     return out;
 }
