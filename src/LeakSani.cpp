@@ -66,6 +66,8 @@
  #define LSAN_DIAGNSOTIC_POP
 #endif
 
+#include <mach-o/dyld.h>
+
 namespace lsan {
 /**
  * Returns an optional containing the runtime name of this library.
@@ -312,6 +314,39 @@ static inline auto findStackBegin() -> void* {
     return toReturn;
 }
 
+struct Region {
+    void *begin, *end;
+    
+    Region(void* begin, void* end): begin(begin), end(end) {}
+};
+
+static inline auto getAvailableRegions() -> std::vector<Region> {
+    auto toReturn = std::vector<Region>();
+    
+    const uint32_t count = _dyld_image_count();
+    for (uint32_t i = 0; i < count; ++i) {
+        const mach_header* header = _dyld_get_image_header(i);
+        if (header->magic != MH_MAGIC_64) continue;
+        
+        load_command* lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(header) + sizeof(mach_header_64));
+        for (uint32_t j = 0; j < header->ncmds; ++j) {
+            switch (lc->cmd) {
+                case LC_SEGMENT_64: {
+                    auto seg = reinterpret_cast<segment_command_64*>(lc);
+                    uintptr_t ptr = _dyld_get_image_vmaddr_slide(i) + seg->vmaddr;
+                    auto end = ptr + seg->vmsize;
+                    if (seg->initprot & 2 && seg->initprot & 1) // 2: Read 1: Write
+                        toReturn.push_back(Region(reinterpret_cast<void*>(ptr), reinterpret_cast<void*>(end)));
+                    break;
+                }
+            }
+            lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(lc) + lc->cmdsize);
+        }
+    }
+    
+    return toReturn;
+}
+
 void LSan::classifyLeaks() {
     // TODO: Search on the stack(s) and in global space
     
@@ -329,6 +364,21 @@ void LSan::classifyLeaks() {
     }
     
     // TODO: Search in global space
+    const auto& regions = getAvailableRegions();
+    for (const auto& region : regions) {
+        const auto begin = align(region.begin);
+        const auto   end = align(region.end);
+        for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(begin); reinterpret_cast<uintptr_t>(it) < end; ++it) {
+            if (*it < lowest || *it > highest) continue;
+            const auto& record = infos.find(reinterpret_cast<void*>(*it));
+            if (record == infos.end()) { // TODO: Circles?
+                continue;
+            }
+            
+            record->second.setLeakType(LeakType::globalDirect);
+            classifyRecord(record->second, LeakType::globalIndirect);
+        }
+    }
     
     // All leaks still unclassified are unreachable, search for reachability inside them
     for (auto& [pointer, record] : infos) {
