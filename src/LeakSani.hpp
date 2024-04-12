@@ -101,12 +101,12 @@ class LSan {
         }
     }
     
-    inline void classifyLeaks(uintptr_t begin, uintptr_t end, LeakType direct, LeakType indirect) {
+    inline void classifyLeaks(uintptr_t begin, uintptr_t end, LeakType direct, LeakType indirect, bool skipClassifieds = false) {
         for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
             if (it < lowest || it > highest) continue;
             
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
-            if (record == infos.end()) {
+            if (record == infos.end() || (skipClassifieds && record->second.getLeakType() != LeakType::unclassified)) {
                 continue;
             }
             if (record->second.getLeakType() > direct) {

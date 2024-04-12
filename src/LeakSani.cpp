@@ -353,12 +353,12 @@ void LSan::classifyLeaks() {
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
-    classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect);
+    classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect, true);
     
     // Search in global space
     const auto& regions = getAvailableRegions();
     for (const auto& region : regions) {
-        classifyLeaks(align(region.begin), align(region.end, false), LeakType::globalDirect, LeakType::globalIndirect);
+        classifyLeaks(align(region.begin), align(region.end, false), LeakType::globalDirect, LeakType::globalIndirect, true);
     }
     
     // All leaks still unclassified are unreachable, search for reachability inside them
