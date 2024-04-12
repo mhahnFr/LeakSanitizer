@@ -141,17 +141,6 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
     }
 }
 
-static inline auto getAlignedSize(const MallocInfo& info) -> std::size_t {
-    const auto realBegin = reinterpret_cast<uintptr_t>(info.getPointer());
-    const auto  beginPtr = align(realBegin);
-    const auto    endPtr = align(realBegin + info.getSize(), false);
-    
-    if (beginPtr > endPtr) return 0;
-    
-    assert(endPtr - beginPtr <= info.getSize());
-    return endPtr - beginPtr;
-}
-
 #if !LSAN_CAN_WALK_STACK
 LSAN_DIAGNOSTIC_PUSH
 LSAN_IGNORE_FRAME_ADDRESS
