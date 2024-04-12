@@ -106,7 +106,7 @@ class LSan {
             if (it < lowest || it > highest) continue;
             
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
-            if (record == infos.end() || (skipClassifieds && record->second.getLeakType() != LeakType::unclassified)) {
+            if (record == infos.end() || record->second.isDeleted() || (skipClassifieds && record->second.getLeakType() != LeakType::unclassified)) {
                 continue;
             }
             if (record->second.getLeakType() > direct) {

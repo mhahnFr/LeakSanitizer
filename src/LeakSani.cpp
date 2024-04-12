@@ -126,10 +126,11 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
         const auto beginPtr = align(info.getPointer());
         const auto   endPtr = align(beginPtr + info.getSize(), false);
         
-        for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(beginPtr); reinterpret_cast<uintptr_t>(it) < endPtr; ++it) {
-            if (*it < lowest || *it > highest) continue;
-            const auto& record = infos.find(reinterpret_cast<void*>(*it));
+        for (uintptr_t it = beginPtr; it < endPtr; it += sizeof(uintptr_t)) {
+            if (it < lowest || it > highest) continue;
+            const auto& record = infos.find(*reinterpret_cast<void**>(it));
             if (record == infos.end()
+                || record->second.isDeleted()
                 || record->second.getPointer() == info.getPointer()
                 || record->second.getPointer() == elem.get().getPointer()
                 || record->second.getLeakType() <= currentType) {
@@ -363,10 +364,10 @@ void LSan::classifyLeaks() {
     
     // All leaks still unclassified are unreachable, search for reachability inside them
     for (auto& [pointer, record] : infos) {
-        if (record.getLeakType() != LeakType::unclassified) continue;
+        if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
+            continue;
+        }
         record.setLeakType(LeakType::unreachableDirect);
-        if (record.isDeleted() || getAlignedSize(record) < sizeof(void*)) continue;
-        
         classifyRecord(record, LeakType::unreachableIndirect);
     }
 }
