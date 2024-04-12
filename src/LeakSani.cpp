@@ -310,8 +310,9 @@ struct Region {
     Region(void* begin, void* end): begin(begin), end(end) {}
 };
 
-static inline auto getAvailableRegions() -> std::vector<Region> {
-    auto toReturn = std::vector<Region>();
+static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, std::vector<void*>> {
+    auto regions = std::vector<Region>();
+    auto locals  = std::vector<void*>();
     
     const uint32_t count = _dyld_image_count();
     for (uint32_t i = 0; i < count; ++i) {
@@ -323,24 +324,48 @@ static inline auto getAvailableRegions() -> std::vector<Region> {
             switch (lc->cmd) {
                 case LC_SEGMENT_64: {
                     auto seg = reinterpret_cast<segment_command_64*>(lc);
-                    uintptr_t ptr = _dyld_get_image_vmaddr_slide(i) + seg->vmaddr;
+                    const auto vmaddrslide = _dyld_get_image_vmaddr_slide(i);
+                    uintptr_t ptr = vmaddrslide + seg->vmaddr;
                     auto end = ptr + seg->vmsize;
                     // TODO: Filter out bss
                     if (seg->initprot & 2 && seg->initprot & 1) // 2: Read 1: Write
-                        toReturn.push_back(Region(reinterpret_cast<void*>(ptr), reinterpret_cast<void*>(end)));
+                    {
+                        regions.push_back(Region(reinterpret_cast<void*>(ptr), reinterpret_cast<void*>(end)));
+                        
+                        auto sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(seg) + sizeof(*seg));
+                        for (uint32_t i = 0; i < seg->nsects; ++i) {
+                            if (sect->flags == S_THREAD_LOCAL_VARIABLES) {
+                                struct tlv_descriptor* desc = reinterpret_cast<tlv_descriptor*>(vmaddrslide + sect->addr);
+                                
+                                uintptr_t de = reinterpret_cast<uintptr_t>(desc) + sect->size;
+                                for (tlv_descriptor* d = desc; reinterpret_cast<uintptr_t>(d) < de; ++d) {
+                                    locals.push_back(desc->thunk(desc));
+                                }
+                            }
+                            sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(sect) + sizeof(section_64));
+                        }
+                    }
+                    
                     break;
                 }
             }
             lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(lc) + lc->cmdsize);
         }
     }
-    
-    return toReturn;
+    return std::make_pair(regions, locals);
 }
 
 void LSan::classifyLeaks() {
     // TODO: Search on the other thread stacks
-    // TODO: Ignore allocated TLVs of our thread - only care about their value
+    
+    const auto& [regions, locals] = getGlobalRegionsAndTLVs();
+    for (const auto& ptr : locals) {
+        const auto& record = infos.find(ptr);
+        if (record != infos.end()) {
+            // Ignore the allocated TLVs of our thread
+            record->second.setDeleted(true);
+        }
+    }
     
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
@@ -348,7 +373,6 @@ void LSan::classifyLeaks() {
     classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect, true);
     
     // Search in global space
-    const auto& regions = getAvailableRegions();
     for (const auto& region : regions) {
         classifyLeaks(align(region.begin), align(region.end, false), LeakType::globalDirect, LeakType::globalIndirect, true);
     }
@@ -540,7 +564,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                 count = 0,
                 total = self.infos.size();
     for (auto & [ptr, info] : self.infos) {
-        assert(info.getLeakType() != LeakType::unclassified);
+        assert(info.getLeakType() != LeakType::unclassified || info.isDeleted());
         if (isATTY()) {
             char buffer[7] {};
             std::snprintf(buffer, 7, "%05.2f", static_cast<double>(j) / total * 100);
