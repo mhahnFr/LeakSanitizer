@@ -325,6 +325,7 @@ static inline auto getAvailableRegions() -> std::vector<Region> {
                     auto seg = reinterpret_cast<segment_command_64*>(lc);
                     uintptr_t ptr = _dyld_get_image_vmaddr_slide(i) + seg->vmaddr;
                     auto end = ptr + seg->vmsize;
+                    // TODO: Filter out bss
                     if (seg->initprot & 2 && seg->initprot & 1) // 2: Read 1: Write
                         toReturn.push_back(Region(reinterpret_cast<void*>(ptr), reinterpret_cast<void*>(end)));
                     break;
@@ -338,7 +339,8 @@ static inline auto getAvailableRegions() -> std::vector<Region> {
 }
 
 void LSan::classifyLeaks() {
-    // TODO: Search on the thread stacks
+    // TODO: Search on the other thread stacks
+    // TODO: Ignore allocated TLVs of our thread - only care about their value
     
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
