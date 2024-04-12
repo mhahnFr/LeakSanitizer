@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2023 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <cxxabi.h>
@@ -75,15 +77,18 @@ static inline auto demangle(const char * string) noexcept -> std::string {
 
 [[ noreturn ]] void exceptionHandler() noexcept {
     setIgnoreMalloc(true);
-    try {
-        std::rethrow_exception(std::current_exception());
-    } catch (lcs::exception & exception) {
-        handleException(exception);
-    } catch (std::exception & exception) {
-        handleException(exception);
-    } catch (...) {
-        // Unknown type...
+    
+    if (auto exception = std::current_exception()) {
+        try {
+            std::rethrow_exception(exception);
+        } catch (lcs::exception& exception) {
+            handleException(exception);
+        } catch (std::exception& exception) {
+            handleException(exception);
+        } catch (...) {
+            crashForce("Unknown uncaught exception");
+        }
     }
-    crashForce("Unknown uncaught exception");
+    crashForce("Terminating without active exception");
 }
 }
