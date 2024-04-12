@@ -101,6 +101,21 @@ class LSan {
         }
     }
     
+    inline void classifyLeaks(uintptr_t begin, uintptr_t end, LeakType direct, LeakType indirect) {
+        for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
+            if (it < lowest || it > highest) continue;
+            
+            const auto& record = infos.find(*reinterpret_cast<void**>(it));
+            if (record == infos.end()) {
+                continue;
+            }
+            if (record->second.getLeakType() > direct) {
+                record->second.setLeakType(direct);
+            }
+            classifyRecord(record->second, indirect);
+        }
+    }
+    
 public:
     LSan();
    ~LSan() {

@@ -348,36 +348,17 @@ static inline auto getAvailableRegions() -> std::vector<Region> {
 }
 
 void LSan::classifyLeaks() {
-    // TODO: Search on the stack(s) and in global space
+    // TODO: Search on the thread stacks
     
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
-    for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(here); reinterpret_cast<uintptr_t>(it) < begin; ++it) {
-        if (*it < lowest || *it > highest) continue;
-        const auto& record = infos.find(reinterpret_cast<void*>(*it));
-        if (record == infos.end()) { // TODO: Circles: Possible? Detect?
-            continue;
-        }
-        record->second.setLeakType(LeakType::reachableDirect);
-        classifyRecord(record->second, LeakType::reachableIndirect);
-    }
+    classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect);
     
-    // TODO: Search in global space
+    // Search in global space
     const auto& regions = getAvailableRegions();
     for (const auto& region : regions) {
-        const auto begin = align(region.begin);
-        const auto   end = align(region.end);
-        for (const uintptr_t* it = reinterpret_cast<const uintptr_t*>(begin); reinterpret_cast<uintptr_t>(it) < end; ++it) {
-            if (*it < lowest || *it > highest) continue;
-            const auto& record = infos.find(reinterpret_cast<void*>(*it));
-            if (record == infos.end()) { // TODO: Circles?
-                continue;
-            }
-            
-            record->second.setLeakType(LeakType::globalDirect);
-            classifyRecord(record->second, LeakType::globalIndirect);
-        }
+        classifyLeaks(align(region.begin), align(region.end, false), LeakType::globalDirect, LeakType::globalIndirect);
     }
     
     // All leaks still unclassified are unreachable, search for reachability inside them
