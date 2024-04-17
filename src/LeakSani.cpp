@@ -120,7 +120,7 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
     while (!stack.empty()) {
         auto& elem = stack.top();
         stack.pop();
-        if (elem.get().getLeakType() > currentType) {
+        if (elem.get().getLeakType() > currentType && elem.get().getPointer() != info.getPointer()) {
             elem.get().setLeakType(currentType);
             ++count;
         }
@@ -386,12 +386,19 @@ void LSan::classifyLeaks() {
     }
     
     // All leaks still unclassified are unreachable, search for reachability inside them
+    std::size_t lostIndirect { 0 };
+    for (auto& [pointer, record] : infos) {
+        if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
+            continue;
+        }
+        lostIndirect += classifyRecord(record, LeakType::unreachableIndirect);
+    }
+    // All leaks not classified are root leaks
     for (auto& [pointer, record] : infos) {
         if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
             continue;
         }
         record.setLeakType(LeakType::unreachableDirect);
-        classifyRecord(record, LeakType::unreachableIndirect);
     }
 }
 
