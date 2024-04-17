@@ -3,26 +3,30 @@
  *
  * Copyright (C) 2022 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef MallocInfo_hpp
 #define MallocInfo_hpp
 
+#include <functional>
 #include <optional>
 #include <ostream>
 #include <string>
+#include <vector>
 
 #include "LeakType.hpp"
 
@@ -39,12 +43,18 @@ namespace lsan {
  * pointer are stored as well.
  */
 class MallocInfo {
+public:
+    using Ref = std::reference_wrapper<MallocInfo>;
+    using CRef = std::reference_wrapper<const MallocInfo>;
+
+private:
     /** The pointer to the allocated piece of memory.             */
     void * pointer;
     /** The size of the allocated piece of memory.                */
     std::size_t size;
     
     LeakType leakType = LeakType::unclassified;
+    std::vector<Ref> viaMeRecords;
     
     /** The filename in which this allocation happened.           */
     std::optional<std::string> createdInFile;
@@ -244,6 +254,14 @@ public:
     
     constexpr inline void setLeakType(LeakType type) noexcept {
         leakType = type;
+    }
+    
+    constexpr inline void addViaMeReachable(MallocInfo& info) {
+        viaMeRecords.push_back(info);
+    }
+    
+    constexpr inline auto getViaMeReachables() const -> const std::vector<Ref>& {
+        return viaMeRecords;
     }
     
     friend auto operator<<(std::ostream &, const MallocInfo &) -> std::ostream &;

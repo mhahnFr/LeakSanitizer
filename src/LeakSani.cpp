@@ -139,6 +139,7 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
                 continue;
             }
             stack.push(record->second);
+            info.addViaMeReachable(record->second);
         }
     }
     return count;
