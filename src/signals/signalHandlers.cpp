@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2022 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <array>
@@ -99,7 +101,8 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
         extendedInstructionPointer = frameBasePointer[1];
         previousRBP = frameBasePointer;
         frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
-    } while (frameBasePointer > previousRBP);
+    } while (frameBasePointer > previousRBP && i < CALLSTACK_BACKTRACE_SIZE);
+    // TODO: "Stream" callstack instead of fixed ones
     
     toReturn = lcs::callstack(addresses.data(), static_cast<int>(i));
 #elif defined(__APPLE__) && (defined(__arm64__) || defined(__arm__))
