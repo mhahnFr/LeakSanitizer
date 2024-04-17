@@ -113,7 +113,8 @@ static inline auto align(const void* ptr, bool up = true) -> uintptr_t {
     return align(reinterpret_cast<uintptr_t>(ptr), up);
 }
 
-void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
+auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::size_t {
+    std::size_t count { 0 };
     auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
     stack.push(info);
     while (!stack.empty()) {
@@ -121,6 +122,7 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
         stack.pop();
         if (elem.get().getLeakType() > currentType) {
             elem.get().setLeakType(currentType);
+            ++count;
         }
         
         const auto beginPtr = align(info.getPointer());
@@ -139,6 +141,7 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
             stack.push(record->second);
         }
     }
+    return count;
 }
 
 #if !LSAN_CAN_WALK_STACK
@@ -370,11 +373,16 @@ void LSan::classifyLeaks() {
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
-    classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect, true);
+    const auto& [stackDirect, stackIndirect] = classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect, true);
     
     // Search in global space
+    std::size_t globalDirect   { 0 },
+                globalIndirect { 0 };
     for (const auto& region : regions) {
-        classifyLeaks(align(region.begin), align(region.end, false), LeakType::globalDirect, LeakType::globalIndirect, true);
+        const auto& [regionDirect, regionIndirect] = classifyLeaks(align(region.begin), align(region.end, false),
+                                                                   LeakType::globalDirect, LeakType::globalIndirect, true);
+        globalDirect   += regionDirect;
+        globalIndirect += regionIndirect;
     }
     
     // All leaks still unclassified are unreachable, search for reachability inside them
