@@ -367,7 +367,15 @@ void LSan::classifyLeaks() {
         const auto& record = infos.find(ptr);
         if (record != infos.end()) {
             // Ignore the allocated TLVs of our thread
-            record->second.setDeleted(true);
+            infos.erase(record);
+        }
+    }
+    
+    for (auto it = infos.begin(); it != infos.end();) {
+        if (it->second.isDeleted() || callstackHelper::getCallstackType(it->second.getCreatedCallstack()) != callstackHelper::CallstackType::USER) {
+            it = infos.erase(it);
+        } else {
+            ++it;
         }
     }
     
@@ -401,6 +409,7 @@ void LSan::classifyLeaks() {
         }
         record.setLeakType(LeakType::unreachableDirect);
     }
+    __builtin_printf("Stack:\n  Direct: %zu\nIndirect: %zu\n\nGlobal:\n  Direct: %zu\nIndirect: %zu\n\nLost:\n  Direct: %lu\nIndirect: %zu\n\n", stackDirect, stackIndirect, globalDirect, globalIndirect, infos.size() - stackDirect - stackIndirect - globalDirect - globalIndirect - lostIndirect, lostIndirect);
 }
 
 LSan::LSan(): libName(lsanName().value()) {
