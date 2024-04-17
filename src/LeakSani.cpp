@@ -281,11 +281,11 @@ LSAN_DIAGNOSTIC_POP
 #endif
 
 static inline auto findStackBegin() -> void* {
-    void* here = __builtin_frame_address(0);
-    
     void* toReturn;
     
 #ifdef LSAN_STACK_X86
+    void* here = __builtin_frame_address(0);
+    
     void** frameBasePointer = reinterpret_cast<void**>(here);
     void** previousFBP = nullptr;
     while (frameBasePointer > previousFBP) {
