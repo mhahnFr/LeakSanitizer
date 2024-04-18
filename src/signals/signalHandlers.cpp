@@ -352,6 +352,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
         
+    setIgnoreMalloc(true);
     const auto reason = getReason(signalCode, info->si_code);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
