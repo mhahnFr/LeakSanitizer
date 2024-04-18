@@ -17,6 +17,7 @@
  * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cstdlib>
 #include <csignal>
 
 #include "signals.hpp"
@@ -26,12 +27,35 @@ auto registerFunction(void (*function)(int), int signalCode) -> bool {
     return signal(signalCode, function) != SIG_ERR;
 }
 
+static bool hasAlternativeStack = false;
+auto createAlternativeStack() -> void* {
+    const std::size_t stackSize = SIGSTKSZ;
+    
+    auto toReturn = std::malloc(stackSize);
+    if (toReturn == nullptr) {
+        return nullptr;
+    }
+    stack_t s;
+    s.ss_flags = 0;
+    s.ss_size  = stackSize;
+    s.ss_sp    = toReturn;
+    if (sigaltstack(&s, nullptr) != 0) {
+        std::free(toReturn);
+        return nullptr;
+    }
+    hasAlternativeStack = true;
+    return toReturn;
+}
+
 auto registerFunction(void* function, int signalCode, bool forCrash) -> bool {
     struct sigaction s{};
     s.sa_sigaction = reinterpret_cast<void (*)(int, siginfo_t*, void*)>(function);
     s.sa_flags = SA_SIGINFO;
     if (forCrash) {
         s.sa_flags |= SA_RESETHAND;
+        if (hasAlternativeStack) {
+            s.sa_flags |= SA_ONSTACK;
+        }
     } else {
         s.sa_flags |= SA_RESTART;
     }
