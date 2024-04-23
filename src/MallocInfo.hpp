@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2022 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef MallocInfo_hpp
@@ -42,18 +44,10 @@ class MallocInfo {
     void * pointer;
     /** The size of the allocated piece of memory.                */
     std::size_t size;
-    
-    /** The filename in which this allocation happened.           */
-    std::optional<std::string> createdInFile;
-    /** The line number in which this allocation happened.        */
-    std::optional<int>         createdOnLine;
+
     /** The callstack where this allocation happened.             */
     mutable lcs::callstack     createdCallstack;
-    
-    /** The filename in which this allocation was deallocated.    */
-    std::optional<std::string>            deletedInFile;
-    /** The line number in which this allocation was deallocated. */
-    std::optional<int>                    deletedOnLine;
+
     /** Indicating whether this allocation has been deallocated.  */
     bool                                  deleted;
     /** The callstack where the deallocation happened.            */
@@ -65,32 +59,14 @@ public:
      *
      * @param pointer the pointer to the allocated piece of memory
      * @param size the size of the allocated piece of memory
-     * @param file the filename where the allocation happened
-     * @param line the line number inside the file where the allocation happened
      */
     inline MallocInfo(void * const                     pointer,
-                      const std::size_t                size,
-                      std::optional<const std::string> file,
-                      std::optional<const int>         line)
+                      const std::size_t                size)
         : pointer(pointer),
           size(size),
-          createdInFile(file),
-          createdOnLine(line),
           createdCallstack(),
-          deletedInFile(std::nullopt),
-          deletedOnLine(std::nullopt),
           deleted(false),
           deletedCallstack(std::nullopt)
-    {}
-    
-    /**
-     * Initializes this allocation record using the given information.
-     *
-     * @param pointer the pointer to the allocated piece of memory
-     * @param size the size of the allocated piece of memory
-     */
-    inline MallocInfo(void * const pointer, std::size_t size)
-        : MallocInfo(pointer, size, std::nullopt, std::nullopt)
     {}
     
     /**
@@ -102,62 +78,12 @@ public:
         return pointer;
     }
     /**
-     * @brief Returns the filename where the allocation happened.
-     *
-     * @return the filename where the allocation happened.
-     */
-    constexpr inline auto getCreatedInFile() const -> const std::optional<std::string> & {
-        return createdInFile;
-    }
-    /**
-     * @brief Returns the line number where the allocation happend.
-     *
-     * @return the line number where the allocation happend
-     */
-    constexpr inline auto getCreatedOnLine() const -> std::optional<int> {
-        return createdOnLine;
-    }
-    /**
      * Returns the size of the allocated piece of memory.
      *
      * @return the size of the allocated memory block
      */
     constexpr inline auto getSize() const -> std::size_t {
         return size;
-    }
-    
-    /**
-     * Sets the filename in which this allocation was deallocated.
-     *
-     * @param file the filename
-     */
-    inline void setDeletedInFile(const std::string & file) {
-        deletedInFile = file;
-    }
-    /**
-     * Returns the filename where this allocation was deallocated.
-     *
-     * @return the filename where the deallocation happened
-     */
-    constexpr inline auto getDeletedInFile() const -> const std::optional<std::string> & {
-        return deletedInFile;
-    }
-    
-    /**
-     * Sets the line number where this allocation was deallocated.
-     *
-     * @param line the line number
-     */
-    constexpr inline void setDeletedOnLine(int line) {
-        deletedOnLine = line;
-    }
-    /**
-     * Returns the line number where this allocation was deallocated.
-     *
-     * @return the line number where the deallocation happened
-     */
-    constexpr inline auto getDeletedOnLine() const -> std::optional<int> {
-        return deletedOnLine;
     }
     
     /**
