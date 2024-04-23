@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2022 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <cmath>
@@ -125,8 +127,8 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
                     loss = fmodf(step, static_cast<int>(step));
         float    tmpLoss = 0.0f;
         for (; it != infos.cend(); ++it) {
-            const std::string fill = it->second.isDeleted() ? formatter::get<Style::BAR_EMPTY>()
-                                                            : formatter::get<Style::BAR_FILLED>();
+            const std::string& fill = it->second.deleted ? formatter::get<Style::BAR_EMPTY>()
+                                                         : formatter::get<Style::BAR_FILLED>();
             tmpLoss += loss;
             if (tmpLoss >= 1.0f) {
                 out << fill;
@@ -156,7 +158,7 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
             }
             std::size_t fs = 0;
             for (; it != e; ++it) {
-                if (it->second.isDeleted()) {
+                if (it->second.deleted) {
                     ++fs;
                 }
             }
@@ -208,12 +210,12 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
     const auto & infos = getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
     std::size_t currentBlockBegin = 0,
-                currentBlockEnd   = it->second.getSize(),
+                currentBlockEnd   = it->second.size,
                 b                 = 0;
     
     std::size_t total       = 0;
     for (const auto & [_, info] : infos) {
-        total += info.getSize();
+        total += info.size;
     }
     
     if (total < width) {
@@ -222,10 +224,10 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
             if (b >= currentBlockEnd) {
                 ++it;
                 currentBlockBegin = b;
-                currentBlockEnd   = currentBlockBegin + it->second.getSize();
+                currentBlockEnd   = currentBlockBegin + it->second.size;
             }
-            const std::string fill = it->second.isDeleted() ? formatter::get<Style::BAR_EMPTY>()
-                                                            : formatter::get<Style::BAR_FILLED>();
+            const std::string& fill = it->second.deleted ? formatter::get<Style::BAR_EMPTY>()
+                                                         : formatter::get<Style::BAR_FILLED>();
             for (std::size_t i = 0; i < step; ++i) {
                 out << fill;
             }
@@ -253,9 +255,9 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
                 if (b >= currentBlockEnd) {
                     ++it;
                     currentBlockBegin = b;
-                    currentBlockEnd   = currentBlockBegin + it->second.getSize();
+                    currentBlockEnd   = currentBlockBegin + it->second.size;
                 }
-                if (it->second.isDeleted()) {
+                if (it->second.deleted) {
                     ++fs;
                 }
             }

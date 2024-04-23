@@ -25,7 +25,6 @@
 #include <optional>
 #include <ostream>
 #include <string>
-#include <utility>
 
 #include "callstacks/callstackHelper.hpp"
 
@@ -39,69 +38,28 @@ namespace lsan {
  * It features a callstack and the file name and the line number of the allocation. The size and the
  * pointer are stored as well.
  */
-class MallocInfo {
+struct MallocInfo {
     /** The pointer to the allocated piece of memory.             */
-    void * pointer;
+    void* pointer;
     /** The size of the allocated piece of memory.                */
     std::size_t size;
-
-    /** The callstack where this allocation happened.             */
-    mutable lcs::callstack     createdCallstack;
-
     /** Indicating whether this allocation has been deallocated.  */
-    bool                                  deleted;
+    bool deleted = false;
+    /** The callstack where this allocation happened.             */
+    mutable lcs::callstack createdCallstack;
     /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
-    
-public:
+
     /**
      * Initializes this allocation record using the given information.
      *
      * @param pointer the pointer to the allocated piece of memory
      * @param size the size of the allocated piece of memory
      */
-    inline MallocInfo(void * const                     pointer,
-                      const std::size_t                size)
-        : pointer(pointer),
-          size(size),
-          createdCallstack(),
-          deleted(false),
-          deletedCallstack(std::nullopt)
-    {}
-    
-    /**
-     * Returns the pointer to the allocated piece of memory.
-     *
-     * @return the pointer to the allocated memory
-     */
-    constexpr inline auto getPointer() const -> const void * {
-        return pointer;
-    }
-    /**
-     * Returns the size of the allocated piece of memory.
-     *
-     * @return the size of the allocated memory block
-     */
-    constexpr inline auto getSize() const -> std::size_t {
-        return size;
-    }
-    
-    /**
-     * Returns whether this allocation has been deallocated.
-     *
-     * @return whether this allocation is marked as deallocated
-     */
-    constexpr inline auto isDeleted() const -> bool {
-        return deleted;
-    }
-    /**
-     * Sets whether this alloction has been deallocated.
-     *
-     * @param deleted whether this allocation is deallocated
-     */
-    inline void setDeleted(bool deleted) {
-        this->deleted = deleted;
-        
+    inline MallocInfo(void* const pointer, const std::size_t size): pointer(pointer), size(size) {}
+
+    inline void markDeleted() {
+        deleted = true;
         deletedCallstack = lcs::callstack();
     }
     
@@ -110,7 +68,7 @@ public:
      *
      * @param out the output stream to print to
      */
-    inline void printCreatedCallstack(std::ostream & out) const {
+    inline void printCreatedCallstack(std::ostream& out) const {
         callstackHelper::format(createdCallstack, out);
     }
     /**
@@ -118,7 +76,7 @@ public:
      *
      * @param out the output stream to print to
      */
-    inline void printDeletedCallstack(std::ostream & out) const {
+    inline void printDeletedCallstack(std::ostream& out) const {
         if (!deletedCallstack.has_value()) {
             throw std::runtime_error("MallocInfo: No deleted callstack! "
                                      "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");
@@ -127,41 +85,7 @@ public:
         callstackHelper::format(deletedCallstack.value(), out);
     }
     
-    /**
-     * Returns a reference to the callstack where this allocation was deallocated.
-     *
-     * @return the callstack where the deallocation happened
-     */
-    constexpr inline auto getDeletedCallstack() const -> const std::optional<lcs::callstack> & {
-        return deletedCallstack;
-    }
-    /**
-     * Returns the optionally callstack where the represented allocation
-     * has been deallocated.
-     *
-     * @return the deleted callstack
-     */
-    inline auto getDeletedCallstack() -> std::optional<lcs::callstack> & {
-        return deletedCallstack;
-    }
-    /**
-     * Returns a reference to the callstack where this allocation was allocated.
-     *
-     * @return the callstack where the allocation happened
-     */
-    constexpr inline auto getCreatedCallstack() const -> const lcs::callstack & {
-        return createdCallstack;
-    }
-    /**
-     * Returns a reference to the callstack where the represented allocation was allocated.
-     *
-     * @return the callstack where the allocation happened
-     */
-    inline auto getCreatedCallstack() -> lcs::callstack & {
-        return createdCallstack;
-    }
-    
-    friend auto operator<<(std::ostream &, const MallocInfo &) -> std::ostream &;
+    friend auto operator<<(std::ostream&, const MallocInfo&) -> std::ostream&;
 };
 }
 

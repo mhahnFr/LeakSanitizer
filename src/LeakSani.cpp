@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2022 - 2024  mhahnFr and contributors
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <dlfcn.h>
@@ -98,12 +100,12 @@ auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
     auto it = infos.find(pointer);
     if (it == infos.end()) {
         return MallocInfoRemoved(false, std::nullopt);
-    } else if (it->second.isDeleted()) {
+    } else if (it->second.deleted) {
         return MallocInfoRemoved(false, it->second);
     }
     if (__lsan_statsActive) {
         stats -= it->second;
-        it->second.setDeleted(true);
+        it->second.markDeleted();
     } else {
         infos.erase(it);
     }
@@ -113,20 +115,20 @@ auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
 auto LSan::changeMalloc(const MallocInfo & info) -> bool {
     std::lock_guard lock(infoMutex);
 
-    auto it = infos.find(info.getPointer());
+    auto it = infos.find(info.pointer);
     if (it == infos.end()) {
         return false;
     }
     if (__lsan_statsActive) {
-        if (it->second.getPointer() != info.getPointer()) {
+        if (it->second.pointer != info.pointer) {
             stats -= it->second;
             stats += info;
         } else {
-            stats.replaceMalloc(it->second.getSize(), info.getSize());
+            stats.replaceMalloc(it->second.size, info.size);
         }
-        it->second.setDeleted(true);
+        it->second.markDeleted();
     }
-    infos.insert_or_assign(info.getPointer(), info);
+    infos.insert_or_assign(info.pointer, info);
     return true;
 }
 
@@ -137,7 +139,7 @@ void LSan::addMalloc(MallocInfo && info) {
         stats += info;
     }
     
-    infos.insert_or_assign(info.getPointer(), info);
+    infos.insert_or_assign(info.pointer, info);
 }
 
 auto LSan::getTotalAllocatedBytes() -> std::size_t {
@@ -145,7 +147,7 @@ auto LSan::getTotalAllocatedBytes() -> std::size_t {
     
     std::size_t ret = 0;
     for (const auto & [ptr, info] : infos) {
-        ret += info.getSize();
+        ret += info.size;
     }
     return ret;
 }
@@ -243,9 +245,9 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
             std::snprintf(buffer, 7, "%05.2f", static_cast<double>(j) / total * 100);
             stream << "\rCollecting the leaks: " << formatter::format<Style::BOLD>(buffer) << " %";
         }
-        if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
+        if (!info.deleted && callstackHelper::getCallstackType(info.createdCallstack) == callstackHelper::CallstackType::USER) {
             ++count;
-            bytes += info.getSize();
+            bytes += info.size;
             if (i < __lsan_leakCount) {
                 if (isATTY()) {
                     stream << "\r";

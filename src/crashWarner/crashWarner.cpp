@@ -93,7 +93,7 @@ static inline void printer(const std::string &                                  
         std::cerr << formatter::format<Style::ITALIC, colour>("Previously allocated here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
-        if (record.getDeletedCallstack().has_value()) {
+        if (record.deletedCallstack.has_value()) {
             std::cerr << std::endl << formatter::format<Style::ITALIC, colour>("Previously freed here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
