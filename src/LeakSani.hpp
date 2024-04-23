@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2022 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef LeakSani_hpp
@@ -43,9 +45,6 @@ namespace lsan {
  * This class manages everything this sanitizer is capable to do.
  */
 class LSan {
-    /** A pair consisting of a boolean and an optional allocation record.               */
-    using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
-    
     /** A map containing all allocation records, sorted by their allocated pointers.    */
     std::map<const void * const, MallocInfo> infos;
     /** An object holding all statistics.                                               */
@@ -156,8 +155,8 @@ public:
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    auto removeMalloc(void* pointer) -> MallocInfoRemoved;
-    
+    auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+
     /**
      * Adds the given allocation record.
      *

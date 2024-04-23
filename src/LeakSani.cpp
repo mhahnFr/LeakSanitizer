@@ -94,14 +94,14 @@ LSan::LSan(): libName(lsanName().value()) {
 #endif
 }
 
-auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
+auto LSan::removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
     std::lock_guard lock(infoMutex);
     
     auto it = infos.find(pointer);
     if (it == infos.end()) {
-        return MallocInfoRemoved(false, std::nullopt);
+        return std::make_pair(false, std::nullopt);
     } else if (it->second.deleted) {
-        return MallocInfoRemoved(false, it->second);
+        return std::make_pair(false, it->second);
     }
     if (__lsan_statsActive) {
         stats -= it->second;
@@ -109,7 +109,7 @@ auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
     } else {
         infos.erase(it);
     }
-    return MallocInfoRemoved(true, std::nullopt);
+    return std::make_pair(true, std::nullopt);
 }
 
 auto LSan::changeMalloc(const MallocInfo & info) -> bool {

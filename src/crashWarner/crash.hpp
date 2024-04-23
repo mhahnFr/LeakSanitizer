@@ -22,7 +22,6 @@
 #ifndef crash_hpp
 #define crash_hpp
 
-#include <functional>
 #include <optional>
 #include <string>
 
@@ -71,7 +70,7 @@ void crash(const std::string & message);
  * @param info the optional allocation record
  */
 void crash(const std::string& message,
-           const std::optional<std::reference_wrapper<const MallocInfo>>& info);
+           const std::optional<MallocInfo::CRef>& info);
 
 /**
  * This function resets the signal handler for `SIGABRT` and performs the abort.

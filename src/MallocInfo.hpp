@@ -22,6 +22,7 @@
 #ifndef MallocInfo_hpp
 #define MallocInfo_hpp
 
+#include <functional>
 #include <optional>
 #include <ostream>
 #include <string>
@@ -39,6 +40,9 @@ namespace lsan {
  * pointer are stored as well.
  */
 struct MallocInfo {
+    using Ref = std::reference_wrapper<MallocInfo>;
+    using CRef = std::reference_wrapper<const MallocInfo>;
+
     /** The pointer to the allocated piece of memory.             */
     void* pointer;
     /** The size of the allocated piece of memory.                */

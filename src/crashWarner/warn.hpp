@@ -22,7 +22,6 @@
 #ifndef warn_hpp
 #define warn_hpp
 
-#include <functional>
 #include <optional>
 #include <string>
 
@@ -48,7 +47,7 @@ void warn(const std::string& message);
  * @param info the optional allocation record
  */
 void warn(const std::string & message,
-          const std::optional<std::reference_wrapper<const MallocInfo>>& info);
+          const std::optional<MallocInfo::CRef>& info);
 }
 
 #endif /* warn_hpp */

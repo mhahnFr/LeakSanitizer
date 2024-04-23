@@ -79,9 +79,9 @@ static inline void printer(const std::string & message, lcs::callstack && callst
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
-static inline void printer(const std::string &                                     message,
-                           std::optional<std::reference_wrapper<const MallocInfo>> info,
-                           lcs::callstack &                                        callstack) {
+static inline void printer(const std::string&                     message,
+                           const std::optional<MallocInfo::CRef>& info,
+                           lcs::callstack&                        callstack) {
     using formatter::Style;
     
     printer<Warning>(message, callstack);
@@ -123,7 +123,7 @@ void warn(const std::string & message) {
 }
 
 void warn(const std::string& message,
-          const std::optional<std::reference_wrapper<const MallocInfo>>& info) {
+          const std::optional<MallocInfo::CRef>& info) {
     withCallstack([&] (auto& callstack) {
         printer<true>(message, info, callstack);
     });
@@ -149,7 +149,7 @@ void crashForce(const std::string& message, const std::optional<std::string>& re
 }
 
 void crash(const std::string& message,
-           const std::optional<std::reference_wrapper<const MallocInfo>>& info) {
+           const std::optional<MallocInfo::CRef>& info) {
     withCallstack([&] (auto& callstack) {
         printer<false>(message, info, callstack);
         abort();
