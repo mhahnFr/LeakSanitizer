@@ -35,6 +35,34 @@
 #include "../../include/lsan_stats.h"
 #include "../../include/lsan_internals.h"
 
+#include <pthread.h>
+
+namespace lsan {
+auto pthread_key_create(pthread_key_t* key, void (*func)(void*)) -> int {
+    auto toReturn = ::pthread_key_create(key, func); // TODO: Nonnull check
+    auto& keys = lsan::getInstance().keys;
+    const auto& it = std::find(keys.cbegin(), keys.cend(), *key);
+    if (it == keys.cend()) {
+        keys.push_back(*key);
+    }
+    return toReturn;
+}
+
+auto pthread_key_delete(pthread_key_t key) -> int {
+    auto& keys = lsan::getInstance().keys;
+    const auto& it = std::find(keys.cbegin(), keys.cend(), key);
+    if (it == keys.cend()) {
+        // TODO: Deleting inexistent key
+    } else {
+        keys.erase(it);
+    }
+    return ::pthread_key_delete(key);
+}
+}
+
+INTERPOSE(lsan::pthread_key_create, pthread_key_create);
+INTERPOSE(lsan::pthread_key_delete, pthread_key_delete);
+
 #ifdef __linux__
 auto operator new(std::size_t size) -> void * {
     if (size == 0) {

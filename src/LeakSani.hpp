@@ -121,6 +121,8 @@ class LSan {
     }
     
 public:
+    std::vector<pthread_key_t> keys;
+
     LSan();
    ~LSan() {
         inited = false;
