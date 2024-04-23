@@ -28,14 +28,12 @@
 #include "../include/lsan_internals.h"
 
 namespace lsan {
-auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
+auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     using formatter::Style;
     
     stream << formatter::get<Style::ITALIC>
            << formatter::format<Style::BOLD, Style::RED>("Leak") << " of size "
-           << formatter::clear<Style::ITALIC>
-           << bytesToString(self.size) << formatter::get<Style::ITALIC> << ", allocation stacktrace:"
-           << std::endl;
+           << formatter::clear<Style::ITALIC> << bytesToString(self.size) << std::endl;
     self.printCreatedCallstack(stream);
     return stream;
 }

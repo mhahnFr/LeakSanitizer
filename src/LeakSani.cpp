@@ -250,7 +250,7 @@ std::ostream & operator<<(std::ostream & stream, LSan & self) {
             bytes += info.size;
             if (i < __lsan_leakCount) {
                 if (isATTY()) {
-                    stream << "\r";
+                    stream << "\r                                    \r";
                 }
                 stream << info << std::endl;
                 ++i;
