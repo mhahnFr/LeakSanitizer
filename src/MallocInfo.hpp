@@ -256,7 +256,7 @@ public:
         leakType = type;
     }
     
-    constexpr inline void addViaMeReachable(MallocInfo& info) {
+    inline void addViaMeReachable(MallocInfo& info) {
         viaMeRecords.push_back(info);
     }
     
