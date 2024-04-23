@@ -18,7 +18,6 @@
  */
 
 #include <charconv>
-#include <cstdlib>
 #include <cstring>
 #include <cctype>
 #include <optional>
