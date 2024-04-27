@@ -23,11 +23,11 @@
 
 #include "../lsanMisc.hpp"
 
-REPLACE(void, exit)(int code) {
+REPLACE(void, exit)(int code) noexcept {
     real::exit(code);
 }
 
-REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) -> int {
+REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) noexcept -> int {
     auto toReturn = real::pthread_key_create(key, func); // TODO: Nonnull check
     auto& keys = lsan::getInstance().keys;
     const auto& it = std::find(keys.cbegin(), keys.cend(), *key);
@@ -37,7 +37,7 @@ REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) -> in
     return toReturn;
 }
 
-REPLACE(auto, pthread_key_delete)(pthread_key_t key) -> int {
+REPLACE(auto, pthread_key_delete)(pthread_key_t key) noexcept -> int {
     auto& keys = lsan::getInstance().keys;
     const auto& it = std::find(keys.cbegin(), keys.cend(), key);
     if (it == keys.cend()) {
