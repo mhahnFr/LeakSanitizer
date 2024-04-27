@@ -37,56 +37,6 @@
 #include "../../include/lsan_stats.h"
 #include "../../include/lsan_internals.h"
 
-#include <pthread.h>
-
-// TODO, FIXME, XXX: Clear up the clutter and make Linux versions call the real versions!!!
-
-namespace lsan {
-extern "C" [[ noreturn ]] void __lsan_exit(int) {
-    crashForce("TODO: Classify direct stack, continue normal exiting");
-}
-}
-#ifdef __linux__
-extern "C" void exit(int) __attribute__((weak, alias("__lsan_exit")));
-#else
-INTERPOSE(lsan::__lsan_exit, exit);
-#endif
-
-namespace lsan {
-extern "C" {
-auto __lsan_pthread_key_create(pthread_key_t* key, void (*func)(void*)) -> int {
-    auto toReturn = ::pthread_key_create(key, func); // TODO: Nonnull check
-    auto& keys = lsan::getInstance().keys;
-    const auto& it = std::find(keys.cbegin(), keys.cend(), *key);
-    if (it == keys.cend()) {
-        keys.push_back(*key);
-    }
-    return toReturn;
-}
-
-auto __lsan_pthread_key_delete(pthread_key_t key) -> int {
-    auto& keys = lsan::getInstance().keys;
-    const auto& it = std::find(keys.cbegin(), keys.cend(), key);
-    if (it == keys.cend()) {
-        // TODO: Deleting inexistent key
-    } else {
-        keys.erase(it);
-    }
-    return ::pthread_key_delete(key);
-}
-}
-}
-
-#ifdef __linux__
-extern "C" {
-int pthread_key_create(pthread_key_t*, void (*)(void*)) __attribute__((weak, alias("__lsan_pthread_key_create")));
-int pthread_key_delete(pthread_key_t) __attribute__((weak, alias("__lsan_pthread_key_delete")));
-}
-#else
-INTERPOSE(lsan::__lsan_pthread_key_create, pthread_key_create);
-INTERPOSE(lsan::__lsan_pthread_key_delete, pthread_key_delete);
-#endif /* __linux__ */
-
 #ifdef __linux__
 auto operator new(std::size_t size) -> void * {
     if (size == 0) {
