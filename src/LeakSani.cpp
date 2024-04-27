@@ -125,9 +125,9 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
             ++count;
         }
         
-        const auto beginPtr = align(info.getPointer());
-        const auto   endPtr = align(beginPtr + info.getSize(), false);
-        
+        const auto beginPtr = align(elem.get().getPointer());
+        const auto   endPtr = align(beginPtr + elem.get().getSize(), false);
+
         for (uintptr_t it = beginPtr; it < endPtr; it += sizeof(uintptr_t)) {
             if (it < lowest || it > highest) continue;
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
@@ -400,15 +400,16 @@ void LSan::classifyLeaks() {
         if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
             continue;
         }
+        record.setLeakType(LeakType::unreachableDirect);
         lostIndirect += classifyRecord(record, LeakType::unreachableIndirect);
     }
     // All leaks not classified are root leaks
-    for (auto& [pointer, record] : infos) {
-        if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
-            continue;
-        }
-        record.setLeakType(LeakType::unreachableDirect);
-    }
+//    for (auto& [pointer, record] : infos) {
+//        if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
+//            continue;
+//        }
+//        record.setLeakType(LeakType::unreachableDirect);
+//    }
     __builtin_printf("Stack:\n  Direct: %zu\nIndirect: %zu\n\nGlobal:\n  Direct: %zu\nIndirect: %zu\n\nLost:\n  Direct: %lu\nIndirect: %zu\n\n", stackDirect, stackIndirect, globalDirect, globalIndirect, infos.size() - stackDirect - stackIndirect - globalDirect - globalIndirect - lostIndirect, lostIndirect);
 }
 
@@ -440,6 +441,8 @@ LSan::LSan(): libName(lsanName().value()) {
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGEMT);
 #endif
 }
+
+// FIXME: Exit stack on Linux is empty...
 
 auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
     std::lock_guard lock(infoMutex);
@@ -656,6 +659,12 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 #ifdef BENCHMARK
     stream << std::endl << timing::printTimings << std::endl;
 #endif
+
+    __builtin_printf("Keys: %lu\n", self.keys.size());
+    for (const auto& key : self.keys) {
+        __builtin_printf("%p\n", pthread_getspecific(key));
+    }
+
     return stream;
 }
 }

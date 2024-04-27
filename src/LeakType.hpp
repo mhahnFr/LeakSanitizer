@@ -32,8 +32,8 @@ enum class LeakType {
     globalDirect,
     globalIndirect,
     
-    unreachableDirect,
     unreachableIndirect,
+    unreachableDirect,
     
     unclassified
 };
