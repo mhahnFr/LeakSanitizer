@@ -37,7 +37,6 @@
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
 		BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCF0B252BDD54A900EE259C /* misc.cpp */; };
-		BFCF0B282BDD54A900EE259C /* misc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFCF0B262BDD54A900EE259C /* misc.hpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
 		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
 /* End PBXBuildFile section */
@@ -86,8 +85,6 @@
 		BFBF736728832C3300BC4208 /* wrap_malloc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wrap_malloc.cpp; sourceTree = "<group>"; };
 		BFBF736928832F8100BC4208 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
 		BFCF0B252BDD54A900EE259C /* misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
-		BFCF0B262BDD54A900EE259C /* misc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = misc.hpp; sourceTree = "<group>"; };
-		BFCF0B292BDD566900EE259C /* miscReal.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = miscReal.hpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -231,8 +228,6 @@
 				BF9623AC2AB36B86005FF2B7 /* interpose.hpp */,
 				BFBCAD892ACF376600C6B69F /* realAlloc.hpp */,
 				BFCF0B252BDD54A900EE259C /* misc.cpp */,
-				BFCF0B262BDD54A900EE259C /* misc.hpp */,
-				BFCF0B292BDD566900EE259C /* miscReal.hpp */,
 			);
 			path = wrappers;
 			sourceTree = "<group>";
@@ -254,7 +249,6 @@
 				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
 				BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */,
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
-				BFCF0B282BDD54A900EE259C /* misc.hpp in Headers */,
 				BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */,
 				BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */,
 				BF378FA52919484800A4DAA9 /* wrap_malloc.hpp in Headers */,
