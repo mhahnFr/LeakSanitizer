@@ -23,8 +23,22 @@
 #define interpose_hpp
 
 #ifdef __linux__
-#define INTERPOSE(NEW, OLD)
-#define REPLACE(NAME)
+#define INTERPOSE(NEW, OLD) \
+extern "C" decltype(OLD) OLD __attribute__((weak, alias(##NEW)))
+
+#define REPLACE(RET, NAME)                                             \
+namespace lsan::real {                                                 \
+template<typename Args...>                                             \
+static inline auto NAME(Args...&& args) -> decltype(::NAME(args...)) { \
+    abort();                                                           \
+}                                                                      \
+}                                                                      \
+namespace lsan {                                                       \
+extern "C" decltype(::NAME) __lsan_##NAME;                             \
+}                                                                      \
+INTERPOSE(__lsan_##NAME, NAME);                                        \
+RET lsan::__lsan_##NAME
+
 #else
 /**
  * This structure contains the data for the `__interpose` Mach-O section.
@@ -36,21 +50,21 @@ struct interpose {
     const void* oldFunc;
 };
 
-#define INTERPOSE(NEW, OLD)                                                  \
-static const struct interpose interpose_##OLD                                \
-    __attribute__((used, section("__DATA, __interpose"))) = {                \
-        reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(NEW))), \
-        reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(OLD)))  \
+#define INTERPOSE(NEW, OLD)                                                        \
+static const struct interpose interpose_##OLD                                      \
+    __attribute__((used, section("__DATA, __interpose"))) = {                      \
+        reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(lsan::NEW))), \
+        reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(OLD)))        \
     }
 
-#define REPLACE(RET, NAME)   \
-namespace lsan::real {       \
-using ::NAME;                \
-}                            \
-namespace lsan {             \
-decltype(::NAME) NAME;       \
-}                            \
-INTERPOSE(lsan::NAME, NAME); \
+#define REPLACE(RET, NAME) \
+namespace lsan::real {     \
+using ::NAME;              \
+}                          \
+namespace lsan {           \
+decltype(::NAME) NAME;     \
+}                          \
+INTERPOSE(NAME, NAME);     \
 RET lsan::NAME
 
 #endif
