@@ -20,8 +20,6 @@
  */
 
 #include "interpose.hpp"
-#include "misc.hpp"
-#include "miscReal.hpp"
 
 #include "../lsanMisc.hpp"
 
@@ -29,8 +27,7 @@ REPLACE(void, exit)(int code) {
     real::exit(code);
 }
 
-namespace lsan {
-auto __lsan_pthread_key_create(pthread_key_t* key, void (*func)(void*)) -> int {
+REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) -> int {
     auto toReturn = real::pthread_key_create(key, func); // TODO: Nonnull check
     auto& keys = lsan::getInstance().keys;
     const auto& it = std::find(keys.cbegin(), keys.cend(), *key);
@@ -40,7 +37,7 @@ auto __lsan_pthread_key_create(pthread_key_t* key, void (*func)(void*)) -> int {
     return toReturn;
 }
 
-auto __lsan_pthread_key_delete(pthread_key_t key) -> int {
+REPLACE(auto, pthread_key_delete)(pthread_key_t key) -> int {
     auto& keys = lsan::getInstance().keys;
     const auto& it = std::find(keys.cbegin(), keys.cend(), key);
     if (it == keys.cend()) {
@@ -49,16 +46,4 @@ auto __lsan_pthread_key_delete(pthread_key_t key) -> int {
         keys.erase(it);
     }
     return real::pthread_key_delete(key);
-}
-
-#ifdef __linux__
-extern "C" {
-void exit(int) __attribute__((weak, alias("__lsan_exit")));
-int pthread_key_create(pthread_key_t*, void (*)(void*)) __attribute__((weak, alias("__lsan_pthread_key_create")));
-int pthread_key_delete(pthread_key_t) __attribute__((weak, alias("__lsan_pthread_key_delete")));
-}
-#else
-INTERPOSE(lsan::__lsan_pthread_key_create, pthread_key_create);
-INTERPOSE(lsan::__lsan_pthread_key_delete, pthread_key_delete);
-#endif
 }
