@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2022 - 2024  mhahnFr and contributors
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <iostream>
@@ -37,8 +39,22 @@
 
 #include <pthread.h>
 
+// TODO, FIXME, XXX: Clear up the clutter and make Linux versions call the real versions!!!
+
 namespace lsan {
-auto pthread_key_create(pthread_key_t* key, void (*func)(void*)) -> int {
+extern "C" [[ noreturn ]] void __lsan_exit(int) {
+    crashForce("TODO: Classify direct stack, continue normal exiting");
+}
+}
+#ifdef __linux__
+extern "C" void exit(int) __attribute__((weak, alias("__lsan_exit")));
+#else
+INTERPOSE(lsan::__lsan_exit, exit);
+#endif
+
+namespace lsan {
+extern "C" {
+auto __lsan_pthread_key_create(pthread_key_t* key, void (*func)(void*)) -> int {
     auto toReturn = ::pthread_key_create(key, func); // TODO: Nonnull check
     auto& keys = lsan::getInstance().keys;
     const auto& it = std::find(keys.cbegin(), keys.cend(), *key);
@@ -48,7 +64,7 @@ auto pthread_key_create(pthread_key_t* key, void (*func)(void*)) -> int {
     return toReturn;
 }
 
-auto pthread_key_delete(pthread_key_t key) -> int {
+auto __lsan_pthread_key_delete(pthread_key_t key) -> int {
     auto& keys = lsan::getInstance().keys;
     const auto& it = std::find(keys.cbegin(), keys.cend(), key);
     if (it == keys.cend()) {
@@ -59,9 +75,17 @@ auto pthread_key_delete(pthread_key_t key) -> int {
     return ::pthread_key_delete(key);
 }
 }
+}
 
-INTERPOSE(lsan::pthread_key_create, pthread_key_create);
-INTERPOSE(lsan::pthread_key_delete, pthread_key_delete);
+#ifdef __linux__
+extern "C" {
+int pthread_key_create(pthread_key_t*, void (*)(void*)) __attribute__((weak, alias("__lsan_pthread_key_create")));
+int pthread_key_delete(pthread_key_t) __attribute__((weak, alias("__lsan_pthread_key_delete")));
+}
+#else
+INTERPOSE(lsan::__lsan_pthread_key_create, pthread_key_create);
+INTERPOSE(lsan::__lsan_pthread_key_delete, pthread_key_delete);
+#endif /* __linux__ */
 
 #ifdef __linux__
 auto operator new(std::size_t size) -> void * {
