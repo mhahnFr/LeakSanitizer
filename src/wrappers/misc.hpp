@@ -26,7 +26,6 @@
 
 namespace lsan {
 extern "C" {
-[[ noreturn ]] void __lsan_exit(int);
 auto __lsan_pthread_key_create(pthread_key_t*, void(*)(void*)) -> int;
 auto __lsan_pthread_key_delete(pthread_key_t) -> int;
 }

@@ -25,11 +25,11 @@
 
 #include "../lsanMisc.hpp"
 
-namespace lsan {
-void __lsan_exit(int code) {
+REPLACE(void, exit)(int code) {
     real::exit(code);
 }
 
+namespace lsan {
 auto __lsan_pthread_key_create(pthread_key_t* key, void (*func)(void*)) -> int {
     auto toReturn = real::pthread_key_create(key, func); // TODO: Nonnull check
     auto& keys = lsan::getInstance().keys;
@@ -58,7 +58,6 @@ int pthread_key_create(pthread_key_t*, void (*)(void*)) __attribute__((weak, ali
 int pthread_key_delete(pthread_key_t) __attribute__((weak, alias("__lsan_pthread_key_delete")));
 }
 #else
-INTERPOSE(lsan::__lsan_exit, exit);
 INTERPOSE(lsan::__lsan_pthread_key_create, pthread_key_create);
 INTERPOSE(lsan::__lsan_pthread_key_delete, pthread_key_delete);
 #endif

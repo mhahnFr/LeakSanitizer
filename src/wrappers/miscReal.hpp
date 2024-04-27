@@ -34,10 +34,6 @@ static inline auto pthread_key_create(pthread_key_t* key, void (*func)(void*)) -
 static inline auto pthread_key_delete(pthread_key_t key) -> int {
     return ::pthread_key_delete(key);
 }
-
-[[ noreturn ]] static inline void exit(int code) {
-    ::exit(code);
-}
 }
 
 #endif /* miscReal_hpp */
