@@ -3,23 +3,29 @@
  *
  * Copyright (C) 2023 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef interpose_hpp
 #define interpose_hpp
 
+#ifdef __linux__
+#define INTERPOSE(NEW, OLD)
+#define REPLACE(NAME)
+#else
 /**
  * This structure contains the data for the `__interpose` Mach-O section.
  */
@@ -36,5 +42,17 @@ static const struct interpose interpose_##OLD                                \
         reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(NEW))), \
         reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(OLD)))  \
     }
+
+#define REPLACE(RET, NAME)   \
+namespace lsan::real {       \
+using ::NAME;                \
+}                            \
+namespace lsan {             \
+decltype(::NAME) NAME;       \
+}                            \
+INTERPOSE(lsan::NAME, NAME); \
+RET lsan::NAME
+
+#endif
 
 #endif /* interpose_hpp */
