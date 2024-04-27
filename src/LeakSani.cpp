@@ -394,6 +394,21 @@ void LSan::classifyLeaks() {
         globalIndirect += regionIndirect;
     }
     
+    // Search in the runtime thread locals
+    std::size_t tlvDirect   { 0 },
+                tlvIndirect { 0 };
+    for (const auto& key : keys) {
+        const auto value = pthread_getspecific(key);
+        if (value == nullptr) continue;
+
+        const auto& it = infos.find(value);
+        if (it == infos.end()) continue;
+
+        it->second.setLeakType(LeakType::tlvDirect);
+        tlvIndirect += classifyRecord(it->second, LeakType::tlvIndirect);
+        ++tlvDirect;
+    }
+
     // All leaks still unclassified are unreachable, search for reachability inside them
     std::size_t lostIndirect { 0 };
     for (auto& [pointer, record] : infos) {
@@ -410,7 +425,14 @@ void LSan::classifyLeaks() {
 //        }
 //        record.setLeakType(LeakType::unreachableDirect);
 //    }
-    __builtin_printf("Stack:\n  Direct: %zu\nIndirect: %zu\n\nGlobal:\n  Direct: %zu\nIndirect: %zu\n\nLost:\n  Direct: %lu\nIndirect: %zu\n\n", stackDirect, stackIndirect, globalDirect, globalIndirect, infos.size() - stackDirect - stackIndirect - globalDirect - globalIndirect - lostIndirect, lostIndirect);
+    __builtin_printf("Stack:\n  Direct: %zu\nIndirect: %zu\n\n"
+                     "Global:\n  Direct: %zu\nIndirect: %zu\n\n"
+                     "TLV:\n  Direct: %zu\nIndirect: %zu\n\n"
+                     "Lost:\n  Direct: %lu\nIndirect: %zu\n\n",
+                     stackDirect, stackIndirect,
+                     globalDirect, globalIndirect,
+                     tlvDirect, tlvIndirect,
+                     infos.size() - stackDirect - stackIndirect - globalDirect - globalIndirect - lostIndirect - tlvDirect - tlvIndirect, lostIndirect);
 }
 
 LSan::LSan(): libName(lsanName().value()) {

@@ -32,6 +32,9 @@ enum class LeakType {
     globalDirect,
     globalIndirect,
     
+    tlvDirect,
+    tlvIndirect,
+
     unreachableIndirect,
     unreachableDirect,
     
@@ -47,6 +50,8 @@ static inline auto operator<<(std::ostream& out, LeakType type) -> std::ostream&
         case LeakType::unreachableIndirect: out << "unreachableIndirect"; break;
         case LeakType::globalDirect:        out << "globalDirect";        break;
         case LeakType::globalIndirect:      out << "globalIndirect";      break;
+        case LeakType::tlvDirect:           out << "tlvDirect";           break;
+        case LeakType::tlvIndirect:         out << "tlvIndirect";         break;
     }
     return out;
 }
