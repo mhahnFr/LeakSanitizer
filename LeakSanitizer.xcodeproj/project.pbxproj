@@ -176,7 +176,7 @@
 			isa = PBXGroup;
 			children = (
 				BFAA94582B6C1E52007FC130 /* signals */,
-				BFBCAD8A2ACF611A00C6B69F /* allocations */,
+				BFBCAD8A2ACF611A00C6B69F /* wrappers */,
 				BF3204F22AC5C625004EC77E /* callstacks */,
 				BFA41A3D2AB8BBBC00DF6FAC /* initialization */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
@@ -218,7 +218,7 @@
 			path = signals;
 			sourceTree = "<group>";
 		};
-		BFBCAD8A2ACF611A00C6B69F /* allocations */ = {
+		BFBCAD8A2ACF611A00C6B69F /* wrappers */ = {
 			isa = PBXGroup;
 			children = (
 				BFBF736728832C3300BC4208 /* wrap_malloc.cpp */,
@@ -226,7 +226,7 @@
 				BF9623AC2AB36B86005FF2B7 /* interpose.hpp */,
 				BFBCAD892ACF376600C6B69F /* realAlloc.hpp */,
 			);
-			path = allocations;
+			path = wrappers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
