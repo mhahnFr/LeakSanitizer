@@ -24,19 +24,19 @@
 
 #ifdef __linux__
 #define INTERPOSE(NEW, OLD) \
-extern "C" decltype(OLD) OLD __attribute__((weak, alias(##NEW)))
+extern "C" decltype(OLD) OLD __attribute__((weak, alias(#NEW)))
 
-#define REPLACE(RET, NAME)                                             \
-namespace lsan::real {                                                 \
-template<typename Args...>                                             \
-static inline auto NAME(Args...&& args) -> decltype(::NAME(args...)) { \
-    abort();                                                           \
-}                                                                      \
-}                                                                      \
-namespace lsan {                                                       \
-extern "C" decltype(::NAME) __lsan_##NAME;                             \
-}                                                                      \
-INTERPOSE(__lsan_##NAME, NAME);                                        \
+#define REPLACE(RET, NAME)                                           \
+namespace lsan::real {                                               \
+template<typename... Args>                                           \
+static inline auto NAME(Args... args) -> decltype(::NAME(args...)) { \
+    abort();                                                         \
+}                                                                    \
+}                                                                    \
+namespace lsan {                                                     \
+extern "C" decltype(::NAME) __lsan_##NAME;                           \
+}                                                                    \
+INTERPOSE(__lsan_##NAME, NAME);                                      \
 RET lsan::__lsan_##NAME
 
 #else
