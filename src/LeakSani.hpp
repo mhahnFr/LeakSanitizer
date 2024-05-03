@@ -50,7 +50,6 @@ class LSan {
     
     /** A map containing all allocation records, sorted by their allocated pointers.    */
     std::map<const void * const, MallocInfo> infos;
-    uintptr_t lowest = 0, highest = UINTPTR_MAX;
     /** An object holding all statistics.                                               */
     Stats                                    stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
@@ -91,22 +90,10 @@ class LSan {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
     
-    inline void maybeSetHighestOrLowest(const void* pointer) {
-        const auto ptr = reinterpret_cast<uintptr_t>(pointer);
-        if (ptr < lowest) {
-            lowest = ptr;
-        }
-        if (ptr > highest) {
-            highest = ptr;
-        }
-    }
-    
     inline auto classifyLeaks(uintptr_t begin, uintptr_t end, LeakType direct, LeakType indirect, bool skipClassifieds = false) -> std::pair<std::size_t, std::size_t> {
         std::size_t directCount   { 0 },
                     indirectCount { 0 };
         for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
-            if (it < lowest || it > highest) continue;
-            
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
             if (record == infos.end() || record->second.isDeleted() || (skipClassifieds && record->second.getLeakType() != LeakType::unclassified)) {
                 continue;

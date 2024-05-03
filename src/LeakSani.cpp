@@ -129,7 +129,6 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
         const auto   endPtr = align(beginPtr + elem.get().getSize(), false);
 
         for (uintptr_t it = beginPtr; it < endPtr; it += sizeof(uintptr_t)) {
-            if (it < lowest || it > highest) continue;
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
             if (record == infos.end()
                 || record->second.isDeleted()
@@ -365,8 +364,6 @@ void LSan::classifyStackLeaksShallow() {
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
     for (uintptr_t it = here; it < begin; it += sizeof(uintptr_t)) {
-        if (it < lowest || it > highest) continue;
-
         const auto& record = infos.find(*reinterpret_cast<void**>(it));
         if (record != infos.end() && !record->second.isDeleted()) {
             record->second.setLeakType(LeakType::reachableDirect);
@@ -524,7 +521,6 @@ auto LSan::changeMalloc(const MallocInfo& info) -> bool {
         }
         it->second.setDeleted(true);
     }
-    maybeSetHighestOrLowest(info.getPointer());
     infos.insert_or_assign(info.getPointer(), info);
     return true;
 }
@@ -535,8 +531,7 @@ void LSan::addMalloc(MallocInfo&& info) {
     if (__lsan_statsActive) {
         stats += info;
     }
-    
-    maybeSetHighestOrLowest(info.getPointer());
+
     infos.insert_or_assign(info.getPointer(), info);
 }
 
@@ -705,11 +700,6 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 #ifdef BENCHMARK
     stream << std::endl << timing::printTimings << std::endl;
 #endif
-
-    __builtin_printf("Keys: %lu\n", self.keys.size());
-    for (const auto& key : self.keys) {
-        __builtin_printf("%p\n", pthread_getspecific(key));
-    }
 
     return stream;
 }
