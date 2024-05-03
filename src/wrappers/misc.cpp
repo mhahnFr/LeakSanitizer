@@ -30,6 +30,11 @@ REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
         setIgnoreMalloc(true);
     }
 
+    // The following builtin call is necessary to guarantee a frame pointer for the stack analysis.
+    // Even though there is no use in the returned address, the exiting stack should not be optimized
+    // away - but the other parts of the LeakSanitizer should still be optimized.
+    //                                                                              - mhahnFr
+    __builtin_frame_address(0);
     getInstance().classifyStackLeaksShallow();
 
     if (inited && !ignoreMalloc) {
