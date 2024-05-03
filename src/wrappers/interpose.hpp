@@ -26,17 +26,27 @@
 #define INTERPOSE(NEW, OLD) \
 extern "C" decltype(OLD) OLD __attribute__((weak, alias(#NEW)))
 
-#define REPLACE(RET, NAME)                                           \
-namespace lsan::real {                                               \
-template<typename... Args>                                           \
-static inline auto NAME(Args... args) -> decltype(::NAME(args...)) { \
-    abort();                                                         \
-}                                                                    \
-}                                                                    \
-namespace lsan {                                                     \
-extern "C" decltype(::NAME) __lsan_##NAME;                           \
-}                                                                    \
-INTERPOSE(__lsan_##NAME, NAME);                                      \
+#define REPLACE(RET, NAME)                                              \
+namespace lsan::real {                                                  \
+template<typename... Args>                                              \
+static inline auto NAME(Args... args) -> decltype(::NAME(args...)) {    \
+    bool ignoreMalloc = false;                                          \
+    if (inited) {                                                       \
+        ignoreMalloc = getIgnoreMalloc();                               \
+        setIgnoreMalloc(true);                                          \
+    }                                                                   \
+    static decltype(::NAME)* realFunc                                   \
+        = reinterpret_cast<decltype(::NAME)*>(dlsym(RTLD_NEXT, #NAME)); \
+    if (inited && !ignoreMalloc) {                                      \
+        setIgnoreMalloc(false);                                         \
+    }                                                                   \
+    return realFunc(std::forward<Args>(args)...);                       \
+}                                                                       \
+}                                                                       \
+namespace lsan {                                                        \
+extern "C" decltype(::NAME) __lsan_##NAME;                              \
+}                                                                       \
+INTERPOSE(__lsan_##NAME, NAME);                                         \
 RET lsan::__lsan_##NAME
 
 #else
