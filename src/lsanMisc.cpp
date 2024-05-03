@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2023 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <filesystem>
@@ -98,16 +100,10 @@ void exitHook() {
     using formatter::Style;
     
     setIgnoreMalloc(true);
-    auto & out = getOutputStream();
-    out << std::endl << formatter::format<Style::GREEN>("Exiting");
-    
-    if (__lsan_printExitPoint) {
-        out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
-        callstackHelper::format(lcs::callstack(), out);
-    }
-    out << std::endl     << std::endl
-        << getInstance() << std::endl
-        << printInformation;
+    getOutputStream() << maybePrintExitPoint
+                      << std::endl     << std::endl
+                      << getInstance() << std::endl
+                      << printInformation;
     internalCleanUp();
 }
 
@@ -135,5 +131,20 @@ auto isATTY() -> bool {
 
 auto has(const std::string & var) -> bool {
     return getenv(var.c_str()) != nullptr;
+}
+
+auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
+    using formatter::Style;
+
+    if (getInstance().hasPrintedExit) return out;
+
+    out << std::endl << formatter::format<Style::GREEN>("Exiting");
+    if (__lsan_printExitPoint) {
+        out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
+        callstackHelper::format(lcs::callstack(), out);
+    }
+    getInstance().hasPrintedExit = true;
+
+    return out;
 }
 }

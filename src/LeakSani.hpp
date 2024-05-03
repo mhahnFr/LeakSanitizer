@@ -122,6 +122,7 @@ class LSan {
     
 public:
     std::vector<pthread_key_t> keys;
+    bool hasPrintedExit = false;
 
     LSan();
    ~LSan() {

@@ -490,8 +490,6 @@ LSan::LSan(): libName(lsanName().value()) {
 #endif
 }
 
-// FIXME: Exit stack on Linux is empty...
-
 auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
     std::lock_guard lock(infoMutex);
     
