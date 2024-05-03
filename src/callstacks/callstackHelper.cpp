@@ -187,7 +187,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     for (i = printed = 0; i < size && printed < __lsan_callstackSize; ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
-        if (binaryFile == nullptr || isInLSan(binaryFile)) {
+        if (binaryFile == nullptr || (firstPrint && isInLSan(binaryFile))) {
             continue;
         } else if (firstHit && isFirstParty(binaryFile)) {
             stream << formatter::get<Style::GREYED>
