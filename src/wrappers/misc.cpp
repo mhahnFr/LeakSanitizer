@@ -22,6 +22,8 @@
 #include "interpose.hpp"
 
 #include "../lsanMisc.hpp"
+#include "../crashWarner/crash.hpp"
+#include "../crashWarner/warn.hpp"
 
 REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
     bool ignoreMalloc = false;
@@ -48,23 +50,17 @@ REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
 }
 
 REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) noexcept(noexcept(::pthread_key_create(key, func))) -> int {
-    auto toReturn = real::pthread_key_create(key, func); // TODO: Nonnull check
-    auto& keys = lsan::getInstance().keys;
-    const auto& it = std::find(keys.cbegin(), keys.cend(), *key);
-    if (it == keys.cend()) {
-        keys.push_back(*key);
+    if (key == nullptr) {
+        crash("Call to pthread_key_create(pthread_key_t*, void (*)(void*) with NULL as key");
     }
+    auto toReturn = real::pthread_key_create(key, func);
+    getInstance().addTLSKey(*key);
     return toReturn;
 }
 
 REPLACE(auto, pthread_key_delete)(pthread_key_t key) noexcept(noexcept(::pthread_key_delete(key))) -> int {
-    auto& keys = lsan::getInstance().keys;
-    const auto& it = std::find(keys.cbegin(), keys.cend(), key);
-    if (it == keys.cend()) {
-        // TODO: Deleting inexistent key
-        // TODO: warnOrError helper function
-    } else {
-        keys.erase(it);
+    if (!getInstance().removeTLSKey(key)) {
+        warn("Call to pthread_key_delete(pthread_key_t) with invalid key");
     }
     return real::pthread_key_delete(key);
 }

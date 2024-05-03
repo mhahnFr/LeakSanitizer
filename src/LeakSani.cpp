@@ -561,6 +561,29 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
     return out;
 }
 
+void LSan::addTLSKey(const pthread_key_t& key) {
+    if (!inited) return;
+
+    bool ignoreMalloc = getIgnoreMalloc();
+    setIgnoreMalloc(true);
+    std::lock_guard lock(tlsKeyMutex);
+
+    keys.insert(key);
+    setIgnoreMalloc(ignoreMalloc);
+}
+
+auto LSan::removeTLSKey(const pthread_key_t& key) -> bool {
+    if (!inited) return true;
+
+    bool ignoreMalloc = getIgnoreMalloc();
+    setIgnoreMalloc(true);
+    std::lock_guard lock(tlsKeyMutex);
+
+    const bool toReturn = keys.erase(key) != 0;
+    setIgnoreMalloc(ignoreMalloc);
+    return toReturn;
+}
+
 /**
  * Prints a deprecation notice using the given information.
  *

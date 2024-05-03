@@ -27,6 +27,7 @@
 #include <optional>
 #include <ostream>
 #include <regex>
+#include <set>
 #include <utility>
 
 #include "MallocInfo.hpp"
@@ -50,6 +51,7 @@ class LSan {
     
     /** A map containing all allocation records, sorted by their allocated pointers.    */
     std::map<const void * const, MallocInfo> infos;
+    std::set<pthread_key_t>                  keys;
     /** An object holding all statistics.                                               */
     Stats                                    stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
@@ -58,6 +60,7 @@ class LSan {
     std::recursive_mutex                     mutex;
     /** This mutex is used to strictly synchronize the access to the infos.             */
     std::mutex                               infoMutex;
+    std::mutex                               tlsKeyMutex;
     /** The optional user regular expression.                                           */
     std::optional<std::optional<std::regex>> userRegex;
     /** The user regex error message.                                                   */
@@ -108,7 +111,6 @@ class LSan {
     }
     
 public:
-    std::vector<pthread_key_t> keys;
     bool hasPrintedExit = false;
 
     LSan();
@@ -226,6 +228,8 @@ public:
     }
 
     void classifyStackLeaksShallow();
+    void addTLSKey(const pthread_key_t& key);
+    auto removeTLSKey(const pthread_key_t& key) -> bool;
 
     friend std::ostream & operator<<(std::ostream &, LSan &);
 };
