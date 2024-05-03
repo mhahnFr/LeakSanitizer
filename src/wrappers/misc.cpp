@@ -36,6 +36,9 @@ REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
     //                                                                              - mhahnFr
     __builtin_frame_address(0);
     getInstance().classifyStackLeaksShallow();
+    if (__lsan_printExitPoint) {
+        getOutputStream() << maybePrintExitPoint;
+    }
 
     if (inited && !ignoreMalloc) {
         setIgnoreMalloc(false);
