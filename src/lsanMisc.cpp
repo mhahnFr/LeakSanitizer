@@ -54,7 +54,7 @@ auto getInstance() -> LSan & {
  */
 static inline auto printLicense(std::ostream & out) -> std::ostream & {
     out << "Copyright (C) 2022 - 2024  mhahnFr and contributors" << std::endl
-        << "Licensed under the terms of the GPL 3.0."            << std::endl
+        << "Licensed under the terms of the GNU GPL 3.0."        << std::endl
         << std::endl;
     
     return out;
