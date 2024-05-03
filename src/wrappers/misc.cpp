@@ -24,6 +24,18 @@
 #include "../lsanMisc.hpp"
 
 REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
+    bool ignoreMalloc = false;
+    if (inited) {
+        ignoreMalloc = getIgnoreMalloc();
+        setIgnoreMalloc(true);
+    }
+
+    getInstance().classifyStackLeaksShallow();
+
+    if (inited && !ignoreMalloc) {
+        setIgnoreMalloc(false);
+    }
+
     real::exit(code);
 }
 
@@ -42,6 +54,7 @@ REPLACE(auto, pthread_key_delete)(pthread_key_t key) noexcept(noexcept(::pthread
     const auto& it = std::find(keys.cbegin(), keys.cend(), key);
     if (it == keys.cend()) {
         // TODO: Deleting inexistent key
+        // TODO: warnOrError helper function
     } else {
         keys.erase(it);
     }

@@ -359,6 +359,21 @@ static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, s
     return std::make_pair(regions, locals);
 }
 
+void LSan::classifyStackLeaksShallow() {
+    std::lock_guard lock(infoMutex);
+
+    const auto  here = align(__builtin_frame_address(0), false);
+    const auto begin = align(findStackBegin());
+    for (uintptr_t it = here; it < begin; it += sizeof(uintptr_t)) {
+        if (it < lowest || it > highest) continue;
+
+        const auto& record = infos.find(*reinterpret_cast<void**>(it));
+        if (record != infos.end() && !record->second.isDeleted()) {
+            record->second.setLeakType(LeakType::reachableDirect);
+        }
+    }
+}
+
 void LSan::classifyLeaks() {
     // TODO: Search on the other thread stacks
     
@@ -378,12 +393,23 @@ void LSan::classifyLeaks() {
             ++it;
         }
     }
-    
+
+    std::size_t stackDirect   { 0 },
+                stackIndirect { 0 };
+    for (auto& [ptr, record] : infos) {
+        if (record.getLeakType() == LeakType::reachableDirect) {
+            ++stackDirect;
+            stackIndirect += classifyRecord(record, LeakType::reachableIndirect);
+        }
+    }
+
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
-    const auto& [stackDirect, stackIndirect] = classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect, true);
-    
+    const auto& [stackHereDirect, stackHereIndirect] = classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect, true);
+    stackDirect += stackHereDirect;
+    stackIndirect += stackHereIndirect;
+
     // Search in global space
     std::size_t globalDirect   { 0 },
                 globalIndirect { 0 };
