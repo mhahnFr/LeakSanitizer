@@ -132,14 +132,31 @@ auto LSan::changeMalloc(const MallocInfo & info) -> bool {
     return true;
 }
 
-void LSan::addMalloc(MallocInfo && info) {
+auto LSan::getRecord(void* pointer) -> std::optional<decltype(infos.end())> {
+    const auto& it = infos.find(pointer);
+    return it == infos.end() ? std::nullopt : std::optional(it);
+}
+
+auto LSan::addMalloc(MallocInfo&& info) -> decltype(infos)::node_type {
     std::lock_guard lock(infoMutex);
     
     if (__lsan_statsActive) {
         stats += info;
     }
     
-    infos.insert_or_assign(info.pointer, info);
+    const auto& oldIt = infos.find(info.pointer);
+    if (oldIt != infos.end()) {
+        infos.erase(oldIt);
+    }
+    const auto& [it, success] = infos.emplace(std::make_pair(info.pointer, std::move(info)));
+    return infos.extract(it);
+}
+
+void LSan::readdMalloc(decltype(infos)::node_type&& node) {
+    // TODO: What if the future pointer exists?
+    std::lock_guard lock(infoMutex);
+
+    infos.insert(std::move(node));
 }
 
 auto LSan::getTotalAllocatedBytes() -> std::size_t {

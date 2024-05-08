@@ -30,6 +30,7 @@
 #include <utility>
 
 #include "MallocInfo.hpp"
+#include "OverAllocator.hpp"
 
 #ifdef BENCHMARK
  #include "timing.hpp"
@@ -46,7 +47,7 @@ namespace lsan {
  */
 class LSan {
     /** A map containing all allocation records, sorted by their allocated pointers.    */
-    std::map<const void * const, MallocInfo> infos;
+    std::map<void*, MallocInfo, std::less<void*>, OverAllocator<std::pair<void* const, MallocInfo>>> infos;
     /** An object holding all statistics.                                               */
     Stats                                    stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
@@ -162,8 +163,11 @@ public:
      *
      * @param info the allocation record to be added
      */
-    void addMalloc(MallocInfo && info);
-    
+    auto addMalloc(MallocInfo&& info) -> decltype(infos)::node_type;
+    void readdMalloc(decltype(infos)::node_type&& node);
+
+    auto getRecord(void* pointer) -> std::optional<decltype(infos.end())>;
+
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
      * principal list containing the allocation records.
@@ -185,7 +189,7 @@ public:
      *
      * @return the globally tracked allocations
      */
-    constexpr inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+    constexpr inline auto getFragmentationInfos() const -> const decltype(infos)& {
         return infos;
     }
     
