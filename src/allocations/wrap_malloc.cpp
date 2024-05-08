@@ -19,6 +19,8 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <malloc/malloc.h>
+
 #include <iostream>
 
 #include "wrap_malloc.hpp"
@@ -78,140 +80,221 @@ namespace lsan {
 #endif /* !__linux__ */
 
 auto malloc(std::size_t size) -> void * {
-    BENCH(auto ptr = lsan::real::malloc(size);, std::chrono::nanoseconds, systemTime);
-    
-    if (ptr != nullptr && lsan::inited) {
-        BENCH(std::lock_guard lock(lsan::getInstance().getMutex());, std::chrono::nanoseconds, lockingTime);
-        
-        if (!lsan::getIgnoreMalloc()) {
-            lsan::setIgnoreMalloc(true);
-            BENCH({
-                if (__lsan_zeroAllocation && size == 0) {
-                    lsan::warn("Implementation-defined allocation of size 0");
-                }
-                lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size));
-            }, std::chrono::nanoseconds, trackingTime);
-            
-            BENCH_ONLY({
-                lsan::timing::addTotalTime(systemTime + lockingTime + trackingTime, lsan::timing::AllocType::malloc);
-                lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::malloc);
-                lsan::timing::addSystemTime(systemTime, lsan::timing::AllocType::malloc);
-                lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::malloc);
-            })
-            
-            lsan::setIgnoreMalloc(false);
-        }
+    if (!lsan::inited) {
+        return lsan::real::malloc(size);
     }
-    return ptr;
+    if (size == 0) {
+        return lsan::real::malloc(size);
+    }
+
+    void* toReturn;
+    std::lock_guard lock(lsan::getInstance().getMutex());
+    if (!lsan::getIgnoreMalloc()) {
+        lsan::setIgnoreMalloc(true);
+        lsan::overAlloc::amount = size;
+        lsan::overAlloc::calloc = false;
+        auto node = lsan::getInstance().addMalloc(lsan::MallocInfo(nullptr, size));
+        node.key() = lsan::overAlloc::allocation.second;
+        node.mapped().pointer = lsan::overAlloc::allocation.second;
+        node.mapped().size    = lsan::overAlloc::allocation.first;
+        toReturn = lsan::overAlloc::allocation.second;
+        lsan::getInstance().readdMalloc(std::move(node));
+        lsan::setIgnoreMalloc(false);
+    } else {
+        toReturn = lsan::real::malloc(size);
+    }
+    return toReturn;
 }
 
 auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What if calloc malloc's?
-    BENCH(auto ptr = lsan::real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
-    
-    if (ptr != nullptr && lsan::inited) {
-        BENCH(std::lock_guard lock(lsan::getInstance().getMutex());, std::chrono::nanoseconds, lockingTime);
-        
-        if (!lsan::getIgnoreMalloc()) {
-            lsan::setIgnoreMalloc(true);
-            BENCH({
-                if (__lsan_zeroAllocation && objectSize * count == 0) {
-                    lsan::warn("Implementation-defined allocation of size 0");
-                }
-                lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, objectSize * count));
-            }, std::chrono::nanoseconds, trackingTime);
-            
-            BENCH_ONLY({
-                lsan::timing::addTotalTime(sysTime + lockingTime + trackingTime, lsan::timing::AllocType::calloc);
-                lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::calloc);
-                lsan::timing::addSystemTime(sysTime, lsan::timing::AllocType::calloc);
-                lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::calloc);
-            })
-            lsan::setIgnoreMalloc(false);
-        }
+    if (!lsan::inited) {
+        return real::calloc(objectSize, count);
     }
-    return ptr;
+    // TODO: Overflow check
+    const size_t size = objectSize * count;
+    if (size == 0) {
+        return nullptr;
+    }
+
+    void* toReturn;
+    std::lock_guard lock(lsan::getInstance().getMutex());
+    if (!lsan::getIgnoreMalloc()) {
+        lsan::setIgnoreMalloc(true);
+        lsan::overAlloc::amount = size;
+        lsan::overAlloc::calloc = true;
+        auto node = lsan::getInstance().addMalloc(lsan::MallocInfo(nullptr, size));
+        node.key() = lsan::overAlloc::allocation.second;
+        node.mapped().pointer = lsan::overAlloc::allocation.second;
+        node.mapped().size = lsan::overAlloc::allocation.first;
+        toReturn = lsan::overAlloc::allocation.second;
+        lsan::getInstance().readdMalloc(std::move(node));
+        lsan::setIgnoreMalloc(false);
+    } else {
+        toReturn = lsan::real::calloc(objectSize, count);
+    }
+    return toReturn;
 }
 
-auto realloc(void * pointer, std::size_t size) -> void * {
-    if (!lsan::inited) return lsan::real::realloc(pointer, size);
-    
-    BENCH(std::lock_guard lock(lsan::getInstance().getMutex());, std::chrono::nanoseconds, lockingTime);
-    
-    auto ignored = lsan::getIgnoreMalloc();
-    if (!ignored) {
-        lsan::setIgnoreMalloc(true);
+auto realloc(void* pointer, std::size_t size) -> void* {
+    if (!lsan::inited) {
+        return lsan::real::realloc(pointer, size);
     }
-    BENCH(void * ptr = lsan::real::realloc(pointer, size);, std::chrono::nanoseconds, sysTime);
-    if (!ignored) {
-        BENCH({
-            if (ptr != nullptr) {
-                if (pointer != ptr) {
-                    if (pointer != nullptr) {
-                        lsan::getInstance().removeMalloc(pointer);
+
+    void* toReturn;
+    std::lock_guard lock(lsan::getInstance().getMutex());
+    if (!lsan::getIgnoreMalloc()) {
+        lsan::setIgnoreMalloc(true);
+
+        std::size_t oldSize = 0;
+        if (pointer != nullptr) {
+            const auto& it = lsan::getInstance().getRecord(pointer);
+            if (!it) {
+                return lsan::real::realloc(pointer, size);
+            }
+            oldSize = (*it)->second.size;
+        }
+
+        lsan::overAlloc::amount = size;
+        lsan::overAlloc::calloc = false;
+        auto node = lsan::getInstance().addMalloc(lsan::MallocInfo(nullptr, size)); // TODO: Copy callstack over?
+        node.key() = lsan::overAlloc::allocation.second;
+        node.mapped().pointer = lsan::overAlloc::allocation.second;
+        node.mapped().size = lsan::overAlloc::allocation.first;
+        toReturn = lsan::overAlloc::allocation.second;
+        lsan::getInstance().readdMalloc(std::move(node));
+
+        if (pointer != nullptr) {
+            std::memcpy(toReturn, pointer, size < oldSize ? size : oldSize);
+            lsan::getInstance().removeMalloc(pointer);
+        }
+        lsan::setIgnoreMalloc(false);
+    } else {
+        toReturn = lsan::real::realloc(pointer, size);
+    }
+    return toReturn;
+}
+
+void free(void* pointer) {
+    if (!lsan::inited) {
+        lsan::real::free(pointer);
+        return;
+    }
+    std::lock_guard lock(lsan::getInstance().getMutex());
+    if (!lsan::getIgnoreMalloc()) {
+        lsan::setIgnoreMalloc(true);
+        if (pointer == nullptr) {
+            if (__lsan_freeNull) {
+                lsan::warn("Free of NULL");
+            }
+        } else {
+            const auto& [success, optRef] = lsan::getInstance().removeMalloc(pointer);
+            if (!success) {
+                if (__lsan_invalidFree && optRef) {
+                    if (__lsan_invalidCrash) {
+                        crash("Invalid free", optRef);
+                    } else {
+                        warn("Invalid free", optRef);
                     }
-                    lsan::getInstance().addMalloc(lsan::MallocInfo(ptr, size));
                 } else {
-                    lsan::getInstance().changeMalloc(lsan::MallocInfo(ptr, size));
+                    lsan::real::free(pointer);
                 }
             }
-        }, std::chrono::nanoseconds, trackingTime);
-        
-        BENCH_ONLY({
-            lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::realloc);
-            lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::realloc);
-            lsan::timing::addSystemTime(sysTime, lsan::timing::AllocType::realloc);
-            lsan::timing::addTotalTime(sysTime + trackingTime + lockingTime, lsan::timing::AllocType::realloc);
-        })
+        }
         lsan::setIgnoreMalloc(false);
     }
-    return ptr;
 }
 
-void free(void * pointer) {
-    BENCH_ONLY(std::chrono::nanoseconds totalTime {0});
-    
-    if (lsan::inited) {
-        BENCH(std::lock_guard lock(lsan::getInstance().getMutex());, std::chrono::nanoseconds, lockingTime);
-        
-        if (!lsan::getIgnoreMalloc()) {
-            lsan::setIgnoreMalloc(true);
-            BENCH({
-                if (pointer == nullptr && __lsan_freeNull) {
-                    lsan::warn("Free of NULL");
-                }
-                auto it = lsan::getInstance().removeMalloc(pointer);
-                if (__lsan_invalidFree && !it.first) {
-                    if (__lsan_invalidCrash) {
-                        lsan::crash("Invalid free", it.second);
-                    } else {
-                        lsan::warn("Invalid free", it.second);
-                    }
-                }
-            }, std::chrono::nanoseconds, trackingTime);
-            BENCH_ONLY({
-                lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::free);
-                lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::free);
-                
-                totalTime = lockingTime + trackingTime;
-            })
-            lsan::setIgnoreMalloc(false);
+auto malloc_size(const void* pointer) -> std::size_t {
+    if (!lsan::inited) return ::malloc_size(pointer);
+
+    std::size_t toReturn;
+    std::lock_guard lock(lsan::getInstance().getMutex());
+    if (!lsan::getIgnoreMalloc()) {
+        lsan::setIgnoreMalloc(true);
+        const auto& it = lsan::getInstance().getRecord((void*) pointer);
+        if (!it) {
+            toReturn = ::malloc_size(pointer);
+        } else {
+            toReturn = (*it)->second.size;
         }
+        lsan::setIgnoreMalloc(false);
+    } else {
+        toReturn = ::malloc_size(pointer);
     }
-    
-    BENCH(lsan::real::free(pointer);, std::chrono::nanoseconds, sysTime);
-    BENCH_ONLY({
-        if (lsan::inited) {
-            std::lock_guard lock { lsan::getInstance().getMutex() };
-            if (!lsan::getIgnoreMalloc()) {
-                lsan::setIgnoreMalloc(true);
-                
-                lsan::timing::addSystemTime(sysTime, lsan::timing::AllocType::free);
-                lsan::timing::addTotalTime(totalTime + sysTime, lsan::timing::AllocType::free);
-                
-                lsan::setIgnoreMalloc(false);
-            }
+    return toReturn;
+}
+
+malloc_zone_t* malloc_zone_from_ptr(const void* ptr) {
+    if (!lsan::inited) {
+        return ::malloc_zone_from_ptr(ptr);
+    }
+
+    malloc_zone_t* toReturn;
+    std::lock_guard lock(lsan::getInstance().getMutex());
+    if (!lsan::getIgnoreMalloc()) {
+        lsan::setIgnoreMalloc(true);
+        const auto& it = lsan::getInstance().getRecord((void*) ptr);
+        if (!it) {
+            toReturn = ::malloc_zone_from_ptr(ptr);
+        } else {
+            abort();
         }
-    })
+        lsan::setIgnoreMalloc(false);
+    } else {
+        toReturn = ::malloc_zone_from_ptr(ptr);
+    }
+
+    return toReturn;
+}
+
+void* malloc_zone_realloc(malloc_zone_t* zone, void* ptr, size_t size) {
+    if (!lsan::inited) {
+        return ::malloc_zone_realloc(zone, ptr, size);
+    }
+
+    void* toReturn;
+    std::lock_guard lock(lsan::getInstance().getMutex());
+    if (!lsan::getIgnoreMalloc()) {
+        lsan::setIgnoreMalloc(true);
+        const auto& it = lsan::getInstance().getRecord(ptr);
+        if (!it) {
+            toReturn = ::malloc_zone_realloc(zone, ptr, size);
+        } else {
+            crashForce("Mist");
+        }
+        lsan::setIgnoreMalloc(false);
+    } else {
+        toReturn = ::malloc_zone_realloc(zone, ptr, size);
+    }
+    return toReturn;
+}
+
+void malloc_zone_batch_free(malloc_zone_t*, void**, unsigned) {
+    crashForce("mmm");
+}
+
+void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
+    if (!lsan::inited) {
+        return ::malloc_zone_free(zone, ptr);
+    }
+
+    std::lock_guard lock(lsan::getInstance().getMutex());
+    if (!lsan::getIgnoreMalloc()) {
+        lsan::setIgnoreMalloc(true);
+        const auto& it = lsan::getInstance().getRecord(ptr);
+        if (!it) {
+            ::malloc_zone_free(zone, ptr);
+        } else  {
+            crashForce("Msit 2");
+        }
+        lsan::setIgnoreMalloc(false);
+    } else {
+        ::malloc_zone_free(zone, ptr);
+    }
+}
+
+void malloc_destroy_zone(malloc_zone_t*) {
+    crashForce("bla");
 }
 
 #ifndef __linux__
@@ -221,5 +304,11 @@ INTERPOSE(lsan::malloc,  malloc);
 INTERPOSE(lsan::calloc,  calloc);
 INTERPOSE(lsan::realloc, realloc);
 INTERPOSE(lsan::free,    free);
+INTERPOSE(lsan::malloc_size, malloc_size);
+INTERPOSE(lsan::malloc_zone_from_ptr, malloc_zone_from_ptr);
+INTERPOSE(lsan::malloc_zone_realloc, malloc_zone_realloc);
+INTERPOSE(lsan::malloc_zone_free, malloc_zone_free);
+INTERPOSE(lsan::malloc_zone_batch_free, malloc_zone_batch_free);
+INTERPOSE(lsan::malloc_destroy_zone, malloc_destroy_zone);
 
 #endif /* !__linux__ */

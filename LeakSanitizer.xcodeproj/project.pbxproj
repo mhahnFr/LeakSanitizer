@@ -35,6 +35,7 @@
 		BFA41A402AB8BC1800DF6FAC /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA41A3E2AB8BC1800DF6FAC /* init.cpp */; };
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
+		BFB6C4962BEB7AC500E4105A /* OverAllocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB6C4952BEB7AC500E4105A /* OverAllocator.cpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
 		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
 /* End PBXBuildFile section */
@@ -74,6 +75,8 @@
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
+		BFB6C4942BEB792200E4105A /* OverAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = OverAllocator.hpp; sourceTree = "<group>"; };
+		BFB6C4952BEB7AC500E4105A /* OverAllocator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OverAllocator.cpp; sourceTree = "<group>"; };
 		BFBCAD892ACF376600C6B69F /* realAlloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = realAlloc.hpp; sourceTree = "<group>"; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
@@ -187,6 +190,8 @@
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
 				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
+				BFB6C4942BEB792200E4105A /* OverAllocator.hpp */,
+				BFB6C4952BEB7AC500E4105A /* OverAllocator.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -319,6 +324,7 @@
 				BFA41A402AB8BC1800DF6FAC /* init.cpp in Sources */,
 				BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */,
 				BF0F134D291947A8008F0FCD /* signalHandlers.cpp in Sources */,
+				BFB6C4962BEB7AC500E4105A /* OverAllocator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
