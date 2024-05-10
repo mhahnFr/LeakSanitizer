@@ -25,4 +25,5 @@ namespace lsan::overAlloc {
 std::size_t amount = 0;
 std::pair<std::size_t, void*> allocation = std::make_pair(0, nullptr);
 bool calloc = false;
+BENCH_ONLY(std::chrono::nanoseconds time;)
 }

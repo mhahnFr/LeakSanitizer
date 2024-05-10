@@ -25,6 +25,8 @@
 #include <new>
 #include <utility>
 
+#include "timing.hpp"
+
 #include "allocations/realAlloc.hpp"
 
 #define LSAN_OVER_ALLOC 3
@@ -34,6 +36,7 @@ namespace overAlloc {
 extern std::size_t amount;
 extern std::pair<std::size_t, void*> allocation;
 extern bool calloc;
+BENCH_ONLY(extern std::chrono::nanoseconds time;)
 }
 
 template<typename T>
@@ -53,11 +56,14 @@ struct OverAllocator {
             reset = true;
         }
         void* ptr;
-        if (reset && overAlloc::calloc) {
-            ptr = lsan::real::calloc(size, 1);
-        } else {
-            ptr = lsan::real::malloc(size);
-        }
+        BENCH({
+            if (reset && overAlloc::calloc) {
+                ptr = lsan::real::calloc(size, 1);
+            } else {
+                ptr = lsan::real::malloc(size);
+            }
+        }, std::chrono::nanoseconds, sysTime);
+        BENCH_ONLY(overAlloc::time = sysTime;)
         if (ptr == nullptr) {
             throw std::bad_alloc();
         }
@@ -78,11 +84,14 @@ struct OverAllocator {
             reset = true;
         }
         void* ptr;
-        if (reset && overAlloc::calloc) {
-            ptr = lsan::real::calloc(size, 1);
-        } else {
-            ptr = lsan::real::malloc(size);
-        }
+        BENCH({
+            if (reset && overAlloc::calloc) {
+                ptr = lsan::real::calloc(size, 1);
+            } else {
+                ptr = lsan::real::malloc(size);
+            }
+        }, std::chrono::nanoseconds, sysTime);
+        BENCH_ONLY(overAlloc::time = sysTime;)
         if (ptr == nullptr) {
             throw std::bad_alloc();
         }
@@ -101,10 +110,15 @@ struct OverAllocator {
 
     void deallocate(T* ptr, std::size_t) {
 #if LSAN_OVER_ALLOC == 1
-        real::free(*reinterpret_cast<void**>(reinterpret_cast<uintptr_t>(ptr) - sizeof(void*)));
+        BENCH({
+            real::free(*reinterpret_cast<void**>(reinterpret_cast<uintptr_t>(ptr) - sizeof(void*)));
+        }, std::chrono::nanoseconds, sysTime);
 #else
-        real::free(ptr);
+        BENCH({
+            real::free(ptr);
+        }, std::chrono::nanoseconds, sysTime);
 #endif
+        BENCH_ONLY(overAlloc::time = sysTime;)
     }
 };
 
