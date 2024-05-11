@@ -36,7 +36,7 @@ DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 BENCHMARK = false
 
 LDFLAGS  = -ldl -L$(LIBCALLSTACK_DIR) -lcallstack
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include
 
 ifeq ($(BENCHMARK),true)
 	CXXFLAGS += -DBENCHMARK
