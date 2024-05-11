@@ -29,6 +29,8 @@
 #include <regex>
 #include <utility>
 
+#include <lsan_internals.h>
+
 #include "MallocInfo.hpp"
 
 #ifdef BENCHMARK
@@ -37,8 +39,6 @@
 
 #include "initialization/init.hpp"
 #include "statistics/Stats.hpp"
-
-#include "../include/lsan_internals.h"
 
 namespace lsan {
 /**

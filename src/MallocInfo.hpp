@@ -27,9 +27,9 @@
 #include <ostream>
 #include <string>
 
-#include "callstacks/callstackHelper.hpp"
+#include <callstack.h>
 
-#include "../CallstackLibrary/include/callstack.h"
+#include "callstacks/callstackHelper.hpp"
 
 namespace lsan {
 /**

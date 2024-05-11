@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr and contributors
+ * Copyright (C) 2022 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -23,6 +23,11 @@
 
 #include <algorithm>
 
+#include <lsan_internals.h>
+#include <lsan_stats.h>
+
+#include <callstack_internals.h>
+
 #include "LeakSani.hpp"
 
 #include "bytePrinter.hpp"
@@ -31,11 +36,6 @@
 #include "callstacks/callstackHelper.hpp"
 #include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
-
-#include "../include/lsan_internals.h"
-#include "../include/lsan_stats.h"
-
-#include "../CallstackLibrary/include/callstack_internals.h"
 
 namespace lsan {
 /**

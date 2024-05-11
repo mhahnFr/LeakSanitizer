@@ -27,13 +27,13 @@
  #define LSAN_HAS_UNISTD
 #endif
 
+#include <lsan_internals.h>
+#include <callstack.h>
+
 #include "lsanMisc.hpp"
 
 #include "formatter.hpp"
 #include "callstacks/callstackHelper.hpp"
-
-#include "../include/lsan_internals.h"
-#include "../CallstackLibrary/include/callstack.h"
 
 namespace lsan {
 auto _getIgnoreMalloc() -> bool & {
@@ -53,8 +53,8 @@ auto getInstance() -> LSan & {
  * @return the given output stream
  */
 static inline auto printLicense(std::ostream & out) -> std::ostream & {
-    out << "Copyright (C) 2022 - 2024  mhahnFr and contributors" << std::endl
-        << "Licensed under the terms of the GNU GPL 3.0."        << std::endl
+    out << "Copyright (C) 2022 - 2024  mhahnFr and contributors"         << std::endl
+        << "Licensed under the terms of the GNU GPL version 3 or later." << std::endl
         << std::endl;
     
     return out;
