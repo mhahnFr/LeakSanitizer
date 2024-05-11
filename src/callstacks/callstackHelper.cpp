@@ -22,13 +22,13 @@
 #include <optional>
 #include <regex>
 
+#include <lsan_internals.h>
+
 #include "callstackHelper.hpp"
 
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../LeakSani.hpp"
-
-#include "../../include/lsan_internals.h"
 
 namespace lsan::callstackHelper {
 /**

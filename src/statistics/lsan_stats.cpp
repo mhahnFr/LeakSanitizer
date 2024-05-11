@@ -23,13 +23,13 @@
 #include <iostream>
 #include <functional>
 
+#include <lsan_internals.h>
+#include <lsan_stats.h>
+
 #include "../formatter.hpp"
 #include "../bytePrinter.hpp"
 #include "../lsanMisc.hpp"
 #include "../LeakSani.hpp"
-
-#include "../../include/lsan_internals.h"
-#include "../../include/lsan_stats.h"
 
 using namespace lsan;
 

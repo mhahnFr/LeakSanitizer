@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr and contributors
+ * Copyright (C) 2022 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -21,18 +21,19 @@
 
 #include <iostream>
 
+#include <lsan_internals.h>
+
 #include "wrap_malloc.hpp"
 
 #include "interpose.hpp"
 #include "realAlloc.hpp"
+
 #include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
 #include "../timing.hpp"
 #include "../crashWarner/crash.hpp"
 #include "../crashWarner/warn.hpp"
 #include "../initialization/init.hpp"
-
-#include "../../include/lsan_internals.h"
 
 #ifdef __linux__
 auto operator new(std::size_t size) -> void * {
