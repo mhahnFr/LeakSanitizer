@@ -33,6 +33,7 @@
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
+#include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 #include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
@@ -65,7 +66,29 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
     }
 }
 
-LSan::LSan(): libName(lsanName().value()) {
+static inline void destroySaniKey(void* value) {
+    auto& globalInstance = getInstance();
+    if (value != std::addressof(globalInstance)) {
+        pthread_setspecific(globalInstance.saniKey, std::addressof(globalInstance));
+        {
+            std::lock_guard lock(globalInstance.ATracker::mutex);
+            auto ignore = globalInstance.ignoreMalloc;
+            globalInstance.ignoreMalloc = true;
+            delete reinterpret_cast<TLSTracker*>(value);
+            globalInstance.ignoreMalloc = ignore;
+        }
+    }
+}
+
+static inline auto createSaniKey() -> pthread_key_t {
+    pthread_key_t key;
+    if (pthread_key_create(&key, destroySaniKey) != 0) {
+        throw std::runtime_error("Could not create TLS key!");
+    }
+    return key;
+}
+
+LSan::LSan(): libName(lsanName().value()), saniKey(createSaniKey()) {
     atexit(exitHook);
     
     signals::registerFunction(signals::handlers::stats, SIGUSR1);
@@ -94,52 +117,101 @@ LSan::LSan(): libName(lsanName().value()) {
 #endif
 }
 
+void LSan::finish() {
+    finished = true;
+    auto& tracker = getTracker();
+    std::lock_guard lock { tracker.mutex };
+    tracker.ignoreMalloc = true;
+
+    while (!tlsTrackers.empty()) {
+        delete *tlsTrackers.begin();
+    }
+    ignoreMalloc = false;
+}
+
+void LSan::registerTracker(ATracker* tracker) {
+    std::lock_guard lock { tlsTrackerMutex };
+    std::lock_guard lock1 { mutex };
+
+    auto ignore = ignoreMalloc;
+    ignoreMalloc = true;
+    tlsTrackers.insert(tracker);
+    ignoreMalloc = ignore;
+}
+
+void LSan::deregisterTracker(ATracker* tracker) {
+    std::lock_guard lock { tlsTrackerMutex };
+    std::lock_guard lock1 { mutex };
+
+    auto ignore = ignoreMalloc;
+    ignoreMalloc = true;
+    tlsTrackers.erase(tracker);
+    ignoreMalloc = ignore;
+}
+
+void LSan::absorbLeaks(std::map<const void *const, MallocInfo>&& leaks) {
+    std::lock_guard lock { mutex };
+    std::lock_guard lock1 { infoMutex };
+
+    auto ignore = ignoreMalloc;
+    ignoreMalloc = true;
+    infos.merge(std::move(leaks));
+    ignoreMalloc = ignore;
+}
+
+auto LSan::removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
+    const auto& result = maybeRemoveMalloc1(pointer);
+    if (!result.first) {
+        std::lock_guard lock { tlsTrackerMutex };
+        for (auto element : tlsTrackers) {
+            if (element == tracker) continue;
+
+            if (element->maybeRemoveMalloc(pointer)) {
+                return std::make_pair(true, std::nullopt);
+            }
+        }
+    }
+    return result;
+}
+
 auto LSan::removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
-    std::lock_guard lock(infoMutex);
-    
-    auto it = infos.find(pointer);
+    return removeMalloc(nullptr, pointer);
+}
+
+auto LSan::maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
+    std::lock_guard lock { infoMutex };
+
+    const auto& it = infos.find(pointer);
     if (it == infos.end()) {
         return std::make_pair(false, std::nullopt);
-    } else if (it->second.deleted) {
+    }
+    if (it->second.deleted) {
         return std::make_pair(false, it->second);
     }
-    if (__lsan_statsActive) {
-        stats -= it->second;
-        it->second.markDeleted();
-    } else {
-        infos.erase(it);
-    }
+    infos.erase(it);
     return std::make_pair(true, std::nullopt);
 }
 
-auto LSan::changeMalloc(const MallocInfo & info) -> bool {
-    std::lock_guard lock(infoMutex);
+void LSan::changeMalloc(ATracker* tracker, MallocInfo&& info) {
+    std::lock_guard lock { infoMutex };
 
-    auto it = infos.find(info.pointer);
+    const auto& it = infos.find(info.pointer);
     if (it == infos.end()) {
-        return false;
-    }
-    if (__lsan_statsActive) {
-        if (it->second.pointer != info.pointer) {
-            stats -= it->second;
-            stats += info;
-        } else {
-            stats.replaceMalloc(it->second.size, info.size);
+        std::lock_guard tlsLock { tlsTrackerMutex };
+        for (auto element : tlsTrackers) {
+            if (element == tracker) continue;
+
+            if (element->maybeChangeMalloc(info)) {
+                return;
+            }
         }
-        it->second.markDeleted();
+        return;
     }
     infos.insert_or_assign(info.pointer, info);
-    return true;
 }
 
-void LSan::addMalloc(MallocInfo && info) {
-    std::lock_guard lock(infoMutex);
-    
-    if (__lsan_statsActive) {
-        stats += info;
-    }
-    
-    infos.insert_or_assign(info.pointer, info);
+void LSan::changeMalloc(MallocInfo&& info) {
+    changeMalloc(nullptr, std::move(info));
 }
 
 auto LSan::getTotalAllocatedBytes() -> std::size_t {

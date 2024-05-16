@@ -27,10 +27,13 @@
 #include <optional>
 #include <ostream>
 #include <regex>
+#include <set>
 #include <utility>
 
+#include <pthread.h>
 #include <lsan_internals.h>
 
+#include "ATracker.hpp"
 #include "MallocInfo.hpp"
 
 #ifdef BENCHMARK
@@ -44,27 +47,24 @@ namespace lsan {
 /**
  * This class manages everything this sanitizer is capable to do.
  */
-class LSan {
-    /** A map containing all allocation records, sorted by their allocated pointers.    */
-    std::map<const void * const, MallocInfo> infos;
+class LSan: public ATracker {
     /** An object holding all statistics.                                               */
     Stats                                    stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool                                     callstackSizeExceeded = false;
-    /** The mutex used to synchronize the allocations and tracking.                     */
-    std::recursive_mutex                     mutex;
-    /** This mutex is used to strictly synchronize the access to the infos.             */
-    std::mutex                               infoMutex;
     /** The optional user regular expression.                                           */
     std::optional<std::optional<std::regex>> userRegex;
     /** The user regex error message.                                                   */
     std::optional<std::string> userRegexError;
-    
+    std::set<ATracker*> tlsTrackers;
+    std::mutex tlsTrackerMutex;
+
     /** The runtime name of this sanitizer.                                             */
     const std::string libName;
     
 #ifdef BENCHMARK
     std::map<timing::AllocType, timing::Timings> timingMap;
+    std::mutex timingMutex;
 #endif
     
     /**
@@ -84,7 +84,18 @@ class LSan {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
     
+    auto maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+
 public:
+    auto removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+    void changeMalloc(ATracker* tracker, MallocInfo&& info);
+    void registerTracker(ATracker* tracker);
+    void deregisterTracker(ATracker* tracker);
+    void absorbLeaks(std::map<const void* const, MallocInfo>&& leaks);
+
+    bool finished = false;
+    void finish();
+
     LSan();
    ~LSan() {
         inited = false;
@@ -95,9 +106,15 @@ public:
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
     
+    const pthread_key_t saniKey;
+
 #ifdef BENCHMARK
     constexpr inline auto getTimingMap() -> std::map<timing::AllocType, timing::Timings>& {
         return timingMap;
+    }
+
+    constexpr inline auto getTimingMutex() -> std::mutex& {
+        return timingMutex;
     }
 #endif
     
@@ -123,15 +140,6 @@ public:
     }
     
     /**
-     * Returns the mutex for the allocations and tracking.
-     *
-     * @return the mutex
-     */
-    constexpr inline auto getMutex() -> std::recursive_mutex & {
-        return mutex;
-    }
-    
-    /**
      * Returns the mutex for the memory allocation infos.
      *
      * @return the mutex
@@ -139,30 +147,16 @@ public:
     constexpr inline auto getInfoMutex() -> std::mutex & {
         return infoMutex;
     }
-    
-    /**
-     * @brief Attempts to exchange the allocation record associated with the given
-     * allocation record by the given allocation record.
-     *
-     * @param info the allocation record to be exchanged
-     * @return whether an allocation record was exchanged
-     */
-    auto changeMalloc(const MallocInfo & info) -> bool;
-    
+
+    void changeMalloc(MallocInfo&& info) override;
+
     /**
      * Removes the allocation record acossiated with the given pointer.
      *
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
-
-    /**
-     * Adds the given allocation record.
-     *
-     * @param info the allocation record to be added
-     */
-    void addMalloc(MallocInfo && info);
+    auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> override;
     
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
