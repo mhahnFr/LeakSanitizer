@@ -66,7 +66,9 @@
  #define LSAN_DIAGNSOTIC_POP
 #endif
 
+#ifdef __APPLE__
 #include <mach-o/dyld.h>
+#endif
 
 namespace lsan {
 /**
@@ -311,6 +313,7 @@ static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, s
     auto regions = std::vector<Region>();
     auto locals  = std::set<const void*>();
 
+#ifdef __APPLE__
     const uint32_t count = _dyld_image_count();
     for (uint32_t i = 0; i < count; ++i) {
         const mach_header* header = _dyld_get_image_header(i);
@@ -349,6 +352,7 @@ static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, s
             lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(lc) + lc->cmdsize);
         }
     }
+#endif
     return std::make_pair(regions, locals);
 }
 
