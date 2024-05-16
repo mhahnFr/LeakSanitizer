@@ -54,12 +54,14 @@ REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) noexc
         crash("Call to pthread_key_create(pthread_key_t*, void (*)(void*) with NULL as key");
     }
     auto toReturn = real::pthread_key_create(key, func);
-    getInstance().addTLSKey(*key);
+    if (inited) {
+        getInstance().addTLSKey(*key);
+    }
     return toReturn;
 }
 
 REPLACE(auto, pthread_key_delete)(pthread_key_t key) noexcept(noexcept(::pthread_key_delete(key))) -> int {
-    if (!getInstance().removeTLSKey(key)) {
+    if (inited && !getInstance().removeTLSKey(key)) {
         warn("Call to pthread_key_delete(pthread_key_t) with invalid key");
     }
     return real::pthread_key_delete(key);

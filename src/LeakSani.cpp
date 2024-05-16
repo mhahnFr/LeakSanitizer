@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr and contributors
+ * Copyright (C) 2022 - 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -562,22 +562,21 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
 }
 
 void LSan::addTLSKey(const pthread_key_t& key) {
-    if (!inited) return;
-
+    std::lock_guard lock { mutex };
     bool ignoreMalloc = getIgnoreMalloc();
     setIgnoreMalloc(true);
-    std::lock_guard lock(tlsKeyMutex);
+    std::lock_guard lock2 { tlsKeyMutex };
 
     keys.insert(key);
     setIgnoreMalloc(ignoreMalloc);
 }
 
 auto LSan::removeTLSKey(const pthread_key_t& key) -> bool {
-    if (!inited) return true;
+    std::lock_guard lock { mutex };
 
     bool ignoreMalloc = getIgnoreMalloc();
     setIgnoreMalloc(true);
-    std::lock_guard lock(tlsKeyMutex);
+    std::lock_guard lock2 { tlsKeyMutex };
 
     const bool toReturn = keys.erase(key) != 0;
     setIgnoreMalloc(ignoreMalloc);
