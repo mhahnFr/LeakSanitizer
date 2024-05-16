@@ -26,6 +26,20 @@
 #include "../include/lsan_internals.h"
 
 namespace lsan {
+static inline auto filter(const MallocInfo& record) -> std::vector<MallocInfo::Ref> {
+    auto toReturn = std::vector<MallocInfo::Ref>();
+    toReturn.reserve(record.getViaMeReachables().size());
+
+    for (const auto& rr : record.getViaMeReachables()) {
+        // TODO: Improve
+        if (rr.get().getLeakType() > record.getLeakType()) {
+            toReturn.push_back(rr);
+        }
+    }
+
+    return toReturn;
+}
+
 auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
     using formatter::Style;
     
@@ -33,6 +47,14 @@ auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream 
            << formatter::format<Style::BOLD, Style::RED>("Leak") << " of size "
            << formatter::clear<Style::ITALIC>
            << bytesToString(self.size) << formatter::get<Style::ITALIC> << ", ";
+    const auto& records = filter(self);
+    if (records.size() > 0) {
+        std::size_t bytes { 0 };
+        for (const auto& record : records) {
+            bytes += record.get().size;
+        }
+        stream << bytesToString(bytes) << " in " << records.size() << " leaks indirectly lost, ";
+    }
     if (self.createdInFile.has_value() && self.createdOnLine.has_value()) {
         stream << "allocated at " << formatter::format<Style::UNDERLINED>(self.createdInFile.value() + ":" + std::to_string(self.createdOnLine.value()));
     } else {
