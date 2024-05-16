@@ -313,10 +313,10 @@ struct Region {
     Region(void* begin, void* end): begin(begin), end(end) {}
 };
 
-static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, std::vector<void*>> {
+static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, std::set<const void*>> {
     auto regions = std::vector<Region>();
-    auto locals  = std::vector<void*>();
-    
+    auto locals  = std::set<const void*>();
+
     const uint32_t count = _dyld_image_count();
     for (uint32_t i = 0; i < count; ++i) {
         const mach_header* header = _dyld_get_image_header(i);
@@ -342,7 +342,7 @@ static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, s
                                 
                                 uintptr_t de = reinterpret_cast<uintptr_t>(desc) + sect->size;
                                 for (tlv_descriptor* d = desc; reinterpret_cast<uintptr_t>(d) < de; ++d) {
-                                    locals.push_back(desc->thunk(desc));
+                                    locals.insert(desc->thunk(desc));
                                 }
                             }
                             sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(sect) + sizeof(section_64));
@@ -375,16 +375,9 @@ void LSan::classifyLeaks() {
     // TODO: Search on the other thread stacks
     
     const auto& [regions, locals] = getGlobalRegionsAndTLVs();
-    for (const auto& ptr : locals) {
-        const auto& record = infos.find(ptr);
-        if (record != infos.end()) {
-            // Ignore the allocated TLVs of our thread
-            infos.erase(record);
-        }
-    }
-    
     for (auto it = infos.begin(); it != infos.end();) {
-        if (it->second.isDeleted() || callstackHelper::getCallstackType(it->second.getCreatedCallstack()) != callstackHelper::CallstackType::USER) {
+        const auto& local = locals.find(it->first);
+        if (local != locals.end() || it->second.isDeleted() || callstackHelper::getCallstackType(it->second.getCreatedCallstack()) != callstackHelper::CallstackType::USER) {
             it = infos.erase(it);
         } else {
             ++it;
@@ -441,13 +434,6 @@ void LSan::classifyLeaks() {
         record.setLeakType(LeakType::unreachableDirect);
         lostIndirect += classifyRecord(record, LeakType::unreachableIndirect);
     }
-    // All leaks not classified are root leaks
-//    for (auto& [pointer, record] : infos) {
-//        if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
-//            continue;
-//        }
-//        record.setLeakType(LeakType::unreachableDirect);
-//    }
     __builtin_printf("Stack:\n  Direct: %zu\nIndirect: %zu\n\n"
                      "Global:\n  Direct: %zu\nIndirect: %zu\n\n"
                      "TLV:\n  Direct: %zu\nIndirect: %zu\n\n"
