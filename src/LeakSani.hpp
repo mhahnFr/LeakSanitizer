@@ -31,6 +31,7 @@
 #include <utility>
 
 #include "MallocInfo.hpp"
+#include "helperStructs.hpp"
 
 #ifdef BENCHMARK
  #include "timing.hpp"
@@ -83,7 +84,7 @@ class LSan {
      */
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
     
-    void classifyLeaks();
+    auto classifyLeaks() -> LeakKindStats;
     auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::size_t;
     
     /**

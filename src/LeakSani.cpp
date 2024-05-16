@@ -307,12 +307,6 @@ static inline auto findStackBegin() -> void* {
     return toReturn;
 }
 
-struct Region {
-    void *begin, *end;
-    
-    Region(void* begin, void* end): begin(begin), end(end) {}
-};
-
 static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, std::set<const void*>> {
     auto regions = std::vector<Region>();
     auto locals  = std::set<const void*>();
@@ -371,9 +365,10 @@ void LSan::classifyStackLeaksShallow() {
     }
 }
 
-void LSan::classifyLeaks() {
+auto LSan::classifyLeaks() -> LeakKindStats {
     // TODO: Search on the other thread stacks
-    
+    auto toReturn = LeakKindStats();
+
     const auto& [regions, locals] = getGlobalRegionsAndTLVs();
     for (auto it = infos.begin(); it != infos.end();) {
         const auto& local = locals.find(it->first);
@@ -384,12 +379,10 @@ void LSan::classifyLeaks() {
         }
     }
 
-    std::size_t stackDirect   { 0 },
-                stackIndirect { 0 };
     for (auto& [ptr, record] : infos) {
         if (record.getLeakType() == LeakType::reachableDirect) {
-            ++stackDirect;
-            stackIndirect += classifyRecord(record, LeakType::reachableIndirect);
+            ++toReturn.stack;
+            toReturn.stackIndirect += classifyRecord(record, LeakType::reachableIndirect);
         }
     }
 
@@ -397,22 +390,18 @@ void LSan::classifyLeaks() {
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
     const auto& [stackHereDirect, stackHereIndirect] = classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect, true);
-    stackDirect += stackHereDirect;
-    stackIndirect += stackHereIndirect;
+    toReturn.stack += stackHereDirect;
+    toReturn.stackIndirect += stackHereIndirect;
 
     // Search in global space
-    std::size_t globalDirect   { 0 },
-                globalIndirect { 0 };
     for (const auto& region : regions) {
         const auto& [regionDirect, regionIndirect] = classifyLeaks(align(region.begin), align(region.end, false),
                                                                    LeakType::globalDirect, LeakType::globalIndirect, true);
-        globalDirect   += regionDirect;
-        globalIndirect += regionIndirect;
+        toReturn.global   += regionDirect;
+        toReturn.globalIndirect += regionIndirect;
     }
     
     // Search in the runtime thread locals
-    std::size_t tlvDirect   { 0 },
-                tlvIndirect { 0 };
     for (const auto& key : keys) {
         const auto value = pthread_getspecific(key);
         if (value == nullptr) continue;
@@ -421,27 +410,20 @@ void LSan::classifyLeaks() {
         if (it == infos.end()) continue;
 
         it->second.setLeakType(LeakType::tlvDirect);
-        tlvIndirect += classifyRecord(it->second, LeakType::tlvIndirect);
-        ++tlvDirect;
+        toReturn.tlvIndirect += classifyRecord(it->second, LeakType::tlvIndirect);
+        ++toReturn.tlv;
     }
 
     // All leaks still unclassified are unreachable, search for reachability inside them
-    std::size_t lostIndirect { 0 };
     for (auto& [pointer, record] : infos) {
         if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
             continue;
         }
         record.setLeakType(LeakType::unreachableDirect);
-        lostIndirect += classifyRecord(record, LeakType::unreachableIndirect);
+        toReturn.lostIndirect += classifyRecord(record, LeakType::unreachableIndirect);
     }
-    __builtin_printf("Stack:\n  Direct: %zu\nIndirect: %zu\n\n"
-                     "Global:\n  Direct: %zu\nIndirect: %zu\n\n"
-                     "TLV:\n  Direct: %zu\nIndirect: %zu\n\n"
-                     "Lost:\n  Direct: %lu\nIndirect: %zu\n\n",
-                     stackDirect, stackIndirect,
-                     globalDirect, globalIndirect,
-                     tlvDirect, tlvIndirect,
-                     infos.size() - stackDirect - stackIndirect - globalDirect - globalIndirect - lostIndirect - tlvDirect - tlvIndirect, lostIndirect);
+    toReturn.lost = infos.size() - toReturn.stack - toReturn.stackIndirect - toReturn.global - toReturn.globalIndirect - toReturn.lostIndirect - toReturn.tlv - toReturn.tlvIndirect;
+    return toReturn;
 }
 
 LSan::LSan(): libName(lsanName().value()) {
@@ -626,8 +608,16 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     
     callstack_autoClearCaches = false;
     
-    self.classifyLeaks();
-    
+    const auto& stats = self.classifyLeaks();
+    __builtin_printf("Stack:\n  Direct: %zu\nIndirect: %zu\n\n"
+                     "Global:\n  Direct: %zu\nIndirect: %zu\n\n"
+                     "TLV:\n  Direct: %zu\nIndirect: %zu\n\n"
+                     "Lost:\n  Direct: %lu\nIndirect: %zu\n\n",
+                     stats.stack, stats.stackIndirect,
+                     stats.global, stats.globalIndirect,
+                     stats.tlv, stats.tlvIndirect,
+                     stats.lost, stats.lostIndirect);
+
     // classify the leaks
     // create summary on the way
     // print summary
