@@ -133,12 +133,12 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
             if (record == infos.end()
                 || record->second.isDeleted()
                 || record->second.getPointer() == info.getPointer()
-                || record->second.getPointer() == elem.get().getPointer()
-                || record->second.getLeakType() <= currentType) {
+                || record->second.getPointer() == elem.get().getPointer()) {
                 continue;
             }
-            stack.push(record->second);
             info.addViaMeReachable(record->second);
+            if (record->second.getLeakType() > currentType)
+                stack.push(record->second);
         }
     }
     return count;
