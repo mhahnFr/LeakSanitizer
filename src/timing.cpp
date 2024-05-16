@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "timing.hpp"
@@ -32,18 +34,22 @@ auto getTimingMap() -> std::map<AllocType, Timings>& {
 }
 
 void addSystemTime(std::chrono::nanoseconds duration, AllocType type) {
+    std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].system.push_back(duration);
 }
 
 void addLockingTime(std::chrono::nanoseconds duration, AllocType type) {
+    std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].locking.push_back(duration);
 }
 
 void addTrackingTime(std::chrono::nanoseconds duration, AllocType type) {
+    std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].tracking.push_back(duration);
 }
 
 void addTotalTime(std::chrono::nanoseconds duration, AllocType type) {
+    std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].total.push_back(duration);
 }
 
@@ -110,7 +116,9 @@ static inline auto operator<<(std::ostream& out, const Timings& timings) -> std:
 
 auto printTimings(std::ostream& out) -> std::ostream& {
     using formatter::Style;
-    
+
+    std::lock_guard lock { getInstance().mutex };
+
     out << formatter::format<Style::BOLD>("Malloc timings")  << std::endl << getTimingMap()[AllocType::malloc]  << std::endl
         << formatter::format<Style::BOLD>("Calloc timings")  << std::endl << getTimingMap()[AllocType::calloc]  << std::endl
         << formatter::format<Style::BOLD>("Realloc timings") << std::endl << getTimingMap()[AllocType::realloc] << std::endl

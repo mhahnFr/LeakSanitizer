@@ -351,7 +351,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
         
-    setIgnoreMalloc(true);
+    getTracker().ignoreMalloc = true;
     const auto reason = getReason(signalCode, info->si_code);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
@@ -365,17 +365,16 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 void callstack(int, siginfo_t*, void* context) {
     using formatter::Style;
     
-    bool ignore = getIgnoreMalloc();
-    setIgnoreMalloc(true);
-    
+    auto& tracker = getTracker();
+    bool ignore = tracker.ignoreMalloc;
+    tracker.ignoreMalloc = true;
+
     auto& out = getOutputStream();
     out << formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
     callstackHelper::format(createCallstackFor(context), out);
     out << std::endl;
     
-    if (!ignore) {
-        setIgnoreMalloc(false);
-    }
+    tracker.ignoreMalloc = ignore;
 }
 
 void stats(int) {

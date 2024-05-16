@@ -76,8 +76,8 @@ static inline auto demangle(const char * string) noexcept -> std::string {
 }
 
 [[ noreturn ]] void exceptionHandler() noexcept {
-    setIgnoreMalloc(true);
-    
+    getTracker().ignoreMalloc = true;
+
     if (auto exception = std::current_exception()) {
         try {
             std::rethrow_exception(exception);
