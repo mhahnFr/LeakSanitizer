@@ -25,17 +25,10 @@
 #include <iostream>
 #include <string>
 
+#include "ATracker.hpp"
 #include "LeakSani.hpp"
 
 namespace lsan {
-/**
- * Returns a reference to a boolean value indicating
- * whether to ignore allocations.
- *
- * @return the ignoration flag
- */
-auto _getIgnoreMalloc() -> bool &;
-
 /**
  * Returns the current instance of this sanitizer.
  *
@@ -92,23 +85,7 @@ auto isATTY() -> bool;
  */
 auto has(const std::string & var) -> bool;
 
-/**
- * Sets whether to ignore subsequent allocation management requests.
- *
- * @param ignoreMalloc whether to ignore allocations
- */
-static inline void setIgnoreMalloc(const bool ignoreMalloc) {
-    _getIgnoreMalloc() = ignoreMalloc;
-}
-
-/**
- * Returns whether to ignore subsequent alloction management requests.
- *
- * @return whether to ignore allocations
- */
-static inline auto getIgnoreMalloc() -> bool {
-    return _getIgnoreMalloc();
-}
+auto getTracker() -> ATracker&;
 
 /**
  * Returns the current instance of the statistics object.
