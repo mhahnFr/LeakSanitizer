@@ -29,11 +29,13 @@ TLSTracker::TLSTracker() {
 }
 
 TLSTracker::~TLSTracker() {
-    std::lock_guard lock  { mutex     };
-    std::lock_guard lock1 { infoMutex };
+    std::lock_guard lock { mutex };
+    ignoreMalloc = true;
 
     pthread_setspecific(getInstance().saniKey, std::addressof(getInstance()));
     getInstance().deregisterTracker(this);
+
+    std::lock_guard lock1 { infoMutex };
     getInstance().absorbLeaks(std::move(infos));
 }
 

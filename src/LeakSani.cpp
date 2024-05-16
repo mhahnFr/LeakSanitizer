@@ -71,7 +71,7 @@ static inline void destroySaniKey(void* value) {
     if (value != std::addressof(globalInstance)) {
         pthread_setspecific(globalInstance.saniKey, std::addressof(globalInstance));
         {
-            std::lock_guard lock(globalInstance.ATracker::mutex);
+            std::lock_guard lock(globalInstance.mutex);
             auto ignore = globalInstance.ignoreMalloc;
             globalInstance.ignoreMalloc = true;
             delete reinterpret_cast<TLSTracker*>(value);
@@ -131,8 +131,8 @@ void LSan::finish() {
 }
 
 void LSan::registerTracker(ATracker* tracker) {
-    std::lock_guard lock { tlsTrackerMutex };
     std::lock_guard lock1 { mutex };
+    std::lock_guard lock { tlsTrackerMutex };
 
     auto ignore = ignoreMalloc;
     ignoreMalloc = true;
@@ -141,8 +141,8 @@ void LSan::registerTracker(ATracker* tracker) {
 }
 
 void LSan::deregisterTracker(ATracker* tracker) {
-    std::lock_guard lock { tlsTrackerMutex };
     std::lock_guard lock1 { mutex };
+    std::lock_guard lock { tlsTrackerMutex };
 
     auto ignore = ignoreMalloc;
     ignoreMalloc = true;
@@ -304,8 +304,8 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     using formatter::Style;
     
-    std::lock_guard lock(self.infoMutex);
-    
+    std::lock_guard lock(self.infoMutex); // TODO: Hat T1
+
     callstack_autoClearCaches = false;
     std::size_t i     = 0,
                 j     = 0,
