@@ -118,15 +118,16 @@ LSan::LSan(): libName(lsanName().value()), saniKey(createSaniKey()) {
 }
 
 void LSan::finish() {
-    finished = true;
-    auto& tracker = getTracker();
-    std::lock_guard lock { tracker.mutex };
-    tracker.ignoreMalloc = true;
-
-    while (!tlsTrackers.empty()) {
-        delete *tlsTrackers.begin();
+    {
+        std::lock_guard lock { mutex };
+        ignoreMalloc = true;
     }
-    ignoreMalloc = false;
+
+    std::lock_guard lock { tlsTrackerMutex };
+
+    for (auto tracker : tlsTrackers) {
+        tracker->finish();
+    }
 }
 
 void LSan::registerTracker(ATracker* tracker) {

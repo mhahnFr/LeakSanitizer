@@ -37,6 +37,15 @@ TLSTracker::~TLSTracker() {
     getInstance().absorbLeaks(std::move(infos));
 }
 
+void TLSTracker::finish() {
+    std::lock_guard lock  { mutex     };
+    std::lock_guard lock1 { infoMutex };
+
+    ignoreMalloc = true;
+    getInstance().absorbLeaks(std::move(infos));
+    infos = decltype(infos)();
+}
+
 auto TLSTracker::maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
     std::lock_guard lock { infoMutex };
 

@@ -38,6 +38,8 @@ public:
 
     virtual auto maybeRemoveMalloc(void* pointer) -> bool final override;
     virtual auto maybeChangeMalloc(const MallocInfo& info) -> bool final override;
+
+    virtual void finish() final override;
 };
 }
 

@@ -48,6 +48,7 @@ public:
 
     virtual auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> = 0;
     virtual void changeMalloc(MallocInfo&& info) = 0;
+    virtual void finish() = 0;
 
     virtual auto maybeRemoveMalloc([[ maybe_unused ]] void* pointer) -> bool {
         return false;

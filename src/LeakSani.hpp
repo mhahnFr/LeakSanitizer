@@ -94,7 +94,7 @@ public:
     void absorbLeaks(std::map<const void* const, MallocInfo>&& leaks);
 
     bool finished = false;
-    void finish();
+    void finish() override;
 
     LSan();
    ~LSan() {
