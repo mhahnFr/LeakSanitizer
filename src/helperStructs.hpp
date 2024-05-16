@@ -22,16 +22,16 @@
 #ifndef helperStructs_hpp
 #define helperStructs_hpp
 
+#include "MallocInfo.hpp"
+
 namespace lsan {
 struct LeakKindStats {
-    using RecordRef = std::reference_wrapper<MallocInfo>;
-
     std::size_t stack = 0, stackIndirect = 0, global = 0, globalIndirect = 0, tlv = 0, tlvIndirect = 0, lost = 0, lostIndirect = 0;
 
-    std::set<RecordRef> recordsStack;
-    std::set<RecordRef> recordsGlobal;
-    std::set<RecordRef> recordsTlv;
-    std::set<RecordRef> recordsLost;
+    std::set<MallocInfo*> recordsStack;
+    std::set<MallocInfo*> recordsGlobal;
+    std::set<MallocInfo*> recordsTlv;
+    std::set<MallocInfo*> recordsLost;
 };
 
 struct Region {

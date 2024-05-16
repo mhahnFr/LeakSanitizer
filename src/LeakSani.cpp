@@ -383,6 +383,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         if (record.getLeakType() == LeakType::reachableDirect) {
             ++toReturn.stack;
             toReturn.stackIndirect += classifyRecord(record, LeakType::reachableIndirect);
+            toReturn.recordsStack.insert(&record);
         }
     }
 
@@ -412,6 +413,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         it->second.setLeakType(LeakType::tlvDirect);
         toReturn.tlvIndirect += classifyRecord(it->second, LeakType::tlvIndirect);
         ++toReturn.tlv;
+        toReturn.recordsTlv.insert(&it->second);
     }
 
     // All leaks still unclassified are unreachable, search for reachability inside them
@@ -421,6 +423,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
         record.setLeakType(LeakType::unreachableDirect);
         toReturn.lostIndirect += classifyRecord(record, LeakType::unreachableIndirect);
+        toReturn.recordsLost.insert(&record);
     }
     toReturn.lost = infos.size() - toReturn.stack - toReturn.stackIndirect - toReturn.global - toReturn.globalIndirect - toReturn.lostIndirect - toReturn.tlv - toReturn.tlvIndirect;
     return toReturn;
