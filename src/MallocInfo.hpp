@@ -43,11 +43,6 @@ namespace lsan {
  * pointer are stored as well.
  */
 class MallocInfo {
-public:
-    using Ref = std::reference_wrapper<MallocInfo>; // TODO: Still needed?
-    using CRef = std::reference_wrapper<const MallocInfo>; // TODO: Still needed?
-
-private:
     /** The pointer to the allocated piece of memory.             */
     void * pointer;
     /** The size of the allocated piece of memory.                */
