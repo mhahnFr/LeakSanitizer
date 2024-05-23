@@ -394,14 +394,17 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
-    const auto& [stackHereDirect, stackHereIndirect] = classifyLeaks(here, begin, LeakType::reachableDirect, LeakType::reachableIndirect, true);
+    const auto& [stackHereDirect, stackHereIndirect] = classifyLeaks(here, begin, 
+                                                                     LeakType::reachableDirect, LeakType::reachableIndirect,
+                                                                     toReturn.recordsStack, true);
     toReturn.stack += stackHereDirect;
     toReturn.stackIndirect += stackHereIndirect;
 
     // Search in global space
     for (const auto& region : regions) {
         const auto& [regionDirect, regionIndirect] = classifyLeaks(align(region.begin), align(region.end, false),
-                                                                   LeakType::globalDirect, LeakType::globalIndirect, true);
+                                                                   LeakType::globalDirect, LeakType::globalIndirect,
+                                                                   toReturn.recordsGlobal, true);
         toReturn.global   += regionDirect;
         toReturn.globalIndirect += regionIndirect;
     }
@@ -429,7 +432,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         toReturn.lostIndirect += classifyRecord(record, LeakType::unreachableIndirect);
         toReturn.recordsLost.insert(&record);
     }
-    toReturn.lost = infos.size() - toReturn.stack - toReturn.stackIndirect - toReturn.global - toReturn.globalIndirect - toReturn.lostIndirect - toReturn.tlv - toReturn.tlvIndirect;
+    toReturn.lost = infos.size() 
+                    - toReturn.stack - toReturn.stackIndirect
+                    - toReturn.global - toReturn.globalIndirect
+                    - toReturn.lostIndirect
+                    - toReturn.tlv - toReturn.tlvIndirect;
     return toReturn;
 }
 

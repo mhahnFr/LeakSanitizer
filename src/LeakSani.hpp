@@ -94,7 +94,9 @@ class LSan {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
     
-    inline auto classifyLeaks(uintptr_t begin, uintptr_t end, LeakType direct, LeakType indirect, bool skipClassifieds = false) -> std::pair<std::size_t, std::size_t> {
+    inline auto classifyLeaks(uintptr_t begin, uintptr_t end,
+                              LeakType direct, LeakType indirect,
+                              std::set<MallocInfo*>& directs, bool skipClassifieds = false) -> std::pair<std::size_t, std::size_t> {
         std::size_t directCount   { 0 },
                     indirectCount { 0 };
         for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
@@ -105,6 +107,7 @@ class LSan {
             if (record->second.getLeakType() > direct) {
                 record->second.setLeakType(direct);
                 ++directCount;
+                directs.insert(&record->second);
             }
             indirectCount += classifyRecord(record->second, indirect);
         }
