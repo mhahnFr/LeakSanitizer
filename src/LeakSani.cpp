@@ -616,68 +616,53 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     callstack_autoClearCaches = false;
     
     const auto& stats = self.classifyLeaks();
-    __builtin_printf("Stack:\n  Direct: %zu\nIndirect: %zu\n\n"
-                     "Global:\n  Direct: %zu\nIndirect: %zu\n\n"
-                     "TLV:\n  Direct: %zu\nIndirect: %zu\n\n"
-                     "Lost:\n  Direct: %lu\nIndirect: %zu\n\n",
-                     stats.stack, stats.stackIndirect,
-                     stats.global, stats.globalIndirect,
-                     stats.tlv, stats.tlvIndirect,
-                     stats.lost, stats.lostIndirect);
 
-    // classify the leaks
-    // create summary on the way
-    // print summary
-    // print lost memory - according to what types should be shown and with a note what kind of leak it is
-    // print summary again
-    // print hint for how to make the rest visible
-    
-    std::size_t i     = 0,
-                j     = 0,
-                bytes = 0,
-                count = 0,
-                total = self.infos.size();
-    for (auto & [ptr, info] : self.infos) {
-        assert(info.getLeakType() != LeakType::unclassified || info.isDeleted());
-        if (isATTY()) {
-            char buffer[7] {};
-            std::snprintf(buffer, 7, "%05.2f", static_cast<double>(j) / total * 100);
-            stream << "\rCollecting the leaks: " << formatter::format<Style::BOLD>(buffer) << " %";
-        }
-        if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
-            ++count;
-            bytes += info.getSize();
-            if (i < __lsan_leakCount) {
-                if (isATTY()) {
-                    stream << "\r";
-                }
-                stream << "Classified: " << info.getLeakType() << "                        " << std::endl;
-                stream << info << std::endl;
-                ++i;
-            }
-        }
-        ++j;
+    // [x] classify the leaks
+    // [x] create summary on the way
+    // [ ] print summary
+    // [ ] print lost memory - according to what types should be shown and with a note what kind of leak it is
+    // [ ] print summary again
+    // [ ] print hint for how to make the rest visible
+
+    // TODO: Return early if no leaks have been detected
+    const size_t totalBytes { 0 }, lostBytes { 0 }, reachableBytes { 0 };
+
+    // TODO: Further formatting
+    // TODO: Maybe split between direct and indirect?
+    stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(totalBytes) << ")" << std::endl
+           << "       " << stats.getTotalLost() << " leaks (" << bytesToString(lostBytes) << ") lost" << std::endl
+           << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(reachableBytes) << ") reachable" << std::endl
+           << std::endl;
+
+    for (const auto& record : stats.recordsLost) {
+        if (record->getLeakType() != LeakType::unreachableDirect) continue;
+
+        stream << *record << std::endl;
     }
-    if (isATTY()) {
-        stream << "\r                                    \r";
+
+    // TODO: Possibility to show indirects
+
+    if (true) { // TODO: If should show reachables
+        for (const auto& record : stats.recordsGlobal) {
+            // TODO: Actually store them!
+            stream << *record << std::endl;
+        }
+        for (const auto& record : stats.recordsTlv) {
+            stream << *record << std::endl;
+        }
+        for (const auto& record : stats.recordsStack) {
+            stream << *record << std::endl;
+        }
+    } else {
+        stream << "Set LSAN_SHOW_REACHABLES to true to display reachable memory leaks." << std::endl;
     }
+
     if (self.callstackSizeExceeded) {
         stream << printCallstackSizeExceeded;
         self.callstackSizeExceeded = false;
     }
-    if (i < count) {
-        stream << std::endl << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(count - i) + " more...") << std::endl << std::endl
-               << "Hint:" << formatter::format<Style::GREYED, Style::ITALIC>(" to see more, increase the value of ")
-               << "LSAN_LEAK_COUNT" << formatter::get<Style::GREYED> << " (__lsan_leakCount)"
-               << formatter::format<Style::ITALIC>(" (currently ") << formatter::clear<Style::GREYED>
-               << __lsan_leakCount << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
-    }
-    
-    if (count == 0) {
-        stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
-    }
-    if (__lsan_relativePaths && count > 0) {
-        stream << std::endl << printWorkingDirectory;
+    if (__lsan_relativePaths) {
+        stream << printWorkingDirectory;
     }
     stream << maybeShowDeprecationWarnings;
     if (self.userRegexError.has_value()) {
@@ -688,16 +673,11 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << formatter::format<Style::ITALIC, Style::BOLD>("\"" + self.userRegexError.value() + "\"")
                << formatter::clear<Style::RED> << std::endl;
     }
-    
-    if (count > 0) {
-        stream << std::endl << formatter::format<Style::BOLD>("Summary: ");
-        if (i == __lsan_leakCount && i < count) {
-            stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of ";
-        }
-        stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
-               << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
-        stream << std::endl;
-    }
+    // TODO: Further formatting
+    stream << std::endl << "Summary:" << std::endl
+           << "Total: " << stats.getTotal() << " leaks (" << bytesToString(totalBytes) << ")" << std::endl
+           << "       " << stats.getTotalLost() << " leaks (" << bytesToString(lostBytes) << ") lost" << std::endl
+           << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(reachableBytes) << ") reachable" << std::endl;
     
     callstack_clearCaches();
     callstack_autoClearCaches = true;
