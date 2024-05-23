@@ -626,19 +626,17 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
     // [x] classify the leaks
     // [x] create summary on the way
-    // [ ] print summary
-    // [ ] print lost memory - according to what types should be shown and with a note what kind of leak it is
-    // [ ] print summary again
-    // [ ] print hint for how to make the rest visible
+    // [x] print summary
+    // [x] print lost memory - according to what types should be shown and with a note what kind of leak it is
+    // [x] print summary again
+    // [x] print hint for how to make the rest visible
 
     // TODO: Return early if no leaks have been detected
-    const size_t totalBytes { 0 }, lostBytes { 0 }, reachableBytes { 0 };
-
     // TODO: Further formatting
     // TODO: Maybe split between direct and indirect?
-    stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(totalBytes) << ")" << std::endl
-           << "       " << stats.getTotalLost() << " leaks (" << bytesToString(lostBytes) << ") lost" << std::endl
-           << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(reachableBytes) << ") reachable" << std::endl
+    stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
+           << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
+           << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl
            << std::endl;
 
     for (const auto& record : stats.recordsLost) {
@@ -682,9 +680,9 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     }
     // TODO: Further formatting
     stream << std::endl << "Summary:" << std::endl
-           << "Total: " << stats.getTotal() << " leaks (" << bytesToString(totalBytes) << ")" << std::endl
-           << "       " << stats.getTotalLost() << " leaks (" << bytesToString(lostBytes) << ") lost" << std::endl
-           << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(reachableBytes) << ") reachable" << std::endl;
+           << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
+           << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
+           << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl;
     
     callstack_clearCaches();
     callstack_autoClearCaches = true;

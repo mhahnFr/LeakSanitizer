@@ -35,6 +35,15 @@ struct LeakKindStats {
                 lost           = 0,
                 lostIndirect   = 0;
 
+    std::size_t bytesStack          = 0,
+                bytesStackIndirect  = 0,
+                bytesGlobal         = 0,
+                bytesGlobalIndirect = 0,
+                bytesTlv            = 0,
+                bytesTlvIndirect    = 0,
+                bytesLost           = 0,
+                bytesLostIndirect   = 0;
+
     std::set<MallocInfo*> recordsStack;
     std::set<MallocInfo*> recordsGlobal;
     std::set<MallocInfo*> recordsTlv;
@@ -50,6 +59,18 @@ struct LeakKindStats {
 
     constexpr inline auto getTotal() const -> std::size_t {
         return getTotalLost() + getTotalReachable();
+    }
+
+    constexpr inline auto getLostBytes() const -> std::size_t {
+        return bytesLost + bytesLostIndirect;
+    }
+
+    constexpr inline auto getReachableBytes() const -> std::size_t {
+        return bytesStack + bytesStackIndirect + bytesGlobal + bytesGlobalIndirect + bytesTlv + bytesTlvIndirect;
+    }
+
+    constexpr inline auto getTotalBytes() const -> std::size_t {
+        return getLostBytes() + getReachableBytes();
     }
 };
 
