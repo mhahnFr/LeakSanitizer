@@ -39,6 +39,7 @@ static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs)
     return lhs > rhs;
 }
 
+// TODO: One leak can appear as reachable via multiple root leaks
 auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
     using formatter::Style;
     
@@ -50,9 +51,9 @@ auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream 
     std::size_t count { 0 },
                 bytes { 0 };
     for (const auto& record : self.viaMeRecords) {
-        if (isIndirect(record.get().leakType) && isConsideredGreater(record.get().leakType, self.leakType)) {
+        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, self.leakType)) {
             ++count;
-            bytes += record.get().size;
+            bytes += record->size;
         }
     }
     if (count > 0) {

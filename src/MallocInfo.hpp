@@ -25,8 +25,8 @@
 #include <functional>
 #include <optional>
 #include <ostream>
+#include <set>
 #include <string>
-#include <vector>
 
 #include "LeakType.hpp"
 
@@ -44,8 +44,8 @@ namespace lsan {
  */
 class MallocInfo {
 public:
-    using Ref = std::reference_wrapper<MallocInfo>;
-    using CRef = std::reference_wrapper<const MallocInfo>;
+    using Ref = std::reference_wrapper<MallocInfo>; // TODO: Still needed?
+    using CRef = std::reference_wrapper<const MallocInfo>; // TODO: Still needed?
 
 private:
     /** The pointer to the allocated piece of memory.             */
@@ -54,8 +54,8 @@ private:
     std::size_t size;
     
     LeakType leakType = LeakType::unclassified;
-    std::vector<Ref> viaMeRecords;
-    
+    std::set<MallocInfo*> viaMeRecords;
+
     /** The filename in which this allocation happened.           */
     std::optional<std::string> createdInFile;
     /** The line number in which this allocation happened.        */
@@ -257,10 +257,10 @@ public:
     }
     
     inline void addViaMeReachable(MallocInfo& info) {
-        viaMeRecords.push_back(info);
+        viaMeRecords.insert(&info);
     }
     
-    constexpr inline auto getViaMeReachables() const -> const std::vector<Ref>& {
+    constexpr inline auto getViaMeReachables() const -> const std::set<MallocInfo*>& {
         return viaMeRecords;
     }
     
