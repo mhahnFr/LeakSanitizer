@@ -29,11 +29,11 @@
 
 namespace lsan {
 static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs) -> bool {
-    if (rhs == LeakType::unreachableDirect && lhs == LeakType::unreachableIndirect) {
-        return false;
+    if (lhs == LeakType::unreachableIndirect && rhs == LeakType::unreachableDirect) {
+        return true;
     }
     if (lhs == LeakType::unreachableDirect && rhs == LeakType::unreachableIndirect) {
-        return true;
+        return false;
     }
 
     return lhs > rhs;
