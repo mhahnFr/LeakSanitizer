@@ -26,12 +26,31 @@
 
 namespace lsan {
 struct LeakKindStats {
-    std::size_t stack = 0, stackIndirect = 0, global = 0, globalIndirect = 0, tlv = 0, tlvIndirect = 0, lost = 0, lostIndirect = 0;
+    std::size_t stack          = 0,
+                stackIndirect  = 0,
+                global         = 0,
+                globalIndirect = 0,
+                tlv            = 0,
+                tlvIndirect    = 0,
+                lost           = 0,
+                lostIndirect   = 0;
 
     std::set<MallocInfo*> recordsStack;
     std::set<MallocInfo*> recordsGlobal;
     std::set<MallocInfo*> recordsTlv;
     std::set<MallocInfo*> recordsLost;
+
+    constexpr inline auto getTotalLost() const -> std::size_t {
+        return lost + lostIndirect;
+    }
+
+    constexpr inline auto getTotalReachable() const -> std::size_t {
+        return stack + stackIndirect + global + globalIndirect + tlv + tlvIndirect;
+    }
+
+    constexpr inline auto getTotal() const -> std::size_t {
+        return getTotalLost() + getTotalReachable();
+    }
 };
 
 struct Region {
