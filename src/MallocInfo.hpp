@@ -71,7 +71,9 @@ private:
     bool                                  deleted;
     /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
-    
+
+    bool printedInRoot = false;
+
 public:
     /**
      * Initializes this allocation record using the given information.
