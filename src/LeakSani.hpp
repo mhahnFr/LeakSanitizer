@@ -28,6 +28,7 @@
 #include <ostream>
 #include <regex>
 #include <set>
+#include <tuple>
 #include <utility>
 
 #include "MallocInfo.hpp"
@@ -85,8 +86,8 @@ class LSan {
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
     
     auto classifyLeaks() -> LeakKindStats;
-    auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::size_t;
-    
+    auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::pair<std::size_t, std::size_t>;
+
     /**
      * Loads the user first party regular expression.
      */
@@ -96,9 +97,11 @@ class LSan {
     
     inline auto classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
-                              std::set<MallocInfo*>& directs, bool skipClassifieds = false) -> std::pair<std::size_t, std::size_t> {
+                              std::set<MallocInfo*>& directs, bool skipClassifieds = false) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
         std::size_t directCount   { 0 },
-                    indirectCount { 0 };
+                    indirectCount { 0 },
+                    directBytes   { 0 },
+                    indirectBytes { 0 };
         for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
             if (record == infos.end() || record->second.isDeleted() || (skipClassifieds && record->second.getLeakType() != LeakType::unclassified)) {
@@ -107,11 +110,14 @@ class LSan {
             if (record->second.getLeakType() > direct) {
                 record->second.setLeakType(direct);
                 ++directCount;
+                directBytes += record->second.getSize();
                 directs.insert(&record->second);
             }
-            indirectCount += classifyRecord(record->second, indirect);
+            const auto& [count, bytes] = classifyRecord(record->second, indirect);
+            indirectCount += count;
+            indirectBytes += bytes;
         }
-        return std::make_pair(directCount, indirectCount);
+        return std::make_tuple(directCount, directBytes, indirectCount, indirectBytes);
     }
     
 public:

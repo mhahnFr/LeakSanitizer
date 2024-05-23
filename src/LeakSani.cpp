@@ -115,8 +115,9 @@ static inline auto align(const void* ptr, bool up = true) -> uintptr_t {
     return align(reinterpret_cast<uintptr_t>(ptr), up);
 }
 
-auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::size_t {
-    std::size_t count { 0 };
+auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::pair<std::size_t, std::size_t> {
+    std::size_t count { 0 },
+                bytes { 0 };
     auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
     stack.push(info);
     while (!stack.empty()) {
@@ -125,6 +126,7 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
         if (elem.get().getLeakType() > currentType && elem.get().getPointer() != info.getPointer()) {
             elem.get().setLeakType(currentType);
             ++count;
+            bytes += elem.get().getSize();
         }
         
         const auto beginPtr = align(elem.get().getPointer());
@@ -143,7 +145,7 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
                 stack.push(record->second);
         }
     }
-    return count;
+    return std::make_pair(count, bytes);
 }
 
 #if !LSAN_CAN_WALK_STACK
@@ -386,7 +388,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     for (auto& [ptr, record] : infos) {
         if (record.getLeakType() == LeakType::reachableDirect) {
             ++toReturn.stack;
-            toReturn.stackIndirect += classifyRecord(record, LeakType::reachableIndirect);
+            toReturn.bytesStack += record.getSize();
+            const auto& [count, bytes] = classifyRecord(record, LeakType::reachableIndirect);
+            toReturn.stackIndirect += count;
+            toReturn.bytesStackIndirect += bytes;
             toReturn.recordsStack.insert(&record);
         }
     }
@@ -394,19 +399,25 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
-    const auto& [stackHereDirect, stackHereIndirect] = classifyLeaks(here, begin, 
-                                                                     LeakType::reachableDirect, LeakType::reachableIndirect,
-                                                                     toReturn.recordsStack, true);
+    const auto& [stackHereDirect, stackHereBytes, 
+                 stackHereIndirect, stackHereBytesIndirect] = classifyLeaks(here, begin,
+                                                                            LeakType::reachableDirect, LeakType::reachableIndirect,
+                                                                            toReturn.recordsStack, true);
     toReturn.stack += stackHereDirect;
     toReturn.stackIndirect += stackHereIndirect;
+    toReturn.bytesStack += stackHereBytes;
+    toReturn.bytesStackIndirect += stackHereBytesIndirect;
 
     // Search in global space
     for (const auto& region : regions) {
-        const auto& [regionDirect, regionIndirect] = classifyLeaks(align(region.begin), align(region.end, false),
-                                                                   LeakType::globalDirect, LeakType::globalIndirect,
-                                                                   toReturn.recordsGlobal, true);
-        toReturn.global   += regionDirect;
+        const auto& [regionDirect, regionBytes,
+                     regionIndirect, regionBytesIndirect] = classifyLeaks(align(region.begin), align(region.end, false),
+                                                                          LeakType::globalDirect, LeakType::globalIndirect,
+                                                                          toReturn.recordsGlobal, true);
+        toReturn.global += regionDirect;
         toReturn.globalIndirect += regionIndirect;
+        toReturn.bytesGlobal += regionBytes;
+        toReturn.bytesGlobalIndirect += regionBytesIndirect;
     }
     
     // Search in the runtime thread locals
@@ -418,8 +429,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         if (it == infos.end()) continue;
 
         it->second.setLeakType(LeakType::tlvDirect);
-        toReturn.tlvIndirect += classifyRecord(it->second, LeakType::tlvIndirect);
+        const auto& [count, bytes] = classifyRecord(it->second, LeakType::tlvIndirect);
+        toReturn.tlvIndirect += count;
+        toReturn.bytesTlvIndirect += bytes;
         ++toReturn.tlv;
+        toReturn.bytesTlv += it->second.getSize();
         toReturn.recordsTlv.insert(&it->second);
     }
 
@@ -429,7 +443,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             continue;
         }
         record.setLeakType(LeakType::unreachableDirect);
-        toReturn.lostIndirect += classifyRecord(record, LeakType::unreachableIndirect);
+        const auto& [count, bytes] = classifyRecord(record, LeakType::unreachableIndirect);
+        toReturn.lostIndirect += count;
+        toReturn.bytesLostIndirect += bytes;
         toReturn.recordsLost.insert(&record);
     }
     toReturn.lost = infos.size() 
@@ -437,6 +453,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                     - toReturn.global - toReturn.globalIndirect
                     - toReturn.lostIndirect
                     - toReturn.tlv - toReturn.tlvIndirect;
+    for (const auto& record : toReturn.recordsLost) {
+        if (record->getLeakType() != LeakType::unreachableDirect) continue;
+
+        toReturn.bytesLost += record->getSize();
+    }
     return toReturn;
 }
 
@@ -631,6 +652,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     // [x] print summary again
     // [x] print hint for how to make the rest visible
 
+    // TODO: Optionally collaps identical callstacks
     // TODO: Return early if no leaks have been detected
     // TODO: Further formatting
     // TODO: Maybe split between direct and indirect?
@@ -683,7 +705,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
            << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
            << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
            << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl;
-    
+
     callstack_clearCaches();
     callstack_autoClearCaches = true;
     
