@@ -652,44 +652,49 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     // [x] print summary again
     // [x] print hint for how to make the rest visible
 
-    // TODO: Optionally collaps identical callstacks
-    // TODO: Return early if no leaks have been detected
-    // TODO: Further formatting
-    // TODO: Maybe split between direct and indirect?
-    stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
-           << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
-           << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl
-           << std::endl;
+    if (stats.getTotal() > 0) {
+        // TODO: Optionally collaps identical callstacks
+        // TODO: Return early if no leaks have been detected
+        // TODO: Further formatting
+        // TODO: Maybe split between direct and indirect?
+        stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
+               << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
+               << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl
+               << std::endl;
 
-    for (const auto& record : stats.recordsLost) {
-        if (record->getLeakType() != LeakType::unreachableDirect) continue;
+        for (const auto& record : stats.recordsLost) {
+            if (record->getLeakType() != LeakType::unreachableDirect) continue;
 
-        stream << *record << std::endl;
-    }
-
-    // TODO: Possibility to show indirects
-
-    if ((true)) { // TODO: If should show reachables
-        for (const auto& record : stats.recordsGlobal) {
             stream << *record << std::endl;
         }
-        for (const auto& record : stats.recordsTlv) {
-            stream << *record << std::endl;
+
+        // TODO: Possibility to show indirects
+
+        if ((true)) { // TODO: If should show reachables
+            for (const auto& record : stats.recordsGlobal) {
+                stream << *record << std::endl;
+            }
+            for (const auto& record : stats.recordsTlv) {
+                stream << *record << std::endl;
+            }
+            for (const auto& record : stats.recordsStack) {
+                stream << *record << std::endl;
+            }
+        } else {
+            stream << "Set LSAN_SHOW_REACHABLES to true to display reachable memory leaks." << std::endl;
         }
-        for (const auto& record : stats.recordsStack) {
-            stream << *record << std::endl;
+
+        if (self.callstackSizeExceeded) {
+            stream << printCallstackSizeExceeded;
+            self.callstackSizeExceeded = false;
+        }
+        if (__lsan_relativePaths) {
+            stream << printWorkingDirectory;
         }
     } else {
-        stream << "Set LSAN_SHOW_REACHABLES to true to display reachable memory leaks." << std::endl;
+        stream << "No leaks detected." << std::endl;
     }
 
-    if (self.callstackSizeExceeded) {
-        stream << printCallstackSizeExceeded;
-        self.callstackSizeExceeded = false;
-    }
-    if (__lsan_relativePaths) {
-        stream << printWorkingDirectory;
-    }
     stream << maybeShowDeprecationWarnings;
     if (self.userRegexError.has_value()) {
         stream << std::endl << formatter::get<Style::RED>
@@ -699,11 +704,13 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << formatter::format<Style::ITALIC, Style::BOLD>("\"" + self.userRegexError.value() + "\"")
                << formatter::clear<Style::RED> << std::endl;
     }
-    // TODO: Further formatting
-    stream << std::endl << "Summary:" << std::endl
-           << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
-           << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
-           << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl;
+    if (stats.getTotal() > 0) {
+        // TODO: Further formatting
+        stream << std::endl << "Summary:" << std::endl
+               << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
+               << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
+               << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl;
+    }
 
     callstack_clearCaches();
     callstack_autoClearCaches = true;
