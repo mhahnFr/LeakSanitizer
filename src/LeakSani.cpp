@@ -671,7 +671,6 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
     if ((true)) { // TODO: If should show reachables
         for (const auto& record : stats.recordsGlobal) {
-            // TODO: Actually store them!
             stream << *record << std::endl;
         }
         for (const auto& record : stats.recordsTlv) {
