@@ -41,19 +41,42 @@ enum class LeakType {
     unclassified
 };
 
-static inline auto operator<<(std::ostream& out, LeakType type) -> std::ostream& {
+static inline auto isIndirect(const LeakType& type) -> bool {
+    return type == LeakType::tlvIndirect
+        || type == LeakType::globalIndirect
+        || type == LeakType::reachableIndirect
+        || type == LeakType::unreachableIndirect;
+}
+
+static inline auto operator<<(std::ostream& out, const LeakType& type) -> std::ostream& {
     switch (type) {
-        case LeakType::unclassified:        out << "unclassified";        break;
-        case LeakType::reachableDirect:     out << "reachableDirect";     break;
-        case LeakType::reachableIndirect:   out << "reachableIndirect";   break;
-        case LeakType::unreachableDirect:   out << "unreachableDirect";   break;
-        case LeakType::unreachableIndirect: out << "unreachableIndirect"; break;
-        case LeakType::globalDirect:        out << "globalDirect";        break;
-        case LeakType::globalIndirect:      out << "globalIndirect";      break;
-        case LeakType::tlvDirect:           out << "tlvDirect";           break;
-        case LeakType::tlvIndirect:         out << "tlvIndirect";         break;
+        case LeakType::unclassified:        out << "unclassified";           break;
+        case LeakType::reachableDirect:     out << "stack";                  break;
+        case LeakType::reachableIndirect:   out << "via stack";              break;
+        case LeakType::unreachableDirect:   out << "lost";                   break;
+        case LeakType::unreachableIndirect: out << "via lost";               break;
+        case LeakType::globalDirect:        out << "global";                 break;
+        case LeakType::globalIndirect:      out << "via global";             break;
+        case LeakType::tlvDirect:           out << "thread-local value";     break;
+        case LeakType::tlvIndirect:         out << "via thread-local value"; break;
     }
     return out;
+}
+
+constexpr static inline auto debugString(const LeakType& type) -> const char* {
+    switch (type) {
+        case LeakType::unclassified:        return "unclassified";
+        case LeakType::reachableDirect:     return "reachableDirect";
+        case LeakType::reachableIndirect:   return "reachableIndirect";
+        case LeakType::unreachableDirect:   return "unreachableDirect";
+        case LeakType::unreachableIndirect: return "unreachableIndirect";
+        case LeakType::globalDirect:        return "globalDirect";
+        case LeakType::globalIndirect:      return "globalIndirect";
+        case LeakType::tlvDirect:           return "tlvDirect";
+        case LeakType::tlvIndirect:         return "tlvIndirect";
+
+        default: return "Unknown";
+    }
 }
 }
 
