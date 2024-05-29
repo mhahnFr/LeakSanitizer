@@ -376,7 +376,13 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto toReturn = LeakKindStats();
 
     auto& out = getOutputStream();
-    const auto& clear = [](std::ostream& out) -> std::ostream& { return out << "\r                                                        \r"; };
+    out << "LSAN: Total allocs: " << infos.size() << std::endl << std::endl;
+    const auto& clear = [](std::ostream& out) -> std::ostream& {
+        if (isATTY()) {
+            return out << "\r                                                        \r";
+        }
+        return out << std::endl;
+    };
     out << "Searching globals and compile time thread locals...";
     const auto& [regions, locals] = getGlobalRegionsAndTLVs();
     out << clear << "Collecting the leaks...";
@@ -468,7 +474,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         toReturn.bytesLost += record->getSize();
     }
-    out << clear;
+    out << clear << clear;
     return toReturn;
 }
 
