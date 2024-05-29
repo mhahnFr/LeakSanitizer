@@ -375,7 +375,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     // TODO: Search on the other thread stacks
     auto toReturn = LeakKindStats();
 
+    auto& out = getOutputStream();
+    const auto& clear = [](std::ostream& out) -> std::ostream& { return out << "\r                                                        \r"; };
+    out << "Searching globals and compile time thread locals...";
     const auto& [regions, locals] = getGlobalRegionsAndTLVs();
+    out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
         const auto& local = locals.find(it->first);
         if (local != locals.end() || it->second.isDeleted() || callstackHelper::getCallstackType(it->second.getCreatedCallstack()) != callstackHelper::CallstackType::USER) {
@@ -385,6 +389,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
     }
 
+    out << clear << "Reachability analysis: Stack, part I...";
     for (auto& [ptr, record] : infos) {
         if (record.getLeakType() == LeakType::reachableDirect) {
             ++toReturn.stack;
@@ -396,6 +401,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
     }
 
+    out << clear << "Reachability analysis: Stack, part II...";
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
@@ -408,6 +414,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     toReturn.bytesStack += stackHereBytes;
     toReturn.bytesStackIndirect += stackHereBytesIndirect;
 
+    out << clear << "Reachability analysis: Globals...";
     // Search in global space
     for (const auto& region : regions) {
         const auto& [regionDirect, regionBytes,
@@ -420,6 +427,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         toReturn.bytesGlobalIndirect += regionBytesIndirect;
     }
     
+    out << clear << "Reachability analysis: Runtime thread-local variables...";
     // Search in the runtime thread locals
     for (const auto& key : keys) {
         const auto value = pthread_getspecific(key);
@@ -437,6 +445,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         toReturn.recordsTlv.insert(&it->second);
     }
 
+    out << clear << "Reachability analysis: Lost memory...";
     // All leaks still unclassified are unreachable, search for reachability inside them
     for (auto& [pointer, record] : infos) {
         if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
@@ -448,7 +457,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         toReturn.bytesLostIndirect += bytes;
         toReturn.recordsLost.insert(&record);
     }
-    toReturn.lost = infos.size() 
+    out << clear << "Enumerating lost memory leaks...";
+    toReturn.lost = infos.size()
                     - toReturn.stack - toReturn.stackIndirect
                     - toReturn.global - toReturn.globalIndirect
                     - toReturn.lostIndirect
@@ -458,6 +468,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         toReturn.bytesLost += record->getSize();
     }
+    out << clear;
     return toReturn;
 }
 
