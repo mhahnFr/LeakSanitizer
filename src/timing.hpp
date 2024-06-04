@@ -27,13 +27,23 @@
 #include <ostream>
 
 namespace lsan::timing {
+/**
+ * This structure contatins the different timings.
+ */
 struct Timings {
+    /** The amount of time the system took.               */
     std::deque<std::chrono::nanoseconds> system;
+    /** The amount of time the mutex locking took.        */
     std::deque<std::chrono::nanoseconds> locking;
+    /** The amount of time the rest of the tracking took. */
     std::deque<std::chrono::nanoseconds> tracking;
+    /** The total time.                                   */
     std::deque<std::chrono::nanoseconds> total;
 };
 
+/**
+ * This enumeration contains the possible allocation types.
+ */
 enum class AllocType {
     malloc, calloc, realloc, free
 };
