@@ -86,6 +86,11 @@ class LSan: public ATracker {
     
     auto maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
 
+protected:
+    virtual inline void addToStats(const MallocInfo& info) override {
+        stats += info;
+    }
+
 public:
     auto removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
     void changeMalloc(ATracker* tracker, MallocInfo&& info);

@@ -27,6 +27,8 @@
 #include <optional>
 #include <utility>
 
+#include <lsan_internals.h>
+
 #include "MallocInfo.hpp"
 
 namespace lsan {
@@ -34,6 +36,8 @@ class ATracker {
 protected:
     std::map<const void* const, MallocInfo> infos;
     std::mutex infoMutex;
+
+    virtual inline void addToStats([[ maybe_unused ]] const MallocInfo& info) {}
 
 public:
     virtual ~ATracker() = default;
@@ -43,6 +47,9 @@ public:
 
     inline void addMalloc(MallocInfo&& info) {
         std::lock_guard lock { infoMutex };
+        if (__lsan_statsActive) {
+            addToStats(info);
+        }
         infos.insert_or_assign(info.pointer, std::move(info));
     }
 

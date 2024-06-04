@@ -190,7 +190,12 @@ auto LSan::maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optio
     if (it->second.deleted) {
         return std::make_pair(false, it->second);
     }
-    infos.erase(it);
+    if (__lsan_statsActive) {
+        it->second.markDeleted();
+        stats -= it->second;
+    } else {
+        infos.erase(it);
+    }
     return std::make_pair(true, std::nullopt);
 }
 
@@ -208,6 +213,9 @@ void LSan::changeMalloc(ATracker* tracker, MallocInfo&& info) {
             }
         }
         return;
+    }
+    if (__lsan_statsActive) {
+        stats.replaceMalloc(it->second.size, info.size);
     }
     infos.insert_or_assign(info.pointer, info);
 }
@@ -305,7 +313,7 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
 std::ostream & operator<<(std::ostream & stream, LSan & self) {
     using formatter::Style;
     
-    std::lock_guard lock(self.infoMutex); // TODO: Hat T1
+    std::lock_guard lock(self.infoMutex);
 
     callstack_autoClearCaches = false;
     std::size_t i     = 0,
