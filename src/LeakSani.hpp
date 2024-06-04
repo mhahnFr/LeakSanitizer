@@ -93,7 +93,7 @@ public:
     void deregisterTracker(ATracker* tracker);
     void absorbLeaks(std::map<const void* const, MallocInfo>&& leaks);
 
-    bool finished = false;
+    std::atomic_bool finished = false;
     void finish() override;
 
     LSan();

@@ -118,6 +118,7 @@ LSan::LSan(): libName(lsanName().value()), saniKey(createSaniKey()) {
 }
 
 void LSan::finish() {
+    finished = true;
     {
         std::lock_guard lock { mutex };
         ignoreMalloc = true;
