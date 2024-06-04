@@ -29,6 +29,10 @@ TLSTracker::TLSTracker() {
 }
 
 TLSTracker::~TLSTracker() {
+    if (finished) return;
+
+    finished = true;
+
     std::lock_guard lock { mutex };
     ignoreMalloc = true;
 
@@ -40,6 +44,8 @@ TLSTracker::~TLSTracker() {
 }
 
 void TLSTracker::finish() {
+    finished = true;
+
     std::lock_guard lock  { mutex     };
     std::lock_guard lock1 { infoMutex };
 

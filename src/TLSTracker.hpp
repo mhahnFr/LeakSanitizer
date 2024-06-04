@@ -22,11 +22,15 @@
 #ifndef TLSTracker_hpp
 #define TLSTracker_hpp
 
+#include <atomic>
+
 #include "ATracker.hpp"
 
 namespace lsan {
 class TLSTracker: public ATracker {
 private:
+    std::atomic_bool finished = false;
+
     auto maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
 
 public:
