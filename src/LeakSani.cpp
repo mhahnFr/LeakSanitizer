@@ -53,6 +53,10 @@ static inline auto lsanName() -> std::optional<const std::string> {
     return info.dli_fname;
 }
 
+auto LSan::loadName() -> std::string {
+    return lsanName().value();
+}
+
 auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
     if (regex == nullptr || *regex == '\0') {
         return std::nullopt;
@@ -88,9 +92,10 @@ static inline auto createSaniKey() -> pthread_key_t {
     return key;
 }
 
-LSan::LSan(): libName(lsanName().value()), saniKey(createSaniKey()) {
-    atexit(exitHook);
-    
+LSan::LSan(): /*libName(lsanName().value()), */saniKey(createSaniKey()) {
+//    libName = lsanName().value();
+    atexit(exitHook); // TODO: Übrigens fehlt hier noch der exception handler
+
     signals::registerFunction(signals::handlers::stats, SIGUSR1);
     
     signals::registerFunction(signals::asHandler(signals::handlers::callstack), SIGUSR2, false);

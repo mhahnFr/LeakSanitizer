@@ -60,8 +60,8 @@ class LSan: public ATracker {
     std::mutex tlsTrackerMutex;
 
     /** The runtime name of this sanitizer.                                             */
-    const std::string libName;
-    
+    /*const */std::string libName; // TODO: Replace the name with its address - the memory will thank it later
+
 #ifdef BENCHMARK
     std::map<timing::AllocType, timing::Timings> timingMap;
     std::mutex timingMutex;
@@ -85,6 +85,8 @@ class LSan: public ATracker {
     }
     
     auto maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+
+    static auto loadName() -> std::string;
 
 protected:
     virtual inline void addToStats(const MallocInfo& info) override {
@@ -140,7 +142,10 @@ public:
      *
      * @return the runtime library name
      */
-    constexpr inline auto getLibName() const -> const std::string & {
+    inline auto getLibName() -> const std::string & {
+        if (libName.empty()) {
+            libName = loadName();
+        }
         return libName;
     }
     
