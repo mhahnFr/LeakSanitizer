@@ -38,8 +38,10 @@ namespace lsan {
  * @param reason the optional reason for the message
  * @tparam Warning whether to use warning formatting
  */
-template<bool Warning>
-static inline void printer(const std::string& message, lcs::callstack& callstack, const std::optional<std::string>& reason = std::nullopt) {
+template<bool Warning, bool SizeHint = true>
+constexpr static inline void printer(const std::string& message,
+                                     lcs::callstack&    callstack,
+                                     const std::optional<std::string>& reason = std::nullopt) {
     using formatter::Style;
     
     constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
@@ -51,7 +53,7 @@ static inline void printer(const std::string& message, lcs::callstack& callstack
     callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
     
-    if (!Warning) {
+    if constexpr (!Warning && SizeHint) {
         getInstance().maybeHintCallstackSize(std::cerr);
         std::cerr << maybeHintRelativePaths;
     }
@@ -84,8 +86,8 @@ constexpr static inline void printer(const std::string&                     mess
                                      lcs::callstack&                        callstack) {
     using formatter::Style;
     
-    printer<Warning>(message, callstack);
-    
+    printer<Warning, false>(message, callstack);
+
     if (info.has_value()) {
         constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
         const auto& record = info.value().get();
@@ -94,10 +96,14 @@ constexpr static inline void printer(const std::string&                     mess
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
         if (record.deletedCallstack.has_value()) {
-            std::cerr << std::endl << formatter::format<Style::ITALIC, colour>("Previously freed here:") << std::endl;
+            std::cerr << formatter::format<Style::ITALIC, colour>("Previously freed here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
         }
+    }
+    if constexpr (!Warning) {
+        getInstance().maybeHintCallstackSize(std::cerr);
+        std::cerr << maybeHintRelativePaths;
     }
 }
 
