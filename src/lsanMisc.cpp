@@ -3,27 +3,23 @@
  *
  * Copyright (C) 2023 - 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <filesystem>
-#include <iostream>
-
-#ifdef BENCHMARK
- #include <deque>
- #include <map>
-#endif
 
 #if __has_include(<unistd.h>)
  #include <unistd.h>
@@ -31,13 +27,13 @@
  #define LSAN_HAS_UNISTD
 #endif
 
+#include <lsan_internals.h>
+#include <callstack.h>
+
 #include "lsanMisc.hpp"
 
 #include "formatter.hpp"
 #include "callstacks/callstackHelper.hpp"
-
-#include "../include/lsan_internals.h"
-#include "../CallstackLibrary/include/callstack.h"
 
 namespace lsan {
 auto _getIgnoreMalloc() -> bool & {
@@ -57,8 +53,8 @@ auto getInstance() -> LSan & {
  * @return the given output stream
  */
 static inline auto printLicense(std::ostream & out) -> std::ostream & {
-    out << "Copyright (C) 2022 - 2024  mhahnFr and contributors" << std::endl
-        << "Licensed under the terms of the GPL 3.0."            << std::endl
+    out << "Copyright (C) 2022 - 2024  mhahnFr and contributors"         << std::endl
+        << "Licensed under the terms of the GNU GPL version 3 or later." << std::endl
         << std::endl;
     
     return out;

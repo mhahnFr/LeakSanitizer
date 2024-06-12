@@ -1,4 +1,3 @@
-#
 # LeakSanitizer - Small library showing information about lost memory.
 #
 # Copyright (C) 2022, 2024  mhahnFr
@@ -17,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License along with the
 # LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
-#
 
 # Prerequisites
 *.d
@@ -69,9 +67,9 @@ dkms.conf
 # Xcode project user data
 xcuserdata/
 
-# macOS spcific
+# macOS specific
 .DS_Store
+*.dSYM/
 
 *~
 .*
-*.dSYM/
