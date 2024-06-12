@@ -42,8 +42,8 @@ template<bool Warning>
 static inline void printer(const std::string& message, lcs::callstack& callstack, const std::optional<std::string>& reason = std::nullopt) {
     using formatter::Style;
     
-    const auto colour = Warning ? Style::MAGENTA : Style::RED;
-    
+    constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
+
     std::cerr << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
     if (reason.has_value()) {
         std::cerr << *reason << "." << std::endl;
@@ -65,7 +65,7 @@ static inline void printer(const std::string& message, lcs::callstack& callstack
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
-static inline void printer(const std::string & message, lcs::callstack && callstack) {
+constexpr static inline void printer(const std::string & message, lcs::callstack && callstack) {
     printer<Warning>(message, callstack);
 }
 
@@ -79,16 +79,16 @@ static inline void printer(const std::string & message, lcs::callstack && callst
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
-static inline void printer(const std::string&                     message,
-                           const std::optional<MallocInfo::CRef>& info,
-                           lcs::callstack&                        callstack) {
+constexpr static inline void printer(const std::string&                     message,
+                                     const std::optional<MallocInfo::CRef>& info,
+                                     lcs::callstack&                        callstack) {
     using formatter::Style;
     
     printer<Warning>(message, callstack);
     
     if (info.has_value()) {
-        const auto   colour = Warning ? Style::MAGENTA : Style::RED;
-        const auto & record = info.value().get();
+        constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
+        const auto& record = info.value().get();
         
         std::cerr << formatter::format<Style::ITALIC, colour>("Previously allocated here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
