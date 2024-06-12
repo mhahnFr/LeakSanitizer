@@ -40,7 +40,9 @@ namespace lsan {
  * pointer are stored as well.
  */
 struct MallocInfo {
+    /** The preferred reference type of this class.          */
     using Ref = std::reference_wrapper<MallocInfo>;
+    /** The preferred constant reference type of this class. */
     using CRef = std::reference_wrapper<const MallocInfo>;
 
     /** The pointer to the allocated piece of memory.             */
@@ -62,6 +64,11 @@ struct MallocInfo {
      */
     inline MallocInfo(void* const pointer, const std::size_t size): pointer(pointer), size(size) {}
 
+    /**
+     * @brief Marks this allocation record as deleted.
+     *
+     * Creates a callstack of the point this function is called.
+     */
     inline void markDeleted() {
         deleted = true;
         deletedCallstack = lcs::callstack();

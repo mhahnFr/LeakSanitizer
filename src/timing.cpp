@@ -53,6 +53,12 @@ void addTotalTime(std::chrono::nanoseconds duration, AllocType type) {
     getTimingMap()[type].total.push_back(duration);
 }
 
+/**
+ * Returns the minimal, maximal and average value of the given nanoseconds.
+ *
+ * @param values the values to examine
+ * @return the minimal, maximal and average values
+ */
 static inline auto getMinMaxAvg(const std::deque<std::chrono::nanoseconds>& values) -> std::tuple<std::chrono::nanoseconds, std::chrono::nanoseconds, double> {
     std::chrono::nanoseconds total{0}, min{std::chrono::nanoseconds::max()}, max{0};
     for (const auto value : values) {

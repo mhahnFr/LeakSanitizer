@@ -193,7 +193,7 @@ auto LSan::maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optio
         return std::make_pair(false, std::nullopt);
     }
     if (it->second.deleted) {
-        return std::make_pair(false, it->second);
+        return std::make_pair(false, std::ref(it->second));
     }
     if (__lsan_statsActive) {
         it->second.markDeleted();

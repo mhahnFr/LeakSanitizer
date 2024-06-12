@@ -141,12 +141,12 @@ static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) ->
  * @tparam S the style to be used
  */
 template<formatter::Style S>
-static inline void formatShared(const struct callstack_frame & frame, std::ostream & out) {
+static inline void formatShared(const callstack_frame& frame, std::ostream & out) {
     using formatter::Style;
     
     if (__lsan_printBinaries) {
         bool reset = false;
-        if (S == Style::GREYED || S == Style::BOLD) {
+        if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
         }
         out << formatter::format<Style::ITALIC>("(" + getCallstackFrameName(frame) + ")") << (reset ? formatter::get<S>() : "") << " ";
