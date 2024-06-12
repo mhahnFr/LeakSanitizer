@@ -123,25 +123,25 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
     while (!stack.empty()) {
         auto& elem = stack.top();
         stack.pop();
-        if (elem.get().getLeakType() > currentType && elem.get().getPointer() != info.getPointer()) {
-            elem.get().setLeakType(currentType);
+        if (elem.get().leakType > currentType && elem.get().pointer != info.pointer) {
+            elem.get().leakType = currentType;
             ++count;
-            bytes += elem.get().getSize();
+            bytes += elem.get().size;
         }
         
-        const auto beginPtr = align(elem.get().getPointer());
-        const auto   endPtr = align(beginPtr + elem.get().getSize(), false);
+        const auto beginPtr = align(elem.get().pointer);
+        const auto   endPtr = align(beginPtr + elem.get().size, false);
 
         for (uintptr_t it = beginPtr; it < endPtr; it += sizeof(uintptr_t)) {
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
             if (record == infos.end()
-                || record->second.isDeleted()
-                || record->second.getPointer() == info.getPointer()
-                || record->second.getPointer() == elem.get().getPointer()) {
+                || record->second.deleted
+                || record->second.pointer == info.pointer
+                || record->second.pointer == elem.get().pointer) {
                 continue;
             }
-            info.addViaMeReachable(record->second);
-            if (record->second.getLeakType() > currentType)
+            info.viaMeRecords.insert(&record->second);
+            if (record->second.leakType > currentType)
                 stack.push(record->second);
         }
     }
@@ -365,8 +365,8 @@ void LSan::classifyStackLeaksShallow() {
     const auto begin = align(findStackBegin());
     for (uintptr_t it = here; it < begin; it += sizeof(uintptr_t)) {
         const auto& record = infos.find(*reinterpret_cast<void**>(it));
-        if (record != infos.end() && !record->second.isDeleted()) {
-            record->second.setLeakType(LeakType::reachableDirect);
+        if (record != infos.end() && !record->second.deleted) {
+            record->second.leakType = LeakType::reachableDirect;
         }
     }
 }
@@ -388,7 +388,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
         const auto& local = locals.find(it->first);
-        if (local != locals.end() || it->second.isDeleted() || callstackHelper::getCallstackType(it->second.getCreatedCallstack()) != callstackHelper::CallstackType::USER) {
+        if (local != locals.end() || it->second.deleted || callstackHelper::getCallstackType(it->second.createdCallstack) != callstackHelper::CallstackType::USER) {
             it = infos.erase(it);
         } else {
             ++it;
@@ -397,9 +397,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Reachability analysis: Stack, part I...";
     for (auto& [ptr, record] : infos) {
-        if (record.getLeakType() == LeakType::reachableDirect) {
+        if (record.leakType == LeakType::reachableDirect) {
             ++toReturn.stack;
-            toReturn.bytesStack += record.getSize();
+            toReturn.bytesStack += record.size;
             const auto& [count, bytes] = classifyRecord(record, LeakType::reachableIndirect);
             toReturn.stackIndirect += count;
             toReturn.bytesStackIndirect += bytes;
@@ -442,22 +442,22 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& it = infos.find(value);
         if (it == infos.end()) continue;
 
-        it->second.setLeakType(LeakType::tlvDirect);
+        it->second.leakType = LeakType::tlvDirect;
         const auto& [count, bytes] = classifyRecord(it->second, LeakType::tlvIndirect);
         toReturn.tlvIndirect += count;
         toReturn.bytesTlvIndirect += bytes;
         ++toReturn.tlv;
-        toReturn.bytesTlv += it->second.getSize();
+        toReturn.bytesTlv += it->second.size;
         toReturn.recordsTlv.insert(&it->second);
     }
 
     out << clear << "Reachability analysis: Lost memory...";
     // All leaks still unclassified are unreachable, search for reachability inside them
     for (auto& [pointer, record] : infos) {
-        if (record.getLeakType() != LeakType::unclassified || record.isDeleted()) {
+        if (record.leakType != LeakType::unclassified || record.deleted) {
             continue;
         }
-        record.setLeakType(LeakType::unreachableDirect);
+        record.leakType = LeakType::unreachableDirect;
         const auto& [count, bytes] = classifyRecord(record, LeakType::unreachableIndirect);
         toReturn.lostIndirect += count;
         toReturn.bytesLostIndirect += bytes;
@@ -470,9 +470,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                     - toReturn.lostIndirect
                     - toReturn.tlv - toReturn.tlvIndirect;
     for (const auto& record : toReturn.recordsLost) {
-        if (record->getLeakType() != LeakType::unreachableDirect) continue;
+        if (record->leakType != LeakType::unreachableDirect) continue;
 
-        toReturn.bytesLost += record->getSize();
+        toReturn.bytesLost += record->size;
     }
     out << clear << clear;
     return toReturn;
@@ -680,7 +680,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << std::endl;
 
         for (const auto& record : stats.recordsLost) {
-            if (record->getLeakType() != LeakType::unreachableDirect) continue;
+            if (record->leakType != LeakType::unreachableDirect) continue;
 
             stream << *record << std::endl;
         }

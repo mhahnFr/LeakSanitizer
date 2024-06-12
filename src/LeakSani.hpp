@@ -101,13 +101,13 @@ class LSan {
                     indirectBytes { 0 };
         for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
-            if (record == infos.end() || record->second.isDeleted() || (skipClassifieds && record->second.getLeakType() != LeakType::unclassified)) {
+            if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
                 continue;
             }
-            if (record->second.getLeakType() > direct) {
-                record->second.setLeakType(direct);
+            if (record->second.leakType > direct) {
+                record->second.leakType = direct;
                 ++directCount;
-                directBytes += record->second.getSize();
+                directBytes += record->second.size;
                 directs.insert(&record->second);
             }
             const auto& [count, bytes] = classifyRecord(record->second, indirect);

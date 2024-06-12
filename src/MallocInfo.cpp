@@ -45,7 +45,7 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     stream << formatter::get<Style::ITALIC>
            << formatter::format<Style::BOLD, Style::RED>("Leak") << " of size "
            << formatter::clear<Style::ITALIC>
-           << bytesToString(self.size) << formatter::get<Style::ITALIC> << ", " << self.leakType << ", ";
+           << bytesToString(self.size) << formatter::get<Style::ITALIC> << ", " << self.leakType;
 
     std::size_t count { 0 },
                 bytes { 0 };
@@ -57,8 +57,9 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
         }
     }
     if (count > 0) {
-        stream << count << " leaks (" << bytesToString(bytes) << ") indirect" << std::endl;
+        stream << ", " << count << " leaks (" << bytesToString(bytes) << ") indirect";
     }
+    stream << std::endl;
     self.printCreatedCallstack(stream);
     return stream;
 }
