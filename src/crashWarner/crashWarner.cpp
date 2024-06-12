@@ -37,6 +37,7 @@ namespace lsan {
  * @param callstack the callstack to be printed
  * @param reason the optional reason for the message
  * @tparam Warning whether to use warning formatting
+ * @tparam SizeHint whether to print the size hint if Warning is false
  */
 template<bool Warning, bool SizeHint = true>
 constexpr static inline void printer(const std::string& message,
