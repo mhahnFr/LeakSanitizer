@@ -67,13 +67,11 @@ To use this sanitizer simply link your application against it (recommended) or p
 #### Linking (_recommended_)
 - Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default
 directories.
-- On Linux add `-rdynamic` to the linking flags.
 
 Link with: `-llsan`
 
 > [!TIP]
-> - Example **macOS**: `-L<path/to/library> -llsan`
-> - Example **Linux**: `-rdynamic -L<path/to/library> -llsan`
+> - Example: `-L<path/to/library> -llsan`
 
 #### Preloading
 Add this sanitizer's library to the dynamic loader preload environment variable:
@@ -108,73 +106,54 @@ int main(void) {
     free(a);
 }
 ```
-Compiled and linked on macOS with `cc main.c -L<path/to/library> -llsan` creates the following output:
+Compiled and linked on macOS with `cc main.c -g -L<path/to/library> -llsan` creates the following output:
 ```
 Exiting
 
-Leak of size 13 B, allocation stacktrace:
+Leak of size 13 B                   
 At: (/usr/lib/system/libsystem_c.dylib) strdup + 32
-in: (a.out) main + 34
+in: (a.out) main (main.c:8:9)
 at: (/usr/lib/dyld) start + 1903
 
-Leak of size 1023 B, allocation stacktrace:
-In: (a.out) main + 18
+Leak of size 1023 B                 
+In: (a.out) main (main.c:7:16)
 at: (/usr/lib/dyld) start + 1903
+
+
+Summary: 2 leaks, 1.01 KiB lost.
+```
+Compiled and linked on Debian with `gcc main.c -g -L<path/to/library> -llsan` creates the following output:
+```
+Exiting
+
+Leak of size 1023 B                 
+In: (a.out) main (main.c:7:16)
+at: (/usr/lib/x86_64-linux-gnu/libc.so.6) << Unknown >>
+at: (/usr/lib/x86_64-linux-gnu/libc.so.6) __libc_start_main + 133
+at: (a.out) _start + 33
+
+Leak of size 13 B                   
+At: (/usr/lib/x86_64-linux-gnu/libc.so.6) __strdup + 26
+in: (a.out) main (main.c:8:9)
+at: (/usr/lib/x86_64-linux-gnu/libc.so.6) << Unknown >>
+at: (/usr/lib/x86_64-linux-gnu/libc.so.6) __libc_start_main + 133
+at: (a.out) _start + 33
 
 
 Summary: 2 leaks, 1.01 KiB lost.
 ```
 
 #### Line numbers
-##### macOS
 Simply compile your code with debug symbols to add line numbers to the output.
 > [!TIP]
 > Usually, the appropriate flag is `-g`.
 
-The previous example compiled and linked on macOS with `cc -g main.c -L<path/to/library> -llsan` creates the following output:
+Currently, debug symbols in the following formats are supported:
+- DWARF in ELF binary files
+- DWARF in Mach-O debug maps (using Mach-O object files)
+- `.dSYM` Mach-O bundles
 
-```
-Exiting
-
-Leak of size 13 B, allocation stacktrace:
-At: (/usr/lib/system/libsystem_c.dylib) strdup + 32
-in: (a.out) main (main.c:8:9)
-at: (/usr/lib/dyld) start + 1903
-
-Leak of size 1023 B, allocation stacktrace:
-In: (a.out) main (main.c:7:16)
-at: (/usr/lib/dyld) start + 1903
-
-                                    
-Summary: 2 leaks, 1.01 KiB lost.
-```
-
-##### Linux
-To (partially) add line numbers, you can add `-Wno-gnu-include-next -I<path/to/library>/include` to the compiling flags
-of your code.
-
-The previous example compiled and linked on Debian with
-`gcc main.c -Wno-gnu-include-next -I<path/to/library>/include -rdynamic -L<path/to/library> -llsan` creates the following output:
-
-```
-Exiting
-
-Leak of size 1023 B, allocated at main.c:7
-In: (a.out) main + 33
-at: (/usr/lib/x86_64-linux-gnu/libc.so.6) << Unknown >>
-at: (/usr/lib/x86_64-linux-gnu/libc.so.6) __libc_start_main + 133
-at: (a.out) _start + 33
-
-Leak of size 13 B, allocation stacktrace:
-At: (/usr/lib/x86_64-linux-gnu/libc.so.6) __strdup + 26
-in: (a.out) main + 52
-at: (/usr/lib/x86_64-linux-gnu/libc.so.6) << Unknown >>
-at: (/usr/lib/x86_64-linux-gnu/libc.so.6) __libc_start_main + 133
-at: (a.out) _start + 33
-
-
-Summary: 2 leaks, 1.01 KiB lost.
-```
+The DWARF parser supports DWARF in version **2**, **3**, **4** and **5**.
 
 ### Behaviour
 Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the 
