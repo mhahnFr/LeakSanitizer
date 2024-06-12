@@ -22,6 +22,7 @@
 #include <array>
 #include <iostream>
 #include <optional>
+#include <sstream>
 #include <string>
 
 #ifdef __APPLE__
@@ -29,6 +30,9 @@
  #include <ucontext.h>
  #undef _XOPEN_SOURCE
 #endif /* __APPLE__ */
+
+#include <lsan_internals.h>
+#include <lsan_stats.h>
 
 #include "signals.hpp"
 #include "signalHandlers.hpp"
@@ -38,11 +42,6 @@
 #include "../MallocInfo.hpp"
 #include "../callstacks/callstackHelper.hpp"
 #include "../crashWarner/crash.hpp"
-
-#include "../../include/lsan_internals.h"
-#include "../../include/lsan_stats.h"
-
-#include <sstream>
 
 namespace lsan::signals::handlers {
 /**

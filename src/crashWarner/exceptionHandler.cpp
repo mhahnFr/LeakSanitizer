@@ -24,12 +24,12 @@
 #include <sstream>
 #include <typeinfo>
 
-#include "exceptionHandler.hpp"
+#include <callstack_exception.hpp>
 
 #include "crash.hpp"
-#include "../lsanMisc.hpp"
+#include "exceptionHandler.hpp"
 
-#include "../../CallstackLibrary/include/callstack_exception.hpp"
+#include "../lsanMisc.hpp"
 
 namespace lsan {
 /**

@@ -22,13 +22,13 @@
 #include <optional>
 #include <regex>
 
+#include <lsan_internals.h>
+
 #include "callstackHelper.hpp"
 
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../LeakSani.hpp"
-
-#include "../../include/lsan_internals.h"
 
 namespace lsan::callstackHelper {
 /**
@@ -141,12 +141,12 @@ static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) ->
  * @tparam S the style to be used
  */
 template<formatter::Style S>
-static inline void formatShared(const struct callstack_frame & frame, std::ostream & out) {
+static inline void formatShared(const callstack_frame& frame, std::ostream & out) {
     using formatter::Style;
     
     if (__lsan_printBinaries) {
         bool reset = false;
-        if (S == Style::GREYED || S == Style::BOLD) {
+        if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
         }
         out << formatter::format<Style::ITALIC>("(" + getCallstackFrameName(frame) + ")") << (reset ? formatter::get<S>() : "") << " ";
@@ -187,7 +187,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     for (i = printed = 0; i < size && printed < __lsan_callstackSize; ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
-        if (binaryFile == nullptr || isInLSan(binaryFile)) {
+        if (binaryFile == nullptr || (firstPrint && isInLSan(binaryFile))) {
             continue;
         } else if (firstHit && isFirstParty(binaryFile)) {
             stream << formatter::get<Style::GREYED>

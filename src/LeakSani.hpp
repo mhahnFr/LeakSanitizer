@@ -31,6 +31,8 @@
 #include <tuple>
 #include <utility>
 
+#include <lsan_internals.h>
+
 #include "MallocInfo.hpp"
 #include "helperStructs.hpp"
 
@@ -41,16 +43,11 @@
 #include "initialization/init.hpp"
 #include "statistics/Stats.hpp"
 
-#include "../include/lsan_internals.h"
-
 namespace lsan {
 /**
  * This class manages everything this sanitizer is capable to do.
  */
 class LSan {
-    /** A pair consisting of a boolean and an optional allocation record.               */
-    using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
-    
     /** A map containing all allocation records, sorted by their allocated pointers.    */
     std::map<const void * const, MallocInfo> infos;
     std::set<pthread_key_t>                  keys;
@@ -193,8 +190,8 @@ public:
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    auto removeMalloc(void* pointer) -> MallocInfoRemoved;
-    
+    auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+
     /**
      * Adds the given allocation record.
      *

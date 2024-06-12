@@ -19,13 +19,13 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <lsan_internals.h>
+
 #include "MallocInfo.hpp"
 
 #include "LeakSani.hpp"
 #include "formatter.hpp"
 #include "bytePrinter.hpp"
-
-#include "../include/lsan_internals.h"
 
 namespace lsan {
 static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs) -> bool {
@@ -39,7 +39,7 @@ static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs)
     return lhs > rhs;
 }
 
-auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream & {
+auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     using formatter::Style;
     
     stream << formatter::get<Style::ITALIC>
@@ -57,14 +57,8 @@ auto operator<<(std::ostream & stream, const MallocInfo & self) -> std::ostream 
         }
     }
     if (count > 0) {
-        stream << count << " leaks (" << bytesToString(bytes) << ") indirect, ";
+        stream << count << " leaks (" << bytesToString(bytes) << ") indirect" << std::endl;
     }
-    if (self.createdInFile.has_value() && self.createdOnLine.has_value()) {
-        stream << "allocated at " << formatter::format<Style::UNDERLINED>(self.createdInFile.value() + ":" + std::to_string(self.createdOnLine.value()));
-    } else {
-        stream << "allocation stacktrace:";
-    }
-    stream << std::endl;
     self.printCreatedCallstack(stream);
     return stream;
 }

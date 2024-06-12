@@ -23,6 +23,7 @@
 #define lsanMisc_hpp
 
 #include <iostream>
+#include <string>
 
 #include "LeakSani.hpp"
 

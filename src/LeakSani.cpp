@@ -26,6 +26,11 @@
 #include <algorithm>
 #include <stack>
 
+#include <lsan_internals.h>
+#include <lsan_stats.h>
+
+#include <callstack_internals.h>
+
 #include "LeakSani.hpp"
 
 #include "bytePrinter.hpp"
@@ -34,11 +39,6 @@
 #include "callstacks/callstackHelper.hpp"
 #include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
-
-#include "../include/lsan_internals.h"
-#include "../include/lsan_stats.h"
-
-#include "../CallstackLibrary/include/callstack_internals.h"
 
 #if defined(__x86_64__) || defined(__i386__)
  #define LSAN_CAN_WALK_STACK 1
@@ -507,41 +507,41 @@ LSan::LSan(): libName(lsanName().value()) {
 #endif
 }
 
-auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
+auto LSan::removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
     std::lock_guard lock(infoMutex);
     
     auto it = infos.find(pointer);
     if (it == infos.end()) {
-        return MallocInfoRemoved(false, std::nullopt);
-    } else if (it->second.isDeleted()) {
-        return MallocInfoRemoved(false, it->second);
+        return std::make_pair(false, std::nullopt);
+    } else if (it->second.deleted) {
+        return std::make_pair(false, std::ref(it->second));
     }
     if (__lsan_statsActive) {
         stats -= it->second;
-        it->second.setDeleted(true);
+        it->second.markDeleted();
     } else {
         infos.erase(it);
     }
-    return MallocInfoRemoved(true, std::nullopt);
+    return std::make_pair(true, std::nullopt);
 }
 
 auto LSan::changeMalloc(const MallocInfo& info) -> bool {
     std::lock_guard lock(infoMutex);
 
-    auto it = infos.find(info.getPointer());
+    auto it = infos.find(info.pointer);
     if (it == infos.end()) {
         return false;
     }
     if (__lsan_statsActive) {
-        if (it->second.getPointer() != info.getPointer()) {
+        if (it->second.pointer != info.pointer) {
             stats -= it->second;
             stats += info;
         } else {
-            stats.replaceMalloc(it->second.getSize(), info.getSize());
+            stats.replaceMalloc(it->second.size, info.size);
         }
-        it->second.setDeleted(true);
+        it->second.markDeleted();
     }
-    infos.insert_or_assign(info.getPointer(), info);
+    infos.insert_or_assign(info.pointer, info);
     return true;
 }
 
@@ -551,8 +551,8 @@ void LSan::addMalloc(MallocInfo&& info) {
     if (__lsan_statsActive) {
         stats += info;
     }
-
-    infos.insert_or_assign(info.getPointer(), info);
+    
+    infos.insert_or_assign(info.pointer, info);
 }
 
 /**
