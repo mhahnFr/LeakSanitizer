@@ -225,7 +225,7 @@ the detected memory leaks are printed.
 The backtraces are translated using the [CallstackLibrary][5].
 
 ## Final notes
-This project is licensed under the terms of the GPL 3.0.
+This project is licensed under the terms of the GNU GPL in version 3 or later.
 
 © Copyright 2022 - 2024 [mhahnFr][6] and contributors
 
