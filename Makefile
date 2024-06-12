@@ -45,7 +45,7 @@ endif
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
 
 ifeq ($(shell uname -s),Darwin)
- 	LDFLAGS += -current_version 1.8 -compatibility_version 1 -install_name $(abspath $@)
+ 	LDFLAGS += -current_version 1.9 -compatibility_version 1 -install_name $(abspath $@)
  	
  	NAME = $(DYLIB_NA)
 else
