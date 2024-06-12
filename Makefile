@@ -93,6 +93,7 @@ release:
 
 update:
 	$(MAKE) fclean
+	git fetch --tags
 	git pull
 	git submodule update
 	git -C $(LIBCALLSTACK_DIR) submodule update
