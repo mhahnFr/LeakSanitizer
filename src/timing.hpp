@@ -3,18 +3,20 @@
  *
  * Copyright (C) 2024  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef timing_hpp
@@ -27,21 +29,65 @@
 #include <ostream>
 
 namespace lsan::timing {
+/**
+ * This structure contatins the different timings.
+ */
 struct Timings {
+    /** The amount of time the system took.               */
     std::deque<std::chrono::nanoseconds> system;
+    /** The amount of time the mutex locking took.        */
     std::deque<std::chrono::nanoseconds> locking;
+    /** The amount of time the rest of the tracking took. */
     std::deque<std::chrono::nanoseconds> tracking;
+    /** The total time.                                   */
     std::deque<std::chrono::nanoseconds> total;
 };
 
+/**
+ * This enumeration contains the possible allocation types.
+ */
 enum class AllocType {
     malloc, calloc, realloc, free
 };
 
+/**
+ * Adds the given duration as system time amount to the given allocation type timings.
+ *
+ * @param duration the duration to add
+ * @param type the allocation type
+ */
 void addSystemTime(std::chrono::nanoseconds duration, AllocType type);
+
+/**
+ * Adds the given duration as mutex locking time amount to the given allocation type timings.
+ *
+ * @param duration the duration to add
+ * @param type the allocation type
+ */
 void addLockingTime(std::chrono::nanoseconds duration, AllocType type);
+
+/**
+ * Adds the given duration as rest of tracking time amount to the given allocation type timings.
+ *
+ * @param duration the duration to add
+ * @param type the allocation type
+ */
 void addTrackingTime(std::chrono::nanoseconds duration, AllocType type);
+
+/**
+ * Adds the given duration as total time amount to the given allocation type timings.
+ *
+ * @param duration the duration to add
+ * @param type the allocation type
+ */
 void addTotalTime(std::chrono::nanoseconds duration, AllocType type);
+
+/**
+ * Prints the timings nicely onto the given output stream.
+ *
+ * @param out the output stream to print to
+ * @return the given output stream
+ */
 auto printTimings(std::ostream& out) -> std::ostream&;
 }
 

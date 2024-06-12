@@ -199,6 +199,9 @@ static inline void __lsan_printFStats() {
 }
 
 /**
+ * @deprecated Since version 1.9 replaced by `__lsan_printFStats()` and `__lsan_printFragmentationStats()`.
+ * Will be removed in version 2.
+ *
  * @brief Prints the statistics of the memory fragmentation.
  *
  * The bar has a size of 100 characters, it can be adjusted by using `__lsan_printFragStatsWithWidth(size_t)`.
@@ -210,7 +213,7 @@ static inline void __lsan_printFStats() {
  *
  * @since 1.2
  */
-DEPRECATED("Since v1.? refer to __lsan_printFStats() or __lsan_printFragmentationStats()")
+DEPRECATED("Since v1.9 refer to __lsan_printFStats() or __lsan_printFragmentationStats()")
 static inline void __lsan_printFragStats() {
     __lsan_printFragmentationStats();
 }
@@ -232,6 +235,9 @@ static inline void __lsan_printFStatsWithWidth(size_t width) {
 }
 
 /**
+ * @deprecated Since version 1.9 replaced by `__lsan_printFStatsWithWidth(size_t)` and `__lsan_printFragmentationStatsWithWidth(size_t)`.
+ * Will be removed in version 2.
+ *
  * @brief Prints the statistics of the memory fragmentation.
  *
  * The size of the bar is specified by the given argument. The output stream defined by `__lsan_printCout`
@@ -243,7 +249,7 @@ static inline void __lsan_printFStatsWithWidth(size_t width) {
  * @param width The width in characters the printed bar should have.
  * @since 1.2
  */
-DEPRECATED("Since v1.? refer to __lsan_printFStatsWithWidth(size_t) or __lsan_printFragmentationStatsWithWidth(size_t)")
+DEPRECATED("Since v1.9 refer to __lsan_printFStatsWithWidth(size_t) or __lsan_printFragmentationStatsWithWidth(size_t)")
 static inline void __lsan_printFragStatsWithWidth(size_t width) {
     __lsan_printFragmentationStatsWithWidth(width);
 }
