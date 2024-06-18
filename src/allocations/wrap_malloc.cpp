@@ -142,7 +142,27 @@ auto malloc_zone_valloc(malloc_zone_t* zone, std::size_t size) -> void* {
     return ptr;
 }
 
-// TODO: realloc, free, memalign
+auto malloc_zone_memalign(malloc_zone_t* zone, std::size_t alignment, std::size_t size) -> void* {
+//    assert(zone != nullptr);
+
+    auto ptr = ::malloc_zone_memalign(zone, alignment, size);
+    if (ptr != nullptr && !LSan::finished) {
+        auto& tracker = getTracker();
+        const std::lock_guard lock { tracker.mutex };
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+
+            if (__lsan_zeroAllocation && size == 0) {
+                warn("Implementation-defined allocation of size 0");
+            }
+            tracker.addMalloc(MallocInfo(ptr, size));
+            tracker.ignoreMalloc = false;
+        }
+    }
+    return ptr;
+}
+
+// TODO: realloc, free
 #endif
 
 auto malloc(std::size_t size) -> void * {
@@ -202,12 +222,34 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void* {
     return ptr;
 }
 
+// TODO: POSIX?
 auto valloc(std::size_t size) -> void* {
     auto ptr = ::valloc(size);
 
     if (ptr != nullptr && !LSan::finished) {
         auto& tracker = getTracker();
-        std::lock_guard lock { tracker.mutex };
+        const std::lock_guard lock { tracker.mutex };
+
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+
+            if (__lsan_zeroAllocation && size == 0) {
+                warn("Implementation-defined allocation of size 0");
+            }
+            tracker.addMalloc(MallocInfo(ptr, size));
+            tracker.ignoreMalloc = false;
+        }
+    }
+    return ptr;
+}
+
+// TODO: POSIX?
+auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
+    auto ptr = ::aligned_alloc(alignment, size);
+
+    if (ptr != nullptr && !LSan::finished) {
+        auto& tracker = getTracker();
+        const std::lock_guard lock { tracker.mutex };
 
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
@@ -310,7 +352,7 @@ void free(void * pointer) {
     })
 }
 
-// TODO: (posix_)memalign, aligned_alloc
+// TODO: (posix_)memalign
 
 #ifndef __linux__
 } /* namespace lsan */
@@ -318,6 +360,7 @@ void free(void * pointer) {
 INTERPOSE(lsan::malloc,  malloc);
 INTERPOSE(lsan::calloc,  calloc);
 INTERPOSE(lsan::valloc,  valloc);
+INTERPOSE(lsan::aligned_alloc, aligned_alloc);
 INTERPOSE(lsan::realloc, realloc);
 INTERPOSE(lsan::free,    free);
 
@@ -325,6 +368,7 @@ INTERPOSE(lsan::free,    free);
 INTERPOSE(lsan::malloc_zone_malloc, malloc_zone_malloc);
 INTERPOSE(lsan::malloc_zone_calloc, malloc_zone_calloc);
 INTERPOSE(lsan::malloc_zone_valloc, malloc_zone_valloc);
+INTERPOSE(lsan::malloc_zone_memalign, malloc_zone_memalign);
 #endif
 
 #endif /* !__linux__ */
