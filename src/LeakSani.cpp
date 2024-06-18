@@ -35,6 +35,7 @@
 #include "lsanMisc.hpp"
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
+#include "crashWarner/exceptionHandler.hpp"
 #include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
 
@@ -92,9 +93,8 @@ static inline auto createSaniKey() -> pthread_key_t {
     return key;
 }
 
-LSan::LSan(): /*libName(lsanName().value()), */saniKey(createSaniKey()) {
-//    libName = lsanName().value();
-    atexit(exitHook); // TODO: Übrigens fehlt hier noch der exception handler
+LSan::LSan(): saniKey(createSaniKey()) {
+    atexit(exitHook);
 
     signals::registerFunction(signals::handlers::stats, SIGUSR1);
     
@@ -120,6 +120,8 @@ LSan::LSan(): /*libName(lsanName().value()), */saniKey(createSaniKey()) {
 #if defined(__APPLE__) || defined(SIGEMT)
     signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGEMT);
 #endif
+
+    std::set_terminate(exceptionHandler);
 }
 
 void LSan::finish() {
