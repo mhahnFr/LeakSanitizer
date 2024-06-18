@@ -41,7 +41,6 @@
 #endif
 
 #include "allocations/realAlloc.hpp"
-#include "initialization/init.hpp"
 #include "statistics/Stats.hpp"
 
 namespace lsan {

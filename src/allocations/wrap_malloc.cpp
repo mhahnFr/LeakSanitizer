@@ -37,7 +37,6 @@
 #include "../timing.hpp"
 #include "../crashWarner/crash.hpp"
 #include "../crashWarner/warn.hpp"
-#include "../initialization/init.hpp"
 
 #ifdef __linux__
 auto operator new(std::size_t size) -> void * {
