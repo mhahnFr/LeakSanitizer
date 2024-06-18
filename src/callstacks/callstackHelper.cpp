@@ -28,17 +28,10 @@
 
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
-#include "../LeakSani.hpp"
 
 namespace lsan::callstackHelper {
-/**
- * Returns whether the given binary file name is this library.
- *
- * @param name the name to be checked
- * @return whether the given name is this library
- */
-static inline auto isInLSan(const std::string & name) -> bool {
-    return getInstance().getLibName() == name;
+constexpr static inline auto isInLSan(const callstack_frame& frame) -> bool {
+    return frame.info.has_value && frame.info.value.isSelf;
 }
 
 /**
@@ -90,7 +83,7 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
     for (std::size_t i = 0; i < frameCount; ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
-        if (binaryFile == nullptr || isInLSan(binaryFile)) {
+        if (binaryFile == nullptr || isInLSan(frames[i])) {
             continue;
         } else if (isTotallyIgnored(binaryFile)) {
             return CallstackType::HARD_IGNORE;
@@ -187,7 +180,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     for (i = printed = 0; i < size && printed < __lsan_callstackSize; ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
-        if (binaryFile == nullptr || (firstPrint && isInLSan(binaryFile))) {
+        if (binaryFile == nullptr || (firstPrint && isInLSan(frames[i]))) {
             continue;
         } else if (firstHit && isFirstParty(binaryFile)) {
             stream << formatter::get<Style::GREYED>
