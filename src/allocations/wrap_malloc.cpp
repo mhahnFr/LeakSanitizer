@@ -304,8 +304,8 @@ void free(void * pointer) {
     BENCH_ONLY(std::chrono::nanoseconds totalTime {0});
 
     if (!lsan::LSan::finished) {
-        auto& tracker = getTracker();
-        BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
+        auto& tracker = lsan::getTracker();
+        BENCH(const std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
 
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
@@ -316,8 +316,8 @@ void free(void * pointer) {
                     const auto& it = tracker.removeMalloc(pointer);
                     if (__lsan_invalidFree && !it.first /*&& malloc_zone_from_ptr(pointer) == nullptr*/) {
                         if (__lsan_invalidCrash) {
-                            malloc_zone_print_ptr_info(pointer);
-                            __builtin_printf("Zone: %s\n", malloc_zone_from_ptr(pointer)->zone_name);
+                            //malloc_zone_print_ptr_info(pointer);
+                            //__builtin_printf("Zone: %s\n", malloc_zone_from_ptr(pointer)->zone_name);
                             lsan::crash("Invalid free", it.second);
                         } else {
                             lsan::warn("Invalid free", it.second);

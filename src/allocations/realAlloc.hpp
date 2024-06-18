@@ -26,10 +26,11 @@
 
 #ifdef __linux__
 extern "C" {
-void * __libc_malloc(std::size_t);
-void * __libc_calloc(std::size_t, std::size_t);
-void * __libc_realloc(void *, std::size_t);
-void   __libc_free(void *);
+void* __libc_malloc(std::size_t);
+void* __libc_calloc(std::size_t, std::size_t);
+void* __libc_realloc(void *, std::size_t);
+void  __libc_free(void *);
+void* __libc_memalign(std::size_t, std::size_t);
 }
 #endif
 
@@ -73,7 +74,7 @@ static inline auto calloc(std::size_t count, std::size_t size) -> void * {
 static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     void* toReturn;
 #ifdef __linux__
-    abort();
+    toReturn = __libc_memalign(alignment, size);
 #else
     toReturn = std::aligned_alloc(alignment, size);
 #endif

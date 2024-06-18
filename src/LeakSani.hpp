@@ -22,6 +22,7 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
+#include <atomic>
 #include <map>
 #include <mutex>
 #include <optional>
