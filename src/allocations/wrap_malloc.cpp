@@ -233,13 +233,15 @@ void free(void * pointer) {
             BENCH({
                 if (pointer == nullptr && __lsan_freeNull) {
                     lsan::warn("Free of NULL");
-                }
-                auto it = tracker.removeMalloc(pointer);
-                if (__lsan_invalidFree && !it.first) {
-                    if (__lsan_invalidCrash) {
-                        lsan::crash("Invalid free", it.second);
-                    } else {
-                        lsan::warn("Invalid free", it.second);
+                } else if (pointer != nullptr) {
+                    const auto& it = tracker.removeMalloc(pointer);
+                    if (__lsan_invalidFree && !it.first /*&& malloc_zone_from_ptr(pointer) == nullptr*/) {
+                        if (__lsan_invalidCrash) {
+//                            malloc_zone_print_ptr_info(pointer);
+                            lsan::crash("Invalid free", it.second);
+                        } else {
+                            lsan::warn("Invalid free", it.second);
+                        }
                     }
                 }
             }, std::chrono::nanoseconds, trackingTime);
