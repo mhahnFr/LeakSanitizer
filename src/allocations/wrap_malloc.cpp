@@ -28,6 +28,10 @@
 #include "interpose.hpp"
 #include "realAlloc.hpp"
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#endif
+
 #include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
 #include "../timing.hpp"
@@ -77,6 +81,51 @@ void __wrap_free(void* pointer, const char*, int) {
 #ifndef __linux__
 namespace lsan {
 #endif /* !__linux__ */
+
+#ifdef __APPLE__
+auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
+//    assert(zone != nullptr);
+
+    auto ptr = ::malloc_zone_malloc(zone, size);
+    if (ptr != nullptr) {
+        auto& tracker = getTracker();
+        const std::lock_guard lock { tracker.mutex };
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+
+            if (__lsan_zeroAllocation && size == 0) {
+                warn("Implementation-defined allocation of size 0");
+            }
+            tracker.addMalloc(MallocInfo(ptr, size));
+            tracker.ignoreMalloc = false;
+        }
+    }
+    return ptr;
+}
+
+auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size) -> void* {
+    // TODO: What if it simply malloc's?
+//    assert(zone != nullptr);
+
+    auto ptr = ::malloc_zone_calloc(zone, count, size);
+    if (ptr != nullptr) {
+        auto& tracker = getTracker();
+        const std::lock_guard lock { tracker.mutex };
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+
+            if (__lsan_zeroAllocation && size == 0) {
+                warn("Implementation-defined allocation of size 0");
+            }
+            tracker.addMalloc(MallocInfo(ptr, count * size));
+            tracker.ignoreMalloc = false;
+        }
+    }
+    return ptr;
+}
+
+// TODO: realloc, free, valloc, memalign
+#endif
 
 auto malloc(std::size_t size) -> void * {
     BENCH(auto ptr = lsan::real::malloc(size);, std::chrono::nanoseconds, systemTime);
@@ -221,6 +270,8 @@ void free(void * pointer) {
     })
 }
 
+// TODO: memalign, valloc, reallocf
+
 #ifndef __linux__
 } /* namespace lsan */
 
@@ -228,5 +279,10 @@ INTERPOSE(lsan::malloc,  malloc);
 INTERPOSE(lsan::calloc,  calloc);
 INTERPOSE(lsan::realloc, realloc);
 INTERPOSE(lsan::free,    free);
+
+#ifdef __APPLE__
+INTERPOSE(lsan::malloc_zone_malloc, malloc_zone_malloc);
+INTERPOSE(lsan::malloc_zone_calloc, malloc_zone_calloc);
+#endif
 
 #endif /* !__linux__ */
