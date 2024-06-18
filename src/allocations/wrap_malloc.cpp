@@ -86,7 +86,7 @@ auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
 //    assert(zone != nullptr);
 
     auto ptr = ::malloc_zone_malloc(zone, size);
-    if (ptr != nullptr && !lsan::LSan::finished) {
+    if (ptr != nullptr && !LSan::finished) {
         auto& tracker = getTracker();
         const std::lock_guard lock { tracker.mutex };
         if (!tracker.ignoreMalloc) {
@@ -106,7 +106,7 @@ auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size
 //    assert(zone != nullptr);
 
     auto ptr = ::malloc_zone_calloc(zone, count, size);
-    if (ptr != nullptr && !lsan::LSan::finished) {
+    if (ptr != nullptr && !LSan::finished) {
         auto& tracker = getTracker();
         const std::lock_guard lock { tracker.mutex };
         if (!tracker.ignoreMalloc) {
@@ -122,7 +122,27 @@ auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size
     return ptr;
 }
 
-// TODO: realloc, free, valloc, memalign
+auto malloc_zone_valloc(malloc_zone_t* zone, std::size_t size) -> void* {
+//    assert(zone != nullptr);
+
+    auto ptr = ::malloc_zone_valloc(zone, size);
+    if (ptr != nullptr && !LSan::finished) {
+        auto& tracker = getTracker();
+        const std::lock_guard lock { tracker.mutex };
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+
+            if (__lsan_zeroAllocation && size == 0) {
+                warn("Implementation-defined allocation of size 0");
+            }
+            tracker.addMalloc(MallocInfo(ptr, size));
+            tracker.ignoreMalloc = false;
+        }
+    }
+    return ptr;
+}
+
+// TODO: realloc, free, memalign
 #endif
 
 auto malloc(std::size_t size) -> void * {
@@ -254,7 +274,8 @@ void free(void * pointer) {
                     const auto& it = tracker.removeMalloc(pointer);
                     if (__lsan_invalidFree && !it.first /*&& malloc_zone_from_ptr(pointer) == nullptr*/) {
                         if (__lsan_invalidCrash) {
-//                            malloc_zone_print_ptr_info(pointer);
+                            malloc_zone_print_ptr_info(pointer);
+                            __builtin_printf("Zone: %s\n", malloc_zone_from_ptr(pointer)->zone_name);
                             lsan::crash("Invalid free", it.second);
                         } else {
                             lsan::warn("Invalid free", it.second);
@@ -296,12 +317,14 @@ void free(void * pointer) {
 
 INTERPOSE(lsan::malloc,  malloc);
 INTERPOSE(lsan::calloc,  calloc);
+INTERPOSE(lsan::valloc,  valloc);
 INTERPOSE(lsan::realloc, realloc);
 INTERPOSE(lsan::free,    free);
 
 #ifdef __APPLE__
 INTERPOSE(lsan::malloc_zone_malloc, malloc_zone_malloc);
 INTERPOSE(lsan::malloc_zone_calloc, malloc_zone_calloc);
+INTERPOSE(lsan::malloc_zone_valloc, malloc_zone_valloc);
 #endif
 
 #endif /* !__linux__ */
