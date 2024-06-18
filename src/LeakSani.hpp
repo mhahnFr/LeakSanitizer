@@ -40,6 +40,7 @@
  #include "timing.hpp"
 #endif
 
+#include "allocations/realAlloc.hpp"
 #include "initialization/init.hpp"
 #include "statistics/Stats.hpp"
 
@@ -94,6 +95,10 @@ protected:
     }
 
 public:
+    inline static void* operator new(std::size_t count) {
+        return real::malloc(count);
+    }
+
     auto removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
     void changeMalloc(ATracker* tracker, MallocInfo&& info);
     void registerTracker(ATracker* tracker);

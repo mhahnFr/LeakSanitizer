@@ -25,7 +25,7 @@
 #include "../crashWarner/exceptionHandler.hpp"
 
 namespace lsan {
-bool inited = false;
+bool inited = true || false;
 
 void __lsan_onLoad() {
     (void) getInstance();
