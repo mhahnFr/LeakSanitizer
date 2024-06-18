@@ -29,7 +29,7 @@
 #include "realAlloc.hpp"
 
 #ifdef __APPLE__
-#include <malloc/malloc.h>
+ #include <malloc/malloc.h>
 #endif
 
 #include "../LeakSani.hpp"
@@ -103,7 +103,6 @@ auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
 }
 
 auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size) -> void* {
-    // TODO: What if it simply malloc's?
 //    assert(zone != nullptr);
 
     auto ptr = ::malloc_zone_calloc(zone, count, size);
@@ -155,8 +154,7 @@ auto malloc(std::size_t size) -> void * {
     return ptr;
 }
 
-auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What if calloc malloc's?
-    // TODO: Overflow check
+auto calloc(std::size_t objectSize, std::size_t count) -> void* {
     BENCH(auto ptr = lsan::real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
     
     if (ptr != nullptr && !lsan::LSan::finished) {
@@ -178,6 +176,26 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What
                 lsan::timing::addSystemTime(sysTime, lsan::timing::AllocType::calloc);
                 lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::calloc);
             })
+            tracker.ignoreMalloc = false;
+        }
+    }
+    return ptr;
+}
+
+auto valloc(std::size_t size) -> void* {
+    auto ptr = ::valloc(size);
+
+    if (ptr != nullptr && !LSan::finished) {
+        auto& tracker = getTracker();
+        std::lock_guard lock { tracker.mutex };
+
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+
+            if (__lsan_zeroAllocation && size == 0) {
+                warn("Implementation-defined allocation of size 0");
+            }
+            tracker.addMalloc(MallocInfo(ptr, size));
             tracker.ignoreMalloc = false;
         }
     }
@@ -271,7 +289,7 @@ void free(void * pointer) {
     })
 }
 
-// TODO: memalign, valloc, reallocf
+// TODO: (posix_)memalign, aligned_alloc
 
 #ifndef __linux__
 } /* namespace lsan */
