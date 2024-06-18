@@ -61,7 +61,7 @@ class LSan: public ATracker {
     std::mutex tlsTrackerMutex;
 
     /** The runtime name of this sanitizer.                                             */
-    /*const */std::string libName; // TODO: Replace the name with its address - the memory will thank it later
+    std::string libName;
 
 #ifdef BENCHMARK
     std::map<timing::AllocType, timing::Timings> timingMap;
@@ -105,13 +105,11 @@ public:
     void deregisterTracker(ATracker* tracker);
     void absorbLeaks(std::map<const void* const, MallocInfo>&& leaks);
 
-    std::atomic_bool finished = false;
+    static std::atomic_bool finished;
     void finish() override;
 
     LSan();
-   ~LSan() {
-        inited = false;
-    }
+   ~LSan() = default;
     
     LSan(const LSan &)              = delete;
     LSan(const LSan &&)             = delete;

@@ -87,7 +87,7 @@ auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
 //    assert(zone != nullptr);
 
     auto ptr = ::malloc_zone_malloc(zone, size);
-    if (ptr != nullptr) {
+    if (ptr != nullptr && !lsan::LSan::finished) {
         auto& tracker = getTracker();
         const std::lock_guard lock { tracker.mutex };
         if (!tracker.ignoreMalloc) {
@@ -108,7 +108,7 @@ auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size
 //    assert(zone != nullptr);
 
     auto ptr = ::malloc_zone_calloc(zone, count, size);
-    if (ptr != nullptr) {
+    if (ptr != nullptr && !lsan::LSan::finished) {
         auto& tracker = getTracker();
         const std::lock_guard lock { tracker.mutex };
         if (!tracker.ignoreMalloc) {
@@ -130,7 +130,7 @@ auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size
 auto malloc(std::size_t size) -> void * {
     BENCH(auto ptr = lsan::real::malloc(size);, std::chrono::nanoseconds, systemTime);
     
-    if (ptr != nullptr && lsan::inited) {
+    if (ptr != nullptr && !lsan::LSan::finished) {
         auto& tracker = lsan::getTracker();
         BENCH(const std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
 
@@ -160,7 +160,7 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What
     // TODO: Overflow check
     BENCH(auto ptr = lsan::real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
     
-    if (ptr != nullptr && lsan::inited) {
+    if (ptr != nullptr && !lsan::LSan::finished) {
         auto& tracker = lsan::getTracker();
         BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
 
@@ -186,8 +186,8 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void * { // TODO: What
 }
 
 auto realloc(void * pointer, std::size_t size) -> void * {
-    if (!lsan::inited) return lsan::real::realloc(pointer, size);
-    
+    if (lsan::LSan::finished) return lsan::real::realloc(pointer, size);
+
     auto& tracker = lsan::getTracker();
     BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
 
@@ -223,8 +223,8 @@ auto realloc(void * pointer, std::size_t size) -> void * {
 
 void free(void * pointer) {
     BENCH_ONLY(std::chrono::nanoseconds totalTime {0});
-    
-    if (lsan::inited) {
+
+    if (!lsan::LSan::finished) {
         auto& tracker = getTracker();
         BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
 

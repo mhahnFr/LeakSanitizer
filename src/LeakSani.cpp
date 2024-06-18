@@ -40,6 +40,8 @@
 #include "signals/signalHandlers.hpp"
 
 namespace lsan {
+std::atomic_bool LSan::finished = false;
+
 /**
  * Returns an optional containing the runtime name of this library.
  *
