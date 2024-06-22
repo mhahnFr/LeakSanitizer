@@ -46,7 +46,9 @@
 
 namespace lsan {
 /**
- * This class manages everything this sanitizer is capable to do.
+ * @brief This class manages everything this sanitizer is capable to do.
+ *
+ * It acts as an allocation tracker.
  */
 class LSan: public ATracker {
     /** An object holding all statistics.                                               */
@@ -57,14 +59,18 @@ class LSan: public ATracker {
     std::optional<std::optional<std::regex>> userRegex;
     /** The user regex error message.                                                   */
     std::optional<std::string> userRegexError;
+    /** The registered thread-local allocation trackers.                                */
     std::set<ATracker*> tlsTrackers;
+    /** The mutex to manage the access to the registered thread-local trackers.         */
     std::mutex tlsTrackerMutex;
 
     /** The runtime name of this sanitizer.                                             */
     std::string libName;
 
 #ifdef BENCHMARK
+    /** The registered timings of the allocations.                                      */
     std::map<timing::AllocType, timing::Timings> timingMap;
+    /** The mutex to manage access to the allocation timings.                           */
     std::mutex timingMutex;
 #endif
     
@@ -85,6 +91,14 @@ class LSan: public ATracker {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
     
+    /**
+     * @brief Attempts to remove the allocation record associated with the given pointer.
+     *
+     * Does not search in the thread-local trackers.
+     *
+     * @param pointer the allocation pointer
+     * @return whether a record was removed and the potentially existing record
+     */
     auto maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
 
     static auto loadName() -> std::string;
@@ -99,14 +113,52 @@ public:
         return real::malloc(count);
     }
 
+    /**
+     * @brief Attempts to remove the allocation record associated with the given pointer.
+     *
+     * If no record is found in this instance, all registered trackers except
+     * the given one are searched for the record.
+     *
+     * @param tracker the tracker to not be searched
+     * @param pointer the pointer to the allocation
+     * @return whether a record was removed and the potentially existing record
+     */
     auto removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+
+    /**
+     * @brief Replaces the allocation record with the given one.
+     *
+     * If no record is found in this instance, all registered trackers except
+     * the given one are searched for the record.
+     *
+     * @param tracker the allocation tracker to not be searched
+     * @param info the new allocation record
+     */
     void changeMalloc(ATracker* tracker, MallocInfo&& info);
+
+    /**
+     * Registers the given allocation tracker.
+     *
+     * @param tracker the allocation tracker to be registered
+     */
     void registerTracker(ATracker* tracker);
+
+    /**
+     * Deregisters the given allocation tracker.
+     *
+     * @param tracker the allocation tracker to be deregistered
+     */
     void deregisterTracker(ATracker* tracker);
+
+    /**
+     * Absorbs the given allocation records.
+     */
     void absorbLeaks(std::map<const void* const, MallocInfo>&& leaks);
 
+    /** Indicates whether the allocation tracking has finished. */
     static std::atomic_bool finished;
-    void finish() override;
+
+    virtual void finish() override;
 
     LSan();
    ~LSan() = default;
@@ -116,13 +168,24 @@ public:
     LSan & operator=(const LSan &)  = delete;
     LSan & operator=(const LSan &&) = delete;
     
+    /** The thread-local storage key used for the thread-local allocation trackers. */
     const pthread_key_t saniKey;
 
 #ifdef BENCHMARK
+    /**
+     * Returns the allocation timings.
+     *
+     * @return the allocation timings
+     */
     constexpr inline auto getTimingMap() -> std::map<timing::AllocType, timing::Timings>& {
         return timingMap;
     }
 
+    /**
+     * Returns the timing mutex.
+     *
+     * @return the timing mutex
+     */
     constexpr inline auto getTimingMutex() -> std::mutex& {
         return timingMutex;
     }
