@@ -27,10 +27,22 @@
 #include "ATracker.hpp"
 
 namespace lsan {
+/**
+ * This class represents a thread-local allocation tracker.
+ */
 class TLSTracker: public ATracker {
 private:
+    /** Indicates whether the tracking has finished. */
     std::atomic_bool finished = false;
 
+    /**
+     * @brief Attempts to remove the allocation record associated with the given pointer.
+     *
+     * Does not search in other trackers.
+     *
+     * @param pointer the allocation pointer
+     * @return whether a record was removed and the potentially already existing record
+     */
     auto maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
 
 public:
