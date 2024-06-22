@@ -25,6 +25,11 @@
 #include <ostream>
 
 namespace lsan {
+/**
+ * @brief This enumeration contains the possible leak kinds.
+ *
+ * The order indicates the classification priority.
+ */
 enum class LeakType {
     reachableDirect,
     reachableIndirect,
@@ -41,6 +46,12 @@ enum class LeakType {
     unclassified
 };
 
+/**
+ * Returns whether the given leak type is an indirect one.
+ *
+ * @param type the leak type to be checked
+ * @return whether the leak type is an indirect one
+ */
 static inline auto isIndirect(const LeakType& type) -> bool {
     return type == LeakType::tlvIndirect
         || type == LeakType::globalIndirect
@@ -63,6 +74,12 @@ static inline auto operator<<(std::ostream& out, const LeakType& type) -> std::o
     return out;
 }
 
+/**
+ * Returns the name of the given leak type.
+ *
+ * @param type the leak type
+ * @return the string representation of the leak type
+ */
 constexpr static inline auto debugString(const LeakType& type) -> const char* {
     switch (type) {
         case LeakType::unclassified:        return "unclassified";
