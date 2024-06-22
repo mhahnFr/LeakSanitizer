@@ -85,6 +85,11 @@ auto isATTY() -> bool;
  */
 auto has(const std::string & var) -> bool;
 
+/**
+ * Returns the tracker instance to be used to track allocations.
+ *
+ * @return the tracker to be used
+ */
 auto getTracker() -> ATracker&;
 
 /**
