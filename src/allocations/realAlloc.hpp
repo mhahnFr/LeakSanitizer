@@ -71,6 +71,13 @@ static inline auto calloc(std::size_t count, std::size_t size) -> void * {
     return toReturn;
 }
 
+/**
+ * Calls the real `aligned_alloc` function.
+ *
+ * @param alignment the allocation alignment
+ * @param size the amount of bytes
+ * @return the allocated block of memory
+ */
 static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     void* toReturn;
 #ifdef __linux__
