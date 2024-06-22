@@ -73,6 +73,12 @@ auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
     }
 }
 
+/**
+ * If the given pointer is a TLSTracker, it is deleted and the thread-local
+ * value is set to point to the global tracker instance.
+ *
+ * @param value the thread-local value
+ */
 static inline void destroySaniKey(void* value) {
     auto& globalInstance = getInstance();
     if (value != std::addressof(globalInstance)) {
@@ -87,6 +93,14 @@ static inline void destroySaniKey(void* value) {
     }
 }
 
+/**
+ * @brief Creates and returns a thread-local storage key with the function
+ * `destroySaniKey` as destructor.
+ *
+ * Throws an exception if no key could be created.
+ *
+ * @return the thread-local storage key
+ */
 static inline auto createSaniKey() -> pthread_key_t {
     pthread_key_t key;
     if (pthread_key_create(&key, destroySaniKey) != 0) {
