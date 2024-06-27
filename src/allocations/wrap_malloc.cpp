@@ -196,7 +196,26 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
     ::malloc_destroy_zone(zone);
 }
 
-// TODO: realloc, free, batch versions
+auto malloc_zone_batch_malloc(malloc_zone_t* zone, std::size_t size, void** results, unsigned num_requested) -> unsigned {
+    if (zone == nullptr) {
+        crashForce("Batch allocating with NULL zone");
+    }
+    auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested);
+    if (!LSan::finished && batched > 0) {
+        auto& tracker = getTracker();
+        const std::lock_guard lock { tracker.mutex };
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+            for (std::size_t i = 0; i < batched; ++i) {
+                tracker.addMalloc(MallocInfo(results[i], size));
+            }
+            tracker.ignoreMalloc = false;
+        }
+    }
+    return batched;
+}
+
+// TODO: realloc, free, batch free
 #endif
 
 auto malloc(std::size_t size) -> void * {
@@ -384,7 +403,7 @@ void free(void * pointer) {
     })
 }
 
-int posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) {
+auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
     if (memPtr == nullptr) {
         lsan::crashForce("posix_memalign of a NULL pointer");
     }
@@ -431,6 +450,7 @@ INTERPOSE(lsan::malloc_zone_calloc,   malloc_zone_calloc);
 INTERPOSE(lsan::malloc_zone_valloc,   malloc_zone_valloc);
 INTERPOSE(lsan::malloc_zone_memalign, malloc_zone_memalign);
 INTERPOSE(lsan::malloc_destroy_zone,  malloc_destroy_zone);
+INTERPOSE(lsan::malloc_zone_batch_malloc, malloc_zone_batch_malloc);
 #endif
 
 #endif /* !__linux__ */
