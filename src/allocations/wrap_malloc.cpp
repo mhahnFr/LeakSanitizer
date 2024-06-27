@@ -244,7 +244,38 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, unsigned nu
     ::malloc_zone_batch_free(zone, to_be_freed, num);
 }
 
-// TODO: realloc, free
+auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, std::size_t size) -> void* {
+    if (zone == nullptr) {
+        crashForce("Called with NULL as zone");
+    }
+
+    if (LSan::finished) {
+        return ::malloc_zone_realloc(zone, ptr, size);
+    }
+    auto& tracker = getTracker();
+    std::lock_guard lock { tracker.mutex };
+    auto ignored = tracker.ignoreMalloc;
+    if (!ignored) {
+        tracker.ignoreMalloc = true;
+    }
+    auto toReturn = ::malloc_zone_realloc(zone, ptr, size);
+    if (!ignored) {
+        if (toReturn != nullptr) {
+            if (toReturn != ptr) {
+                if (ptr != nullptr) {
+                    tracker.removeMalloc(ptr);
+                }
+                tracker.addMalloc(MallocInfo(toReturn, size));
+            } else {
+                tracker.changeMalloc(MallocInfo(toReturn, size));
+            }
+        }
+        tracker.ignoreMalloc = false;
+    }
+    return toReturn;
+}
+
+// TODO: free
 #endif
 
 auto malloc(std::size_t size) -> void * {
@@ -477,6 +508,7 @@ INTERPOSE(lsan::posix_memalign, posix_memalign);
 INTERPOSE(lsan::malloc_zone_malloc,   malloc_zone_malloc);
 INTERPOSE(lsan::malloc_zone_calloc,   malloc_zone_calloc);
 INTERPOSE(lsan::malloc_zone_valloc,   malloc_zone_valloc);
+INTERPOSE(lsan::malloc_zone_realloc,  malloc_zone_realloc);
 INTERPOSE(lsan::malloc_zone_memalign, malloc_zone_memalign);
 INTERPOSE(lsan::malloc_destroy_zone,  malloc_destroy_zone);
 INTERPOSE(lsan::malloc_zone_batch_malloc, malloc_zone_batch_malloc);
