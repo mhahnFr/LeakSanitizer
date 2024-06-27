@@ -27,6 +27,7 @@
 #include "realAlloc.hpp"
 
 #ifdef __APPLE__
+ #include <mach/mach_init.h>
  #include <malloc/malloc.h>
 #endif
 
@@ -166,6 +167,33 @@ auto malloc_zone_memalign(malloc_zone_t* zone, std::size_t alignment, std::size_
         }
     }
     return ptr;
+}
+
+void malloc_destroy_zone(malloc_zone_t* zone) {
+    if (zone == nullptr) {
+        crashForce("Destroying NULL zone");
+    }
+
+    if (!LSan::finished) {
+        auto& tracker = getTracker();
+        const std::lock_guard lock { tracker.mutex };
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+            zone->introspect->enumerator(mach_task_self_,
+                                         &tracker,
+                                         MALLOC_PTR_IN_USE_RANGE_TYPE,
+                                         reinterpret_cast<vm_address_t>(zone),
+                                         nullptr, [](task_t, auto context, unsigned, auto array, unsigned count) {
+                auto& tracker = *reinterpret_cast<ATracker*>(context);
+                for (unsigned i = 0; i < count; ++i) {
+                    tracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
+                }
+            });
+            tracker.ignoreMalloc = false;
+        }
+    }
+
+    ::malloc_destroy_zone(zone);
 }
 
 // TODO: realloc, free, batch versions
@@ -402,6 +430,7 @@ INTERPOSE(lsan::malloc_zone_malloc,   malloc_zone_malloc);
 INTERPOSE(lsan::malloc_zone_calloc,   malloc_zone_calloc);
 INTERPOSE(lsan::malloc_zone_valloc,   malloc_zone_valloc);
 INTERPOSE(lsan::malloc_zone_memalign, malloc_zone_memalign);
+INTERPOSE(lsan::malloc_destroy_zone,  malloc_destroy_zone);
 #endif
 
 #endif /* !__linux__ */
