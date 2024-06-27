@@ -99,6 +99,17 @@ static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> voi
     return toReturn;
 }
 
+static inline auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
+    int toReturn;
+#ifdef __linux__
+    abort();
+    // TODO: Linux version
+#else
+    toReturn = ::posix_memalign(memPtr, alignment, size);
+#endif
+    return toReturn;
+}
+
 /**
  * Calls the real `realloc` function.
  *

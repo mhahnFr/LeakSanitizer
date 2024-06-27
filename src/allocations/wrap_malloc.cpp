@@ -356,7 +356,34 @@ void free(void * pointer) {
     })
 }
 
-// TODO: (posix_)memalign
+int posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) {
+    if (memPtr == nullptr) {
+        lsan::crashForce("posix_memalign of a NULL pointer");
+    }
+
+    auto wasPtr = *memPtr;
+    auto toReturn = lsan::real::posix_memalign(memPtr, alignment, size);
+    if (!lsan::LSan::finished) {
+        auto& tracker = lsan::getTracker();
+        const std::lock_guard lock { tracker.mutex };
+
+        if (!tracker.ignoreMalloc) {
+            tracker.ignoreMalloc = true;
+
+            if (alignment == 0 || alignment % 2 != 0 || alignment % sizeof(void*) != 0) {
+                lsan::warn("posix_memalign with invalid alignment of " + std::to_string(alignment));
+            }
+            if (__lsan_zeroAllocation && size == 0) {
+                lsan::warn("Implementation-defined allocation of size 0");
+            }
+            if (*memPtr != wasPtr) {
+                tracker.addMalloc(lsan::MallocInfo(*memPtr, size));
+            }
+            tracker.ignoreMalloc = false;
+        }
+    }
+    return toReturn;
+}
 
 #ifndef __linux__
 } /* namespace lsan */
@@ -366,7 +393,9 @@ INTERPOSE(lsan::calloc,  calloc);
 INTERPOSE(lsan::valloc,  valloc);
 INTERPOSE(lsan::realloc, realloc);
 INTERPOSE(lsan::free,    free);
-INTERPOSE(lsan::aligned_alloc, aligned_alloc);
+
+INTERPOSE(lsan::aligned_alloc,  aligned_alloc);
+INTERPOSE(lsan::posix_memalign, posix_memalign);
 
 #ifdef __APPLE__
 INTERPOSE(lsan::malloc_zone_malloc,   malloc_zone_malloc);
