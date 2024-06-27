@@ -222,27 +222,25 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void* {
     return ptr;
 }
 
-#ifdef __APPLE__
 auto valloc(std::size_t size) -> void* {
-    auto ptr = ::valloc(size);
+    auto ptr = lsan::real::valloc(size);
 
-    if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
+    if (ptr != nullptr && !lsan::LSan::finished) {
+        auto& tracker = lsan::getTracker();
         const std::lock_guard lock { tracker.mutex };
 
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
 
             if (__lsan_zeroAllocation && size == 0) {
-                warn("Implementation-defined allocation of size 0");
+                lsan::warn("Implementation-defined allocation of size 0");
             }
-            tracker.addMalloc(MallocInfo(ptr, size));
+            tracker.addMalloc(lsan::MallocInfo(ptr, size));
             tracker.ignoreMalloc = false;
         }
     }
     return ptr;
 }
-#endif
 
 auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     auto ptr = lsan::real::aligned_alloc(alignment, size);
@@ -359,17 +357,15 @@ void free(void * pointer) {
 
 INTERPOSE(lsan::malloc,  malloc);
 INTERPOSE(lsan::calloc,  calloc);
-#ifdef __APPLE__
 INTERPOSE(lsan::valloc,  valloc);
-#endif
-INTERPOSE(lsan::aligned_alloc, aligned_alloc);
 INTERPOSE(lsan::realloc, realloc);
 INTERPOSE(lsan::free,    free);
+INTERPOSE(lsan::aligned_alloc, aligned_alloc);
 
 #ifdef __APPLE__
-INTERPOSE(lsan::malloc_zone_malloc, malloc_zone_malloc);
-INTERPOSE(lsan::malloc_zone_calloc, malloc_zone_calloc);
-INTERPOSE(lsan::malloc_zone_valloc, malloc_zone_valloc);
+INTERPOSE(lsan::malloc_zone_malloc,   malloc_zone_malloc);
+INTERPOSE(lsan::malloc_zone_calloc,   malloc_zone_calloc);
+INTERPOSE(lsan::malloc_zone_valloc,   malloc_zone_valloc);
 INTERPOSE(lsan::malloc_zone_memalign, malloc_zone_memalign);
 #endif
 

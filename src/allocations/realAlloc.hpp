@@ -27,6 +27,7 @@
 #ifdef __linux__
 extern "C" {
 void* __libc_malloc(std::size_t);
+void* __libc_valloc(std::size_t);
 void* __libc_calloc(std::size_t, std::size_t);
 void* __libc_realloc(void *, std::size_t);
 void  __libc_free(void *);
@@ -50,6 +51,16 @@ static inline auto malloc(std::size_t size) -> void * {
     toReturn = __libc_malloc(size);
 #else
     toReturn = std::malloc(size);
+#endif
+    return toReturn;
+}
+
+static inline auto valloc(std::size_t size) -> void* {
+    void* toReturn;
+#ifdef __linux__
+    toReturn = __libc_valloc(size);
+#else
+    toReturn = ::valloc(size);
 #endif
     return toReturn;
 }
