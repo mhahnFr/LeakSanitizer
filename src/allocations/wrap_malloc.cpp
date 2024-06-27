@@ -19,8 +19,6 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
 #include <lsan_internals.h>
 
 #include "wrap_malloc.hpp"
@@ -83,7 +81,9 @@ namespace lsan {
 
 #ifdef __APPLE__
 auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
-//    assert(zone != nullptr);
+    if (zone == nullptr) {
+        crashForce("Called with NULL as zone");
+    }
 
     auto ptr = ::malloc_zone_malloc(zone, size);
     if (ptr != nullptr && !LSan::finished) {
@@ -103,7 +103,9 @@ auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
 }
 
 auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size) -> void* {
-//    assert(zone != nullptr);
+    if (zone == nullptr) {
+        crashForce("Called with NULL as zone");
+    }
 
     auto ptr = ::malloc_zone_calloc(zone, count, size);
     if (ptr != nullptr && !LSan::finished) {
@@ -123,7 +125,9 @@ auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size
 }
 
 auto malloc_zone_valloc(malloc_zone_t* zone, std::size_t size) -> void* {
-//    assert(zone != nullptr);
+    if (zone == nullptr) {
+        crashForce("Called with NULL as zone");
+    }
 
     auto ptr = ::malloc_zone_valloc(zone, size);
     if (ptr != nullptr && !LSan::finished) {
@@ -143,7 +147,9 @@ auto malloc_zone_valloc(malloc_zone_t* zone, std::size_t size) -> void* {
 }
 
 auto malloc_zone_memalign(malloc_zone_t* zone, std::size_t alignment, std::size_t size) -> void* {
-//    assert(zone != nullptr);
+    if (zone == nullptr) {
+        crashForce("Called with NULL as zone");
+    }
 
     auto ptr = ::malloc_zone_memalign(zone, alignment, size);
     if (ptr != nullptr && !LSan::finished) {
@@ -162,7 +168,7 @@ auto malloc_zone_memalign(malloc_zone_t* zone, std::size_t alignment, std::size_
     return ptr;
 }
 
-// TODO: realloc, free
+// TODO: realloc, free, batch versions
 #endif
 
 auto malloc(std::size_t size) -> void * {

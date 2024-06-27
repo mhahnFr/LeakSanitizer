@@ -22,7 +22,7 @@
 #ifndef realAlloc_hpp
 #define realAlloc_hpp
 
-#include <cstddef>
+#include <cstdlib>
 
 #ifdef __linux__
 extern "C" {
