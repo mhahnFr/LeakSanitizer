@@ -19,6 +19,7 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <map>
 #include <optional>
 #include <regex>
 
@@ -30,16 +31,30 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan::callstackHelper {
+static std::map<std::string, bool> ignored;
+static std::map<std::string, bool> firstParties;
+
 /**
  * Returns whether the given binary file name should be ignored totally.
  *
  * @param file the binary file name to be checked
  * @return whether to totally ignore the binary
  */
-static inline auto isTotallyIgnored(const std::string & file) -> bool {
+static inline auto isTotallyIgnoredCore(const std::string& file) -> bool {
     // So far totally ignored: Everything Objective-C and Swift (using ARC -> no leak).
     return file.find("libobjc.A.dylib")    != std::string::npos
         || file.rfind("/usr/lib/swift", 0) != std::string::npos;
+}
+
+static inline auto isTotallyIgnored(const std::string& file) -> bool {
+    const auto& it = ignored.find(file);
+    if (it != ignored.end()) {
+        return it->second;
+    }
+
+    const auto& flag = isTotallyIgnoredCore(file);
+    ignored.emplace(std::make_pair(file, flag));
+    return flag;
 }
 
 /**
@@ -64,11 +79,22 @@ static inline auto isUserDefinedFirstParty(const std::string & file) -> bool {
  * @param file the binary file name to be checked
  * @return whether the given binary file name is first party
  */
-static inline auto isFirstParty(const std::string & file) -> bool {
+static inline auto isFirstPartyCore(const std::string& file) -> bool {
     return file.rfind("/usr/lib", 0) != std::string::npos
         || file.rfind("/lib", 0)     != std::string::npos
         || file.rfind("/System", 0)  != std::string::npos
         || isUserDefinedFirstParty(file);
+}
+
+static inline auto isFirstParty(const std::string& file) -> bool {
+    const auto& it = firstParties.find(file);
+    if (it != firstParties.end()) {
+        return it->second;
+    }
+
+    const auto& flag = isFirstPartyCore(file);
+    firstParties.emplace(std::make_pair(file, flag));
+    return flag;
 }
 
 auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
