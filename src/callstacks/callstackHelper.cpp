@@ -30,10 +30,6 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan::callstackHelper {
-constexpr static inline auto isInLSan(const callstack_frame& frame) -> bool {
-    return frame.info.has_value && frame.info.value.isSelf;
-}
-
 /**
  * Returns whether the given binary file name should be ignored totally.
  *
@@ -83,7 +79,7 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
     for (std::size_t i = 0; i < frameCount; ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
-        if (binaryFile == nullptr || isInLSan(frames[i])) {
+        if (binaryFile == nullptr || frames[i].binaryFileIsSelf) {
             continue;
         } else if (isTotallyIgnored(binaryFile)) {
             return CallstackType::HARD_IGNORE;
@@ -154,8 +150,8 @@ static inline void formatShared(const callstack_frame& frame, std::ostream & out
             out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED>;
         }
         out << getCallstackFrameSourceFile(frame) << ":" << frame.sourceLine;
-        if (frame.sourceLineColumn.has_value) {
-            out << ":" << frame.sourceLineColumn.value;
+        if (frame.sourceLineColumn > 0) {
+            out << ":" << frame.sourceLineColumn;
         }
         if (needsBrackets) {
             out << formatter::clear<Style::GREYED, Style::UNDERLINED>;
@@ -180,7 +176,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     for (i = printed = 0; i < size && printed < __lsan_callstackSize; ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
-        if (binaryFile == nullptr || (firstPrint && isInLSan(frames[i]))) {
+        if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
         } else if (firstHit && isFirstParty(binaryFile)) {
             stream << formatter::get<Style::GREYED>
