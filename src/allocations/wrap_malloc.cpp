@@ -444,24 +444,34 @@ void free(void* pointer) {
     }
 
     auto& tracker = lsan::getTracker();
-    std::lock_guard lock { tracker.mutex };
+    BENCH(const std::lock_guard lock { tracker.mutex };, std::chrono::nanoseconds, lockingTime);
+    BENCH_ONLY(std::chrono::nanoseconds trackingTime;)
     auto ignored = tracker.ignoreMalloc;
     if (!ignored) {
         tracker.ignoreMalloc = true;
-        if (pointer == nullptr && __lsan_freeNull) {
-            lsan::warn("Free of NULL");
-        } else if (pointer != nullptr) {
-            const auto& it = tracker.removeMalloc(pointer);
-            if (__lsan_invalidFree && !it.first) {
-                if (__lsan_invalidCrash) {
-                    lsan::crash("Invalid free", it.second);
-                } else {
-                    lsan::warn("Invalid free", it.second);
+        BENCH({
+            if (pointer == nullptr && __lsan_freeNull) {
+                lsan::warn("Free of NULL");
+            } else if (pointer != nullptr) {
+                const auto& it = tracker.removeMalloc(pointer);
+                if (__lsan_invalidFree && !it.first) {
+                    if (__lsan_invalidCrash) {
+                        lsan::crash("Invalid free", it.second);
+                    } else {
+                        lsan::warn("Invalid free", it.second);
+                    }
                 }
             }
-        }
+        }, std::chrono::nanoseconds, trackingTimeLocal);
+        BENCH_ONLY(trackingTime = trackingTimeLocal;)
     }
-    lsan::real::free(pointer);
+    BENCH(lsan::real::free(pointer);, std::chrono::nanoseconds, systemTime);
+    BENCH_ONLY(if (!ignored) {
+        lsan::timing::addTotalTime(systemTime + lockingTime + trackingTime, lsan::timing::AllocType::free);
+        lsan::timing::addTrackingTime(trackingTime, lsan::timing::AllocType::free);
+        lsan::timing::addSystemTime(systemTime, lsan::timing::AllocType::free);
+        lsan::timing::addLockingTime(lockingTime, lsan::timing::AllocType::free);
+    })
     if (!ignored) {
         tracker.ignoreMalloc = false;
     }
