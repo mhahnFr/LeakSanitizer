@@ -50,6 +50,16 @@ void TLSTracker::finish() {
     std::lock_guard lock1 { infoMutex };
 
     ignoreMalloc = true;
+
+    if (__lsan_invalidFreeLevel == 1) {
+        for (auto it = infos.cbegin(); it != infos.cend();) {
+            if (it->second.deleted) {
+                it = infos.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
     getInstance().absorbLeaks(std::move(infos));
     infos = decltype(infos)();
 }
