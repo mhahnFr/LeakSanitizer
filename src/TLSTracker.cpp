@@ -74,7 +74,7 @@ auto TLSTracker::maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std:
     if (it->second.deleted) {
         return std::make_pair(false, std::ref(it->second));
     }
-    if (__lsan_invalidFree) {
+    if (__lsan_invalidFreeLevel > 0) {
         it->second.markDeleted();
     } else {
         infos.erase(it);

@@ -100,6 +100,7 @@ extern bool __lsan_invalidCrash;
  * but by `__lsan_freeNull`.
  * Defaults to `false`.
  */
+DEPRECATED("Since v1.9?, replaced by __lsan_invalidFreeLevel")
 extern bool __lsan_invalidFree;
 
 /**
