@@ -91,15 +91,18 @@ static inline auto classify(const std::string& file) -> Classification {
     return Classification::none;
 }
 
+static inline auto classifyAndCache(const char* file) -> Classification {
+    const auto& toReturn = classify(file);
+    cache.emplace(std::make_pair(file, toReturn));
+    return toReturn;
+}
+
 static inline auto isTotallyIgnoredCached(const char* file) -> bool {
     const auto& it = cache.find(file);
     if (it != cache.end()) {
         return it->second == Classification::ignored;
     }
-
-    const auto& c = classify(file);
-    cache.emplace(std::make_pair(file, c));
-    return c == Classification::ignored;
+    return classifyAndCache(file) == Classification::ignored;
 }
 
 static inline auto isTotallyIgnored(const char* file) -> bool {
@@ -111,10 +114,7 @@ static inline auto isFirstPartyCached(const char* file) -> bool {
     if (it != cache.end()) {
         return it->second == Classification::firstParty;
     }
-
-    const auto& c = classify(file);
-    cache.emplace(std::make_pair(file, c));
-    return c == Classification::firstParty;
+    return classifyAndCache(file) == Classification::firstParty;
 }
 
 static inline auto isFirstParty(const char* file) -> bool {
