@@ -248,6 +248,23 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
+/* Begin PBXLegacyTarget section */
+		BFB062292C397C1E0032E9C4 /* LeakSanitizer_make */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "-j $(ACTION)";
+			buildConfigurationList = BFB0622C2C397C1E0032E9C4 /* Build configuration list for PBXLegacyTarget "LeakSanitizer_make" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = LeakSanitizer_make;
+			passBuildSettingsInEnvironment = 1;
+			productName = LeakSanitizer_make;
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		BF0F131B29194652008F0FCD /* LeakSanitizer */ = {
 			isa = PBXNativeTarget;
@@ -279,6 +296,9 @@
 					BF0F131B29194652008F0FCD = {
 						CreatedOnToolsVersion = 12.3;
 					};
+					BFB062292C397C1E0032E9C4 = {
+						CreatedOnToolsVersion = 15.2;
+					};
 				};
 			};
 			buildConfigurationList = BF97EB5128831E5B00DAF1FE /* Build configuration list for PBXProject "LeakSanitizer" */;
@@ -295,6 +315,7 @@
 			projectRoot = "";
 			targets = (
 				BF0F131B29194652008F0FCD /* LeakSanitizer */,
+				BFB062292C397C1E0032E9C4 /* LeakSanitizer_make */,
 			);
 		};
 /* End PBXProject section */
@@ -499,6 +520,39 @@
 			};
 			name = Release;
 		};
+		BFB0622A2C397C1E0032E9C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BFB0622B2C397C1E0032E9C4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -516,6 +570,15 @@
 			buildConfigurations = (
 				BF97EB5828831E5B00DAF1FE /* Debug */,
 				BF97EB5928831E5B00DAF1FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BFB0622C2C397C1E0032E9C4 /* Build configuration list for PBXLegacyTarget "LeakSanitizer_make" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BFB0622A2C397C1E0032E9C4 /* Debug */,
+				BFB0622B2C397C1E0032E9C4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
