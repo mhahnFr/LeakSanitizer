@@ -122,9 +122,9 @@ static inline auto isFirstParty(const char* file) -> bool {
 }
 
 auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
-    // FIXME: On error?
     const auto& frames = callstack_autoClearCaches ? callstack_getBinaries(callstack)
                                                    : callstack_getBinariesCached(callstack);
+    if (frames == nullptr) return CallstackType::USER;
 
     std::size_t firstPartyCount = 0;
     const auto frameCount = callstack_getFrameCount(callstack);
@@ -207,7 +207,7 @@ static inline void formatShared(const callstack_frame& frame, std::ostream & out
         }
         if (needsBrackets) {
             out << formatter::clear<Style::GREYED, Style::UNDERLINED>;
-            if (S == Style::GREYED || S == Style::BOLD) {
+            if constexpr (S == Style::GREYED || S == Style::BOLD) {
                 out << formatter::get<S>;
             }
             out << ")";
@@ -220,13 +220,22 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     using formatter::Style;
 
     if (!callstack_autoClearCaches) {
-        // Make sure to use the cached values.
+        // Make sure to use the cached values and
+        // potentially fail early.
         //
         //                          - mhahnFr
-        callstack_getBinariesCached(callstack);
+        if (callstack_getBinariesCached(callstack) == nullptr) {
+            stream << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
+            return;
+        }
     }
     const auto& frames = callstack_toArray(callstack);
     const auto& size   = callstack_getFrameCount(callstack);
+
+    if (frames == nullptr) {
+        stream << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
+        return;
+    }
 
     bool firstHit   = true,
          firstPrint = true;
