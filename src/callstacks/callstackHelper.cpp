@@ -20,7 +20,6 @@
  */
 
 #include <map>
-#include <optional>
 #include <regex>
 
 #include <lsan_internals.h>
