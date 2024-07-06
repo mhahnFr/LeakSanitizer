@@ -35,8 +35,11 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan::callstackHelper {
-static std::map<const char*, bool> ignored;
-static std::map<const char*, bool> firstParties;
+enum class Classification {
+    ignored, firstParty, none
+};
+
+static std::map<const char*, Classification> cache;
 
 /**
  * Returns whether the given binary file name should be ignored totally.
@@ -48,21 +51,6 @@ static inline auto isTotallyIgnoredCore(const std::string& file) -> bool {
     // So far totally ignored: Everything Objective-C and Swift (using ARC -> no leak).
     return file.find("libobjc.A.dylib")    != std::string::npos
         || file.rfind("/usr/lib/swift", 0) != std::string::npos;
-}
-
-static inline auto isTotallyIgnoredCached(const char* file) -> bool {
-    const auto& it = ignored.find(file);
-    if (it != ignored.end()) {
-        return it->second;
-    }
-
-    const auto& flag = isTotallyIgnoredCore(file);
-    ignored.emplace(std::make_pair(file, flag));
-    return flag;
-}
-
-static inline auto isTotallyIgnored(const char* file) -> bool {
-    return callstack_autoClearCaches ? isTotallyIgnoredCore(file) : isTotallyIgnoredCached(file);
 }
 
 /**
@@ -94,15 +82,39 @@ static inline auto isFirstPartyCore(const std::string& file) -> bool {
         || isUserDefinedFirstParty(file);
 }
 
-static inline auto isFirstPartyCached(const char* file) -> bool {
-    const auto& it = firstParties.find(file);
-    if (it != firstParties.end()) {
-        return it->second;
+static inline auto classify(const std::string& file) -> Classification {
+    if (isTotallyIgnoredCore(file)) {
+        return Classification::ignored;
+    } else if (isFirstPartyCore(file)) {
+        return Classification::firstParty;
+    }
+    return Classification::none;
+}
+
+static inline auto isTotallyIgnoredCached(const char* file) -> bool {
+    const auto& it = cache.find(file);
+    if (it != cache.end()) {
+        return it->second == Classification::ignored;
     }
 
-    const auto& flag = isFirstPartyCore(file);
-    firstParties.emplace(std::make_pair(file, flag));
-    return flag;
+    const auto& c = classify(file);
+    cache.emplace(std::make_pair(file, c));
+    return c == Classification::ignored;
+}
+
+static inline auto isTotallyIgnored(const char* file) -> bool {
+    return callstack_autoClearCaches ? isTotallyIgnoredCore(file) : isTotallyIgnoredCached(file);
+}
+
+static inline auto isFirstPartyCached(const char* file) -> bool {
+    const auto& it = cache.find(file);
+    if (it != cache.end()) {
+        return it->second == Classification::firstParty;
+    }
+
+    const auto& c = classify(file);
+    cache.emplace(std::make_pair(file, c));
+    return c == Classification::firstParty;
 }
 
 static inline auto isFirstParty(const char* file) -> bool {
