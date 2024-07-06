@@ -25,14 +25,18 @@
 
 #include <lsan_internals.h>
 
+#define LCS_USE_UNSAFE_OPTIMIZATION 1
+#include <callstack.h>
+#include <callstack_internals.h>
+
 #include "callstackHelper.hpp"
 
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 
 namespace lsan::callstackHelper {
-static std::map<std::string, bool> ignored;
-static std::map<std::string, bool> firstParties;
+static std::map<const char*, bool> ignored;
+static std::map<const char*, bool> firstParties;
 
 /**
  * Returns whether the given binary file name should be ignored totally.
@@ -46,7 +50,7 @@ static inline auto isTotallyIgnoredCore(const std::string& file) -> bool {
         || file.rfind("/usr/lib/swift", 0) != std::string::npos;
 }
 
-static inline auto isTotallyIgnored(const std::string& file) -> bool {
+static inline auto isTotallyIgnoredCached(const char* file) -> bool {
     const auto& it = ignored.find(file);
     if (it != ignored.end()) {
         return it->second;
@@ -55,6 +59,10 @@ static inline auto isTotallyIgnored(const std::string& file) -> bool {
     const auto& flag = isTotallyIgnoredCore(file);
     ignored.emplace(std::make_pair(file, flag));
     return flag;
+}
+
+static inline auto isTotallyIgnored(const char* file) -> bool {
+    return callstack_autoClearCaches ? isTotallyIgnoredCore(file) : isTotallyIgnoredCached(file);
 }
 
 /**
@@ -86,7 +94,7 @@ static inline auto isFirstPartyCore(const std::string& file) -> bool {
         || isUserDefinedFirstParty(file);
 }
 
-static inline auto isFirstParty(const std::string& file) -> bool {
+static inline auto isFirstPartyCached(const char* file) -> bool {
     const auto& it = firstParties.find(file);
     if (it != firstParties.end()) {
         return it->second;
@@ -97,9 +105,15 @@ static inline auto isFirstParty(const std::string& file) -> bool {
     return flag;
 }
 
+static inline auto isFirstParty(const char* file) -> bool {
+    return callstack_autoClearCaches ? isFirstPartyCore(file) : isFirstPartyCached(file);
+}
+
 auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
-    const auto frames = callstack_getBinaries(callstack);
-    
+    // FIXME: On error?
+    const auto& frames = callstack_autoClearCaches ? callstack_getBinaries(callstack)
+                                                   : callstack_getBinariesCached(callstack);
+
     std::size_t firstPartyCount = 0;
     const auto frameCount = callstack_getFrameCount(callstack);
     for (std::size_t i = 0; i < frameCount; ++i) {
@@ -192,10 +206,16 @@ static inline void formatShared(const callstack_frame& frame, std::ostream & out
 
 void format(lcs::callstack & callstack, std::ostream & stream) {
     using formatter::Style;
-    
-    const auto frames = callstack_toArray(callstack);
-    const auto size   = callstack_getFrameCount(callstack);
-    
+
+    if (!callstack_autoClearCaches) {
+        // Make sure to use the cached values.
+        //
+        //                          - mhahnFr
+        callstack_getBinariesCached(callstack);
+    }
+    const auto& frames = callstack_toArray(callstack);
+    const auto& size   = callstack_getFrameCount(callstack);
+
     bool firstHit   = true,
          firstPrint = true;
     std::size_t i, printed;
