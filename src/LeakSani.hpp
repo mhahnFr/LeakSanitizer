@@ -52,9 +52,9 @@ namespace lsan {
  */
 class LSan: public ATracker {
     /** An object holding all statistics.                                               */
-    Stats                                    stats;
+    Stats stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
-    bool                                     callstackSizeExceeded = false;
+    bool callstackSizeExceeded = false;
     /** The optional user regular expression.                                           */
     std::optional<std::optional<std::regex>> userRegex;
     /** The user regex error message.                                                   */
@@ -109,6 +109,20 @@ protected:
     }
 
 public:
+    /** Indicates whether the allocation tracking has finished. */
+    static std::atomic_bool finished;
+    /** The thread-local storage key used for the thread-local allocation trackers. */
+    const pthread_key_t saniKey;
+
+    LSan();
+   ~LSan() = default;
+
+    LSan(const LSan&) = delete;
+    LSan(LSan&&)      = delete;
+
+    auto operator=(const LSan&) -> LSan& = delete;
+    auto operator=(LSan&&)      -> LSan& = delete;
+
     inline static void* operator new(std::size_t count) {
         return real::malloc(count);
     }
@@ -155,21 +169,7 @@ public:
      */
     void absorbLeaks(std::map<const void* const, MallocInfo>&& leaks);
 
-    /** Indicates whether the allocation tracking has finished. */
-    static std::atomic_bool finished;
-
     virtual void finish() override;
-
-    LSan();
-   ~LSan() = default;
-    
-    LSan(const LSan &)              = delete;
-    LSan(const LSan &&)             = delete;
-    LSan & operator=(const LSan &)  = delete;
-    LSan & operator=(const LSan &&) = delete;
-    
-    /** The thread-local storage key used for the thread-local allocation trackers. */
-    const pthread_key_t saniKey;
 
 #ifdef BENCHMARK
     /**
@@ -224,7 +224,7 @@ public:
         return infoMutex;
     }
 
-    void changeMalloc(MallocInfo&& info) override;
+    virtual void changeMalloc(MallocInfo&& info) override;
 
     /**
      * Removes the allocation record acossiated with the given pointer.
@@ -232,8 +232,8 @@ public:
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> override;
-    
+    virtual auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> override;
+
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the
      * principal list containing the allocation records.
@@ -277,7 +277,7 @@ public:
         return stats;
     }
 
-    friend std::ostream & operator<<(std::ostream &, LSan &);
+    friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;
 };
 }
 
