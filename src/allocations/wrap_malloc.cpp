@@ -19,6 +19,8 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+
 #include <lsan_internals.h>
 
 #include "wrap_malloc.hpp"
@@ -32,6 +34,7 @@
 #endif
 
 #include "../LeakSani.hpp"
+#include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../timing.hpp"
 #include "../crashWarner/crash.hpp"
@@ -79,6 +82,20 @@ void __wrap_free(void* pointer, const char*, int) {
 #ifndef __linux__
 namespace lsan {
 #endif /* !__linux__ */
+
+static inline auto toString(const void* pointer) -> std::string {
+    // TODO: Abstract these two functions!
+    std::ostringstream stream;
+    stream << pointer;
+    return stream.str();
+}
+
+static inline auto createInvalidFreeMessage(const void* address, bool doubleFree) -> std::string {
+    using namespace lsan::formatter;
+    
+    return formatString<Style::BOLD, Style::RED>(doubleFree ? "Double free" : "Invalid free") 
+        + " for address " + formatString<Style::BOLD>(toString(address));
+}
 
 #ifdef __APPLE__
 auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
@@ -230,11 +247,10 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, unsigned nu
                 } else if (to_be_freed[i] != nullptr) {
                     const auto& it = tracker.removeMalloc(to_be_freed[i]);
                     if (__lsan_invalidFreeLevel > 0 && !it.first) {
-                        const auto& message = it.second ? "Double free" : "Invalid free";
                         if (__lsan_invalidCrash) {
-                            crash(message, it.second);
+                            crash(createInvalidFreeMessage(to_be_freed[i], static_cast<bool>(it.second)), it.second);
                         } else {
-                            warn(message, it.second);
+                            warn(createInvalidFreeMessage(to_be_freed[i], static_cast<bool>(it.second)), it.second);
                         }
                     }
                 }
@@ -260,11 +276,10 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
             } else if (ptr != nullptr) {
                 const auto& it = tracker.removeMalloc(ptr);
                 if (__lsan_invalidFreeLevel > 0 && !it.first) {
-                    const auto& message = it.second ? "Double free" : "Invalid free";
                     if (__lsan_invalidCrash) {
-                        crash(message, it.second);
+                        crash(createInvalidFreeMessage(ptr, static_cast<bool>(it.second)), it.second);
                     } else {
-                        warn(message, it.second);
+                        warn(createInvalidFreeMessage(ptr, static_cast<bool>(it.second)), it.second);
                     }
                 }
             }
@@ -457,11 +472,10 @@ void free(void* pointer) {
             } else if (pointer != nullptr) {
                 const auto& it = tracker.removeMalloc(pointer);
                 if (__lsan_invalidFreeLevel > 0 && !it.first) {
-                    const auto& message = it.second ? "Double free" : "Invalid free";
                     if (__lsan_invalidCrash) {
-                        lsan::crash(message, it.second);
+                        lsan::crash(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
                     } else {
-                        lsan::warn(message, it.second);
+                        lsan::warn(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
                     }
                 }
             }
