@@ -22,7 +22,6 @@
 #include <array>
 #include <iostream>
 #include <optional>
-#include <sstream>
 #include <string>
 
 #ifdef __APPLE__
@@ -40,22 +39,11 @@
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../MallocInfo.hpp"
+#include "../utils.hpp"
 #include "../callstacks/callstackHelper.hpp"
 #include "../crashWarner/crash.hpp"
 
 namespace lsan::signals::handlers {
-/**
- * Stringifies the given pointer.
- *
- * @param ptr the pointer to be stringified
- * @return the stringified pointer
- */
-static inline auto toString(void* ptr) -> std::string {
-    std::stringstream stream;
-    stream << ptr;
-    return stream.str();
-}
-
 /**
  * Creates a callstack using the pointer to the `ucontext`.
  *
@@ -355,7 +343,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
     const auto reason = getReason(signalCode, info->si_code);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
-               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : ""),
+               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(utils::toString(info->si_addr)) : ""),
                reason.has_value()
                 ? std::optional(formatter::formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, info->si_code).value_or("Unknown reason") + ")")
                 : std::nullopt,

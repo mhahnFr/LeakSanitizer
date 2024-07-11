@@ -36,6 +36,7 @@
 #include "../LeakSani.hpp"
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
+#include "../utils.hpp"
 #include "../timing.hpp"
 #include "../crashWarner/crash.hpp"
 #include "../crashWarner/warn.hpp"
@@ -83,18 +84,11 @@ void __wrap_free(void* pointer, const char*, int) {
 namespace lsan {
 #endif /* !__linux__ */
 
-static inline auto toString(const void* pointer) -> std::string {
-    // TODO: Abstract these two functions!
-    std::ostringstream stream;
-    stream << pointer;
-    return stream.str();
-}
-
 static inline auto createInvalidFreeMessage(const void* address, bool doubleFree) -> std::string {
     using namespace lsan::formatter;
     
     return formatString<Style::BOLD, Style::RED>(doubleFree ? "Double free" : "Invalid free") 
-        + " for address " + formatString<Style::BOLD>(toString(address));
+    + " for address " + formatString<Style::BOLD>(utils::toString(address));
 }
 
 #ifdef __APPLE__
