@@ -22,6 +22,8 @@
 #ifndef utils_hpp
 #define utils_hpp
 
+#include <sstream>
+
 namespace lsan::utils {
 static inline auto toString(const void* pointer) -> std::string {
     auto stream = std::ostringstream();
