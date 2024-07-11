@@ -86,7 +86,12 @@ auto TLSTracker::removeMalloc(void* pointer) -> std::pair<const bool, std::optio
     const auto& result = maybeRemoveMalloc1(pointer);
 
     if (!result.first) {
-        return getInstance().removeMalloc(this, pointer);
+        const auto& globalResult = getInstance().removeMalloc(this, pointer);
+        if (!globalResult.first) {
+            // TODO: Find a way to use the more recent one
+            return globalResult.second ? globalResult : result;
+        }
+        return globalResult;
     }
     return result;
 }
