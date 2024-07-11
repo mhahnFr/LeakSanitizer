@@ -186,6 +186,8 @@ void LSan::absorbLeaks(std::map<const void *const, MallocInfo>&& leaks) {
 
 auto LSan::removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
     const auto& result = maybeRemoveMalloc1(pointer);
+    // TODO: If no one finds it, use the (best) one indicating invalid free
+    // Keep in mind records from other threads can become invalid!
     if (!result.first) {
         std::lock_guard lock { tlsTrackerMutex };
         for (auto element : tlsTrackers) {
