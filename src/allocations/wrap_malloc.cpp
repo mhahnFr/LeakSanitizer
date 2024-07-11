@@ -230,10 +230,11 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, unsigned nu
                 } else if (to_be_freed[i] != nullptr) {
                     const auto& it = tracker.removeMalloc(to_be_freed[i]);
                     if (__lsan_invalidFreeLevel > 0 && !it.first) {
+                        const auto& message = it.second ? "Double free" : "Invalid free";
                         if (__lsan_invalidCrash) {
-                            crash("Invalid free", it.second);
+                            crash(message, it.second);
                         } else {
-                            warn("Invalid free", it.second);
+                            warn(message, it.second);
                         }
                     }
                 }
@@ -259,10 +260,11 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
             } else if (ptr != nullptr) {
                 const auto& it = tracker.removeMalloc(ptr);
                 if (__lsan_invalidFreeLevel > 0 && !it.first) {
+                    const auto& message = it.second ? "Double free" : "Invalid free";
                     if (__lsan_invalidCrash) {
-                        crash("Invalid free", it.second);
+                        crash(message, it.second);
                     } else {
-                        warn("Invalid free", it.second);
+                        warn(message, it.second);
                     }
                 }
             }
@@ -455,10 +457,11 @@ void free(void* pointer) {
             } else if (pointer != nullptr) {
                 const auto& it = tracker.removeMalloc(pointer);
                 if (__lsan_invalidFreeLevel > 0 && !it.first) {
+                    const auto& message = it.second ? "Double free" : "Invalid free";
                     if (__lsan_invalidCrash) {
-                        lsan::crash("Invalid free", it.second);
+                        lsan::crash(message, it.second);
                     } else {
-                        lsan::warn("Invalid free", it.second);
+                        lsan::warn(message, it.second);
                     }
                 }
             }
