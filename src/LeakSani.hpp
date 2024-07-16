@@ -50,7 +50,7 @@ namespace lsan {
  *
  * It acts as an allocation tracker.
  */
-class LSan: public ATracker {
+class LSan final: public ATracker {
     /** An object holding all statistics.                                               */
     Stats stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
@@ -91,16 +91,6 @@ class LSan: public ATracker {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
     
-    /**
-     * @brief Attempts to remove the allocation record associated with the given pointer.
-     *
-     * Does not search in the thread-local trackers.
-     *
-     * @param pointer the allocation pointer
-     * @return whether a record was removed and the potentially existing record
-     */
-    auto maybeRemoveMalloc1(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
-
     static auto loadName() -> std::string;
 
 protected:
@@ -224,7 +214,7 @@ public:
         return infoMutex;
     }
 
-    virtual void changeMalloc(MallocInfo&& info) override;
+    virtual void changeMalloc(MallocInfo&& info) final override;
 
     /**
      * Removes the allocation record acossiated with the given pointer.
@@ -232,7 +222,17 @@ public:
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
+    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
+
+    /**
+     * @brief Attempts to remove the allocation record associated with the given pointer.
+     *
+     * Does not search in the thread-local trackers.
+     *
+     * @param pointer the allocation pointer
+     * @return whether a record was removed and the potentially existing record
+     */
+    virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
 
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the

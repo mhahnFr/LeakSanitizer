@@ -35,6 +35,15 @@ private:
     /** Indicates whether the tracking has finished. */
     std::atomic_bool finished = false;
 
+public:
+    TLSTracker();
+   ~TLSTracker();
+
+    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
+    virtual void changeMalloc(MallocInfo&& info) final override;
+
+    virtual auto maybeChangeMalloc(const MallocInfo& info) -> bool final override;
+
     /**
      * @brief Attempts to remove the allocation record associated with the given pointer.
      *
@@ -43,17 +52,7 @@ private:
      * @param pointer the allocation pointer
      * @return whether a record was removed and the potentially already existing record
      */
-    auto maybeRemoveMalloc1(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
-
-public:
-    TLSTracker();
-   ~TLSTracker();
-
-    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
-    virtual void changeMalloc(MallocInfo&& info) final override;
-
-    virtual auto maybeRemoveMalloc(void* pointer) -> bool final override;
-    virtual auto maybeChangeMalloc(const MallocInfo& info) -> bool final override;
+    virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
 
     virtual void finish() final override;
 };

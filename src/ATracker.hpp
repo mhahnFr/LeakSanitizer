@@ -92,17 +92,7 @@ public:
      */
     virtual void finish() = 0;
 
-    /**
-     * @brief Removes the allocation record associated with the given pointer.
-     *
-     * Does not search in other trackers if no record was found.
-     *
-     * @param pointer the allocation pointer
-     * @return whether a record was found and removed
-     */
-    virtual auto maybeRemoveMalloc([[ maybe_unused ]] void* pointer) -> bool {
-        return false;
-    }
+    virtual auto maybeRemoveMalloc([[ maybe_unused ]] void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> = 0;
 
     /**
      * @brief Changes the allocation record already registered to the given one.

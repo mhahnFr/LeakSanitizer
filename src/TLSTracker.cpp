@@ -73,7 +73,7 @@ void TLSTracker::finish() {
     infos = decltype(infos)();
 }
 
-auto TLSTracker::maybeRemoveMalloc1(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
+auto TLSTracker::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
     std::lock_guard lock { infoMutex };
 
     const auto& it = infos.find(pointer);
@@ -92,7 +92,7 @@ auto TLSTracker::maybeRemoveMalloc1(void* pointer) -> std::pair<bool, std::optio
 }
 
 auto TLSTracker::removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
-    const auto& result = maybeRemoveMalloc1(pointer);
+    const auto& result = maybeRemoveMalloc(pointer);
 
     if (!result.first) {
         const auto& globalResult = getInstance().removeMalloc(this, pointer);
@@ -103,10 +103,6 @@ auto TLSTracker::removeMalloc(void* pointer) -> std::pair<bool, std::optional<Ma
         return globalResult;
     }
     return result;
-}
-
-auto TLSTracker::maybeRemoveMalloc(void* pointer) -> bool {
-    return maybeRemoveMalloc1(pointer).first;
 }
 
 void TLSTracker::changeMalloc(MallocInfo&& info) {
