@@ -22,6 +22,7 @@
 #ifndef MallocInfo_hpp
 #define MallocInfo_hpp
 
+#include <chrono>
 #include <functional>
 #include <optional>
 #include <ostream>
@@ -51,6 +52,7 @@ struct MallocInfo {
     std::size_t size;
     /** Indicating whether this allocation has been deallocated.  */
     bool deleted = false;
+    std::optional<std::chrono::system_clock::time_point> freeTimestamp; // TODO: Check with the timing!!!
     /** The callstack where this allocation happened.             */
     mutable lcs::callstack createdCallstack;
     /** The callstack where the deallocation happened.            */
@@ -72,8 +74,16 @@ struct MallocInfo {
     inline void markDeleted() {
         deleted = true;
         deletedCallstack = lcs::callstack();
+        freeTimestamp = std::chrono::system_clock::now();
     }
     
+    constexpr inline auto isMoreRecent(const MallocInfo& other) const -> bool {
+        if (!freeTimestamp || !other.freeTimestamp) {
+            return false;
+        }
+        return freeTimestamp > other.freeTimestamp;
+    }
+
     /**
      * Prints the callstack where this allocation happened.
      *
