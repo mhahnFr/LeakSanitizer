@@ -100,7 +100,7 @@ extern bool __lsan_invalidCrash;
  * but by `__lsan_freeNull`.
  * Defaults to `false`.
  */
-DEPRECATED("Since v1.9?, replaced by __lsan_invalidFreeLevel")
+DEPRECATED("Since v1.10?, replaced by __lsan_invalidFreeLevel")
 extern bool __lsan_invalidFree;
 
 /**
@@ -217,7 +217,7 @@ extern size_t __lsan_callstackSize;
  */
 extern size_t __lsan_firstPartyThreshold;
 
-extern size_t __lsan_invalidFreeLevel; // Since v1.9?
+extern size_t __lsan_invalidFreeLevel; // Since v1.10?
 
 /**
  * @brief This string defines the regex pattern for which binary file
