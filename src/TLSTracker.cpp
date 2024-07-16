@@ -40,6 +40,15 @@ TLSTracker::~TLSTracker() {
     getInstance().deregisterTracker(this);
 
     std::lock_guard lock1 { infoMutex };
+    if (__lsan_invalidFreeLevel == 1) {
+        for (auto it = infos.cbegin(); it != infos.cend();) {
+            if (it->second.deleted) {
+                it = infos.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
     getInstance().absorbLeaks(std::move(infos));
 }
 
