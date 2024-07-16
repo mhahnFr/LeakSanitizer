@@ -97,7 +97,9 @@ auto TLSTracker::removeMalloc(void* pointer) -> std::pair<bool, std::optional<Ma
     if (!result.first) {
         const auto& globalResult = getInstance().removeMalloc(this, pointer);
         if (!globalResult.first) {
-            // TODO: Find a way to use the more recent one
+            if (globalResult.second && result.second) {
+                return globalResult.second->get().isMoreRecent(result.second->get()) ? globalResult : result;
+            }
             return globalResult.second ? globalResult : result;
         }
         return globalResult;
