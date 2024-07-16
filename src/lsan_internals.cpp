@@ -146,6 +146,6 @@ bool __lsan_relativePaths    = getBool("LSAN_RELATIVE_PATHS") .value_or(true);
 std::size_t __lsan_leakCount           = getSize_t("LSAN_LEAK_COUNT")           .value_or(100);
 std::size_t __lsan_callstackSize       = getSize_t("LSAN_CALLSTACK_SIZE")       .value_or(20);
 std::size_t __lsan_firstPartyThreshold = getSize_t("LSAN_FIRST_PARTY_THRESHOLD").value_or(3);
-std::size_t __lsan_invalidFreeLevel    = getSize_t("LSAN_INVALID_FREE")         .value_or(0);
+std::size_t __lsan_invalidFreeLevel    = getSize_t("LSAN_INVALID_FREE")         .value_or(1);
 
 const char * __lsan_firstPartyRegex = getVariable("LSAN_FIRST_PARTY_REGEX").value_or(nullptr);
