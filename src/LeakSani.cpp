@@ -184,7 +184,7 @@ void LSan::absorbLeaks(std::map<const void *const, MallocInfo>&& leaks) {
     ignoreMalloc = ignore;
 }
 
-auto LSan::removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
+auto LSan::removeMalloc(ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
     const auto& result = maybeRemoveMalloc1(pointer);
     // TODO: If no one finds it, use the (best) one indicating invalid free
     // Keep in mind records from other threads can become invalid!
@@ -201,11 +201,11 @@ auto LSan::removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const boo
     return result;
 }
 
-auto LSan::removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
+auto LSan::removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
     return removeMalloc(nullptr, pointer);
 }
 
-auto LSan::maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> {
+auto LSan::maybeRemoveMalloc1(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
     std::lock_guard lock { infoMutex };
 
     const auto& it = infos.find(pointer);

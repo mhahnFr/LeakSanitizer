@@ -99,7 +99,7 @@ class LSan: public ATracker {
      * @param pointer the allocation pointer
      * @return whether a record was removed and the potentially existing record
      */
-    auto maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+    auto maybeRemoveMalloc1(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
 
     static auto loadName() -> std::string;
 
@@ -137,7 +137,7 @@ public:
      * @param pointer the pointer to the allocation
      * @return whether a record was removed and the potentially existing record
      */
-    auto removeMalloc(ATracker* tracker, void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+    auto removeMalloc(ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
 
     /**
      * @brief Replaces the allocation record with the given one.
@@ -232,7 +232,7 @@ public:
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    virtual auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> override;
+    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
 
     /**
      * Calculates and returns the total count of allocated bytes that are stored inside the

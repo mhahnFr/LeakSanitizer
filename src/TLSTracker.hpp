@@ -43,13 +43,13 @@ private:
      * @param pointer the allocation pointer
      * @return whether a record was removed and the potentially already existing record
      */
-    auto maybeRemoveMalloc1(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+    auto maybeRemoveMalloc1(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
 
 public:
     TLSTracker();
    ~TLSTracker();
 
-    virtual auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> final override;
+    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
     virtual void changeMalloc(MallocInfo&& info) final override;
 
     virtual auto maybeRemoveMalloc(void* pointer) -> bool final override;

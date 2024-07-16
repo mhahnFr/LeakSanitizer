@@ -77,7 +77,7 @@ public:
      * @param pointer the pointer of the actual allocation
      * @return whether the allocation record was removed and the potentially found existing record
      */
-    virtual auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>> = 0;
+    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> = 0;
 
     /**
      * Changes the allocation record already registered to the given one.
