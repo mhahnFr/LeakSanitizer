@@ -184,19 +184,29 @@ void LSan::absorbLeaks(std::map<const void *const, MallocInfo>&& leaks) {
     ignoreMalloc = ignore;
 }
 
+// FIXME: Though unlikely, the invalidly freed record ref can become invalid throughout this process
 auto LSan::removeMalloc(ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
     const auto& result = maybeRemoveMalloc(pointer);
-    // TODO: If no one finds it, use the (best) one indicating invalid free
-    // Keep in mind records from other threads can become invalid!
+    std::pair<bool, std::optional<MallocInfo::CRef>> tmp { false, std::nullopt };
     if (!result.first) {
         std::lock_guard lock { tlsTrackerMutex };
         for (auto element : tlsTrackers) {
             if (element == tracker) continue;
 
-            if (element->maybeRemoveMalloc(pointer)) {
-                return std::make_pair(true, std::nullopt);
+            const auto& result = element->maybeRemoveMalloc(pointer);
+            if (result.first) {
+                return result;
+            }
+            if (!tmp.second || (tmp.second && result.second && result.second->get().isMoreRecent(tmp.second->get()))) {
+                tmp = std::move(result);
             }
         }
+    }
+    if (!result.first) {
+        if (result.second && tmp.second) {
+            return result.second->get().isMoreRecent(tmp.second->get()) ? result : tmp;
+        }
+        return result.second ? result : tmp;
     }
     return result;
 }
