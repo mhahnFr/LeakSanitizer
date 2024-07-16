@@ -52,7 +52,7 @@ struct MallocInfo {
     std::size_t size;
     /** Indicating whether this allocation has been deallocated.  */
     bool deleted = false;
-    std::optional<std::chrono::system_clock::time_point> freeTimestamp; // TODO: Check with the timing!!!
+    std::optional<std::chrono::system_clock::time_point> freeTimestamp;
     /** The callstack where this allocation happened.             */
     mutable lcs::callstack createdCallstack;
     /** The callstack where the deallocation happened.            */
