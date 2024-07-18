@@ -27,7 +27,7 @@ DYLIB_NA = $(CORE_NAME).dylib
 LIBCALLSTACK_NAME = libcallstack
 LIBCALLSTACK_DIR  = ./CallstackLibrary
 LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
-LIBCALLSTACK_FLAG = 'CXX_FUNCTIONS=true' 'USE_BUILTINS=false' 'FORCE_DYNAMIC_FLAG=true'
+LIBCALLSTACK_FLAG = 'CXX_FUNCTIONS=true' 'USE_BUILTINS=false'
 
 SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
 OBJS  = $(patsubst %.cpp, %.o, $(SRC))
@@ -35,7 +35,7 @@ DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 
 BENCHMARK = false
 
-LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack -ldl
+LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include
 
 ifeq ($(BENCHMARK),true)
