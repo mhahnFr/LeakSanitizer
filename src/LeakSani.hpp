@@ -65,9 +65,6 @@ class LSan {
     /** The user regex error message.                                                   */
     std::optional<std::string> userRegexError;
     
-    /** The runtime name of this sanitizer.                                             */
-    const std::string libName;
-    
 #ifdef BENCHMARK
     std::map<timing::AllocType, timing::Timings> timingMap;
 #endif
@@ -146,15 +143,6 @@ public:
             loadUserRegex();
         }
         return userRegex.value();
-    }
-    
-    /**
-     * Returns the runtime library name of this sanitizer.
-     *
-     * @return the runtime library name
-     */
-    constexpr inline auto getLibName() const -> const std::string & {
-        return libName;
     }
     
     /**
