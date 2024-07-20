@@ -105,8 +105,23 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     
     toReturn = lcs::callstack(addresses.data(), static_cast<int>(i));
 #elif defined(__APPLE__) && (defined(__arm64__) || defined(__arm__))
-    // TODO: Properly implement
-    toReturn = lcs::callstack();
+    const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
+    
+    auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
+    int i = 0;
+    const auto& lr = context->uc_mcontext->__ss.__lr;
+    const auto& fp = context->uc_mcontext->__ss.__fp;
+    // lr is the return address (callstack frame address)
+    void* frame         = reinterpret_cast<void*>(fp);
+    void* previousFrame = nullptr;
+    void* returnAddress = reinterpret_cast<void*>(lr);
+    do {
+        addresses[i++] = returnAddress;
+        returnAddress = reinterpret_cast<void**>(frame)[1];
+        previousFrame = frame;
+        frame = *reinterpret_cast<void**>(frame);
+    } while (frame > previousFrame && i < CALLSTACK_BACKTRACE_SIZE); // TODO: Stack direction
+    toReturn = lcs::callstack(addresses.data(), i);
 #else
     (void) ptr;
     toReturn = lcs::callstack();
