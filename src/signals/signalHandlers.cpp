@@ -110,6 +110,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     int i = 0;
     const auto& lr = context->uc_mcontext->__ss.__lr;
     const auto& fp = context->uc_mcontext->__ss.__fp;
+    // TODO: 32-bit version
     void* frame         = reinterpret_cast<void*>(fp);
     void* previousFrame = nullptr;
     void* returnAddress = reinterpret_cast<void*>(lr);
