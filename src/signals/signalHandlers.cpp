@@ -101,7 +101,6 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
         previousRBP = frameBasePointer;
         frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
     } while (frameBasePointer > previousRBP && i < CALLSTACK_BACKTRACE_SIZE);
-    // TODO: "Stream" callstack instead of fixed ones
     
     toReturn = lcs::callstack(addresses.data(), static_cast<int>(i));
 #elif defined(__APPLE__) && (defined(__arm64__) || defined(__arm__))
@@ -111,7 +110,6 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     int i = 0;
     const auto& lr = context->uc_mcontext->__ss.__lr;
     const auto& fp = context->uc_mcontext->__ss.__fp;
-    // lr is the return address (callstack frame address)
     void* frame         = reinterpret_cast<void*>(fp);
     void* previousFrame = nullptr;
     void* returnAddress = reinterpret_cast<void*>(lr);
