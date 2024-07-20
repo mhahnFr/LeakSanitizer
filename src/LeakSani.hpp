@@ -64,9 +64,6 @@ class LSan final: public ATracker {
     /** The mutex to manage the access to the registered thread-local trackers.         */
     std::mutex tlsTrackerMutex;
 
-    /** The runtime name of this sanitizer.                                             */
-    std::string libName;
-
 #ifdef BENCHMARK
     /** The registered timings of the allocations.                                      */
     std::map<timing::AllocType, timing::Timings> timingMap;
@@ -194,15 +191,12 @@ public:
     }
     
     /**
-     * Returns the runtime library name of this sanitizer.
+     * Returns the mutex for the allocations and tracking.
      *
-     * @return the runtime library name
+     * @return the mutex
      */
-    inline auto getLibName() -> const std::string & {
-        if (libName.empty()) {
-            libName = loadName();
-        }
-        return libName;
+    constexpr inline auto getMutex() -> std::recursive_mutex & {
+        return mutex;
     }
     
     /**

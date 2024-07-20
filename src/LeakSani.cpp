@@ -19,12 +19,9 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <dlfcn.h>
-
 #include <algorithm>
 
 #include <lsan_internals.h>
-#include <lsan_stats.h>
 
 #include <callstack_internals.h>
 
@@ -41,24 +38,6 @@
 
 namespace lsan {
 std::atomic_bool LSan::finished = false;
-
-/**
- * Returns an optional containing the runtime name of this library.
- *
- * @return the runtime name of this library if available
- */
-static inline auto lsanName() -> std::optional<const std::string> {
-    Dl_info info;
-    if (!dladdr(reinterpret_cast<const void *>(&lsanName), &info)) {
-        return std::nullopt;
-    }
-    
-    return info.dli_fname;
-}
-
-auto LSan::loadName() -> std::string {
-    return lsanName().value();
-}
 
 auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
     if (regex == nullptr || *regex == '\0') {
