@@ -57,7 +57,7 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
         }
     }
     if (count > 0) {
-        stream << ", " << count << " leaks (" << bytesToString(bytes) << ") indirect";
+        stream << ", " << count << " leak" << (count > 1 ? "s" : "") << " (" << bytesToString(bytes) << ") indirect";
     }
     stream << std::endl;
     self.printCreatedCallstack(stream);
