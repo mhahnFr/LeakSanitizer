@@ -51,7 +51,7 @@ REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
 
 REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) noexcept(noexcept(::pthread_key_create(key, func))) -> int {
     if (key == nullptr) {
-        crash("Call to pthread_key_create(pthread_key_t*, void (*)(void*) with NULL as key");
+        crash("Call to pthread_key_create(pthread_key_t*, void (*)(void*)) with NULL as key");
     }
     auto toReturn = real::pthread_key_create(key, func);
     if (inited) {
