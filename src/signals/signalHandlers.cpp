@@ -103,13 +103,13 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     } while (frameBasePointer > previousRBP && i < CALLSTACK_BACKTRACE_SIZE);
     
     toReturn = lcs::callstack(addresses.data(), static_cast<int>(i));
-#elif defined(__APPLE__) && (defined(__arm64__) || defined(__arm__))
+#elif defined(__APPLE__) && defined(__arm64__)
     const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
     
     auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
     int i = 0;
-    const auto& lr = context->uc_mcontext->__ss.__lr;
-    const auto& fp = context->uc_mcontext->__ss.__fp;
+    const auto& lr = __darwin_arm_thread_state64_get_lr(context->uc_mcontext->__ss);
+    const auto& fp = __darwin_arm_thread_state64_get_fp(context->uc_mcontext->__ss);
     // TODO: 32-bit version
     void* frame         = reinterpret_cast<void*>(fp);
     void* previousFrame = nullptr;
