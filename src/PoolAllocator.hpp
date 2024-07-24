@@ -24,6 +24,8 @@
 
 #include <limits>
 
+#include "ObjectPool.hpp"
+
 namespace lsan {
 template<typename T>
 struct PoolAllocator {
@@ -32,24 +34,33 @@ struct PoolAllocator {
     PoolAllocator() = default;
 
     template<typename U>
-    constexpr inline PoolAllocator(const PoolAllocator<U>& other) noexcept {}
+    constexpr inline PoolAllocator(const PoolAllocator<U>&) noexcept {}
 
     [[ nodiscard ]] auto allocate(std::size_t count) -> T* {
         if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
         }
 
-        // TODO: Call the mempool
-        auto toReturn = std::malloc(count * sizeof(T));
+        if (count > 1) {
+            auto toReturn = std::malloc(count * sizeof(T));
+            if (toReturn == nullptr) {
+                throw std::bad_alloc();
+            }
+            return static_cast<T*>(toReturn);
+        }
+        auto toReturn = lsan::allocate<T>();
         if (toReturn == nullptr) {
             throw std::bad_alloc();
         }
-        return static_cast<T*>(toReturn);
+        return toReturn;
     }
 
     void deallocate(T* pointer, std::size_t count) noexcept {
-        // TODO: Use the mempool
-        std::free(pointer);
+        if (count > 1) {
+            std::free(pointer);
+        } else {
+            lsan::deallocate(pointer);
+        }
     }
 };
 
