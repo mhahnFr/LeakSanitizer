@@ -37,10 +37,8 @@ struct MemoryBlock {
 struct ObjectPool {
     std::size_t objectSize;
     std::size_t blockSize;
-    ObjectPool* next = nullptr;
 
     MemoryChunk* chunks = nullptr;
-
     MemoryBlock* blocks = nullptr;
 
     constexpr inline ObjectPool(std::size_t objectSize, std::size_t blockSize): objectSize(objectSize), blockSize(blockSize) {}
