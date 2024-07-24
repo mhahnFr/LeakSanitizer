@@ -19,8 +19,6 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
-
 #include <algorithm>
 #include <stack>
 
@@ -344,6 +342,7 @@ static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, s
 void LSan::classifyStackLeaksShallow() {
     std::lock_guard lock(infoMutex);
 
+    // TODO: Care about the stack direction
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
     for (uintptr_t it = here; it < begin; it += sizeof(uintptr_t)) {
