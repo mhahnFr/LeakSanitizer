@@ -73,19 +73,20 @@ struct ObjectPool {
     }
 };
 
-static auto pools() -> std::vector<ObjectPool>& {
+static auto getPools() -> std::vector<ObjectPool>& {
     static std::vector<ObjectPool>* pools = new std::vector<ObjectPool>(); // TODO: How to get rid of this memory leak?
     return *pools;
 }
 
 static inline auto findPool(std::size_t size, bool create = true) -> ObjectPool& {
-    for (auto& pool : pools()) {
-        if (pool.objectSize == size) {
-            return pool;
-        }
-    }
-    if (create) {
-        return *pools().insert(pools().end(), ObjectPool(size, 100));
+    auto& pools = getPools();
+    const auto& it = std::find_if(pools.begin(), pools.end(), [&size](auto element) {
+        return element.objectSize == size;
+    });
+    if (it != pools.end()) {
+        return *it;
+    } else if (create) {
+        return *pools.insert(pools.end(), ObjectPool(size, 100));
     }
     abort(); // TODO: Fail more gracefully
 }
