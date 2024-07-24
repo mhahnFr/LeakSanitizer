@@ -82,6 +82,7 @@
 		BFBF736928832F8100BC4208 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
+		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -188,6 +189,7 @@
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
 				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
+				F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
