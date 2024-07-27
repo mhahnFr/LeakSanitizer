@@ -489,7 +489,8 @@ void free(void* pointer) {
 }
 
 auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
-    if (memPtr == nullptr) {
+    void** checkPtr = memPtr;
+    if (checkPtr == nullptr) {
         lsan::crashForce("posix_memalign of a NULL pointer");
     }
 
