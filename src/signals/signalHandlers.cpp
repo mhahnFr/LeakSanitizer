@@ -66,7 +66,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     auto toReturn = lcs::callstack(false);
     
 #if (defined(__APPLE__) || defined(__linux__)) \
-    && (defined(__x86_64__) || defined(__i386__))
+    && (defined(__x86_64__) || defined(__i386__) || (defined(__APPLE__) && defined(__arm64__)))
     const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
     
     size_t ip, bp;
@@ -77,6 +77,9 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
  #elif defined(__i386__)
     ip = context->uc_mcontext->__ss.__eip;
     bp = context->uc_mcontext->__ss.__ebp;
+ #elif defined(__arm64__)
+    ip = __darwin_arm_thread_state64_get_lr(context->uc_mcontext->__ss);
+    bp = __darwin_arm_thread_state64_get_fp(context->uc_mcontext->__ss);
  #endif
 #elif defined(__linux__)
  #ifdef __x86_64__
@@ -88,38 +91,18 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
  #endif
 #endif
     
-    void** frameBasePointer           = reinterpret_cast<void**>(bp);
-    void*  extendedInstructionPointer = reinterpret_cast<void*>(ip);
+    void* previousFrame = nullptr;
+    void* frame         = reinterpret_cast<void*>(bp);
+    void* returnAddress = reinterpret_cast<void*>(ip);
 
     auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
-    std::size_t i = 0;
-    void** previousRBP = nullptr;
-    do {
-        addresses[i++] = extendedInstructionPointer;
-        
-        extendedInstructionPointer = frameBasePointer[1];
-        previousRBP = frameBasePointer;
-        frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
-    } while (frameBasePointer > previousRBP && i < CALLSTACK_BACKTRACE_SIZE);
-    
-    toReturn = lcs::callstack(addresses.data(), static_cast<int>(i));
-#elif defined(__APPLE__) && defined(__arm64__)
-    const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
-    
-    auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
     int i = 0;
-    const auto& lr = __darwin_arm_thread_state64_get_lr(context->uc_mcontext->__ss);
-    const auto& fp = __darwin_arm_thread_state64_get_fp(context->uc_mcontext->__ss);
-    // TODO: 32-bit version
-    void* frame         = reinterpret_cast<void*>(fp);
-    void* previousFrame = nullptr;
-    void* returnAddress = reinterpret_cast<void*>(lr);
     do {
         addresses[i++] = returnAddress;
         returnAddress = reinterpret_cast<void**>(frame)[1];
         previousFrame = frame;
         frame = *reinterpret_cast<void**>(frame);
-    } while (frame > previousFrame && i < CALLSTACK_BACKTRACE_SIZE); // TODO: Stack direction
+    } while (frame > previousFrame && i < CALLSTACK_BACKTRACE_SIZE);
     toReturn = lcs::callstack(addresses.data(), i);
 #else
     (void) ptr;
