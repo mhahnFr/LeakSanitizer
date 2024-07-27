@@ -63,11 +63,17 @@ static inline auto toString(void* ptr) -> std::string {
  * @return the callstack
  */
 static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
-    // TODO, FIXME: Use .eh_frame unwinding information!
     auto toReturn = lcs::callstack(false);
     
-#if (defined(__APPLE__) || defined(__linux__)) \
-    && (defined(__x86_64__) || defined(__i386__) || (defined(__APPLE__) && defined(__arm64__)))
+    /*
+     * The Linux version of the following code has been deactivated because of
+     * causing crashes when the frame pointer is unavailable.
+     *
+     * FIXME: Use .eh_frame unwinding information for this instead.
+     *
+     *                                                          - mhahnFr
+     */
+#if defined(__APPLE__) && (defined(__x86_64__) || defined(__i386__) || defined(__arm64__))
     const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
     
     uintptr_t ip, bp;
