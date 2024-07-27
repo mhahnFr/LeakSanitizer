@@ -63,13 +63,14 @@ static inline auto toString(void* ptr) -> std::string {
  * @return the callstack
  */
 static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
+    // TODO, FIXME: Use .eh_frame unwinding information!
     auto toReturn = lcs::callstack(false);
     
 #if (defined(__APPLE__) || defined(__linux__)) \
     && (defined(__x86_64__) || defined(__i386__) || (defined(__APPLE__) && defined(__arm64__)))
     const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
     
-    size_t ip, bp;
+    uintptr_t ip, bp;
 #ifdef __APPLE__
  #ifdef __x86_64__
     ip = context->uc_mcontext->__ss.__rip;
