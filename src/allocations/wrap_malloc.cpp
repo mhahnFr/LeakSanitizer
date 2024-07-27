@@ -88,7 +88,7 @@ static inline auto createInvalidFreeMessage(const void* address, bool doubleFree
     using namespace lsan::formatter;
     
     return formatString<Style::BOLD, Style::RED>(doubleFree ? "Double free" : "Invalid free") 
-        + " for address " + formatString<Style::BOLD>(utils::toString(address));
+        + " for address " + formatString<Style::BOLD>(lsan::utils::toString(address));
 }
 
 #ifdef __APPLE__
