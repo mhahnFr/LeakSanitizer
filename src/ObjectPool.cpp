@@ -25,21 +25,28 @@
 #include "ObjectPool.hpp"
 
 namespace lsan {
-struct MemoryChunk {
-    MemoryChunk* next = nullptr;
+struct MemoryBlock {
+    std::size_t blockSize = 0;
+    std::size_t allocCount = 0;
+
+    constexpr inline MemoryBlock(std::size_t blockSize): blockSize(blockSize) {}
+
+    inline ~MemoryBlock() {
+        __builtin_printf("Deleted block: %p Possible: %zu\n", this, blockSize);
+    }
 };
 
-struct MemoryBlock {
-    MemoryBlock* next = nullptr;
-    std::size_t allocCount = 0;
+struct MemoryChunk {
+    MemoryBlock* block = nullptr;
+    MemoryChunk* next = nullptr;
+    MemoryChunk* previous = nullptr;
 };
 
 struct ObjectPool {
     std::size_t objectSize;
     std::size_t blockSize;
-
     MemoryChunk* chunks = nullptr;
-    MemoryBlock* blocks = nullptr;
+    std::size_t factor = 1;
 
     constexpr inline ObjectPool(std::size_t objectSize, std::size_t blockSize): objectSize(objectSize), blockSize(blockSize) {}
 
@@ -47,29 +54,59 @@ struct ObjectPool {
         if (chunks != nullptr) {
             auto toReturn = chunks;
             chunks = chunks->next;
-            return static_cast<void*>(toReturn);
+            if (chunks != nullptr) {
+                chunks->previous = nullptr;
+            }
+            ++toReturn->block->allocCount;
+            return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(toReturn) + sizeof(MemoryBlock*));
         }
-        auto buffer = std::malloc(objectSize * blockSize + sizeof(MemoryBlock)); // TODO: Align
+        auto buffer = std::malloc((objectSize + sizeof(MemoryBlock*)) * (blockSize * factor) + sizeof(MemoryBlock)); // TODO: Align
         if (buffer == nullptr) {
             return nullptr;
         }
-        auto newBlock = new(buffer) MemoryBlock;
-        newBlock->next = blocks;
-        blocks = newBlock;
+        auto newBlock = new(buffer) MemoryBlock(blockSize * factor);
 
-        for (std::size_t i = 0; i < blockSize; ++i) {
-            auto newChunk = new(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(buffer) + sizeof(MemoryBlock) + i * objectSize)) MemoryChunk;
+        for (std::size_t i = 0; i < newBlock->blockSize; ++i) {
+            auto newChunk = new(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(buffer) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)))) MemoryChunk;
             newChunk->next = chunks;
+            if (chunks != nullptr) {
+                chunks->previous = newChunk;
+            }
+            newChunk->block = newBlock;
             chunks = newChunk;
         }
+        ++factor;
         return allocate();
     }
 
     inline void deallocate(void* pointer) {
-        auto chunk = static_cast<MemoryChunk*>(pointer);
+        auto chunk = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(pointer) - sizeof(MemoryBlock*));
         chunk->next = chunks;
+        if (chunks != nullptr) {
+            chunks->previous = chunk;
+        }
+        chunk->previous = nullptr;
         chunks = chunk;
-        // TODO: Release the corresponding block if empty
+        if (--chunk->block->allocCount == 0) {
+            const auto& block = chunk->block;
+            for (std::size_t i = 0; i < block->blockSize; ++i) {
+                const auto& element = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(block) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)));
+                if (element->previous != nullptr) {
+                    element->previous->next = element->next;
+                }
+                if (element->next != nullptr) {
+                    element->next->previous = element->previous;
+                }
+                if (element == chunks) {
+                    chunks = element->next;
+                }
+                element->~MemoryChunk();
+            }
+            delete block;
+            if (factor > 1) {
+                --factor;
+            }
+        }
     }
 };
 
