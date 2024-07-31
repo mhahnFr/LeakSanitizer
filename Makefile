@@ -49,7 +49,7 @@ ifeq ($(shell uname -s),Darwin)
  	
  	NAME = $(DYLIB_NA)
 else
-	LDFLAGS += $(LINUX_SONAME_FLAG)
+	LDFLAGS += $(LINUX_SONAME_FLAG) -ldl
 
 	NAME = $(SHARED_L)
 endif
