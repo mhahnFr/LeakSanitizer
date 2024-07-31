@@ -66,3 +66,24 @@ REPLACE(auto, pthread_key_delete)(pthread_key_t key) noexcept(noexcept(::pthread
     }
     return real::pthread_key_delete(key);
 }
+
+/*
+ * The following function replacement is a hack to convince the linker on Linux
+ * to always link with the LeakSanitizer, even in the case no allocation function
+ * is called directly.
+ *                                                              - mhahnFr
+ */
+#if defined(__linux__) && !defined(__APPLE__)
+extern "C" int __libc_start_main(
+        int (*)(int, char**, char**), int, char**, void (*)(void), void (*)(void), void (*)(void), void*);
+
+REPLACE(auto, __libc_start_main)(int (*main)(int, char**, char**),
+                                 int    argc, 
+                                 char** ubp_av,
+                                 void (*init)(void),
+                                 void (*fini)(void),
+                                 void (*rtld_fini)(void),
+                                 void* stack_end) -> int {
+    return  real::__libc_start_main(main, argc, ubp_av, init, fini, rtld_fini, stack_end);
+}
+#endif
