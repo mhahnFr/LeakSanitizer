@@ -119,7 +119,7 @@ static inline auto findPool(std::size_t size, bool create = true) -> ObjectPool&
     if (it != pools.end()) {
         return *it;
     } else if (create) {
-        return *pools.insert(pools.end(), ObjectPool(size, 100));
+        return *pools.insert(pools.end(), ObjectPool(size, 500));
     }
     abort(); // TODO: Fail more gracefully
 }
