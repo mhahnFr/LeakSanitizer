@@ -23,6 +23,8 @@
 #define interpose_hpp
 
 #ifdef __linux__
+#include <dlfcn.h>
+
 #define INTERPOSE(NEW, OLD) \
 extern "C" decltype(OLD) OLD __attribute__((weak, alias(#NEW)))
 
