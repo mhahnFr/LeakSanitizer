@@ -488,6 +488,7 @@ void free(void* pointer) {
     }
 }
 
+#ifndef __linux__
 auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
     void** checkPtr = memPtr;
     if (checkPtr == nullptr) {
@@ -517,6 +518,7 @@ auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> i
     }
     return toReturn;
 }
+#endif
 
 #ifndef __linux__
 } /* namespace lsan */
@@ -528,7 +530,9 @@ INTERPOSE(lsan::realloc, realloc);
 INTERPOSE(lsan::free,    free);
 
 INTERPOSE(lsan::aligned_alloc,  aligned_alloc);
+#ifndef __linux__
 INTERPOSE(lsan::posix_memalign, posix_memalign);
+#endif
 
 #ifdef __APPLE__
 INTERPOSE(lsan::malloc_zone_malloc,   malloc_zone_malloc);

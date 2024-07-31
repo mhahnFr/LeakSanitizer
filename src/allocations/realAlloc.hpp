@@ -103,6 +103,9 @@ static inline auto posix_memalign(void** memPtr, std::size_t alignment, std::siz
     int toReturn;
 #ifdef __linux__
     abort();
+    (void) memPtr;
+    (void) alignment;
+    (void) size;
     // TODO: Linux version
 #else
     toReturn = ::posix_memalign(memPtr, alignment, size);
