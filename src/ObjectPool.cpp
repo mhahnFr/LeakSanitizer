@@ -30,10 +30,6 @@ struct MemoryBlock {
     std::size_t allocCount = 0;
 
     constexpr inline MemoryBlock(std::size_t blockSize): blockSize(blockSize) {}
-
-    inline ~MemoryBlock() {
-        __builtin_printf("Deleted block: %p Possible: %zu\n", this, blockSize);
-    }
 };
 
 struct MemoryChunk {
