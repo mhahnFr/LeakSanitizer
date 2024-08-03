@@ -42,12 +42,12 @@ struct PoolAllocator {
     inline PoolAllocator(): pools(std::allocate_shared<Pools>(RealAllocator<Pools>())) {}
 
     template<typename U>
-    constexpr inline PoolAllocator(const PoolAllocator<U>& other) noexcept: pools(other.pools) {}
+    constexpr inline PoolAllocator(const PoolAllocator<U>& other) noexcept: pools(other.getPools()) {}
 
     constexpr inline PoolAllocator(PoolAllocator&& other) noexcept: pools(other.pools) {}
 
     template<typename U>
-    constexpr inline PoolAllocator(PoolAllocator<U>&& other) noexcept: pools(std::move(other.pools)) {}
+    constexpr inline PoolAllocator(PoolAllocator<U>&& other) noexcept: pools(other.getPools()) {}
 
     constexpr inline auto operator=(const PoolAllocator& other) noexcept -> PoolAllocator& {
         pools = other.pools;
@@ -59,7 +59,7 @@ struct PoolAllocator {
         return *this;
     }
 
-    [[ nodiscard ]] auto allocate(std::size_t count) -> T* {
+    [[ nodiscard ]] constexpr inline auto allocate(std::size_t count) -> T* {
         if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
         }
@@ -78,7 +78,7 @@ struct PoolAllocator {
         return toReturn;
     }
 
-    void deallocate(T* pointer, std::size_t count) noexcept {
+    constexpr inline void deallocate(T* pointer, std::size_t count) noexcept {
         if (count > 1) {
             std::free(pointer);
         } else {
@@ -87,13 +87,31 @@ struct PoolAllocator {
     }
 
     template<typename U>
-    constexpr inline auto operator==(const PoolAllocator<U>& other) noexcept -> bool {
-        return pools == other.pools;
+    constexpr inline auto operator==(const PoolAllocator<U>& other) const noexcept -> bool {
+        return pools == other.getPools() || *pools == *other.pools;
     }
 
     template<typename U>
-    constexpr inline auto operator!=(const PoolAllocator<U>& other) noexcept -> bool {
+    constexpr inline auto operator!=(const PoolAllocator<U>& other) const noexcept -> bool {
         return !(*this == other);
+    }
+
+    inline auto getPools() const -> std::shared_ptr<Pools> {
+        return pools;
+    }
+
+    inline void merge(PoolAllocator&& other) {
+        for (auto& pool : *other.getPools()) {
+            const auto& it = std::find_if(pools->begin(), pools->end(), [&pool](const auto& element) {
+                return element.getObjectSize() == pool.getObjectSize();
+            });
+            if (it == pools->end()) {
+                pools->push_back(pool);
+            } else {
+                it->merge(pool);
+            }
+        }
+        *other.pools = *pools;
     }
 
 private:

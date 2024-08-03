@@ -50,6 +50,8 @@ public:
     auto allocate() -> void*;
     void deallocate(void* pointer);
 
+    void merge(ObjectPool& other);
+
     constexpr inline auto getObjectSize() const -> std::size_t {
         return objectSize;
     }

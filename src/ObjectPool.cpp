@@ -84,4 +84,9 @@ void ObjectPool::deallocate(void* pointer) {
         }
     }
 }
+
+void ObjectPool::merge(ObjectPool& other) {
+    // TODO: Properly implement
+    abort();
+}
 }
