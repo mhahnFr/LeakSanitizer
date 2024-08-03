@@ -46,12 +46,14 @@ namespace lsan {
  * This class manages everything this sanitizer is capable to do.
  */
 class LSan {
+    template<
+        typename Key,
+        typename T,
+        typename Compare = std::less<Key>,
+        typename Allocator = PoolAllocator<std::pair<const Key, T>>
+    > using PoolMap = std::map<Key, T, Compare, Allocator>;
     /** A map containing all allocation records, sorted by their allocated pointers.    */
-    std::map<const void* const,
-             MallocInfo,
-             std::less<const void* const>,
-             PoolAllocator<std::pair<const void* const, MallocInfo>>>
-    infos;
+    PoolMap<const void* const, MallocInfo> infos;
     /** An object holding all statistics.                                               */
     Stats                                    stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
