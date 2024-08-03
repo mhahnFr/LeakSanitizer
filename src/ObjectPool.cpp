@@ -123,7 +123,7 @@ static inline auto findPool(std::size_t size, bool create = true) -> ObjectPool&
     } else if (create) {
         return *pools.insert(pools.end(), ObjectPool(size, 500));
     }
-    abort(); // TODO: Fail more gracefully
+    throw std::runtime_error("Object pool not found! Size = " + std::to_string(size) + ", create = false");
 }
 
 auto allocate(std::size_t size) -> void* {
