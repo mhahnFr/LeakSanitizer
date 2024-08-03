@@ -153,12 +153,13 @@ void LSan::deregisterTracker(ATracker* tracker) {
     ignoreMalloc = ignore;
 }
 
-void LSan::absorbLeaks(std::map<const void *const, MallocInfo>&& leaks) {
+void LSan::absorbLeaks(PoolMap<const void *const, MallocInfo>&& leaks) {
     std::lock_guard lock { mutex };
     std::lock_guard lock1 { infoMutex };
 
     auto ignore = ignoreMalloc;
     ignoreMalloc = true;
+    infos.get_allocator().merge(leaks.get_allocator());
     infos.merge(std::move(leaks));
     ignoreMalloc = ignore;
 }

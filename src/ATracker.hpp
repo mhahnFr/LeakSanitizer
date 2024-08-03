@@ -30,6 +30,7 @@
 #include <lsan_internals.h>
 
 #include "MallocInfo.hpp"
+#include "PoolAllocator.hpp"
 
 namespace lsan {
 /**
@@ -37,8 +38,14 @@ namespace lsan {
  */
 class ATracker {
 protected:
+    template<
+        typename Key,
+        typename T,
+        typename Compare = std::less<Key>,
+        typename Allocator = PoolAllocator<std::pair<const Key, T>>
+    > using PoolMap = std::map<Key, T, Compare, Allocator>;
     /** The registered allocations.                                   */
-    std::map<const void* const, MallocInfo> infos;
+    PoolMap<const void* const, MallocInfo> infos;
     /** The mutex to manage the access to the registered allocations. */
     std::mutex infoMutex;
 
