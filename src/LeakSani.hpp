@@ -36,6 +36,7 @@
 
 #include "ATracker.hpp"
 #include "MallocInfo.hpp"
+#include "PoolAllocator.hpp"
 
 #ifdef BENCHMARK
  #include "timing.hpp"
@@ -51,6 +52,14 @@ namespace lsan {
  * It acts as an allocation tracker.
  */
 class LSan final: public ATracker {
+//    template<
+//        typename Key,
+//        typename T,
+//        typename Compare = std::less<Key>,
+//        typename Allocator = PoolAllocator<std::pair<const Key, T>>
+//    > using PoolMap = std::map<Key, T, Compare, Allocator>;
+//    /** A map containing all allocation records, sorted by their allocated pointers.    */
+//    PoolMap<const void* const, MallocInfo> infos;
     /** An object holding all statistics.                                               */
     Stats stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
@@ -249,7 +258,7 @@ public:
      *
      * @return the globally tracked allocations
      */
-    constexpr inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+    constexpr inline auto getFragmentationInfos() const -> const decltype(infos)& {
         return infos;
     }
     
