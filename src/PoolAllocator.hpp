@@ -28,14 +28,18 @@
 #include <vector>
 
 #include "ObjectPool.hpp"
+#include "RealAllocator.hpp"
 
 namespace lsan {
 template<typename T>
 struct PoolAllocator {
     using value_type = T;
     using is_always_equal = std::false_type;
+    using propagate_on_container_move_assignment = std::true_type;
+    using propagate_on_container_copy_assignment = std::true_type;
+    using Pools = std::vector<ObjectPool>;
 
-    inline PoolAllocator(): pools(std::make_shared<std::vector<ObjectPool>>()) {}
+    inline PoolAllocator(): pools(std::allocate_shared<Pools>(RealAllocator<Pools>())) {}
 
     template<typename U>
     constexpr inline PoolAllocator(const PoolAllocator<U>& other) noexcept: pools(other.pools) {}
@@ -93,7 +97,7 @@ struct PoolAllocator {
     }
 
 private:
-    std::shared_ptr<std::vector<ObjectPool>> pools;
+    std::shared_ptr<Pools> pools;
 
     constexpr inline auto findPool(bool create = true) -> ObjectPool& {
         constexpr const std::size_t size = sizeof(T);
