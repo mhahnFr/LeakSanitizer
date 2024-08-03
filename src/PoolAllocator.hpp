@@ -22,7 +22,10 @@
 #ifndef PoolAllocator_hpp
 #define PoolAllocator_hpp
 
+#include <algorithm>
 #include <limits>
+#include <memory>
+#include <vector>
 
 #include "ObjectPool.hpp"
 
@@ -30,11 +33,27 @@ namespace lsan {
 template<typename T>
 struct PoolAllocator {
     using value_type = T;
+    using is_always_equal = std::false_type;
 
-    PoolAllocator() = default;
+    inline PoolAllocator(): pools(std::make_shared<std::vector<ObjectPool>>()) {}
 
     template<typename U>
-    constexpr inline PoolAllocator(const PoolAllocator<U>&) noexcept {}
+    constexpr inline PoolAllocator(const PoolAllocator<U>& other) noexcept: pools(other.pools) {}
+
+    constexpr inline PoolAllocator(PoolAllocator&& other) noexcept: pools(other.pools) {}
+
+    template<typename U>
+    constexpr inline PoolAllocator(PoolAllocator<U>&& other) noexcept: pools(std::move(other.pools)) {}
+
+    constexpr inline auto operator=(const PoolAllocator& other) noexcept -> PoolAllocator& {
+        pools = other.pools;
+        return *this;
+    }
+
+    constexpr inline auto operator=(PoolAllocator&& other) noexcept -> PoolAllocator& {
+        pools = other.pools;
+        return *this;
+    }
 
     [[ nodiscard ]] auto allocate(std::size_t count) -> T* {
         if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
@@ -48,7 +67,7 @@ struct PoolAllocator {
             }
             return static_cast<T*>(toReturn);
         }
-        auto toReturn = lsan::allocate<T>();
+        auto toReturn = static_cast<T*>(findPool().allocate());
         if (toReturn == nullptr) {
             throw std::bad_alloc();
         }
@@ -59,20 +78,37 @@ struct PoolAllocator {
         if (count > 1) {
             std::free(pointer);
         } else {
-            lsan::deallocate(pointer);
+            findPool(false).deallocate(pointer);
         }
     }
+
+    template<typename U>
+    constexpr inline auto operator==(const PoolAllocator<U>& other) noexcept -> bool {
+        return pools == other.pools;
+    }
+
+    template<typename U>
+    constexpr inline auto operator!=(const PoolAllocator<U>& other) noexcept -> bool {
+        return !(*this == other);
+    }
+
+private:
+    std::shared_ptr<std::vector<ObjectPool>> pools;
+
+    constexpr inline auto findPool(bool create = true) -> ObjectPool& {
+        constexpr const std::size_t size = sizeof(T);
+
+        const auto& it = std::find_if(pools->begin(), pools->end(), [&size](auto element) {
+        return element.getObjectSize() == size;
+    });
+        if (it != pools->end()) {
+        return *it;
+    } else if (create) {
+        return *pools->insert(pools->end(), ObjectPool(size, 500));
+    }
+    throw std::runtime_error("Object pool not found! Size = " + std::to_string(size) + ", create = false");
+    }
 };
-
-template<typename T, typename U>
-constexpr inline auto operator==(const PoolAllocator<T>&, const PoolAllocator<U>&) noexcept -> bool {
-    return true;
-}
-
-template<typename T, typename U>
-constexpr inline auto operator!=(const PoolAllocator<T>&, const PoolAllocator<U>&) noexcept -> bool {
-    return false;
-}
 }
 
 #endif /* PoolAllocator_hpp */
