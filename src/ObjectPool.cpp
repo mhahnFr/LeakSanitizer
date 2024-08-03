@@ -58,7 +58,7 @@ struct ObjectPool {
             ++toReturn->block->allocCount;
             return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(toReturn) + sizeof(MemoryBlock*));
         }
-        auto buffer = std::malloc((objectSize + sizeof(MemoryBlock*)) * (blockSize * factor) + sizeof(MemoryBlock)); // TODO: Align
+        auto buffer = std::malloc((objectSize + sizeof(MemoryBlock*)) * (blockSize * factor) + sizeof(MemoryBlock));
         if (buffer == nullptr) {
             return nullptr;
         }
