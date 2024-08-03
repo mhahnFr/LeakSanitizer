@@ -53,6 +53,17 @@ public:
     constexpr inline auto getObjectSize() const -> std::size_t {
         return objectSize;
     }
+
+    constexpr inline auto operator==(const ObjectPool& other) const noexcept -> bool {
+        return objectSize == other.objectSize
+            && blockSize == other.blockSize
+            && factor == other.factor
+            && chunks == other.chunks;
+    }
+
+    constexpr inline auto operator!=(const ObjectPool& other) const noexcept -> bool {
+        return !(*this == other);
+    }
 };
 }
 
