@@ -25,18 +25,35 @@
 #include <cstddef>
 
 namespace lsan {
-auto allocate(std::size_t size) -> void*;
-void deallocate(void* pointer, std::size_t size);
+class ObjectPool {
+    struct MemoryBlock {
+        std::size_t blockSize = 0;
+        std::size_t allocCount = 0;
 
-template<typename T>
-constexpr inline auto allocate() -> T* {
-    return static_cast<T*>(allocate(sizeof(T)));
-}
+        constexpr inline MemoryBlock(std::size_t blockSize): blockSize(blockSize) {}
+    };
 
-template<typename T>
-constexpr inline void deallocate(T* pointer) {
-    deallocate(pointer, sizeof(T));
-}
+    struct MemoryChunk {
+        MemoryBlock* block = nullptr;
+        MemoryChunk* next = nullptr;
+        MemoryChunk* previous = nullptr;
+    };
+
+    std::size_t objectSize;
+    std::size_t blockSize;
+    std::size_t factor = 1;
+    MemoryChunk* chunks = nullptr;
+
+public:
+    constexpr inline ObjectPool(std::size_t objectSize, std::size_t blockSize): objectSize(objectSize), blockSize(blockSize) {}
+
+    auto allocate() -> void*;
+    void deallocate(void* pointer);
+
+    constexpr inline auto getObjectSize() const -> std::size_t {
+        return objectSize;
+    }
+};
 }
 
 #endif /* ObjectPool_hpp */

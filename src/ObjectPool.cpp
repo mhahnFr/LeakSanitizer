@@ -19,118 +19,69 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
 #include <cstdint>
 #include <cstdlib>
-#include <vector>
+#include <new>
 
 #include "ObjectPool.hpp"
 
 namespace lsan {
-struct MemoryBlock {
-    std::size_t blockSize = 0;
-    std::size_t allocCount = 0;
-
-    constexpr inline MemoryBlock(std::size_t blockSize): blockSize(blockSize) {}
-};
-
-struct MemoryChunk {
-    MemoryBlock* block = nullptr;
-    MemoryChunk* next = nullptr;
-    MemoryChunk* previous = nullptr;
-};
-
-struct ObjectPool {
-    std::size_t objectSize;
-    std::size_t blockSize;
-    MemoryChunk* chunks = nullptr;
-    std::size_t factor = 1;
-
-    constexpr inline ObjectPool(std::size_t objectSize, std::size_t blockSize): objectSize(objectSize), blockSize(blockSize) {}
-
-    inline auto allocate() -> void* {
+auto ObjectPool::allocate() -> void* {
+    if (chunks != nullptr) {
+        auto toReturn = chunks;
+        chunks = chunks->next;
         if (chunks != nullptr) {
-            auto toReturn = chunks;
-            chunks = chunks->next;
-            if (chunks != nullptr) {
-                chunks->previous = nullptr;
-            }
-            ++toReturn->block->allocCount;
-            return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(toReturn) + sizeof(MemoryBlock*));
+            chunks->previous = nullptr;
         }
-        auto buffer = std::malloc((objectSize + sizeof(MemoryBlock*)) * (blockSize * factor) + sizeof(MemoryBlock));
-        if (buffer == nullptr) {
-            return nullptr;
-        }
-        auto newBlock = new(buffer) MemoryBlock(blockSize * factor);
-
-        for (std::size_t i = 0; i < newBlock->blockSize; ++i) {
-            auto newChunk = new(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(buffer) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)))) MemoryChunk;
-            newChunk->next = chunks;
-            if (chunks != nullptr) {
-                chunks->previous = newChunk;
-            }
-            newChunk->block = newBlock;
-            chunks = newChunk;
-        }
-        ++factor;
-        return allocate();
+        ++toReturn->block->allocCount;
+        return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(toReturn) + sizeof(MemoryBlock*));
     }
+    auto buffer = std::malloc((objectSize + sizeof(MemoryBlock*)) * (blockSize * factor) + sizeof(MemoryBlock));
+    if (buffer == nullptr) {
+        return nullptr;
+    }
+    auto newBlock = new(buffer) MemoryBlock(blockSize * factor);
 
-    inline void deallocate(void* pointer) {
-        auto chunk = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(pointer) - sizeof(MemoryBlock*));
-        chunk->next = chunks;
+    for (std::size_t i = 0; i < newBlock->blockSize; ++i) {
+        auto newChunk = new(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(buffer) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)))) MemoryChunk;
+        newChunk->next = chunks;
         if (chunks != nullptr) {
-            chunks->previous = chunk;
+            chunks->previous = newChunk;
         }
-        chunk->previous = nullptr;
-        chunks = chunk;
-        if (--chunk->block->allocCount == 0) {
-            const auto& block = chunk->block;
-            for (std::size_t i = 0; i < block->blockSize; ++i) {
-                const auto& element = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(block) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)));
-                if (element->previous != nullptr) {
-                    element->previous->next = element->next;
-                }
-                if (element->next != nullptr) {
-                    element->next->previous = element->previous;
-                }
-                if (element == chunks) {
-                    chunks = element->next;
-                }
-                element->~MemoryChunk();
+        newChunk->block = newBlock;
+        chunks = newChunk;
+    }
+    ++factor;
+    return allocate();
+}
+
+void ObjectPool::deallocate(void* pointer) {
+    auto chunk = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(pointer) - sizeof(MemoryBlock*));
+    chunk->next = chunks;
+    if (chunks != nullptr) {
+        chunks->previous = chunk;
+    }
+    chunk->previous = nullptr;
+    chunks = chunk;
+    if (--chunk->block->allocCount == 0) {
+        const auto& block = chunk->block;
+        for (std::size_t i = 0; i < block->blockSize; ++i) {
+            const auto& element = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(block) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)));
+            if (element->previous != nullptr) {
+                element->previous->next = element->next;
             }
-            delete block;
-            if (factor > 1) {
-                --factor;
+            if (element->next != nullptr) {
+                element->next->previous = element->previous;
             }
+            if (element == chunks) {
+                chunks = element->next;
+            }
+            element->~MemoryChunk();
+        }
+        delete block;
+        if (factor > 1) {
+            --factor;
         }
     }
-};
-
-static auto getPools() -> std::vector<ObjectPool>& {
-    static std::vector<ObjectPool>* pools = new std::vector<ObjectPool>(); // TODO: How to get rid of this memory leak?
-    return *pools;
-}
-
-static inline auto findPool(std::size_t size, bool create = true) -> ObjectPool& {
-    auto& pools = getPools();
-    const auto& it = std::find_if(pools.begin(), pools.end(), [&size](auto element) {
-        return element.objectSize == size;
-    });
-    if (it != pools.end()) {
-        return *it;
-    } else if (create) {
-        return *pools.insert(pools.end(), ObjectPool(size, 500));
-    }
-    throw std::runtime_error("Object pool not found! Size = " + std::to_string(size) + ", create = false");
-}
-
-auto allocate(std::size_t size) -> void* {
-    return findPool(size).allocate();
-}
-
-void deallocate(void* pointer, std::size_t size) {
-    findPool(size, false).deallocate(pointer);
 }
 }
