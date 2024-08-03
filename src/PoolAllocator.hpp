@@ -98,15 +98,15 @@ private:
     constexpr inline auto findPool(bool create = true) -> ObjectPool& {
         constexpr const std::size_t size = sizeof(T);
 
-        const auto& it = std::find_if(pools->begin(), pools->end(), [&size](auto element) {
-        return element.getObjectSize() == size;
-    });
+        const auto& it = std::find_if(pools->begin(), pools->end(), [&size](const auto& element) {
+            return element.getObjectSize() == size;
+        });
         if (it != pools->end()) {
-        return *it;
-    } else if (create) {
-        return *pools->insert(pools->end(), ObjectPool(size, 500));
-    }
-    throw std::runtime_error("Object pool not found! Size = " + std::to_string(size) + ", create = false");
+            return *it;
+        } else if (create) {
+            return *pools->insert(pools->end(), ObjectPool(size, 500));
+        }
+        throw std::runtime_error("Object pool not found! Size = " + std::to_string(size) + ", create = false");
     }
 };
 }
