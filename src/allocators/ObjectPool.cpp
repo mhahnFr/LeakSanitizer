@@ -31,7 +31,7 @@ auto ObjectPool::allocate() -> void* {
         auto toReturn = chunks;
         chunks = chunks->next;
         if (chunks != nullptr) {
-            chunks->previous = nullptr;
+            chunks->previous = toReturn->previous;
         }
         ++toReturn->block->allocCount;
         return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(toReturn) + sizeof(MemoryBlock*));
@@ -45,7 +45,10 @@ auto ObjectPool::allocate() -> void* {
     for (std::size_t i = 0; i < newBlock->blockSize; ++i) {
         auto newChunk = new(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(buffer) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)))) MemoryChunk;
         newChunk->next = chunks;
-        if (chunks != nullptr) {
+        if (chunks == nullptr) {
+            newChunk->previous = newChunk;
+        } else {
+            newChunk->previous = chunks->previous;
             chunks->previous = newChunk;
         }
         newChunk->block = newBlock;
@@ -58,16 +61,18 @@ auto ObjectPool::allocate() -> void* {
 void ObjectPool::deallocate(void* pointer) {
     auto chunk = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(pointer) - sizeof(MemoryBlock*));
     chunk->next = chunks;
-    if (chunks != nullptr) {
+    if (chunks == nullptr) {
+        chunk->previous = chunk;
+    } else {
+        chunk->previous = chunks->previous;
         chunks->previous = chunk;
     }
-    chunk->previous = nullptr;
     chunks = chunk;
     if (--chunk->block->allocCount == 0) {
         const auto& block = chunk->block;
         for (std::size_t i = 0; i < block->blockSize; ++i) {
             const auto& element = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(block) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)));
-            if (element->previous != nullptr) {
+            if (element != chunks) {
                 element->previous->next = element->next;
             }
             if (element->next != nullptr) {
@@ -75,6 +80,9 @@ void ObjectPool::deallocate(void* pointer) {
             }
             if (element == chunks) {
                 chunks = element->next;
+                if (chunks != nullptr) {
+                    chunks->previous = element->previous;
+                }
             }
             element->~MemoryChunk();
         }
@@ -86,18 +94,14 @@ void ObjectPool::deallocate(void* pointer) {
 }
 
 void ObjectPool::merge(ObjectPool& other) {
-    // FIXME: This process needs heavy optimization!!!
-
     if (chunks == nullptr) {
         chunks = other.chunks;
     } else if (other.chunks != nullptr) {
-        MemoryChunk* it;
-        for (it = chunks; it->next != nullptr; it = it->next);
-
-        it->next = other.chunks;
-        other.chunks->previous = it->next;
+        auto end = chunks->previous;
+        end->next = other.chunks;
+        chunks->previous = other.chunks->previous;
+        other.chunks->previous = end;
     }
-
     other.chunks = chunks;
 }
 }
