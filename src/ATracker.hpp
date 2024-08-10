@@ -30,7 +30,8 @@
 #include <lsan_internals.h>
 
 #include "MallocInfo.hpp"
-#include "PoolAllocator.hpp"
+
+#include "allocators/PoolAllocator.hpp"
 
 namespace lsan {
 /**

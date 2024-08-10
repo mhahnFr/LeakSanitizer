@@ -24,7 +24,7 @@
 
 #include <limits>
 
-#include "allocations/realAlloc.hpp"
+#include "../allocations/realAlloc.hpp"
 
 namespace lsan {
 template<typename T>

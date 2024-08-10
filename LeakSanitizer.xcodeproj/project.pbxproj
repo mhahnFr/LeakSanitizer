@@ -180,6 +180,7 @@
 		BF9DD3A428A6761400AEBC17 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				F1B373972C67A0D700674C3C /* allocators */,
 				BFAA94582B6C1E52007FC130 /* signals */,
 				BFBCAD8A2ACF611A00C6B69F /* allocations */,
 				BF3204F22AC5C625004EC77E /* callstacks */,
@@ -201,10 +202,6 @@
 				BFC817152BEFB36E00332937 /* TLSTracker.hpp */,
 				BFC817182BEFB3C200332937 /* ATracker.hpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
-				F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */,
-				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
-				F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */,
-				F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -229,6 +226,17 @@
 				BFBCAD892ACF376600C6B69F /* realAlloc.hpp */,
 			);
 			path = allocations;
+			sourceTree = "<group>";
+		};
+		F1B373972C67A0D700674C3C /* allocators */ = {
+			isa = PBXGroup;
+			children = (
+				F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */,
+				F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */,
+				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
+				F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */,
+			);
+			path = allocators;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
