@@ -86,7 +86,18 @@ void ObjectPool::deallocate(void* pointer) {
 }
 
 void ObjectPool::merge(ObjectPool& other) {
-    // TODO: Properly implement
-    abort();
+    // FIXME: This process needs heavy optimization!!!
+
+    if (chunks == nullptr) {
+        chunks = other.chunks;
+    } else if (other.chunks != nullptr) {
+        MemoryChunk* it;
+        for (it = chunks; it->next != nullptr; it = it->next);
+
+        it->next = other.chunks;
+        other.chunks->previous = it->next;
+    }
+
+    other.chunks = chunks;
 }
 }
