@@ -269,6 +269,11 @@ LSAN_DIAGNOSTIC_POP
 #endif
 
 static inline auto findStackBegin() -> void* {
+    /*
+     TODO: Implement a way of getting the stack bounds without walking framepointers
+     TODO: Consolidate the ARM and the x86 stackwalking implementations
+     */
+
     void* toReturn;
     
 #ifdef LSAN_STACK_X86
