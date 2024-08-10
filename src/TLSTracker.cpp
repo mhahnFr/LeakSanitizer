@@ -53,6 +53,8 @@ TLSTracker::~TLSTracker() {
 }
 
 void TLSTracker::finish() {
+    if (finished) return;
+
     finished = true;
 
     std::lock_guard lock  { mutex     };
