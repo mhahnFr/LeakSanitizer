@@ -358,7 +358,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto toReturn = LeakKindStats();
 
     auto& out = getOutputStream();
-    out << "LSAN: Total allocs: " << infos.size() << std::endl << std::endl;
     const auto& clear = [](std::ostream& out) -> std::ostream& {
         if (isATTY()) {
             return out << "\r                                                        \r";
