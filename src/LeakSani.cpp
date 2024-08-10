@@ -39,7 +39,7 @@
  #define LSAN_CAN_WALK_STACK 1
  #define LSAN_STACK_X86
 #elif defined(__arm64__) || defined(__arm__)
- #define LSAN_CAN_WALK_STACK 0
+ #define LSAN_CAN_WALK_STACK 1
  #define LSAN_STACK_ARM
 #else
  #define LSAN_CAN_WALK_STACK 0
@@ -281,7 +281,16 @@ static inline auto findStackBegin() -> void* {
         frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
     }
     toReturn = previousFBP;
-#else // TODO: Implement properly for ARM (64)
+#elif defined(LSAN_STACK_ARM)
+    void* previousFrame = nullptr;
+    void* frame = __builtin_frame_address(0);
+
+    while (frame > previousFrame) {
+        previousFrame = frame;
+        frame = *reinterpret_cast<void**>(frame);
+    }
+    toReturn = previousFrame;
+#else
     toReturn = nullptr;
     void* it;
     for (unsigned i = 0; i < 128 && (it = getFrameAddress(i)) != nullptr; ++i) {
