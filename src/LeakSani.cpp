@@ -66,7 +66,7 @@ static inline void destroySaniKey(void* value) {
             std::lock_guard lock(globalInstance.mutex);
             auto ignore = globalInstance.ignoreMalloc;
             globalInstance.ignoreMalloc = true;
-            delete reinterpret_cast<TLSTracker*>(value);
+            delete static_cast<TLSTracker*>(value);
             globalInstance.ignoreMalloc = ignore;
         }
     }
