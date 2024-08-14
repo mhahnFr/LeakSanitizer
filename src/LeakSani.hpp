@@ -110,7 +110,7 @@ public:
     auto operator=(const LSan&) -> LSan& = delete;
     auto operator=(LSan&&)      -> LSan& = delete;
 
-    inline static void* operator new(std::size_t count) {
+    inline static auto operator new(std::size_t count) -> void* {
         return real::malloc(count);
     }
 
