@@ -327,7 +327,7 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
-std::ostream & operator<<(std::ostream & stream, LSan & self) {
+auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     using formatter::Style;
     
     std::lock_guard lock(self.infoMutex);
