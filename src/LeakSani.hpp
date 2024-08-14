@@ -91,7 +91,7 @@ class LSan final: public ATracker {
     static auto loadName() -> std::string;
 
 protected:
-    virtual inline void addToStats(const MallocInfo& info) override {
+    virtual inline void addToStats(const MallocInfo& info) final override {
         stats += info;
     }
 
@@ -156,7 +156,7 @@ public:
      */
     void absorbLeaks(PoolMap<const void* const, MallocInfo>&& leaks);
 
-    virtual void finish() override;
+    virtual void finish() final override;
 
 #ifdef BENCHMARK
     /**
