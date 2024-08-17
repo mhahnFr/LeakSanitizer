@@ -84,6 +84,13 @@ void __wrap_free(void* pointer, const char*, int) {
 namespace lsan {
 #endif /* !__linux__ */
 
+/**
+ * Creates an appropriate invalid free message for the given pointer.
+ *
+ * @param address the invalidly freed pointer
+ * @param doubleFree whether the pointer has previously been freed
+ * @return a descriptive invalid free message
+ */
 static inline auto createInvalidFreeMessage(const void* address, bool doubleFree) -> std::string {
     using namespace lsan::formatter;
     
