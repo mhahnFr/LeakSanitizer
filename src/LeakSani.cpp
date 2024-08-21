@@ -161,7 +161,7 @@ void LSan::registerTracker(ATracker* tracker) {
 
 void LSan::deregisterTracker(ATracker* tracker) {
     std::lock_guard lock1 { mutex };
-    std::lock_guard lock { tlsTrackerMutex }; // <-- T6 tracker b
+    std::lock_guard lock { tlsTrackerMutex };
 
     auto ignore = ignoreMalloc;
     ignoreMalloc = true;
@@ -185,7 +185,7 @@ auto LSan::removeMalloc(ATracker* tracker, void* pointer) -> std::pair<bool, std
     const auto& result = maybeRemoveMalloc(pointer);
     std::pair<bool, std::optional<MallocInfo::CRef>> tmp { false, std::nullopt };
     if (!result.first) {
-        std::lock_guard lock { tlsTrackerMutex }; // <-- T7 Tracker a
+        std::lock_guard lock { tlsTrackerMutex };
         for (auto element : tlsTrackers) {
             if (element == tracker) continue;
 

@@ -547,8 +547,8 @@ INTERPOSE(lsan::malloc_zone_calloc,   malloc_zone_calloc);
 INTERPOSE(lsan::malloc_zone_valloc,   malloc_zone_valloc);
 INTERPOSE(lsan::malloc_zone_realloc,  malloc_zone_realloc);
 INTERPOSE(lsan::malloc_zone_memalign, malloc_zone_memalign);
-INTERPOSE(lsan::malloc_destroy_zone,  malloc_destroy_zone);
 INTERPOSE(lsan::malloc_zone_free,     malloc_zone_free);
+INTERPOSE(lsan::malloc_destroy_zone,  malloc_destroy_zone);
 INTERPOSE(lsan::malloc_zone_batch_malloc, malloc_zone_batch_malloc);
 INTERPOSE(lsan::malloc_zone_batch_free,   malloc_zone_batch_free);
 #endif

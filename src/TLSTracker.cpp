@@ -57,7 +57,7 @@ void TLSTracker::finish() {
 
     finished = true;
 
-    std::lock_guard lock  { mutex     }; // <-- T1 tracker a
+    std::lock_guard lock  { mutex     };
     std::lock_guard lock1 { infoMutex };
 
     ignoreMalloc = true;
