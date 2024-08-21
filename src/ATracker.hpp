@@ -63,6 +63,7 @@ public:
 
     /** Indicates whether allocations should be ignored. */
     bool ignoreMalloc = false;
+    bool needsDealloc = false;
     /** The mutex to guard allocations in this thread.   */
     std::recursive_mutex mutex;
 

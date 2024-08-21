@@ -62,12 +62,15 @@ static inline void destroySaniKey(void* value) {
     auto& globalInstance = getInstance();
     if (value != std::addressof(globalInstance)) {
         pthread_setspecific(globalInstance.saniKey, std::addressof(globalInstance));
+        auto tracker = static_cast<TLSTracker*>(value);
         if (!globalInstance.finished) {
             std::lock_guard lock(globalInstance.mutex);
             auto ignore = globalInstance.ignoreMalloc;
             globalInstance.ignoreMalloc = true;
-            delete static_cast<TLSTracker*>(value);
+            delete tracker;
             globalInstance.ignoreMalloc = ignore;
+        } else {
+            tracker->needsDealloc = true;
         }
     }
 }
@@ -119,13 +122,20 @@ LSan::LSan(): saniKey(createSaniKey()) {
     std::set_terminate(exceptionHandler);
 }
 
+LSan::~LSan() {
+    std::size_t i = 0;
+    for (auto tracker : tlsTrackers) {
+        if (tracker->needsDealloc) {
+            delete tracker;
+        }
+    }
+}
+
 auto LSan::copyTrackerList() -> decltype(tlsTrackers) {
     std::lock_guard lock { tlsTrackerMutex };
 
     return tlsTrackers;
 }
-
-// FIXME: Causes now memory leaks - what to do with the trackers that should be destroyed but weren't?
 
 void LSan::finish() {
     finished = true;

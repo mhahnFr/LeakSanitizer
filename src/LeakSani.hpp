@@ -104,7 +104,7 @@ public:
     const pthread_key_t saniKey;
 
     LSan();
-   ~LSan() = default;
+   ~LSan();
 
     LSan(const LSan&) = delete;
     LSan(LSan&&)      = delete;
