@@ -81,13 +81,15 @@ class LSan final: public ATracker {
      */
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
     
+    auto copyTrackerList() -> decltype(tlsTrackers);
+
     /**
      * Loads the user first party regular expression.
      */
     inline void loadUserRegex() {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
-    
+
     static auto loadName() -> std::string;
 
 protected:
