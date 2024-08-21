@@ -90,8 +90,6 @@ class LSan final: public ATracker {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
 
-    static auto loadName() -> std::string;
-
 protected:
     virtual inline void addToStats(const MallocInfo& info) final override {
         stats += info;

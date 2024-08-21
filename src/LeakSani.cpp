@@ -123,7 +123,6 @@ LSan::LSan(): saniKey(createSaniKey()) {
 }
 
 LSan::~LSan() {
-    std::size_t i = 0;
     for (auto tracker : tlsTrackers) {
         if (tracker->needsDealloc) {
             delete tracker;
