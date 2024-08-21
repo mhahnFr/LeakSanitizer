@@ -25,6 +25,12 @@
 #include <sstream>
 
 namespace lsan::utils {
+/**
+ * Converts the given pointer to a string.
+ *
+ * @param pointer the pointer to create a string representation
+ * @return the string representation
+ */
 static inline auto toString(const void* pointer) -> std::string {
     auto stream = std::ostringstream();
     stream << pointer;
