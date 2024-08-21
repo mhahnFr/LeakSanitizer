@@ -39,6 +39,7 @@ namespace lsan {
  */
 class ATracker {
 protected:
+    /** A `std::map` using the `PoolAllocator`.                       */
     template<
         typename Key,
         typename T,
@@ -61,10 +62,11 @@ protected:
 public:
     virtual ~ATracker() = default;
 
-    /** Indicates whether allocations should be ignored. */
+    /** Indicates whether allocations should be ignored.                 */
     bool ignoreMalloc = false;
+    /** Indicates whether this tracker instance needs to be deallocated. */
     bool needsDealloc = false;
-    /** The mutex to guard allocations in this thread.   */
+    /** The mutex to guard allocations in this thread.                   */
     std::recursive_mutex mutex;
 
     /**
@@ -101,6 +103,14 @@ public:
      */
     virtual void finish() = 0;
 
+    /**
+     * @brief Removes the allocation record associated with the given pointer in this instance if it was found.
+     *
+     * Does not call out to the global instance.
+     *
+     * @param pointer the pointer whose allocation record to be removed
+     * @return whether the record was removed and the potentially already as deleted marked record 
+     */
     virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> = 0;
 
     /**
