@@ -100,7 +100,7 @@ public:
      */
     virtual void finish() = 0;
 
-    virtual auto maybeRemoveMalloc([[ maybe_unused ]] void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> = 0;
+    virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> = 0;
 
     /**
      * @brief Changes the allocation record already registered to the given one.
