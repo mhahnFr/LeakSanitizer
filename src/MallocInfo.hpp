@@ -52,6 +52,7 @@ struct MallocInfo {
     std::size_t size;
     /** Indicating whether this allocation has been deallocated.  */
     bool deleted = false;
+    /** The timestamp when this record was freed.                 */
     std::optional<std::chrono::system_clock::time_point> freeTimestamp;
     /** The callstack where this allocation happened.             */
     mutable lcs::callstack createdCallstack;
@@ -77,6 +78,12 @@ struct MallocInfo {
         freeTimestamp = std::chrono::system_clock::now();
     }
     
+    /**
+     * Returns whether this allocation record was freed more recently than the given one.
+     *
+     * @param other the allocation record to compare to
+     * @return whether this record was freed more recently
+     */
     constexpr inline auto isMoreRecent(const MallocInfo& other) const -> bool {
         if (!freeTimestamp || !other.freeTimestamp) {
             return false;
