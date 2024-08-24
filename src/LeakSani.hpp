@@ -98,6 +98,7 @@ protected:
 public:
     /** Indicates whether the allocation tracking has finished. */
     static std::atomic_bool finished;
+    static std::atomic_bool preventDealloc;
     /** The thread-local storage key used for the thread-local allocation trackers. */
     const pthread_key_t saniKey;
 

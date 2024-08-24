@@ -38,6 +38,7 @@
 
 namespace lsan {
 std::atomic_bool LSan::finished = false;
+std::atomic_bool LSan::preventDealloc = false;
 
 auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
     if (regex == nullptr || *regex == '\0') {
@@ -63,7 +64,7 @@ static inline void destroySaniKey(void* value) {
     if (value != std::addressof(globalInstance)) {
         pthread_setspecific(globalInstance.saniKey, std::addressof(globalInstance));
         auto tracker = static_cast<TLSTracker*>(value);
-        if (!globalInstance.finished) {
+        if (!globalInstance.preventDealloc) {
             std::lock_guard lock(globalInstance.mutex);
             auto ignore = globalInstance.ignoreMalloc;
             globalInstance.ignoreMalloc = true;
@@ -128,6 +129,7 @@ LSan::~LSan() {
             delete tracker;
         }
     }
+    preventDealloc = false;
 }
 
 auto LSan::copyTrackerList() -> decltype(tlsTrackers) {
@@ -137,6 +139,7 @@ auto LSan::copyTrackerList() -> decltype(tlsTrackers) {
 }
 
 void LSan::finish() {
+    preventDealloc = true;
     finished = true;
     {
         std::lock_guard lock { mutex };
