@@ -121,6 +121,10 @@ public:
         return real::malloc(count);
     }
 
+    inline static void operator delete(void* ptr) {
+        real::free(ptr);
+    }
+
     /**
      * @brief Attempts to remove the allocation record associated with the given pointer.
      *
