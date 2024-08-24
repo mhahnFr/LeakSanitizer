@@ -247,7 +247,7 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, unsigned nu
                     warn("Free of NULL");
                 } else if (to_be_freed[i] != nullptr) {
                     const auto& it = tracker.removeMalloc(to_be_freed[i]);
-                    if (__lsan_invalidFreeLevel > 0 && !it.first) {
+                    if (__lsan_invalidFree && !it.first) {
                         if (__lsan_invalidCrash) {
                             crash(createInvalidFreeMessage(to_be_freed[i], static_cast<bool>(it.second)), it.second);
                         } else {
@@ -276,7 +276,7 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
                 warn("Free of NULL");
             } else if (ptr != nullptr) {
                 const auto& it = tracker.removeMalloc(ptr);
-                if (__lsan_invalidFreeLevel > 0 && !it.first) {
+                if (__lsan_invalidFree && !it.first) {
                     if (__lsan_invalidCrash) {
                         crash(createInvalidFreeMessage(ptr, static_cast<bool>(it.second)), it.second);
                     } else {
@@ -472,7 +472,7 @@ void free(void* pointer) {
                 lsan::warn("Free of NULL");
             } else if (pointer != nullptr) {
                 const auto& it = tracker.removeMalloc(pointer);
-                if (__lsan_invalidFreeLevel > 0 && !it.first) {
+                if (__lsan_invalidFree && !it.first) {
                     if (__lsan_invalidCrash) {
                         lsan::crash(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
                     } else {

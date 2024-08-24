@@ -227,7 +227,7 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
     if (__lsan_statsActive) {
         stats -= it->second;
     }
-    if (__lsan_statsActive || __lsan_invalidFreeLevel > 1) {
+    if (__lsan_statsActive) {
         it->second.markDeleted();
     } else {
         infos.erase(it);

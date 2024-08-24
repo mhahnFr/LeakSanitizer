@@ -129,7 +129,7 @@ bool __lsan_printLicense     = getBool("LSAN_PRINT_LICENSE")  .value_or(true);
 bool __lsan_printWebsite     = getBool("LSAN_PRINT_WEBSITE")  .value_or(true);
 
 bool __lsan_invalidCrash     = getBool("LSAN_INVALID_CRASH")  .value_or(true);
-bool __lsan_invalidFree      = getBool("LSAN_D_INVALID_FREE") .value_or(false);
+bool __lsan_invalidFree      = getBool("LSAN_INVALID_FREE")   .value_or(true);
 bool __lsan_freeNull         = getBool("LSAN_FREE_NULL")      .value_or(false);
 bool __lsan_zeroAllocation   = getBool("LSAN_ZERO_ALLOCATION").value_or(false);
 
@@ -146,6 +146,5 @@ bool __lsan_relativePaths    = getBool("LSAN_RELATIVE_PATHS") .value_or(true);
 std::size_t __lsan_leakCount           = getSize_t("LSAN_LEAK_COUNT")           .value_or(100);
 std::size_t __lsan_callstackSize       = getSize_t("LSAN_CALLSTACK_SIZE")       .value_or(20);
 std::size_t __lsan_firstPartyThreshold = getSize_t("LSAN_FIRST_PARTY_THRESHOLD").value_or(3);
-std::size_t __lsan_invalidFreeLevel    = getSize_t("LSAN_INVALID_FREE")         .value_or(1);
 
 const char * __lsan_firstPartyRegex = getVariable("LSAN_FIRST_PARTY_REGEX").value_or(nullptr);

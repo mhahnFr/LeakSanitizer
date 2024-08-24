@@ -40,7 +40,7 @@ TLSTracker::~TLSTracker() {
     getInstance().deregisterTracker(this);
 
     std::lock_guard lock1 { infoMutex };
-    if (__lsan_invalidFreeLevel == 1) {
+    if (__lsan_invalidFree) {
         for (auto it = infos.cbegin(); it != infos.cend();) {
             if (it->second.deleted) {
                 it = infos.erase(it);
@@ -62,7 +62,7 @@ void TLSTracker::finish() {
 
     ignoreMalloc = true;
 
-    if (__lsan_invalidFreeLevel == 1) {
+    if (__lsan_invalidFree) {
         for (auto it = infos.cbegin(); it != infos.cend();) {
             if (it->second.deleted) {
                 it = infos.erase(it);
@@ -85,7 +85,7 @@ auto TLSTracker::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::option
     if (it->second.deleted) {
         return std::make_pair(false, std::ref(it->second));
     }
-    if (__lsan_invalidFreeLevel > 0) {
+    if (__lsan_invalidFree) {
         it->second.markDeleted();
     } else {
         infos.erase(it);
