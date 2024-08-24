@@ -98,7 +98,7 @@ extern bool __lsan_invalidCrash;
  * If a pointer which is unknown to the sanitizer is freed, a warning or a termination is issued,
  * according to the value `__lsan_invalidCrash`. Freeing a null pointer is not checked by this flag,
  * but by `__lsan_freeNull`.
- * Defaults to `false`.
+ * Defaults to `true` since version 1.10.
  */
 extern bool __lsan_invalidFree;
 

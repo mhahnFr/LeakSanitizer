@@ -55,6 +55,12 @@ static inline auto malloc(std::size_t size) -> void * {
     return toReturn;
 }
 
+/**
+ * Calls the real `valloc` function.
+ *
+ * @param size the requested allocation size
+ * @return the allocated block of memory or `NULL` if no memory was available
+ */
 static inline auto valloc(std::size_t size) -> void* {
     void* toReturn;
 #ifdef __linux__
@@ -99,6 +105,14 @@ static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> voi
     return toReturn;
 }
 
+/**
+ * Calls the real `posix_memalign` function.
+ *
+ * @param memPtr the memory pointer
+ * @param alignment the memory alignment
+ * @param size the requested amount of bytes
+ * @return whether the allocation was successful
+ */
 static inline auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
     int toReturn;
 #ifdef __linux__
