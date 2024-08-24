@@ -23,7 +23,6 @@
 #define callstackHelper_hpp
 
 #include <ostream>
-#include <string>
 
 #include <callstack.h>
 
