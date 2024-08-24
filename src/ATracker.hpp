@@ -99,7 +99,7 @@ public:
 
     /**
      * Marks this tracker instance as finished, that is, it will ignore all upcoming allocations
-     * and upload it's registered allocation records to the main instance.
+     * and upload its registered allocation records to the main instance.
      */
     virtual void finish() = 0;
 

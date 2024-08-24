@@ -81,6 +81,11 @@ class LSan final: public ATracker {
      */
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
     
+    /**
+     * Creates a thread-safe copy of the thread-local tracker list.
+     *
+     * @return the copy
+     */
     auto copyTrackerList() -> decltype(tlsTrackers);
 
     /**
@@ -96,8 +101,9 @@ protected:
     }
 
 public:
-    /** Indicates whether the allocation tracking has finished. */
+    /** Indicates whether the allocation tracking has finished.                     */
     static std::atomic_bool finished;
+    /** Indicates whether to ignore deallocations in the TLS deallocator.           */
     static std::atomic_bool preventDealloc;
     /** The thread-local storage key used for the thread-local allocation trackers. */
     const pthread_key_t saniKey;
