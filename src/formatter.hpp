@@ -201,6 +201,8 @@ inline auto get(std::ostream & out, const std::string & str) -> std::ostream & {
 
 /**
  * Formats the given string using the given styles.
+ *
+ * @tparam S the requested styles
  */
 template<Style... S>
 struct format {
