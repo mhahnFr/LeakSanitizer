@@ -33,6 +33,8 @@
 namespace lsan {
 template<typename T>
 struct PoolAllocator {
+    static_assert(sizeof(T) >= 2 * sizeof(void*), "The PoolAllocator needs to store two pointers in deallocated memory blocks.");
+
     using value_type = T;
     using is_always_equal = std::false_type;
     using propagate_on_container_move_assignment = std::true_type;
