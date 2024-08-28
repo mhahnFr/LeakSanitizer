@@ -297,7 +297,7 @@ static inline auto stringifyReasonBUS(const int code) -> std::optional<std::stri
  * Stringifies the given trapping instruction reason code.
  *
  * @param code the reason code
- * @return the optional string represenation
+ * @return the optional string representation
  */
 static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::string> {
     switch (code) {

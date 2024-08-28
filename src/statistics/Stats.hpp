@@ -56,12 +56,12 @@ public:
     Stats() = default;
    ~Stats() = default;
     
-    Stats(const Stats & other);
-    Stats(Stats && other);
+    Stats(const Stats& other);
+    Stats(Stats&& other);
     
-    Stats & operator=(const Stats & other);
-    Stats & operator=(Stats && other);
-    
+    auto operator=(const Stats& other) -> Stats&;
+    auto operator=(Stats&& other) -> Stats&;
+
     /**
      * Returns the count of currently active allocations.
      *
@@ -127,7 +127,7 @@ public:
     /**
      * Exchanges an allocation using the given values.
      *
-     * @param oldSize the size to substract
+     * @param oldSize the size to subtract
      * @param newSize the size to add
      */
     void replaceMalloc(std::size_t oldSize, std::size_t newSize);
@@ -162,7 +162,7 @@ public:
     /**
      * Removes the given allocation record from this instance and returns itself.
      *
-     * @param info the allocation record to be substracted
+     * @param info the allocation record to be subtracted
      * @return this instance
      */
     inline auto operator-=(const MallocInfo & info) -> Stats & {

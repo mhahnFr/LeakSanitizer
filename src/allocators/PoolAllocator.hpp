@@ -32,7 +32,7 @@
 
 namespace lsan {
 /**
- * This class is an allocator using the obect pool class.
+ * This class is an allocator using the object pool class.
  *
  * @tparam T the type of object to be allocated with this allocator
  */

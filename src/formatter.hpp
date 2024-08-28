@@ -92,7 +92,7 @@ constexpr inline auto get() -> const char * {
 }
 
 /**
- * @brief Returns an ANSI esape code to clear the given style.
+ * @brief Returns an ANSI escape code to clear the given style.
  *
  * The returned string might be empty if `__lsan_printFormatted` is
  * set to `false`.
