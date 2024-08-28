@@ -31,6 +31,11 @@
 #include "RealAllocator.hpp"
 
 namespace lsan {
+/**
+ * This class is an allocator using the obect pool class.
+ *
+ * @tparam T the type of object to be allocated with this allocator
+ */
 template<typename T>
 struct PoolAllocator {
     static_assert(sizeof(T) >= 2 * sizeof(void*), "The PoolAllocator needs to store two pointers in deallocated memory blocks.");
