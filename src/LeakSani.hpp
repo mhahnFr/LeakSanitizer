@@ -222,7 +222,7 @@ public:
     virtual void changeMalloc(MallocInfo&& info) final override;
 
     /**
-     * Removes the allocation record acossiated with the given pointer.
+     * Removes the allocation record associated with the given pointer.
      *
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record

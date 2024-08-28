@@ -31,12 +31,24 @@
 #include "RealAllocator.hpp"
 
 namespace lsan {
+/**
+ * This class is an allocator using the object pool class.
+ *
+ * @tparam T the type of object to be allocated with this allocator
+ */
 template<typename T>
 struct PoolAllocator {
+    static_assert(sizeof(T) >= 2 * sizeof(void*), "The PoolAllocator needs to store two pointers in deallocated memory blocks.");
+
+    /** The value type of this allocator.                                                */
     using value_type = T;
+    /** Indicates allocators of this type are not always equal.                          */
     using is_always_equal = std::false_type;
+    /** Indicates allocators of this type should propagate on container move assignment. */
     using propagate_on_container_move_assignment = std::true_type;
+    /** Indicates allocators of this type should propagate on container copy assignment. */
     using propagate_on_container_copy_assignment = std::true_type;
+    /** The type used to store object pools.                                             */
     using Pools = std::vector<ObjectPool>;
 
     inline PoolAllocator(): pools(std::allocate_shared<Pools>(RealAllocator<Pools>())) {}
@@ -59,6 +71,15 @@ struct PoolAllocator {
         return *this;
     }
 
+    /**
+     * @brief Allocates the given amount of objects.
+     *
+     * If more than one object is requested, the object pool is not used.
+     *
+     * @param count the amount of objects to allocate
+     * @return the allocated block of memory
+     * @throws if too many objects are requested or if unable to allocate
+     */
     [[ nodiscard ]] constexpr inline auto allocate(std::size_t count) -> T* {
         if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
@@ -78,6 +99,12 @@ struct PoolAllocator {
         return toReturn;
     }
 
+    /**
+     * Deallocates the given block of memory.
+     *
+     * @param pointer the block of memory to be deallocated
+     * @param count the amount of objects to be deallocated
+     */
     constexpr inline void deallocate(T* pointer, std::size_t count) noexcept {
         if (count > 1) {
             std::free(pointer);
@@ -96,10 +123,22 @@ struct PoolAllocator {
         return !(*this == other);
     }
 
+    /**
+     * Returns the registered object pools.
+     *
+     * @return the registered object pools
+     */
     inline auto getPools() const -> std::shared_ptr<Pools> {
         return pools;
     }
 
+    /**
+     * @brief Merges this allocator with the given other allocator.
+     *
+     * After this operation, both allocators will compare equal, but the state is not shared.
+     *
+     * @param other the other allocator to merge with
+     */
     inline void merge(PoolAllocator&& other) {
         for (auto& pool : *other.getPools()) {
             const auto& it = std::find_if(pools->begin(), pools->end(), [&pool](const auto& element) {
@@ -115,8 +154,17 @@ struct PoolAllocator {
     }
 
 private:
+    /** The shared object pools. */
     std::shared_ptr<Pools> pools;
 
+    /**
+     * Attempts to find an appropriate object pool for the type of object managed
+     * by this allocator.
+     *
+     * @param create whether to create a new object pool if no appropriate one has been found
+     * @return an appropriate object pool
+     * @throws if no appropriate object pool was found and no pool should be created
+     */
     constexpr inline auto findPool(bool create = true) -> ObjectPool& {
         constexpr const std::size_t size = sizeof(T);
 

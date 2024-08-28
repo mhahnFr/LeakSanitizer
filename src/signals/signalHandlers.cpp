@@ -297,7 +297,7 @@ static inline auto stringifyReasonBUS(const int code) -> std::optional<std::stri
  * Stringifies the given trapping instruction reason code.
  *
  * @param code the reason code
- * @return the optional string represenation
+ * @return the optional string representation
  */
 static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::string> {
     switch (code) {
@@ -342,7 +342,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
-        
+
     getTracker().ignoreMalloc = true;
     const auto reason = getReason(signalCode, info->si_code);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))

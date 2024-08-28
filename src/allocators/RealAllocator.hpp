@@ -27,10 +27,17 @@
 #include "../allocations/realAlloc.hpp"
 
 namespace lsan {
+/**
+ * This allocator uses the allocation functions of the namespace `real`.
+ *
+ * @tparam T the type to be allocated by this allocator
+ */
 template<typename T>
 struct RealAllocator
 {
+    /** The value type of this allocator.                   */
     using value_type = T;
+    /** Indicates allocators of this type are always equal. */
     using is_always_equal = std::true_type;
 
     RealAllocator() = default;
@@ -38,6 +45,13 @@ struct RealAllocator
     template<typename U>
     constexpr inline RealAllocator(const RealAllocator<U>&) noexcept {}
 
+    /**
+     * Allocates and returns a block of memory fitting for the given amount of objects.
+     *
+     * @param n the amount of objects to be allocated
+     * @return the allocated block
+     * @throws if too many objects are requested or when the allocator failed to allocate
+     */
     [[ nodiscard ]] constexpr inline auto allocate(std::size_t n) -> T* {
         if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
@@ -50,6 +64,13 @@ struct RealAllocator
         return static_cast<T*>(toReturn);
     }
 
+    /**
+     * @brief Deallocates the given pointer.
+     *
+     * The given object amount is ignored.
+     *
+     * @param p the pointer to be deallocated
+     */
     constexpr inline void deallocate(T* p, std::size_t) noexcept {
         real::free(p);
     }
