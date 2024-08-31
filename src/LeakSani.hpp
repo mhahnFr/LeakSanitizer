@@ -43,7 +43,7 @@
  #include "timing.hpp"
 #endif
 
-#include "allocations/realAlloc.hpp"
+#include "wrappers/realAlloc.hpp"
 #include "statistics/Stats.hpp"
 
 namespace lsan {

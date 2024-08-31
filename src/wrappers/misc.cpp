@@ -26,11 +26,10 @@
 #include "../crashWarner/warn.hpp"
 
 REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
-    bool ignoreMalloc = false;
-    if (inited) {
-        ignoreMalloc = getIgnoreMalloc();
-        setIgnoreMalloc(true);
-    }
+    // TODO: Mutex?
+    auto& tracker = getTracker();
+    auto ignoreMalloc = tracker.ignoreMalloc;
+    tracker.ignoreMalloc = true;
 
     // The following builtin call is necessary to guarantee a frame pointer for the stack analysis.
     // Even though there is no use in the returned address, the exiting stack should not be optimized
@@ -42,9 +41,7 @@ REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
         getOutputStream() << maybePrintExitPoint;
     }
 
-    if (inited && !ignoreMalloc) {
-        setIgnoreMalloc(false);
-    }
+    tracker.ignoreMalloc = ignoreMalloc;
 
     real::exit(code);
 }
@@ -55,16 +52,18 @@ REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) noexc
         crash("Call to pthread_key_create(pthread_key_t*, void (*)(void*)) with NULL as key");
     }
     auto toReturn = real::pthread_key_create(key, func);
-    if (inited) {
-        getInstance().addTLSKey(*key);
-    }
+    // FIXME: Rethink this!
+//    if (inited) {
+//        getInstance().addTLSKey(*key);
+//    }
     return toReturn;
 }
 
 REPLACE(auto, pthread_key_delete)(pthread_key_t key) noexcept(noexcept(::pthread_key_delete(key))) -> int {
-    if (inited && !getInstance().removeTLSKey(key)) {
-        warn("Call to pthread_key_delete(pthread_key_t) with invalid key");
-    }
+    // FIXME: Rethink this!
+//    if (inited && !getInstance().removeTLSKey(key)) {
+//        warn("Call to pthread_key_delete(pthread_key_t) with invalid key");
+//    }
     return real::pthread_key_delete(key);
 }
 

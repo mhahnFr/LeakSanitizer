@@ -24,7 +24,7 @@
 
 #include <limits>
 
-#include "../allocations/realAlloc.hpp"
+#include "../wrappers/realAlloc.hpp"
 
 namespace lsan {
 /**

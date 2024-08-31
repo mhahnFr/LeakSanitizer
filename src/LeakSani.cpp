@@ -712,25 +712,28 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
 }
 
 void LSan::addTLSKey(const pthread_key_t& key) {
-    std::lock_guard lock { mutex };
-    bool ignoreMalloc = getIgnoreMalloc();
-    setIgnoreMalloc(true);
-    std::lock_guard lock2 { tlsKeyMutex };
-
-    keys.insert(key);
-    setIgnoreMalloc(ignoreMalloc);
+    // FIXME: Rethink this!
+//    std::lock_guard lock { mutex };
+//    bool ignoreMalloc = getIgnoreMalloc();
+//    setIgnoreMalloc(true);
+//    std::lock_guard lock2 { tlsKeyMutex };
+//
+//    keys.insert(key);
+//    setIgnoreMalloc(ignoreMalloc);
 }
 
 auto LSan::removeTLSKey(const pthread_key_t& key) -> bool {
-    std::lock_guard lock { mutex };
-
-    bool ignoreMalloc = getIgnoreMalloc();
-    setIgnoreMalloc(true);
-    std::lock_guard lock2 { tlsKeyMutex };
-
-    const bool toReturn = keys.erase(key) != 0;
-    setIgnoreMalloc(ignoreMalloc);
-    return toReturn;
+    // FIXME: Rethink this!
+    return true;
+//    std::lock_guard lock { mutex };
+//
+//    bool ignoreMalloc = getIgnoreMalloc();
+//    setIgnoreMalloc(true);
+//    std::lock_guard lock2 { tlsKeyMutex };
+//
+//    const bool toReturn = keys.erase(key) != 0;
+//    setIgnoreMalloc(ignoreMalloc);
+//    return toReturn;
 }
 
 /**
