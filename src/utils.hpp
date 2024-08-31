@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,22 +19,23 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef bytePrinter_hpp
-#define bytePrinter_hpp
+#ifndef utils_hpp
+#define utils_hpp
 
-#include <string>
+#include <sstream>
 
-namespace lsan {
+namespace lsan::utils {
 /**
- * @brief Returns a human readable representation of the given byte amount.
+ * Converts the given pointer to a string.
  *
- * Depending on `__lsan_humanPrint`, the amount may be represented in
- * a higher entity.
- *
- * @param amount the amount to create a string representation of
- * @return a string representation of the given byte amount
+ * @param pointer the pointer to create a string representation
+ * @return the string representation
  */
-auto bytesToString(unsigned long long amount) -> std::string;
+static inline auto toString(const void* pointer) -> std::string {
+    auto stream = std::ostringstream();
+    stream << pointer;
+    return stream.str();
+}
 }
 
-#endif /* bytePrinter_hpp */
+#endif /* utils_hpp */

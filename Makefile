@@ -43,11 +43,14 @@ ifeq ($(BENCHMARK),true)
 endif
 
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
+MACOS_ARCH_FLAGS =
 
 ifeq ($(shell uname -s),Darwin)
- 	LDFLAGS += -current_version 1.9 -compatibility_version 1 -install_name $(abspath $@)
- 	
- 	NAME = $(DYLIB_NA)
+	LDFLAGS += -current_version 1.9 -compatibility_version 1 -install_name $(abspath $@) $(MACOS_ARCH_FLAGS)
+	CXXFLAGS += $(MACOS_ARCH_FLAGS)
+	LIBCALLSTACK_FLAG += "MACOS_ARCH_FLAGS=$(MACOS_ARCH_FLAGS)"
+
+	NAME = $(DYLIB_NA)
 else
 	LDFLAGS += $(LINUX_SONAME_FLAG) -ldl
 
@@ -86,9 +89,8 @@ uninstall:
 	- $(RM) $(INSTALL_PATH)/lib/$(NAME)
 	- $(RM) -r "$(INSTALL_PATH)/include/lsan"
 
-release:
-	- $(RM) $(NAME)
-	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
+release: fclean
+	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" MACOS_ARCH_FLAGS="-arch x86_64 -arch arm64 -arch arm64e" $(NAME)
 	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(NAME)" $(NAME); fi
 
 update:

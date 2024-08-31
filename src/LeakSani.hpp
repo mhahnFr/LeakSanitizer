@@ -22,6 +22,7 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
+#include <atomic>
 #include <map>
 #include <mutex>
 #include <optional>
@@ -31,8 +32,10 @@
 #include <tuple>
 #include <utility>
 
+#include <pthread.h>
 #include <lsan_internals.h>
 
+#include "ATracker.hpp"
 #include "MallocInfo.hpp"
 #include "helperStructs.hpp"
 
@@ -40,33 +43,36 @@
  #include "timing.hpp"
 #endif
 
-#include "initialization/init.hpp"
+#include "allocations/realAlloc.hpp"
 #include "statistics/Stats.hpp"
 
 namespace lsan {
 /**
- * This class manages everything this sanitizer is capable to do.
+ * @brief This class manages everything this sanitizer is capable to do.
+ *
+ * It acts as an allocation tracker.
  */
-class LSan {
-    /** A map containing all allocation records, sorted by their allocated pointers.    */
-    std::map<const void * const, MallocInfo> infos;
-    std::set<pthread_key_t>                  keys;
+class LSan final: public ATracker {
+    std::set<pthread_key_t> keys;
     /** An object holding all statistics.                                               */
-    Stats                                    stats;
+    Stats stats;
+    std::mutex tlsKeyMutex;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
-    bool                                     callstackSizeExceeded = false;
-    /** The mutex used to synchronize the allocations and tracking.                     */
-    std::recursive_mutex                     mutex;
-    /** This mutex is used to strictly synchronize the access to the infos.             */
-    std::mutex                               infoMutex;
-    std::mutex                               tlsKeyMutex;
+    bool callstackSizeExceeded = false;
     /** The optional user regular expression.                                           */
     std::optional<std::optional<std::regex>> userRegex;
     /** The user regex error message.                                                   */
     std::optional<std::string> userRegexError;
-    
+    /** The registered thread-local allocation trackers.                                */
+    std::set<ATracker*> tlsTrackers;
+    /** The mutex to manage the access to the registered thread-local trackers.         */
+    std::mutex tlsTrackerMutex;
+
 #ifdef BENCHMARK
+    /** The registered timings of the allocations.                                      */
     std::map<timing::AllocType, timing::Timings> timingMap;
+    /** The mutex to manage access to the allocation timings.                           */
+    std::mutex timingMutex;
 #endif
     
     /**
@@ -83,12 +89,19 @@ class LSan {
     auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::pair<std::size_t, std::size_t>;
 
     /**
+     * Creates a thread-safe copy of the thread-local tracker list.
+     *
+     * @return the copy
+     */
+    auto copyTrackerList() -> decltype(tlsTrackers);
+
+    /**
      * Loads the user first party regular expression.
      */
     inline void loadUserRegex() {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
-    
+
     inline auto classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
                               std::set<MallocInfo*>& directs, bool skipClassifieds = false) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
@@ -113,23 +126,99 @@ class LSan {
         }
         return std::make_tuple(directCount, directBytes, indirectCount, indirectBytes);
     }
-    
+
+protected:
+    virtual inline void addToStats(const MallocInfo& info) final override {
+        stats += info;
+    }
+
 public:
+    /** Indicates whether the allocation tracking has finished.                     */
+    static std::atomic_bool finished;
+    /** Indicates whether to ignore deallocations in the TLS deallocator.           */
+    static std::atomic_bool preventDealloc;
+    /** The thread-local storage key used for the thread-local allocation trackers. */
+    const pthread_key_t saniKey;
     bool hasPrintedExit = false;
 
     LSan();
-   ~LSan() {
-        inited = false;
+   ~LSan();
+
+    LSan(const LSan&) = delete;
+    LSan(LSan&&)      = delete;
+
+    auto operator=(const LSan&) -> LSan& = delete;
+    auto operator=(LSan&&)      -> LSan& = delete;
+
+    inline static auto operator new(std::size_t count) -> void* {
+        return real::malloc(count);
     }
-    
-    LSan(const LSan &)              = delete;
-    LSan(const LSan &&)             = delete;
-    LSan & operator=(const LSan &)  = delete;
-    LSan & operator=(const LSan &&) = delete;
-    
+
+    inline static void operator delete(void* ptr) {
+        real::free(ptr);
+    }
+
+    /**
+     * @brief Attempts to remove the allocation record associated with the given pointer.
+     *
+     * If no record is found in this instance, all registered trackers except
+     * the given one are searched for the record.
+     *
+     * @param tracker the tracker to not be searched
+     * @param pointer the pointer to the allocation
+     * @return whether a record was removed and the potentially existing record
+     */
+    auto removeMalloc(ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
+
+    /**
+     * @brief Replaces the allocation record with the given one.
+     *
+     * If no record is found in this instance, all registered trackers except
+     * the given one are searched for the record.
+     *
+     * @param tracker the allocation tracker to not be searched
+     * @param info the new allocation record
+     */
+    void changeMalloc(ATracker* tracker, MallocInfo&& info);
+
+    /**
+     * Registers the given allocation tracker.
+     *
+     * @param tracker the allocation tracker to be registered
+     */
+    void registerTracker(ATracker* tracker);
+
+    /**
+     * Deregisters the given allocation tracker.
+     *
+     * @param tracker the allocation tracker to be deregistered
+     */
+    void deregisterTracker(ATracker* tracker);
+
+    /**
+     * Absorbs the given allocation records.
+     */
+    void absorbLeaks(PoolMap<const void* const, MallocInfo>&& leaks);
+
+    virtual void finish() final override;
+
 #ifdef BENCHMARK
+    /**
+     * Returns the allocation timings.
+     *
+     * @return the allocation timings
+     */
     constexpr inline auto getTimingMap() -> std::map<timing::AllocType, timing::Timings>& {
         return timingMap;
+    }
+
+    /**
+     * Returns the timing mutex.
+     *
+     * @return the timing mutex
+     */
+    constexpr inline auto getTimingMutex() -> std::mutex& {
+        return timingMutex;
     }
 #endif
     
@@ -162,31 +251,27 @@ public:
     constexpr inline auto getInfoMutex() -> std::mutex & {
         return infoMutex;
     }
-    
+
+    virtual void changeMalloc(MallocInfo&& info) final override;
+
     /**
-     * @brief Attempts to exchange the allocation record associated with the given
-     * allocation record by the given allocation record.
-     *
-     * @param info the allocation record to be exchanged
-     * @return whether an allocation record was exchanged
-     */
-    auto changeMalloc(const MallocInfo & info) -> bool;
-    
-    /**
-     * Removes the allocation record acossiated with the given pointer.
+     * Removes the allocation record associated with the given pointer.
      *
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    auto removeMalloc(void* pointer) -> std::pair<const bool, std::optional<MallocInfo::CRef>>;
+    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
 
     /**
-     * Adds the given allocation record.
+     * @brief Attempts to remove the allocation record associated with the given pointer.
      *
-     * @param info the allocation record to be added
+     * Does not search in the thread-local trackers.
+     *
+     * @param pointer the allocation pointer
+     * @return whether a record was removed and the potentially existing record
      */
-    void addMalloc(MallocInfo && info);
-    
+    virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
+
     /**
      * Prints a hint about the exceeded callstack size if it was exceeded.
      *
@@ -200,7 +285,7 @@ public:
      *
      * @return the globally tracked allocations
      */
-    constexpr inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+    constexpr inline auto getFragmentationInfos() const -> const decltype(infos)& {
         return infos;
     }
     
@@ -226,7 +311,7 @@ public:
     void addTLSKey(const pthread_key_t& key);
     auto removeTLSKey(const pthread_key_t& key) -> bool;
 
-    friend std::ostream & operator<<(std::ostream &, LSan &);
+    friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;
 };
 }
 

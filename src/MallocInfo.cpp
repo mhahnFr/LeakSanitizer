@@ -19,11 +19,8 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <lsan_internals.h>
-
 #include "MallocInfo.hpp"
 
-#include "LeakSani.hpp"
 #include "formatter.hpp"
 #include "bytePrinter.hpp"
 

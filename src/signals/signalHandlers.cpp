@@ -22,7 +22,6 @@
 #include <array>
 #include <iostream>
 #include <optional>
-#include <sstream>
 #include <string>
 
 #ifdef __APPLE__
@@ -40,22 +39,11 @@
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../MallocInfo.hpp"
+#include "../utils.hpp"
 #include "../callstacks/callstackHelper.hpp"
 #include "../crashWarner/crash.hpp"
 
 namespace lsan::signals::handlers {
-/**
- * Stringifies the given pointer.
- *
- * @param ptr the pointer to be stringified
- * @return the stringified pointer
- */
-static inline auto toString(void* ptr) -> std::string {
-    std::stringstream stream;
-    stream << ptr;
-    return stream.str();
-}
-
 /**
  * Creates a callstack using the pointer to the `ucontext`.
  *
@@ -65,11 +53,18 @@ static inline auto toString(void* ptr) -> std::string {
 static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     auto toReturn = lcs::callstack(false);
     
-#if (defined(__APPLE__) || defined(__linux__)) \
-    && (defined(__x86_64__) || defined(__i386__))
+    /*
+     * The Linux version of the following code has been deactivated because of
+     * causing crashes when the frame pointer is unavailable.
+     *
+     * FIXME: Use .eh_frame unwinding information for this instead.
+     *
+     *                                                          - mhahnFr
+     */
+#if defined(__APPLE__) && (defined(__x86_64__) || defined(__i386__) || defined(__arm64__))
     const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
     
-    size_t ip, bp;
+    uintptr_t ip, bp;
 #ifdef __APPLE__
  #ifdef __x86_64__
     ip = context->uc_mcontext->__ss.__rip;
@@ -77,6 +72,9 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
  #elif defined(__i386__)
     ip = context->uc_mcontext->__ss.__eip;
     bp = context->uc_mcontext->__ss.__ebp;
+ #elif defined(__arm64__)
+    ip = __darwin_arm_thread_state64_get_lr(context->uc_mcontext->__ss);
+    bp = __darwin_arm_thread_state64_get_fp(context->uc_mcontext->__ss);
  #endif
 #elif defined(__linux__)
  #ifdef __x86_64__
@@ -88,25 +86,19 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
  #endif
 #endif
     
-    void** frameBasePointer           = reinterpret_cast<void**>(bp);
-    void*  extendedInstructionPointer = reinterpret_cast<void*>(ip);
+    void* previousFrame = nullptr;
+    void* frame         = reinterpret_cast<void*>(bp);
+    void* returnAddress = reinterpret_cast<void*>(ip);
 
     auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
-    std::size_t i = 0;
-    void** previousRBP = nullptr;
+    int i = 0;
     do {
-        addresses[i++] = extendedInstructionPointer;
-        
-        extendedInstructionPointer = frameBasePointer[1];
-        previousRBP = frameBasePointer;
-        frameBasePointer = reinterpret_cast<void**>(frameBasePointer[0]);
-    } while (frameBasePointer > previousRBP && i < CALLSTACK_BACKTRACE_SIZE);
-    // TODO: "Stream" callstack instead of fixed ones
-    
-    toReturn = lcs::callstack(addresses.data(), static_cast<int>(i));
-#elif defined(__APPLE__) && (defined(__arm64__) || defined(__arm__))
-    // TODO: Properly implement
-    toReturn = lcs::callstack();
+        addresses[i++] = returnAddress;
+        returnAddress = reinterpret_cast<void**>(frame)[1];
+        previousFrame = frame;
+        frame = *reinterpret_cast<void**>(frame);
+    } while (frame > previousFrame && i < CALLSTACK_BACKTRACE_SIZE);
+    toReturn = lcs::callstack(addresses.data(), i);
 #else
     (void) ptr;
     toReturn = lcs::callstack();
@@ -305,7 +297,7 @@ static inline auto stringifyReasonBUS(const int code) -> std::optional<std::stri
  * Stringifies the given trapping instruction reason code.
  *
  * @param code the reason code
- * @return the optional string represenation
+ * @return the optional string representation
  */
 static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::string> {
     switch (code) {
@@ -350,12 +342,12 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
     using formatter::Style;
-        
-    setIgnoreMalloc(true);
+
+    getTracker().ignoreMalloc = true;
     const auto reason = getReason(signalCode, info->si_code);
     crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
-               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(toString(info->si_addr)) : ""),
+               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(utils::toString(info->si_addr)) : ""),
                reason.has_value()
                 ? std::optional(formatter::formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, info->si_code).value_or("Unknown reason") + ")")
                 : std::nullopt,
@@ -365,17 +357,16 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 void callstack(int, siginfo_t*, void* context) {
     using formatter::Style;
     
-    bool ignore = getIgnoreMalloc();
-    setIgnoreMalloc(true);
-    
+    auto& tracker = getTracker();
+    bool ignore = tracker.ignoreMalloc;
+    tracker.ignoreMalloc = true;
+
     auto& out = getOutputStream();
     out << formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
     callstackHelper::format(createCallstackFor(context), out);
     out << std::endl;
     
-    if (!ignore) {
-        setIgnoreMalloc(false);
-    }
+    tracker.ignoreMalloc = ignore;
 }
 
 void stats(int) {

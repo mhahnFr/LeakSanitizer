@@ -30,7 +30,7 @@
 
 namespace lsan::timing {
 /**
- * This structure contatins the different timings.
+ * This structure contains the different timings.
  */
 struct Timings {
     /** The amount of time the system took.               */

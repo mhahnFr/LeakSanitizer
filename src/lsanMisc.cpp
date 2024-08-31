@@ -33,14 +33,10 @@
 #include "lsanMisc.hpp"
 
 #include "formatter.hpp"
+#include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 
 namespace lsan {
-auto _getIgnoreMalloc() -> bool & {
-    static bool ignore = false;
-    return ignore;
-}
-
 auto getInstance() -> LSan & {
     static auto instance = new LSan();
     return *instance;
@@ -92,8 +88,9 @@ auto printInformation(std::ostream & out) -> std::ostream & {
 
 void exitHook() {
     using formatter::Style;
-    
-    setIgnoreMalloc(true);
+
+    getInstance().finish();
+    getTracker().ignoreMalloc = true;
     getOutputStream() << maybePrintExitPoint
                       << std::endl     << std::endl
                       << getInstance() << std::endl
@@ -140,5 +137,27 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     getInstance().hasPrintedExit = true;
 
     return out;
+}
+
+auto getTracker() -> ATracker& {
+    auto& globalInstance = getInstance();
+    if (globalInstance.finished || __lsan_statsActive) return globalInstance;
+
+    const auto& key = globalInstance.saniKey;
+    auto tlv = pthread_getspecific(key);
+    if (tlv == nullptr) {
+        pthread_setspecific(key, std::addressof(globalInstance));
+        TLSTracker* tlsTracker;
+        {
+            std::lock_guard lock(globalInstance.mutex);
+            auto ignore = globalInstance.ignoreMalloc;
+            globalInstance.ignoreMalloc = true;
+            tlsTracker = new TLSTracker();
+            pthread_setspecific(key, tlsTracker);
+            globalInstance.ignoreMalloc = ignore;
+        }
+        return *tlsTracker;
+    }
+    return *static_cast<ATracker*>(tlv);
 }
 }

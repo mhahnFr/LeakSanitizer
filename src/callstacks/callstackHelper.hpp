@@ -23,21 +23,20 @@
 #define callstackHelper_hpp
 
 #include <ostream>
-#include <string>
 
 #include <callstack.h>
 
 /** This namespace includes the helper functions for the callstacks. */
 namespace lsan::callstackHelper {
-/** An enumeration containing the possible callstack types.  */
+/** An enumeration containing the possible callstack types.   */
 enum class CallstackType {
-    /** Indicates the callstack shoud be ignored completely. */
+    /** Indicates the callstack should be ignored completely. */
     HARD_IGNORE,
-    /** Indicates the callstack is entirely first party.     */
+    /** Indicates the callstack is entirely first party.      */
     FIRST_PARTY,
-    /** Indicates the callstack originates in first party.   */
+    /** Indicates the callstack originates in first party.    */
     FIRST_PARTY_ORIGIN,
-    /** Indicates the callstack is user relevant.            */
+    /** Indicates the callstack is user relevant.             */
     USER
 };
 

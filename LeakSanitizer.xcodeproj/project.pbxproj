@@ -32,12 +32,17 @@
 		BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF4368F32AACF04700252E2A /* crashWarner.cpp */; };
 		BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */; };
 		BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
-		BFA41A402AB8BC1800DF6FAC /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA41A3E2AB8BC1800DF6FAC /* init.cpp */; };
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
 		BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCF0B252BDD54A900EE259C /* misc.cpp */; };
+		BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC817142BEFB36E00332937 /* TLSTracker.cpp */; };
+		BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817152BEFB36E00332937 /* TLSTracker.hpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
 		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
+		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
+		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
+		F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,7 +77,6 @@
 		BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsanMisc.cpp; sourceTree = "<group>"; };
 		BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lsanMisc.hpp; sourceTree = "<group>"; };
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
-		BFA41A3E2AB8BC1800DF6FAC /* init.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = init.cpp; sourceTree = "<group>"; };
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFAE06F32BF64689006D3196 /* helperStructs.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helperStructs.hpp; sourceTree = "<group>"; };
@@ -83,8 +87,16 @@
 		BFBF736728832C3300BC4208 /* wrap_malloc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wrap_malloc.cpp; sourceTree = "<group>"; };
 		BFBF736928832F8100BC4208 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
 		BFCF0B252BDD54A900EE259C /* misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
+		BFC817142BEFB36E00332937 /* TLSTracker.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TLSTracker.cpp; sourceTree = "<group>"; };
+		BFC817152BEFB36E00332937 /* TLSTracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TLSTracker.hpp; sourceTree = "<group>"; };
+		BFC817182BEFB3C200332937 /* ATracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ATracker.hpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
+		F16901512C403EF200EED0AE /* utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
+		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
+		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
+		F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ObjectPool.hpp; sourceTree = "<group>"; };
+		F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealAllocator.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,10 +185,10 @@
 		BF9DD3A428A6761400AEBC17 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				F1B373972C67A0D700674C3C /* allocators */,
 				BFAA94582B6C1E52007FC130 /* signals */,
 				BFBCAD8A2ACF611A00C6B69F /* wrappers */,
 				BF3204F22AC5C625004EC77E /* callstacks */,
-				BFA41A3D2AB8BBBC00DF6FAC /* initialization */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
 				BFAFADC528B4FDA40060076C /* formatter.hpp */,
@@ -193,17 +205,12 @@
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
 				BF7592282BB1799500891A55 /* LeakType.hpp */,
 				BFAE06F32BF64689006D3196 /* helperStructs.hpp */,
+				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
+				BFC817152BEFB36E00332937 /* TLSTracker.hpp */,
+				BFC817182BEFB3C200332937 /* ATracker.hpp */,
+				F16901512C403EF200EED0AE /* utils.hpp */,
 			);
 			path = src;
-			sourceTree = "<group>";
-		};
-		BFA41A3D2AB8BBBC00DF6FAC /* initialization */ = {
-			isa = PBXGroup;
-			children = (
-				BFA41A3E2AB8BC1800DF6FAC /* init.cpp */,
-				BF84625A2AD1B2D3003B05F5 /* init.hpp */,
-			);
-			path = initialization;
 			sourceTree = "<group>";
 		};
 		BFAA94582B6C1E52007FC130 /* signals */ = {
@@ -229,6 +236,17 @@
 			path = wrappers;
 			sourceTree = "<group>";
 		};
+		F1B373972C67A0D700674C3C /* allocators */ = {
+			isa = PBXGroup;
+			children = (
+				F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */,
+				F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */,
+				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
+				F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */,
+			);
+			path = allocators;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -236,11 +254,15 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F16901522C403EF200EED0AE /* utils.hpp in Headers */,
 				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
+				F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */,
 				BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */,
 				BF2C5CB42AEAB76A00DE2224 /* exceptionHandler.hpp in Headers */,
+				F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */,
 				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
+				BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */,
 				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
 				BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */,
 				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
@@ -297,7 +319,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1520;
+				LastUpgradeCheck = 1540;
 				ORGANIZATIONNAME = mhahnFr;
 				TargetAttributes = {
 					BF0F131B29194652008F0FCD = {
@@ -332,6 +354,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */,
 				BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */,
 				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
 				BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */,
@@ -345,8 +368,8 @@
 				BF0F1347291947A2008F0FCD /* wrap_malloc.cpp in Sources */,
 				BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */,
 				BF3204EF2AC5C614004EC77E /* callstackHelper.cpp in Sources */,
-				BFA41A402AB8BC1800DF6FAC /* init.cpp in Sources */,
 				BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */,
+				BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */,
 				BF0F134D291947A8008F0FCD /* signalHandlers.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

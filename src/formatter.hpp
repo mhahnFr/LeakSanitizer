@@ -92,7 +92,7 @@ constexpr inline auto get() -> const char * {
 }
 
 /**
- * @brief Returns an ANSI esape code to clear the given style.
+ * @brief Returns an ANSI escape code to clear the given style.
  *
  * The returned string might be empty if `__lsan_printFormatted` is
  * set to `false`.
@@ -201,6 +201,8 @@ inline auto get(std::ostream & out, const std::string & str) -> std::ostream & {
 
 /**
  * Formats the given string using the given styles.
+ *
+ * @tparam S the requested styles
  */
 template<Style... S>
 struct format {

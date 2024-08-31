@@ -34,18 +34,22 @@ auto getTimingMap() -> std::map<AllocType, Timings>& {
 }
 
 void addSystemTime(std::chrono::nanoseconds duration, AllocType type) {
+    std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].system.push_back(duration);
 }
 
 void addLockingTime(std::chrono::nanoseconds duration, AllocType type) {
+    std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].locking.push_back(duration);
 }
 
 void addTrackingTime(std::chrono::nanoseconds duration, AllocType type) {
+    std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].tracking.push_back(duration);
 }
 
 void addTotalTime(std::chrono::nanoseconds duration, AllocType type) {
+    std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].total.push_back(duration);
 }
 
@@ -118,7 +122,9 @@ static inline auto operator<<(std::ostream& out, const Timings& timings) -> std:
 
 auto printTimings(std::ostream& out) -> std::ostream& {
     using formatter::Style;
-    
+
+    std::lock_guard lock { getInstance().mutex };
+
     out << formatter::format<Style::BOLD>("Malloc timings")  << std::endl << getTimingMap()[AllocType::malloc]  << std::endl
         << formatter::format<Style::BOLD>("Calloc timings")  << std::endl << getTimingMap()[AllocType::calloc]  << std::endl
         << formatter::format<Style::BOLD>("Realloc timings") << std::endl << getTimingMap()[AllocType::realloc] << std::endl
