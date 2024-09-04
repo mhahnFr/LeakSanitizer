@@ -25,6 +25,13 @@
 #include "bytePrinter.hpp"
 
 namespace lsan {
+/**
+ * Returns whether the first given leak type is greater than the other one.
+ *
+ * @param lhs the first leak type
+ * @param rhs the second leak type
+ * @return whether the first leak type is considered to be greater
+ */
 static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs) -> bool {
     if (lhs == LeakType::unreachableIndirect && rhs == LeakType::unreachableDirect) {
         return true;
