@@ -85,6 +85,12 @@ auto isATTY() -> bool;
  */
 auto has(const std::string & var) -> bool;
 
+/**
+ * Prints the stacktrace of the exit point if requested.
+ *
+ * @param out the ouput stream to print to
+ * @return the given output stream
+ */
 auto maybePrintExitPoint(std::ostream& out) -> std::ostream&;
 
 /**
