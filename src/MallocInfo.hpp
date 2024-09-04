@@ -54,7 +54,9 @@ struct MallocInfo {
     /** The size of the allocated piece of memory.                */
     std::size_t size;
     
+    /** The type of leak this record has been classified as.      */
     LeakType leakType = LeakType::unclassified;
+    /** The allocation records reachable via this record.         */
     std::set<MallocInfo*> viaMeRecords;
 
     /** Indicating whether this allocation has been deallocated.  */
@@ -66,6 +68,7 @@ struct MallocInfo {
     /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
 
+    /** Indicates whether this record has been printed as a root. */
     bool printedInRoot = false;
 
     /**
