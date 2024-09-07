@@ -38,10 +38,10 @@ void   __wrap_free(void *, const char *, int);
 extern "C" {
 #endif /* __linux__ */
 
-auto __lsan_malloc(std::size_t)              -> void *;
-auto __lsan_calloc(std::size_t, std::size_t) -> void *;
-auto __lsan_realloc(void *, std::size_t)     -> void *;
-void __lsan_free(void *);
+auto malloc(std::size_t)              -> void*;
+auto calloc(std::size_t, std::size_t) -> void*;
+auto realloc(void*, std::size_t)      -> void*;
+void free(void*);
 
 #ifdef __linux__
 } /* extern "C" */

@@ -317,7 +317,7 @@ auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, std::size_t size) -> vo
 }
 #endif
 
-auto __lsan_malloc(std::size_t size) -> void * {
+auto malloc(std::size_t size) -> void* {
     BENCH(auto ptr = lsan::real::malloc(size);, std::chrono::nanoseconds, systemTime);
     
     if (ptr != nullptr && !lsan::LSan::finished) {
@@ -345,7 +345,7 @@ auto __lsan_malloc(std::size_t size) -> void * {
     return ptr;
 }
 
-auto __lsan_calloc(std::size_t objectSize, std::size_t count) -> void* {
+auto calloc(std::size_t objectSize, std::size_t count) -> void* {
     BENCH(auto ptr = lsan::real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
     
     if (ptr != nullptr && !lsan::LSan::finished) {
@@ -373,7 +373,7 @@ auto __lsan_calloc(std::size_t objectSize, std::size_t count) -> void* {
     return ptr;
 }
 
-auto __lsan_valloc(std::size_t size) -> void* {
+auto valloc(std::size_t size) -> void* {
     auto ptr = lsan::real::valloc(size);
 
     if (ptr != nullptr && !lsan::LSan::finished) {
@@ -393,7 +393,7 @@ auto __lsan_valloc(std::size_t size) -> void* {
     return ptr;
 }
 
-auto __lsan_aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
+auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     auto ptr = lsan::real::aligned_alloc(alignment, size);
 
     if (ptr != nullptr && !lsan::LSan::finished) {
@@ -413,7 +413,7 @@ auto __lsan_aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     return ptr;
 }
 
-auto __lsan_realloc(void * pointer, std::size_t size) -> void * {
+auto realloc(void* pointer, std::size_t size) -> void* {
     if (lsan::LSan::finished) return lsan::real::realloc(pointer, size);
 
     auto& tracker = lsan::getTracker();
@@ -449,7 +449,7 @@ auto __lsan_realloc(void * pointer, std::size_t size) -> void * {
     return ptr;
 }
 
-void __lsan_free(void* pointer) {
+void free(void* pointer) {
     if (lsan::LSan::finished) {
         lsan::real::free(pointer);
         return;
@@ -489,7 +489,7 @@ void __lsan_free(void* pointer) {
     }
 }
 
-auto __lsan_posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
+auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
     void** checkPtr = memPtr;
     if (checkPtr == nullptr) {
         lsan::crashForce("posix_memalign of a NULL pointer");
@@ -520,14 +520,14 @@ auto __lsan_posix_memalign(void** memPtr, std::size_t alignment, std::size_t siz
 }
 } /* namespace lsan */
 
-INTERPOSE(__lsan_malloc,  malloc);
-INTERPOSE(__lsan_calloc,  calloc);
-INTERPOSE(__lsan_valloc,  valloc);
-INTERPOSE(__lsan_realloc, realloc);
-INTERPOSE(__lsan_free,    free);
+INTERPOSE(malloc,  malloc);
+INTERPOSE(calloc,  calloc);
+INTERPOSE(valloc,  valloc);
+INTERPOSE(realloc, realloc);
+INTERPOSE(free,    free);
 
-INTERPOSE(__lsan_aligned_alloc,  aligned_alloc);
-INTERPOSE(__lsan_posix_memalign, posix_memalign);
+INTERPOSE(aligned_alloc,  aligned_alloc);
+INTERPOSE(posix_memalign, posix_memalign);
 
 #ifdef __APPLE__
 INTERPOSE(malloc_zone_malloc,   malloc_zone_malloc);
