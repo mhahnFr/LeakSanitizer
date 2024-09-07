@@ -165,7 +165,7 @@ following environment variables to their indicated values:
 | `LSAN_PRINT_COUT`            | Print to the default output stream                                             | `true`, `false`   | `false`       |
 | `LSAN_PRINT_FORMATTED`       | Print using ANSI escape codes                                                  | `true`, `false`   | `true`        |
 | `LSAN_INVALID_CRASH`         | Terminate if an invalid action is detected                                     | `true`, `false`   | `true`        |
-| `LSAN_INVALID_FREE`          | Detect invalid de-allocations                                                  | `true`, `false`   | `false`       |
+| `LSAN_INVALID_FREE`          | Detect invalid de-allocations                                                  | `true`, `false`   | `true`        |
 | `LSAN_FREE_NULL`             | Issue a warning if `NULL` is `free`d                                           | `true`, `false`   | `false`       |
 | `LSAN_STATS_ACTIVE`          | Enable the statistical bookkeeping                                             | `true`, `false`   | `false`       |
 | `LSAN_LEAK_COUNT`            | The amount of leaks to be printed in detail                                    | `0` to `SIZE_MAX` | `100`         |
@@ -212,16 +212,15 @@ The statistics then can be queried using the following API:
 More on the statistics [here][4].
 
 ## Behind the scenes or: How does it work?
-In order to track the memory allocations this sanitizer replaces the four allocation management functions
-`malloc`, `calloc`, `realloc` and `free`. Every allocation and de-allocation is registered and a backtrace
-is stored for it.  
+In order to track the memory allocations this sanitizer replaces the common allocation management functions such as
+`malloc`, `calloc`, `realloc` and `free`. Every allocation and de-allocation is registered and a backtrace is stored
+for it.  
 Its own allocations are not tracked.
 
-The signal handlers and the wrapper functions are installed once the sanitizer has been loaded by the
-dynamic loader.
+The signal handlers and the wrapper functions are installed once the sanitizer has been loaded by the dynamic loader.
 
-When the exit handler registered using `atexit` is invoked the allocated memory is examined and
-the detected memory leaks are printed.  
+When the exit handler registered using `atexit` is invoked the allocated memory is examined and the detected memory
+leaks are printed.  
 The backtraces are translated using the [CallstackLibrary][5].
 
 ## Final notes
