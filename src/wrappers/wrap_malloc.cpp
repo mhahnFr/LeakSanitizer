@@ -23,8 +23,6 @@
 
 #include <lsan_internals.h>
 
-#include "wrap_malloc.hpp"
-
 #include "interpose.hpp"
 #include "realAlloc.hpp"
 
@@ -59,6 +57,7 @@ auto operator new(std::size_t size) -> void * {
 #endif /* __linux__ */
 
 namespace lsan {
+extern "C" {
 auto __wrap_malloc(std::size_t size, const char*, int) -> void* {
     return malloc(size);
 }
@@ -77,6 +76,7 @@ void __wrap_free(void* pointer, const char*, int) {
 
 [[ noreturn ]] void __wrap_exit(int code, const char*, int) {
     exit(code);
+}
 }
 
 /**
@@ -317,9 +317,13 @@ auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, std::size_t size) -> vo
 }
 #endif
 
+#ifdef __linux__
+extern "C" {
+#endif /* __linux__ */
+
 auto malloc(std::size_t size) -> void* {
     BENCH(auto ptr = lsan::real::malloc(size);, std::chrono::nanoseconds, systemTime);
-    
+
     if (ptr != nullptr && !lsan::LSan::finished) {
         auto& tracker = lsan::getTracker();
         BENCH(const std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
@@ -347,7 +351,7 @@ auto malloc(std::size_t size) -> void* {
 
 auto calloc(std::size_t objectSize, std::size_t count) -> void* {
     BENCH(auto ptr = lsan::real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
-    
+
     if (ptr != nullptr && !lsan::LSan::finished) {
         auto& tracker = lsan::getTracker();
         BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
@@ -518,6 +522,11 @@ auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> i
     }
     return toReturn;
 }
+
+#ifdef __linux__
+} /* extern "C" */
+#endif /* __linux__ */
+
 } /* namespace lsan */
 
 INTERPOSE(malloc,  malloc);
