@@ -41,16 +41,6 @@
 #include "../crashWarner/crash.hpp"
 #include "../crashWarner/warn.hpp"
 
-#ifdef __linux__
-auto operator new(std::size_t size) -> void * {
-    if (size == 0) {
-        size = 1;
-    }
-    
-    return malloc(size);
-}
-#endif /* __linux__ */
-
 /*
  * These wrapper functions still reside here to not break compatibility with
  * previously compiled programs.
@@ -58,6 +48,16 @@ auto operator new(std::size_t size) -> void * {
  *
  *                                                                  - mhahnFr
  */
+#ifdef __linux__
+auto operator new(std::size_t size) -> void * {
+    if (size == 0) {
+        size = 1;
+    }
+
+    return malloc(size);
+}
+#endif /* __linux__ */
+
 namespace lsan {
 auto __wrap_malloc(std::size_t size, const char*, int) -> void* {
     return malloc(size);
