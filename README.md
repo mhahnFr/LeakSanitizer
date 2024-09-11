@@ -13,7 +13,7 @@ This sanitizer has been optimized for both **macOS** and **Linux** - all memory 
 ## Quickstart
 Use the LeakSanitizer to check for memory leaks as follows:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
-2. Build it: `cd LeakSanitizer && make`
+2. Build it: `cd LeakSanitizer && make -j`
 3. Link your code with: `-L<path/to/library> -llsan`
 
 > [!TIP]
@@ -32,11 +32,11 @@ Get started by either downloading a prebuilt version of this sanitizer [here][1]
 Alternatively you can also build it from source:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
 2. go into the cloned repository: `cd LeakSanitizer`
-3. and build the library: `make`
+3. and build the library: `make -j`
 
 Or in one step:
 ```shell
-git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make
+git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make -j
 ```
 
 Once you have a copy of this sanitizer you can install it using the following command:
