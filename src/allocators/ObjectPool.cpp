@@ -54,7 +54,9 @@ auto ObjectPool::allocate() -> void* {
         newChunk->block = newBlock;
         chunks = newChunk;
     }
-    ++factor;
+    if (factor < 50) {
+        ++factor;
+    }
     return allocate();
 }
 

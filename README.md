@@ -1,21 +1,19 @@
 # Welcome to the LeakSanitizer!
 The LeakSanitizer is a tool designed to debug memory leaks.
 
-It can be used with almost any programming language that compiles to native
-machine code.  
+It can be used with almost any programming language that compiles to native machine code.  
 Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 
 > [!IMPORTANT]
-> **Objective-C** and **Swift** objects are never considered to become memory leaks - 
-> even in the case of strong reference cycles.
+> **Objective-C** and **Swift** objects are never considered to become memory leaks - even in the case of strong
+> reference cycles.
 
-This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are
-detected on both platforms.
+This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are detected on both platforms.
 
 ## Quickstart
 Use the LeakSanitizer to check for memory leaks as follows:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
-2. Build it: `cd LeakSanitizer && make`
+2. Build it: `cd LeakSanitizer && make -j`
 3. Link your code with: `-L<path/to/library> -llsan`
 
 > [!TIP]
@@ -30,22 +28,33 @@ More explanation can be found in the [wiki][7]; the detailed explanation follows
 ## Usage
 ### Installation
 Get started by either downloading a prebuilt version of this sanitizer [here][1].
+
 Alternatively you can also build it from source:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
 2. go into the cloned repository: `cd LeakSanitizer`
-3. and build the library: `make`
+3. and build the library: `make -j`
 
 Or in one step:
 ```shell
-git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make
+git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make -j
 ```
 
-Once you have a copy of this sanitizer you can install it using the following command:
+The LeakSanitizer is automatically installed in the current directory.
+
+To install it in a specific directory you can use the following command:
 ```shell
 make INSTALL_PATH=/usr/local install
 ```
-If you downloaded a release you can simply move the headers and the library anywhere
-you like.
+Adapt the value of the `INSTALL_PATH` argument to your needs.
+
+> [!TIP]
+> To create a portable build use the following command:
+> ```shell
+> make -j release
+> ```
+
+If you have downloaded a release or if you have created a portable build you can simply move the headers and the library
+anywhere you like.
 
 #### Uninstallation
 Uninstall the sanitizer by simply removing its library and its header files from the installation directory.  
@@ -53,6 +62,7 @@ This can be done using the following command:
 ```shell
 make INSTALL_PATH=/usr/local uninstall
 ```
+Adapt the value of the `INSTALL_PATH` argument to your needs.
 
 ### Updating
 Update the LeakSanitizer by either downloading the new release or, when cloned from the repository, using:
@@ -65,8 +75,7 @@ Install it again as described [above][8].
 To use this sanitizer simply link your application against it (recommended) or preload its library.
 
 #### Linking (_recommended_)
-- Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default
-directories.
+- Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default directories.
 
 Link with: `-llsan`
 
@@ -89,8 +98,7 @@ Add this sanitizer's library to the dynamic loader preload environment variable:
 > ```
 
 ### Leaks
-Once this sanitizer is bundled with your application the detected memory leaks are
-printed upon termination.
+Once this sanitizer is bundled with your application the detected memory leaks are printed upon termination.
 
 ```C
 // main.c
@@ -156,8 +164,8 @@ Currently, debug symbols in the following formats are supported:
 The DWARF parser supports DWARF in version **2**, **3**, **4** and **5**.
 
 ### Behaviour
-Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the 
-following environment variables to their indicated values:
+Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the following environment variables to
+their indicated values:
 
 | Name                         | Description                                                                    | Values            | Default value |
 |------------------------------|--------------------------------------------------------------------------------|-------------------|---------------|
@@ -192,9 +200,8 @@ This sanitizer comes with handlers for the following signals:
 More on the signal handlers [here][3].
 
 ### Statistics
-The statistics of the tracked memory can be queried at runtime. To do so activate the statistical
-bookkeeping by setting either the environment variable `LSAN_STATS_ACTIVE` or the variable `__lsan_statsActive`
-to `true`.  
+The statistics of the tracked memory can be queried at runtime. To do so activate the statistical bookkeeping by setting
+either the environment variable `LSAN_STATS_ACTIVE` or the variable `__lsan_statsActive` to `true`.  
 The statistics then can be queried using the following API:
 
 | Function                         | Description                                                                              |
@@ -224,6 +231,9 @@ leaks are printed.
 The backtraces are translated using the [CallstackLibrary][5].
 
 ## Final notes
+If you experience any problems with the LeakSanitizer or if you have ideas to further improve it don't hesitate to
+[open an issue][9] or to [open a pull request][10].
+
 This project is licensed under the terms of the GNU GPL in version 3 or later.
 
 © Copyright 2022 - 2024 [mhahnFr][6] and contributors
@@ -236,3 +246,5 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 [6]: https://github.com/mhahnFr
 [7]: https://github.com/mhahnFr/LeakSanitizer/wiki
 [8]: #installation
+[9]: https://github.com/mhahnFr/LeakSanitizer/issues/new
+[10]: https://github.com/mhahnFr/LeakSanitizer/pulls
