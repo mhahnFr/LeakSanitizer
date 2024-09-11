@@ -220,6 +220,9 @@ leaks are printed.
 The backtraces are translated using the [CallstackLibrary][5].
 
 ## Final notes
+If you experience any problems with the LeakSanitizer or if you have ideas to further improve it don't hesitate to
+[open an issue][9] or to [open a pull request][10].
+
 This project is licensed under the terms of the GNU GPL in version 3 or later.
 
 © Copyright 2022 - 2024 [mhahnFr][6] and contributors
@@ -232,3 +235,5 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 [6]: https://github.com/mhahnFr
 [7]: https://github.com/mhahnFr/LeakSanitizer/wiki
 [8]: #installation
+[9]: https://github.com/mhahnFr/LeakSanitizer/issues/new
+[10]: https://github.com/mhahnFr/LeakSanitizer/pulls
