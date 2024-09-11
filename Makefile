@@ -46,7 +46,7 @@ LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
 MACOS_ARCH_FLAGS =
 
 ifeq ($(shell uname -s),Darwin)
-	LDFLAGS += -current_version 1.9 -compatibility_version 1 -install_name $(abspath $@) $(MACOS_ARCH_FLAGS)
+	LDFLAGS += -current_version 1.10 -compatibility_version 1 -install_name $(abspath $@) $(MACOS_ARCH_FLAGS)
 	CXXFLAGS += $(MACOS_ARCH_FLAGS)
 	LIBCALLSTACK_FLAG += "MACOS_ARCH_FLAGS=$(MACOS_ARCH_FLAGS)"
 
