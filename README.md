@@ -39,12 +39,22 @@ Or in one step:
 git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make -j
 ```
 
-Once you have a copy of this sanitizer you can install it using the following command:
+The LeakSanitizer is automatically installed in the current directory.
+
+To install it in a specific directory you can use the following command:
 ```shell
 make INSTALL_PATH=/usr/local install
 ```
-If you downloaded a release you can simply move the headers and the library anywhere
-you like.
+Adapt the value of the `INSTALL_PATH` argument to your needs.
+
+> [!TIP]
+> To create a portable build use the following command:
+> ```shell
+> make -j release
+> ```
+
+If you have downloaded a release or if you have created a portable build you can simply move the headers and the library
+anywhere you like.
 
 #### Uninstallation
 Uninstall the sanitizer by simply removing its library and its header files from the installation directory.  
@@ -52,6 +62,7 @@ This can be done using the following command:
 ```shell
 make INSTALL_PATH=/usr/local uninstall
 ```
+Adapt the value of the `INSTALL_PATH` argument to your needs.
 
 ### Updating
 Update the LeakSanitizer by either downloading the new release or, when cloned from the repository, using:
