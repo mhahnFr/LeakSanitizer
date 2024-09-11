@@ -47,7 +47,7 @@ auto printInformation(std::ostream & out) -> std::ostream &;
 /**
  * @brief The hook to be called on exit.
  *
- * It prints all informations tracked by the sanitizer and performs internal cleaning.
+ * It prints all information tracked by the sanitizer and performs internal cleaning.
  */
 void exitHook();
 
