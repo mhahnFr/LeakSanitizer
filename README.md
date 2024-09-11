@@ -1,16 +1,14 @@
 # Welcome to the LeakSanitizer!
 The LeakSanitizer is a tool designed to debug memory leaks.
 
-It can be used with almost any programming language that compiles to native
-machine code.  
+It can be used with almost any programming language that compiles to native machine code.  
 Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 
 > [!IMPORTANT]
-> **Objective-C** and **Swift** objects are never considered to become memory leaks - 
-> even in the case of strong reference cycles.
+> **Objective-C** and **Swift** objects are never considered to become memory leaks - even in the case of strong
+> reference cycles.
 
-This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are
-detected on both platforms.
+This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are detected on both platforms.
 
 ## Quickstart
 Use the LeakSanitizer to check for memory leaks as follows:
@@ -30,6 +28,7 @@ More explanation can be found in the [wiki][7]; the detailed explanation follows
 ## Usage
 ### Installation
 Get started by either downloading a prebuilt version of this sanitizer [here][1].
+
 Alternatively you can also build it from source:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
 2. go into the cloned repository: `cd LeakSanitizer`
@@ -65,8 +64,7 @@ Install it again as described [above][8].
 To use this sanitizer simply link your application against it (recommended) or preload its library.
 
 #### Linking (_recommended_)
-- Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default
-directories.
+- Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default directories.
 
 Link with: `-llsan`
 
@@ -89,8 +87,7 @@ Add this sanitizer's library to the dynamic loader preload environment variable:
 > ```
 
 ### Leaks
-Once this sanitizer is bundled with your application the detected memory leaks are
-printed upon termination.
+Once this sanitizer is bundled with your application the detected memory leaks are printed upon termination.
 
 ```C
 // main.c
@@ -156,8 +153,8 @@ Currently, debug symbols in the following formats are supported:
 The DWARF parser supports DWARF in version **2**, **3**, **4** and **5**.
 
 ### Behaviour
-Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the 
-following environment variables to their indicated values:
+Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the following environment variables to
+their indicated values:
 
 | Name                         | Description                                                                    | Values            | Default value |
 |------------------------------|--------------------------------------------------------------------------------|-------------------|---------------|
@@ -192,9 +189,8 @@ This sanitizer comes with handlers for the following signals:
 More on the signal handlers [here][3].
 
 ### Statistics
-The statistics of the tracked memory can be queried at runtime. To do so activate the statistical
-bookkeeping by setting either the environment variable `LSAN_STATS_ACTIVE` or the variable `__lsan_statsActive`
-to `true`.  
+The statistics of the tracked memory can be queried at runtime. To do so activate the statistical bookkeeping by setting
+either the environment variable `LSAN_STATS_ACTIVE` or the variable `__lsan_statsActive` to `true`.  
 The statistics then can be queried using the following API:
 
 | Function                         | Description                                                                              |
