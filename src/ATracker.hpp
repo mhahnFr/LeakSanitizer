@@ -27,6 +27,8 @@
 #include <optional>
 #include <utility>
 
+#include <pthread.h>
+
 #include <lsan_internals.h>
 
 #include "MallocInfo.hpp"
@@ -124,6 +126,8 @@ public:
     virtual auto maybeChangeMalloc([[ maybe_unused ]] const MallocInfo& info) -> bool {
         return false;
     }
+
+    virtual auto addTLSValue(const pthread_key_t& key, const void* value) -> bool = 0;
 };
 }
 
