@@ -61,6 +61,7 @@
 #else
  #define LSAN_DIAGNOSTIC_PUSH
  #define LSAN_DIAGNSOTIC_POP
+ #define LSAN_IGNORE_FRAME_ADDRESS
 #endif
 
 #ifdef __APPLE__
