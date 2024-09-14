@@ -342,7 +342,7 @@ static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, s
                                 
                                 uintptr_t de = reinterpret_cast<uintptr_t>(desc) + sect->size;
                                 for (tlv_descriptor* d = desc; reinterpret_cast<uintptr_t>(d) < de; ++d) {
-                                    locals.insert(desc->thunk(desc));
+                                    locals.insert(d->thunk(d));
                                 }
                             }
                             sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(sect) + sizeof(section_64));
