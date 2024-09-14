@@ -719,17 +719,9 @@ void LSan::addTLSKey(const pthread_key_t& key) {
 }
 
 auto LSan::removeTLSKey(const pthread_key_t& key) -> bool {
-    // FIXME: Rethink this!
-    return true;
-//    std::lock_guard lock { mutex };
-//
-//    bool ignoreMalloc = getIgnoreMalloc();
-//    setIgnoreMalloc(true);
-//    std::lock_guard lock2 { tlsKeyMutex };
-//
-//    const bool toReturn = keys.erase(key) != 0;
-//    setIgnoreMalloc(ignoreMalloc);
-//    return toReturn;
+    std::lock_guard lock { tlsKeyMutex };
+
+    return keys.erase(key) != 0;
 }
 
 /**

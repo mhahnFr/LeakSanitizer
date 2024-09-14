@@ -64,10 +64,16 @@ REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) noexc
 }
 
 REPLACE(auto, pthread_key_delete)(pthread_key_t key) noexcept(noexcept(::pthread_key_delete(key))) -> int {
-    // FIXME: Rethink this!
-//    if (inited && !getInstance().removeTLSKey(key)) {
-//        warn("Call to pthread_key_delete(pthread_key_t) with invalid key");
-//    }
+    auto& tracker = getTracker();
+    {
+        std::lock_guard lock { tracker.mutex };
+        auto ignored = tracker.ignoreMalloc;
+        tracker.ignoreMalloc = true;
+        if (!getInstance().removeTLSKey(key)) {
+            warn("Call to pthread_key_delete(pthread_key_t) with invalid key");
+        }
+        tracker.ignoreMalloc = ignored;
+    }
     return real::pthread_key_delete(key);
 }
 
