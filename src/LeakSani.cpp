@@ -713,14 +713,9 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
 }
 
 void LSan::addTLSKey(const pthread_key_t& key) {
-    // FIXME: Rethink this!
-//    std::lock_guard lock { mutex };
-//    bool ignoreMalloc = getIgnoreMalloc();
-//    setIgnoreMalloc(true);
-//    std::lock_guard lock2 { tlsKeyMutex };
-//
-//    keys.insert(key);
-//    setIgnoreMalloc(ignoreMalloc);
+    std::lock_guard lock { tlsKeyMutex };
+
+    keys.insert(key);
 }
 
 auto LSan::removeTLSKey(const pthread_key_t& key) -> bool {

@@ -51,11 +51,15 @@ REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) noexc
     if (copy == nullptr) {
         crash("Call to pthread_key_create(pthread_key_t*, void (*)(void*)) with NULL as key");
     }
-    auto toReturn = real::pthread_key_create(key, func);
-    // FIXME: Rethink this!
-//    if (inited) {
-//        getInstance().addTLSKey(*key);
-//    }
+    const auto& toReturn = real::pthread_key_create(key, func);
+    auto& tracker = getTracker();
+    {
+        std::lock_guard lock { tracker.mutex };
+        auto ignored = tracker.ignoreMalloc;
+        tracker.ignoreMalloc = true;
+        getInstance().addTLSKey(*key);
+        tracker.ignoreMalloc = ignored;
+    }
     return toReturn;
 }
 
