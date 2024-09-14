@@ -54,9 +54,9 @@ namespace lsan {
  */
 class LSan final: public ATracker {
     std::set<pthread_key_t> keys;
+    std::mutex tlsKeyMutex;
     /** An object holding all statistics.                                               */
     Stats stats;
-    std::mutex tlsKeyMutex;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
     /** The optional user regular expression.                                           */
