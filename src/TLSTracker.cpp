@@ -130,4 +130,12 @@ auto TLSTracker::maybeChangeMalloc(const MallocInfo& info) -> bool {
     infos.insert_or_assign(info.pointer, std::move(info));
     return true;
 }
+
+auto TLSTracker::addTLSValue(const pthread_key_t& key, const void* value) -> bool {
+    if (!getInstance().hasTLSKey(key)) {
+        return false;
+    }
+    tlsKeyValues.insert_or_assign(key, value);
+    return true;
+}
 }
