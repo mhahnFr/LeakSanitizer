@@ -55,6 +55,8 @@ namespace lsan {
 class LSan final: public ATracker {
     std::set<pthread_key_t> keys;
     std::mutex tlsKeyMutex;
+    std::map<std::pair<pthread_t, pthread_key_t>, const void*> tlsKeyValues;
+    std::mutex tlsKeyValuesMutex;
     /** An object holding all statistics.                                               */
     Stats stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
@@ -310,6 +312,10 @@ public:
     void classifyStackLeaksShallow();
     void addTLSKey(const pthread_key_t& key);
     auto removeTLSKey(const pthread_key_t& key) -> bool;
+
+    auto hasTLSKey(const pthread_key_t& key) -> bool;
+
+    virtual auto addTLSValue(const pthread_key_t& key, const void* value) -> bool final override;
 
     friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;
 };

@@ -712,6 +712,18 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
     return out;
 }
 
+auto LSan::addTLSValue(const pthread_key_t& key, const void* value) -> bool {
+    if (!hasTLSKey(key)) {
+        return false;
+    }
+
+    std::lock_guard lock { tlsKeyValuesMutex };
+    
+    tlsKeyValues.insert_or_assign(std::make_pair(pthread_self(), key), value);
+
+    return true;
+}
+
 void LSan::addTLSKey(const pthread_key_t& key) {
     std::lock_guard lock { tlsKeyMutex };
 
@@ -722,6 +734,13 @@ auto LSan::removeTLSKey(const pthread_key_t& key) -> bool {
     std::lock_guard lock { tlsKeyMutex };
 
     return keys.erase(key) != 0;
+}
+
+auto LSan::hasTLSKey(const pthread_key_t& key) -> bool {
+    // TODO: Collect all TLS keys - also the compile time ones
+    std::lock_guard lock { tlsKeyMutex };
+
+    return keys.count(key) != 0;
 }
 
 /**
