@@ -312,7 +312,7 @@ auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, std::size_t size) -> vo
 extern "C" {
 #endif /* __linux__ */
 
-auto malloc(std::size_t size) -> void* {
+auto __lsan_malloc(std::size_t size) -> void* {
     BENCH(auto ptr = real::malloc(size);, std::chrono::nanoseconds, systemTime);
 
     if (ptr != nullptr && !LSan::finished) {
@@ -340,7 +340,7 @@ auto malloc(std::size_t size) -> void* {
     return ptr;
 }
 
-auto calloc(std::size_t objectSize, std::size_t count) -> void* {
+auto __lsan_calloc(std::size_t objectSize, std::size_t count) -> void* {
     BENCH(auto ptr = real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
 
     if (ptr != nullptr && !LSan::finished) {
@@ -368,7 +368,7 @@ auto calloc(std::size_t objectSize, std::size_t count) -> void* {
     return ptr;
 }
 
-auto valloc(std::size_t size) -> void* {
+auto __lsan_valloc(std::size_t size) -> void* {
     auto ptr = real::valloc(size);
 
     if (ptr != nullptr && !LSan::finished) {
@@ -388,7 +388,7 @@ auto valloc(std::size_t size) -> void* {
     return ptr;
 }
 
-auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
+auto __lsan_aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     auto ptr = real::aligned_alloc(alignment, size);
 
     if (ptr != nullptr && !LSan::finished) {
@@ -408,7 +408,7 @@ auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     return ptr;
 }
 
-auto realloc(void* pointer, std::size_t size) -> void* {
+auto __lsan_realloc(void* pointer, std::size_t size) -> void* {
     if (LSan::finished) return real::realloc(pointer, size);
 
     auto& tracker = getTracker();
@@ -444,7 +444,7 @@ auto realloc(void* pointer, std::size_t size) -> void* {
     return ptr;
 }
 
-void free(void* pointer) {
+void __lsan_free(void* pointer) {
     if (LSan::finished) {
         real::free(pointer);
         return;
@@ -515,13 +515,13 @@ REPLACE(auto, posix_memalign)(void** memPtr, std::size_t alignment, std::size_t 
 }
 } /* namespace lsan */
 
-INTERPOSE(malloc,  malloc);
-INTERPOSE(calloc,  calloc);
-INTERPOSE(valloc,  valloc);
-INTERPOSE(realloc, realloc);
-INTERPOSE(free,    free);
+INTERPOSE(__lsan_malloc,  malloc);
+INTERPOSE(__lsan_calloc,  calloc);
+INTERPOSE(__lsan_valloc,  valloc);
+INTERPOSE(__lsan_realloc, realloc);
+INTERPOSE(__lsan_free,    free);
 
-INTERPOSE(aligned_alloc, aligned_alloc);
+INTERPOSE(__lsan_aligned_alloc, aligned_alloc);
 
 #ifdef __APPLE__
 INTERPOSE(malloc_zone_malloc,   malloc_zone_malloc);
