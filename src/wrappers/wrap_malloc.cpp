@@ -480,6 +480,10 @@ void free(void* pointer) {
     }
 }
 
+#ifdef __linux__
+} /* extern "C" */
+#endif /* __linux__ */
+
 REPLACE(auto, posix_memalign)(void** memPtr, std::size_t alignment, std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
     void** checkPtr = memPtr;
     if (checkPtr == nullptr) {
@@ -509,11 +513,6 @@ REPLACE(auto, posix_memalign)(void** memPtr, std::size_t alignment, std::size_t 
     }
     return toReturn;
 }
-
-#ifdef __linux__
-} /* extern "C" */
-#endif /* __linux__ */
-
 } /* namespace lsan */
 
 INTERPOSE(malloc,  malloc);
