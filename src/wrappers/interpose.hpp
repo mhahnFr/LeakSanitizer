@@ -25,6 +25,23 @@
 #ifdef __linux__
 #include <dlfcn.h>
 
+#include "../lsanMisc.hpp"
+
+namespace lsan {
+template<typename T>
+static inline auto loadFunction(const char* name) -> T* {
+    auto& tracker = getTracker();
+    std::lock_guard lock { tracker.mutex };
+    bool ignoreMalloc = tracker.ignoreMalloc;
+    tracker.ignoreMalloc = true;
+
+    auto toReturn = dlsym(RTLD_NEXT, name);
+
+    tracker.ignoreMalloc = ignoreMalloc;
+    return reinterpret_cast<T*>(toReturn);
+}
+}
+
 #define INTERPOSE(NEW, OLD) \
 extern "C" decltype(OLD) OLD __attribute__((weak, alias(#NEW)))
 
@@ -32,16 +49,8 @@ extern "C" decltype(OLD) OLD __attribute__((weak, alias(#NEW)))
 namespace lsan::real {                                                  \
 template<typename... Args>                                              \
 static inline auto NAME(Args... args) -> decltype(::NAME(args...)) {    \
-    bool ignoreMalloc = false;                                          \
-    if (inited) {                                                       \
-        ignoreMalloc = getIgnoreMalloc();                               \
-        setIgnoreMalloc(true);                                          \
-    }                                                                   \
-    static decltype(::NAME)* realFunc                                   \
-        = reinterpret_cast<decltype(::NAME)*>(dlsym(RTLD_NEXT, #NAME)); \
-    if (inited && !ignoreMalloc) {                                      \
-        setIgnoreMalloc(false);                                         \
-    }                                                                   \
+    static auto realFunc = loadFunction<decltype(::NAME)>(#NAME);       \
+                                                                        \
     return realFunc(std::forward<Args>(args)...);                       \
 }                                                                       \
 }                                                                       \
