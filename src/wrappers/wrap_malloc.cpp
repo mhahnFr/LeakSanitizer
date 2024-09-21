@@ -36,8 +36,7 @@
 #include "../lsanMisc.hpp"
 #include "../utils.hpp"
 #include "../timing.hpp"
-#include "../crashWarner/crash.hpp"
-#include "../crashWarner/warn.hpp"
+#include "../crashWarner/crashOrWarn.hpp"
 
 /*
  * These wrapper functions still reside here to not break compatibility with
@@ -243,11 +242,7 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, unsigned nu
                 } else if (to_be_freed[i] != nullptr) {
                     const auto& it = tracker.removeMalloc(to_be_freed[i]);
                     if (__lsan_invalidFree && !it.first) {
-                        if (__lsan_invalidCrash) {
-                            crash(createInvalidFreeMessage(to_be_freed[i], static_cast<bool>(it.second)), it.second);
-                        } else {
-                            warn(createInvalidFreeMessage(to_be_freed[i], static_cast<bool>(it.second)), it.second);
-                        }
+                        crashOrWarn(createInvalidFreeMessage(to_be_freed[i], static_cast<bool>(it.second)), it.second);
                     }
                 }
             }
@@ -272,11 +267,7 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
             } else if (ptr != nullptr) {
                 const auto& it = tracker.removeMalloc(ptr);
                 if (__lsan_invalidFree && !it.first) {
-                    if (__lsan_invalidCrash) {
-                        crash(createInvalidFreeMessage(ptr, static_cast<bool>(it.second)), it.second);
-                    } else {
-                        warn(createInvalidFreeMessage(ptr, static_cast<bool>(it.second)), it.second);
-                    }
+                    crashOrWarn(createInvalidFreeMessage(ptr, static_cast<bool>(it.second)), it.second);
                 }
             }
             tracker.ignoreMalloc = false;
@@ -471,11 +462,7 @@ void free(void* pointer) {
             } else if (pointer != nullptr) {
                 const auto& it = tracker.removeMalloc(pointer);
                 if (__lsan_invalidFree && !it.first) {
-                    if (__lsan_invalidCrash) {
-                        crash(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
-                    } else {
-                        warn(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
-                    }
+                    crashOrWarn(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
                 }
             }
         }, std::chrono::nanoseconds, trackingTimeLocal);
