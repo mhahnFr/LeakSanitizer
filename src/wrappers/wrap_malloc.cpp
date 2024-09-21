@@ -493,7 +493,7 @@ void free(void* pointer) {
     }
 }
 
-auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
+REPLACE(auto, posix_memalign)(void** memPtr, std::size_t alignment, std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
     void** checkPtr = memPtr;
     if (checkPtr == nullptr) {
         crashForce("posix_memalign of a NULL pointer");
@@ -515,7 +515,7 @@ auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> i
                 warn("Implementation-defined allocation of size 0");
             }
             if (*memPtr != wasPtr) {
-                tracker.addMalloc(lsan::MallocInfo(*memPtr, size));
+                tracker.addMalloc(MallocInfo(*memPtr, size));
             }
             tracker.ignoreMalloc = false;
         }
@@ -535,8 +535,7 @@ INTERPOSE(valloc,  valloc);
 INTERPOSE(realloc, realloc);
 INTERPOSE(free,    free);
 
-INTERPOSE(aligned_alloc,  aligned_alloc);
-INTERPOSE(posix_memalign, posix_memalign);
+INTERPOSE(aligned_alloc, aligned_alloc);
 
 #ifdef __APPLE__
 INTERPOSE(malloc_zone_malloc,   malloc_zone_malloc);

@@ -106,28 +106,6 @@ static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> voi
 }
 
 /**
- * Calls the real `posix_memalign` function.
- *
- * @param memPtr the memory pointer
- * @param alignment the memory alignment
- * @param size the requested amount of bytes
- * @return whether the allocation was successful
- */
-static inline auto posix_memalign(void** memPtr, std::size_t alignment, std::size_t size) -> int {
-    int toReturn;
-#ifdef __linux__
-    abort();
-    (void) memPtr;
-    (void) alignment;
-    (void) size;
-    // TODO: Linux version
-#else
-    toReturn = ::posix_memalign(memPtr, alignment, size);
-#endif
-    return toReturn;
-}
-
-/**
  * Calls the real `realloc` function.
  *
  * @param pointer the pointer to the memory block to be reallocated
