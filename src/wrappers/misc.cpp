@@ -26,17 +26,20 @@
 #include "../crashWarner/warn.hpp"
 
 REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
-    // TODO: Mutex?
     auto& tracker = getTracker();
-    auto ignoreMalloc = tracker.ignoreMalloc;
-    tracker.ignoreMalloc = true;
+    {
+        std::lock_guard lock { tracker.mutex };
 
-    getInstance().classifyStackLeaksShallow();
-    if (__lsan_printExitPoint) {
-        getOutputStream() << maybePrintExitPoint;
+        auto ignoreMalloc = tracker.ignoreMalloc;
+        tracker.ignoreMalloc = true;
+
+        getInstance().classifyStackLeaksShallow();
+        if (__lsan_printExitPoint) {
+            getOutputStream() << maybePrintExitPoint;
+        }
+
+        tracker.ignoreMalloc = ignoreMalloc;
     }
-
-    tracker.ignoreMalloc = ignoreMalloc;
 
     real::exit(code);
 }
