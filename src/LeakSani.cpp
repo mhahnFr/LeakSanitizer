@@ -39,6 +39,7 @@
 
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
+#include <mach-o/dyld_images.h>
 #endif
 
 namespace lsan {
@@ -119,6 +120,47 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
     return toReturn;
 }
 
+#ifdef __APPLE__
+static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t vmaddrslide, std::vector<Region>& regions, std::set<const void*>& tlvs) {
+    if (header->magic != MH_MAGIC_64) return;
+
+    load_command* lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(header) + sizeof(mach_header_64));
+    for (uint32_t j = 0; j < header->ncmds; ++j) {
+        switch (lc->cmd) {
+            case LC_SEGMENT_64: {
+                auto seg = reinterpret_cast<segment_command_64*>(lc);
+                if (strcmp(seg->segname, SEG_TEXT) == 0) {
+                    if (vmaddrslide == 0) vmaddrslide = (uintptr_t)header - seg->vmaddr;
+                }
+                uintptr_t ptr = vmaddrslide + seg->vmaddr;
+                auto end = ptr + seg->vmsize;
+                // TODO: Filter out bss
+                if (seg->initprot & 2 && seg->initprot & 1) // 2: Read 1: Write
+                {
+                    regions.push_back(Region(reinterpret_cast<void*>(ptr), reinterpret_cast<void*>(end)));
+
+                    auto sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(seg) + sizeof(*seg));
+                    for (uint32_t i = 0; i < seg->nsects; ++i) {
+                        if (sect->flags == S_THREAD_LOCAL_VARIABLES) {
+                            struct tlv_descriptor* desc = reinterpret_cast<tlv_descriptor*>(vmaddrslide + sect->addr);
+
+                            uintptr_t de = reinterpret_cast<uintptr_t>(desc) + sect->size;
+                            for (tlv_descriptor* d = desc; reinterpret_cast<uintptr_t>(d) < de; ++d) {
+                                tlvs.insert(d->thunk(d));
+                            }
+                        }
+                        sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(sect) + sizeof(section_64));
+                    }
+                }
+
+                break;
+            }
+        }
+        lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(lc) + lc->cmdsize);
+    }
+}
+#endif
+
 static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, std::set<const void*>> {
     auto regions = std::vector<Region>();
     auto locals  = std::set<const void*>();
@@ -126,41 +168,16 @@ static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, s
 #ifdef __APPLE__
     const uint32_t count = _dyld_image_count();
     for (uint32_t i = 0; i < count; ++i) {
-        const mach_header* header = _dyld_get_image_header(i);
-        if (header->magic != MH_MAGIC_64) continue;
-        
-        load_command* lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(header) + sizeof(mach_header_64));
-        for (uint32_t j = 0; j < header->ncmds; ++j) {
-            switch (lc->cmd) {
-                case LC_SEGMENT_64: {
-                    auto seg = reinterpret_cast<segment_command_64*>(lc);
-                    const auto vmaddrslide = _dyld_get_image_vmaddr_slide(i);
-                    uintptr_t ptr = vmaddrslide + seg->vmaddr;
-                    auto end = ptr + seg->vmsize;
-                    // TODO: Filter out bss
-                    if (seg->initprot & 2 && seg->initprot & 1) // 2: Read 1: Write
-                    {
-                        regions.push_back(Region(reinterpret_cast<void*>(ptr), reinterpret_cast<void*>(end)));
-                        
-                        auto sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(seg) + sizeof(*seg));
-                        for (uint32_t i = 0; i < seg->nsects; ++i) {
-                            if (sect->flags == S_THREAD_LOCAL_VARIABLES) {
-                                struct tlv_descriptor* desc = reinterpret_cast<tlv_descriptor*>(vmaddrslide + sect->addr);
-                                
-                                uintptr_t de = reinterpret_cast<uintptr_t>(desc) + sect->size;
-                                for (tlv_descriptor* d = desc; reinterpret_cast<uintptr_t>(d) < de; ++d) {
-                                    locals.insert(d->thunk(d));
-                                }
-                            }
-                            sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(sect) + sizeof(section_64));
-                        }
-                    }
-                    
-                    break;
-                }
-            }
-            lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(lc) + lc->cmdsize);
-        }
+        getGlobalRegionsAndTLVs(_dyld_get_image_header(i), _dyld_get_image_vmaddr_slide(i), regions, locals);
+    }
+
+    struct task_dyld_info dyldInfo;
+    mach_msg_type_number_t infoCount = TASK_DYLD_INFO_COUNT;
+    if (task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t) &dyldInfo, &infoCount) == KERN_SUCCESS) {
+        struct dyld_all_image_infos* infos = (struct dyld_all_image_infos*) dyldInfo.all_image_info_addr;
+        getGlobalRegionsAndTLVs(infos->dyldImageLoadAddress, 0, regions, locals);
+    } else {
+        // TODO: Handle the error
     }
 #endif
     return std::make_pair(regions, locals);
