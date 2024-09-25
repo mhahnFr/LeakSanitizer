@@ -89,7 +89,7 @@ constexpr inline auto get() -> const char * {
         case Style::MAGENTA:    return "\033[95m";
         case Style::RED:        return "\033[31m";
         case Style::TURQUOISE:  return "\033[36m";
-        case Style::BLUE:       return "\033[34m";
+        case Style::BLUE:       return "\033[94m";
         case Style::AMBER:      return "\033[33m";
         case Style::UNDERLINED: return "\033[4m";
         default:
