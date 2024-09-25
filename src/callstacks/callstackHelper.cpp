@@ -235,15 +235,15 @@ static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) ->
  * @tparam S the style to be used
  */
 template<formatter::Style S>
-static inline void formatShared(const callstack_frame& frame, std::ostream & out) {
-    using formatter::Style;
-    
+static inline void formatShared(const callstack_frame& frame, std::ostream& out) {
+    using namespace formatter;
+
     if (__lsan_printBinaries) {
         bool reset = false;
         if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
         }
-        out << formatter::format<Style::ITALIC>("(" + getCallstackFrameName(frame) + ")") << (reset ? formatter::get<S>() : "") << " ";
+        out << formatter::format<Style::ITALIC>("(" + formatString<Style::DARK_BLUE>(getCallstackFrameName(frame)) + ")") << (reset ? get<S>() : "") << " ";
     }
     bool needsBrackets = false;
     if (frame.sourceFile == nullptr || __lsan_printFunctions) {
@@ -252,21 +252,21 @@ static inline void formatShared(const callstack_frame& frame, std::ostream & out
     }
     if (frame.sourceFile != nullptr) {
         if (needsBrackets) {
-            out << " (" << formatter::get<Style::GREYED, Style::UNDERLINED>;
+            out << " (" << get<Style::BLUE>;
         }
         out << getCallstackFrameSourceFile(frame) << ":" << frame.sourceLine;
         if (frame.sourceLineColumn > 0) {
             out << ":" << frame.sourceLineColumn;
         }
         if (needsBrackets) {
-            out << formatter::clear<Style::GREYED, Style::UNDERLINED>;
+            out << clear<Style::BLUE>;
             if constexpr (S == Style::GREYED || S == Style::BOLD) {
-                out << formatter::get<S>;
+                out << get<S>;
             }
             out << ")";
         }
     }
-    out << formatter::clear<S> << std::endl;
+    out << clear<S> << std::endl;
 }
 
 void format(lcs::callstack & callstack, std::ostream & stream) {
