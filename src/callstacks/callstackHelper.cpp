@@ -243,7 +243,7 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
         if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
         }
-        out << formatter::format<Style::ITALIC>("(" + formatString<Style::DARK_BLUE>(getCallstackFrameName(frame)) + ")") << (reset ? get<S>() : "") << " ";
+        out << formatter::format<Style::ITALIC>("(" + formatString<Style::BLUE>(getCallstackFrameName(frame)) + ")") << (reset ? get<S>() : "") << " ";
     }
     bool needsBrackets = false;
     if (frame.sourceFile == nullptr || __lsan_printFunctions) {
@@ -252,14 +252,14 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
     }
     if (frame.sourceFile != nullptr) {
         if (needsBrackets) {
-            out << " (" << get<Style::BLUE>;
+            out << " (" << get<Style::TURQUOISE>;
         }
         out << getCallstackFrameSourceFile(frame) << ":" << frame.sourceLine;
         if (frame.sourceLineColumn > 0) {
             out << ":" << frame.sourceLineColumn;
         }
         if (needsBrackets) {
-            out << clear<Style::BLUE>;
+            out << clear<Style::TURQUOISE>;
             if constexpr (S == Style::GREYED || S == Style::BOLD) {
                 out << get<S>;
             }
