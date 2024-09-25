@@ -637,7 +637,6 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
     if (stats.getTotal() > 0) {
         // TODO: Optionally collaps identical callstacks
-        // TODO: Return early if no leaks have been detected
         // TODO: Further formatting
         // TODO: Maybe split between direct and indirect?
         stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
