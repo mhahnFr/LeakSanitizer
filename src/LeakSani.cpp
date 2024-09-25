@@ -620,8 +620,8 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
 }
 
 auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
-    using formatter::Style;
-    
+    using namespace formatter;
+
     std::lock_guard lock(self.infoMutex);
 
     callstack_autoClearCaches = false;
@@ -674,21 +674,21 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
             stream << printWorkingDirectory;
         }
     } else {
-        stream << "No leaks detected." << std::endl;
+        stream << format<Style::BOLD, Style::GREEN, Style::ITALIC>("No leaks detected.") << std::endl;
     }
 
     stream << maybeShowDeprecationWarnings;
     if (self.userRegexError.has_value()) {
-        stream << std::endl << formatter::get<Style::RED>
-               << formatter::format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
-               << formatter::format<Style::ITALIC>("__lsan_firstPartyRegex") << ") "
-               << formatter::format<Style::BOLD>("ignored: ")
-               << formatter::format<Style::ITALIC, Style::BOLD>("\"" + self.userRegexError.value() + "\"")
-               << formatter::clear<Style::RED> << std::endl;
+        stream << std::endl << get<Style::RED>
+               << format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
+               << format<Style::ITALIC>("__lsan_firstPartyRegex") << ") "
+               << format<Style::BOLD>("ignored: ")
+               << format<Style::ITALIC, Style::BOLD>("\"" + self.userRegexError.value() + "\"")
+               << clear<Style::RED> << std::endl;
     }
     if (stats.getTotal() > 0) {
         // TODO: Further formatting
-        stream << std::endl << "Summary:" << std::endl
+        stream << std::endl << format<Style::BOLD>("Summary:") << std::endl
                << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
                << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
                << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl;
