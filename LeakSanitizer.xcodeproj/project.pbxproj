@@ -38,6 +38,9 @@
 		BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817152BEFB36E00332937 /* TLSTracker.hpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
 		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
+		BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */; };
+		BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
+		BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F62CA8765500AEFD5A /* helper.hpp */; };
 		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
 		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
@@ -87,6 +90,9 @@
 		BFC817182BEFB3C200332937 /* ATracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ATracker.hpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
+		BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AutoStats.cpp; sourceTree = "<group>"; };
+		BFE023F22CA874D100AEFD5A /* Behaviour.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Behaviour.hpp; sourceTree = "<group>"; };
+		BFE023F62CA8765500AEFD5A /* helper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helper.hpp; sourceTree = "<group>"; };
 		F16901512C403EF200EED0AE /* utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
@@ -129,6 +135,7 @@
 				BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */,
 				BF23A2E0289ED24200B17349 /* Stats.cpp */,
 				BF23A2E1289ED24200B17349 /* Stats.hpp */,
+				BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */,
 			);
 			path = statistics;
 			sourceTree = "<group>";
@@ -181,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				F1B373972C67A0D700674C3C /* allocators */,
+				BFE023F12CA874AE00AEFD5A /* behaviour */,
 				BFAA94582B6C1E52007FC130 /* signals */,
 				BFBCAD8A2ACF611A00C6B69F /* allocations */,
 				BF3204F22AC5C625004EC77E /* callstacks */,
@@ -228,6 +236,15 @@
 			path = allocations;
 			sourceTree = "<group>";
 		};
+		BFE023F12CA874AE00AEFD5A /* behaviour */ = {
+			isa = PBXGroup;
+			children = (
+				BFE023F22CA874D100AEFD5A /* Behaviour.hpp */,
+				BFE023F62CA8765500AEFD5A /* helper.hpp */,
+			);
+			path = behaviour;
+			sourceTree = "<group>";
+		};
 		F1B373972C67A0D700674C3C /* allocators */ = {
 			isa = PBXGroup;
 			children = (
@@ -258,8 +275,10 @@
 				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
 				BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */,
 				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
+				BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */,
 				BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */,
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
+				BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */,
 				BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */,
 				BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */,
 				BF378FA52919484800A4DAA9 /* wrap_malloc.hpp in Headers */,
@@ -348,6 +367,7 @@
 			files = (
 				F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */,
 				BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */,
+				BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */,
 				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
 				BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */,
 				BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */,
