@@ -252,14 +252,14 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
     }
     if (frame.sourceFile != nullptr) {
         if (needsBrackets) {
-            out << " (" << get<Style::TURQUOISE>;
+            out << " (" << get<Style::CYAN>;
         }
         out << getCallstackFrameSourceFile(frame) << ":" << frame.sourceLine;
         if (frame.sourceLineColumn > 0) {
             out << ":" << frame.sourceLineColumn;
         }
         if (needsBrackets) {
-            out << clear<Style::TURQUOISE>;
+            out << clear<Style::CYAN>;
             if constexpr (S == Style::GREYED || S == Style::BOLD) {
                 out << get<S>;
             }

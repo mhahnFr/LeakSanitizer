@@ -43,7 +43,7 @@ enum class Style {
     MAGENTA,
     AMBER,
     BLUE,
-    TURQUOISE,
+    CYAN,
     /// Represents *italic* text.
     ITALIC,
     /// Represents underlined text.
@@ -88,7 +88,7 @@ constexpr inline auto get() -> const char * {
         case Style::ITALIC:     return "\033[3m";
         case Style::MAGENTA:    return "\033[95m";
         case Style::RED:        return "\033[31m";
-        case Style::TURQUOISE:  return "\033[36m";
+        case Style::CYAN:       return "\033[36m";
         case Style::BLUE:       return "\033[94m";
         case Style::AMBER:      return "\033[33m";
         case Style::UNDERLINED: return "\033[4m";
@@ -115,7 +115,7 @@ constexpr inline auto clear() -> const char * {
         case Style::RED:
         case Style::GREEN:
         case Style::BLUE:
-        case Style::TURQUOISE:
+        case Style::CYAN:
         case Style::AMBER:
         case Style::MAGENTA:    return "\033[39m";
             
