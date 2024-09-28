@@ -43,7 +43,7 @@ auto __lsan_getCurrentByteCount()   -> std::size_t { return getStats().getCurren
 auto __lsan_getMallocPeek() -> std::size_t { return getStats().getMallocPeek(); }
 auto __lsan_getBytePeek()   -> std::size_t { return getStats().getBytePeek();   }
 
-static constexpr inline auto BAR_COLOR = formatter::Style::GREYED;
+static constexpr inline auto BAR_COLOR = formatter::Style::CYAN;
 
 /**
  * @brief Prints the statistics using the given parameters.
