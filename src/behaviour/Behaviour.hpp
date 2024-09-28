@@ -22,6 +22,8 @@
 #ifndef Behaviour_hpp
 #define Behaviour_hpp
 
+#include <lsan_internals.h>
+
 #include "helper.hpp"
 
 namespace lsan::behaviour {
@@ -33,7 +35,9 @@ public:
         _autoStatsActive(getBool("LSAN_AUTO_STATS"))
     {}
 
-    // TODO: Combine with __lsan_statsActive!
+    inline auto statsActive() const -> bool {
+        return __lsan_statsActive || autoStatsActive();
+    }
 
     constexpr inline auto autoStatsActive() const -> bool {
         return _autoStatsActive;
