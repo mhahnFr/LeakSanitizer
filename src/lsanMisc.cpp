@@ -36,6 +36,10 @@
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 
+#ifndef VERSION
+ #define VERSION "clean build"
+#endif
+
 namespace lsan {
 auto getInstance() -> LSan & {
     static auto instance = new LSan();

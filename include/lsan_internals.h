@@ -231,8 +231,4 @@ extern const char * __lsan_firstPartyRegex;
 } // extern "C"
 #endif
 
-#ifndef VERSION
- #define VERSION "clean build"
-#endif
-
 #endif /* lsan_internals_h */
