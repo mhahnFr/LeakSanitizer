@@ -129,6 +129,10 @@ static inline auto printFormatted() -> bool {
 static inline auto getOutputStream() -> std::ostream & {
     return __lsan_printCout ? std::cout : std::clog;
 }
+
+static inline auto getBehaviour() -> const behaviour::Behaviour& {
+    return getInstance().getBehaviour();
+}
 }
 
 #endif /* lsanMisc_hpp */

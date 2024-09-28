@@ -42,6 +42,7 @@
 #endif
 
 #include "allocations/realAlloc.hpp"
+#include "behaviour/Behaviour.hpp"
 #include "statistics/Stats.hpp"
 
 namespace lsan {
@@ -53,6 +54,7 @@ namespace lsan {
 class LSan final: public ATracker {
     /** An object holding all statistics.                                               */
     Stats stats;
+    behaviour::Behaviour behaviour;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
     /** The optional user regular expression.                                           */
@@ -278,8 +280,12 @@ public:
      *
      * @return the current statistics instance
      */
-    constexpr inline auto getStats() -> const Stats & {
+    constexpr inline auto getStats() const -> const Stats & {
         return stats;
+    }
+
+    constexpr inline auto getBehaviour() const -> const behaviour::Behaviour& {
+        return behaviour;
     }
 
     friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;
