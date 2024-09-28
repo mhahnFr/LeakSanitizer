@@ -43,6 +43,8 @@ auto __lsan_getCurrentByteCount()   -> std::size_t { return getStats().getCurren
 auto __lsan_getMallocPeek() -> std::size_t { return getStats().getMallocPeek(); }
 auto __lsan_getBytePeek()   -> std::size_t { return getStats().getBytePeek();   }
 
+static constexpr inline auto BAR_COLOR = formatter::Style::GREYED;
+
 /**
  * @brief Prints the statistics using the given parameters.
  *
@@ -92,8 +94,8 @@ static inline void __lsan_printBar(std::size_t         current,
     using formatter::Style;
     
     out << formatter::format<Style::BOLD>("[")
-        << formatter::get<Style::GREYED, Style::UNDERLINED>;
-    
+        << formatter::get<BAR_COLOR, Style::UNDERLINED>;
+
     std::size_t i;
     for (i = 0; i < (static_cast<float>(current) / peek) * width; ++i) {
         out << formatter::get<Style::BAR_FILLED>;
@@ -101,7 +103,7 @@ static inline void __lsan_printBar(std::size_t         current,
     for (; i < width; ++i) {
         out << formatter::get<Style::BAR_EMPTY>;
     }
-    out << formatter::clear<Style::GREYED, Style::UNDERLINED>
+    out << formatter::clear<BAR_COLOR, Style::UNDERLINED>
         << formatter::format<Style::BOLD>("]") << " of " << formatter::format<Style::BOLD>(peekText) << " peek"
         << std::endl << std::endl;
 }
@@ -116,8 +118,8 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
     using formatter::Style;
     
     out << formatter::format<Style::BOLD>("[")
-        << formatter::get<Style::GREYED, Style::UNDERLINED>;
-    
+        << formatter::get<BAR_COLOR, Style::UNDERLINED>;
+
     std::lock_guard lock(getInstance().getInfoMutex());
     
     const auto & infos = getInstance().getFragmentationInfos();
@@ -187,7 +189,7 @@ static inline void __lsan_printFragmentationObjectBar(std::size_t width, std::os
             previousCorrected = corrected;
         }
     }
-    out << formatter::clear<Style::GREYED, Style::UNDERLINED>
+    out << formatter::clear<BAR_COLOR, Style::UNDERLINED>
         << formatter::format<Style::BOLD>("]") << " of "
         << formatter::get<Style::BOLD> << infos.size() << " objects"
         << formatter::clear<Style::BOLD> << " total" << std::endl << std::endl;
@@ -203,8 +205,8 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
     using formatter::Style;
     
     out << formatter::format<Style::BOLD>("[")
-        << formatter::get<Style::GREYED, Style::UNDERLINED>;
-    
+        << formatter::get<BAR_COLOR, Style::UNDERLINED>;
+
     std::lock_guard lock(getInstance().getInfoMutex());
     
     const auto & infos = getInstance().getFragmentationInfos();
@@ -286,7 +288,7 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
             previousCorrected = corrected;
         }
     }
-    out << formatter::clear<Style::GREYED, Style::UNDERLINED>
+    out << formatter::clear<BAR_COLOR, Style::UNDERLINED>
         << formatter::format<Style::BOLD>("]") << " of "
         << formatter::format<Style::BOLD>(bytesToString(total)) << " total"
         << std::endl << std::endl;
