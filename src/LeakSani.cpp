@@ -40,6 +40,8 @@
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #include <mach-o/dyld_images.h>
+
+#include <objc/runtime.h>
 #endif
 
 namespace lsan {
