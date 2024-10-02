@@ -241,6 +241,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     for (auto it = infos.begin(); it != infos.end();) {
         const auto& local = locals.find(it->first);
         if (local != locals.end() || it->second.deleted || callstackHelper::getCallstackType(it->second.createdCallstack) != callstackHelper::CallstackType::USER) {
+            // TODO: In the future only erase the deleted records
             it = infos.erase(it);
         } else {
             ++it;
@@ -677,7 +678,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
         // TODO: Possibility to show indirects
 
-        if ((true)) { // TODO: If should show reachables
+        if ((false)) { // TODO: If should show reachables
             for (const auto& record : stats.recordsGlobal) {
                 stream << *record << std::endl;
             }
