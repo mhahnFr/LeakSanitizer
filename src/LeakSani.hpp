@@ -76,7 +76,7 @@ class LSan final: public ATracker {
     /** The mutex to manage access to the allocation timings.                           */
     std::mutex timingMutex;
 #endif
-    
+
     /**
      * @brief Generates and returns a regular expression object for the given string.
      *
@@ -86,7 +86,7 @@ class LSan final: public ATracker {
      * @return an optional regex object
      */
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
-    
+
     auto classifyLeaks() -> LeakKindStats;
     auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::pair<std::size_t, std::size_t>;
 
@@ -130,10 +130,10 @@ class LSan final: public ATracker {
     }
 
     inline auto classifyClass(void* cls) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
-        std::size_t count  = 0,
-                    bytes  = 0,
-                    iCount = 0,
-                    iBytes = 0;
+        std::size_t count  { 0 },
+                    bytes  { 0 },
+                    iCount { 0 },
+                    iBytes { 0 };
 
         auto classWords = reinterpret_cast<void**>(cls);
         auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
