@@ -308,56 +308,20 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto classes = new Class[classNumber];
     objc_getClassList(classes, classNumber);
     for (int i = 0; i < classNumber; ++i) {
-        char** c = (char**) classes[i];
-        auto ptr = (void*)((uintptr_t)c[4] & 0x0f007ffffffffff8UL);
-        if (ptr != nullptr) {
-            auto it2 = infos.find(ptr);
-            if (it2 != infos.end()) {
-                void** rwStuff = (void**) it2->second.pointer;
-                void* ptr = (void*)((uintptr_t) rwStuff[1] & ~1);
-                auto it3 = infos.find(ptr);
-                if (it3 != infos.end()) {
-                    const auto& [count, bytes] = classifyRecord(it3->second, LeakType::globalIndirect);
-                    it3->second.leakType = LeakType::globalDirect;
-                    toReturn.globalIndirect += count;
-                    toReturn.bytesGlobalIndirect += bytes;
-                    ++toReturn.global;
-                    toReturn.bytesGlobal += it3->second.size;
-                }
-
-                const auto& [count, bytes] = classifyRecord(it2->second, LeakType::globalIndirect);
-                it2->second.leakType = LeakType::globalDirect;
-                toReturn.globalIndirect += count;
-                toReturn.bytesGlobalIndirect += bytes;
-                ++toReturn.global;
-                toReturn.bytesGlobal += it2->second.size;
-            }
+        {
+            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(classes[i]);
+            toReturn.global += count;
+            toReturn.globalIndirect += indirectCount;
+            toReturn.bytesGlobal += bytes;
+            toReturn.bytesGlobalIndirect += indirectBytes;
         }
         auto meta = object_getClass((id) classes[i]);
-        c = (char**) meta;
-        ptr = (void*)((uintptr_t)c[4] & 0x0f007ffffffffff8UL);
-        if (ptr != nullptr) {
-            auto it2 = infos.find(ptr);
-            if (it2 != infos.end()) {
-                void** rwStuff = (void**) it2->second.pointer;
-                void* ptr = (void*)((uintptr_t) rwStuff[1] & ~1);
-                auto it3 = infos.find(ptr);
-                if (it3 != infos.end()) {
-                    const auto& [count, bytes] = classifyRecord(it3->second, LeakType::globalIndirect);
-                    it3->second.leakType = LeakType::globalDirect;
-                    toReturn.globalIndirect += count;
-                    toReturn.bytesGlobalIndirect += bytes;
-                    ++toReturn.global;
-                    toReturn.bytesGlobal += it3->second.size;
-                }
-
-                const auto& [count, bytes] = classifyRecord(it2->second, LeakType::globalIndirect);
-                it2->second.leakType = LeakType::globalDirect;
-                toReturn.globalIndirect += count;
-                toReturn.bytesGlobalIndirect += bytes;
-                ++toReturn.global;
-                toReturn.bytesGlobal += it2->second.size;
-            }
+        {
+            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(meta);
+            toReturn.global += count;
+            toReturn.globalIndirect += indirectCount;
+            toReturn.bytesGlobal += bytes;
+            toReturn.bytesGlobalIndirect += indirectBytes;
         }
     }
 #endif

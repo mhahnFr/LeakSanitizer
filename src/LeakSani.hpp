@@ -129,6 +129,40 @@ class LSan final: public ATracker {
         return std::make_tuple(directCount, directBytes, indirectCount, indirectBytes);
     }
 
+    inline auto classifyClass(void* cls) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
+        std::size_t count  = 0,
+                    bytes  = 0,
+                    iCount = 0,
+                    iBytes = 0;
+
+        auto classWords = reinterpret_cast<void**>(cls);
+        auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
+        if (ptr != nullptr) {
+            const auto& it = infos.find(ptr);
+            if (it != infos.end()) {
+                void** rwStuff = (void**) it->second.pointer;
+                void* ptr = (void*)((uintptr_t) rwStuff[1] & ~1);
+                const auto& it3 = infos.find(ptr);
+                if (it3 != infos.end()) {
+                    const auto& [rCount, rBytes] = classifyRecord(it3->second, LeakType::globalIndirect);
+                    it3->second.leakType = LeakType::globalDirect;
+                    iCount += rCount;
+                    iBytes += rBytes;
+                    ++count;
+                    bytes += it3->second.size;
+                }
+
+                const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
+                it->second.leakType = LeakType::globalDirect;
+                iCount += rCount;
+                iBytes += rBytes;
+                ++count;
+                bytes += it->second.size;
+            }
+        }
+        return std::make_tuple(count, bytes, iCount, iBytes);
+    }
+
 protected:
     virtual inline void addToStats(const MallocInfo& info) final override {
         stats += info;
