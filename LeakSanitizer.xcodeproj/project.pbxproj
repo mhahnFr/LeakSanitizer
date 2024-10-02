@@ -398,6 +398,7 @@
 					"$(PROJECT_DIR)/CallstackLibrary",
 				);
 				MACH_O_TYPE = mh_dylib;
+				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
@@ -427,6 +428,7 @@
 					"$(PROJECT_DIR)/CallstackLibrary",
 				);
 				MACH_O_TYPE = mh_dylib;
+				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
