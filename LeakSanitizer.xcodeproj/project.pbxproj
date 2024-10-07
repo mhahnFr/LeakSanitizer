@@ -39,6 +39,7 @@
 		BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCF0B252BDD54A900EE259C /* misc.cpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
 		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
+		F12CA5DD2CB40E6A00C93A2C /* libobjc.A.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */; };
 		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
 		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
@@ -91,6 +92,7 @@
 		BFCF0B252BDD54A900EE259C /* misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
+		F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libobjc.A.tbd; path = usr/lib/libobjc.A.tbd; sourceTree = SDKROOT; };
 		F16901512C403EF200EED0AE /* utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F12CA5DD2CB40E6A00C93A2C /* libobjc.A.tbd in Frameworks */,
 				BF378FB52919496000A4DAA9 /* libcallstack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -122,6 +125,7 @@
 		BF378FB32919496000A4DAA9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */,
 				BF378FB42919496000A4DAA9 /* libcallstack.a */,
 			);
 			name = Frameworks;
@@ -493,6 +497,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -548,6 +553,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
 				SDKROOT = macosx;
 			};
 			name = Release;
