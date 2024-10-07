@@ -98,8 +98,10 @@ class LSan final: public ATracker {
     }
 
 protected:
-    virtual inline void addToStats(const MallocInfo& info) final override {
-        stats += info;
+    virtual inline void maybeAddToStats(const MallocInfo& info) final override {
+        if (behaviour.statsActive()) {
+            stats += info;
+        }
     }
 
 public:
