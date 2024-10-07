@@ -136,7 +136,7 @@ auto has(const std::string & var) -> bool {
 
 auto getTracker() -> ATracker& {
     auto& globalInstance = getInstance();
-    if (globalInstance.finished || __lsan_statsActive) return globalInstance;
+    if (globalInstance.finished || getBehaviour().statsActive()) return globalInstance;
 
     const auto& key = globalInstance.saniKey;
     auto tlv = pthread_getspecific(key);

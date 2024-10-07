@@ -224,10 +224,10 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
     if (it->second.deleted) {
         return std::make_pair(false, std::ref(it->second));
     }
-    if (__lsan_statsActive) {
+    if (behaviour.statsActive()) {
         stats -= it->second;
     }
-    if (__lsan_statsActive) {
+    if (behaviour.statsActive()) {
         it->second.markDeleted();
     } else {
         infos.erase(it);
@@ -250,7 +250,7 @@ void LSan::changeMalloc(ATracker* tracker, MallocInfo&& info) {
         }
         return;
     }
-    if (__lsan_statsActive) {
+    if (behaviour.statsActive()) {
         stats.replaceMalloc(it->second.size, info.size);
     }
     infos.insert_or_assign(info.pointer, info);
