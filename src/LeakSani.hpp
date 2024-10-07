@@ -129,7 +129,7 @@ class LSan final: public ATracker {
         return std::make_tuple(directCount, directBytes, indirectCount, indirectBytes);
     }
 
-    inline auto classifyClass(void* cls) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
+    inline auto classifyClass(void* cls, std::set<MallocInfo*>& directs) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
         std::size_t count  { 0 },
                     bytes  { 0 },
                     iCount { 0 },
@@ -145,6 +145,7 @@ class LSan final: public ATracker {
             iBytes += rBytes;
             ++count;
             bytes += cacheIt->second.size;
+            directs.insert(&cacheIt->second);
         }
 
         auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
@@ -156,6 +157,7 @@ class LSan final: public ATracker {
             iBytes += rBytes;
             ++count;
             bytes += it->second.size;
+            directs.insert(&it->second);
 
             auto rwStuff = reinterpret_cast<void**>(it->second.pointer);
             auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(rwStuff[1]) & ~1);
@@ -167,6 +169,7 @@ class LSan final: public ATracker {
                 iBytes += rBytes;
                 ++count;
                 bytes += it->second.size;
+                directs.insert(&it->second);
             }
         }
         return std::make_tuple(count, bytes, iCount, iBytes);

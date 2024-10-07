@@ -310,7 +310,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     objc_getClassList(classes, classNumber);
     for (int i = 0; i < classNumber; ++i) {
         {
-            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(classes[i]);
+            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(classes[i], toReturn.recordsGlobal);
             toReturn.global += count;
             toReturn.globalIndirect += indirectCount;
             toReturn.bytesGlobal += bytes;
@@ -318,7 +318,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
         auto meta = object_getClass((id) classes[i]);
         {
-            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(meta);
+            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(meta, toReturn.recordsGlobal);
             toReturn.global += count;
             toReturn.globalIndirect += indirectCount;
             toReturn.bytesGlobal += bytes;
