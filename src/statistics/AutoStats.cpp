@@ -31,26 +31,29 @@ namespace lsan {
 namespace {
 class AutoStats {
     static std::atomic_bool run;
+    static std::chrono::microseconds interval;
 
     std::thread statsThread;
     bool threadRunning = false;
 
     static inline void printer() {
-        using namespace std::chrono_literals;
         while (run) {
             const auto& begin = std::chrono::system_clock::now();
             __lsan_printStats();
             __lsan_printFStats();
             const auto& elapsed = std::chrono::system_clock::now() - begin;
-            if (elapsed < 1s) {
-                std::this_thread::sleep_for(1s - elapsed);
+            if (elapsed < interval) {
+                std::this_thread::sleep_for(interval - elapsed);
             }
         }
     }
 
 public:
     inline AutoStats() {
+        using namespace std::chrono_literals;
+
         if (getBehaviour().autoStatsActive()) {
+            interval = 1s;
             statsThread = std::thread(printer);
             threadRunning = true;
         }
@@ -65,6 +68,7 @@ public:
 };
 
 std::atomic_bool AutoStats::run = true;
+std::chrono::microseconds AutoStats::interval;
 
 static AutoStats autoStats;
 }
