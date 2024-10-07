@@ -20,6 +20,7 @@
  */
 
 #include <atomic>
+#include <chrono>
 #include <thread>
 
 #include <lsan_stats.h>
@@ -37,9 +38,13 @@ class AutoStats {
     static inline void printer() {
         using namespace std::chrono_literals;
         while (run) {
+            const auto& begin = std::chrono::system_clock::now();
             __lsan_printStats();
             __lsan_printFStats();
-            std::this_thread::sleep_for(1s);
+            const auto& elapsed = std::chrono::system_clock::now() - begin;
+            if (elapsed < 1s) {
+                std::this_thread::sleep_for(1s - elapsed);
+            }
         }
     }
 
