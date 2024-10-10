@@ -40,14 +40,14 @@ namespace lsan {
  * @tparam SizeHint whether to print the size hint if Warning is false
  */
 template<bool Warning, bool SizeHint = true>
-constexpr static inline void printer(const std::string& message,
-                                     lcs::callstack&    callstack,
+constexpr static inline void printer(const std::string& message, lcs::callstack& callstack,
                                      const std::optional<std::string>& reason = std::nullopt) {
     using formatter::Style;
     
     constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
 
-    std::cerr << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
+    std::cerr << formatter::clearAll() << std::endl
+              << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
     if (reason.has_value()) {
         std::cerr << *reason << "." << std::endl;
     }
@@ -144,13 +144,11 @@ void crash(const std::string & message) {
 }
 
 void crashForce(const std::string & message) {
-    std::cerr << formatter::clearAll() << std::endl;
     printer<false>(message, lcs::callstack());
     abort();
 }
 
 void crashForce(const std::string& message, const std::optional<std::string>& reason, lcs::callstack&& callstack) {
-    std::cerr << formatter::clearAll() << std::endl;
     printer<false>(message, callstack, reason);
     abort();
 }
