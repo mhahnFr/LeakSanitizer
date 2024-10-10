@@ -351,6 +351,17 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         toReturn.bytesLost += record->size;
     }
     out << clear << clear;
+
+    out << "   Total: " << infos.size() << " (" << toReturn.getTotal() << ")"<< std::endl
+        << "    Lost: " << toReturn.lost << " (" << toReturn.recordsLost.size() << ")" << std::endl
+        << "Indirect: " << toReturn.lostIndirect << std::endl
+        << "  Global: " << toReturn.global << " (" << toReturn.recordsGlobal.size() << ")" << std::endl
+        << "Indirect: " << toReturn.globalIndirect << std::endl
+        << "     TLV: " << toReturn.tlv << " (" << toReturn.recordsTlv.size() << ")" << std::endl
+        << "Indirect: " << toReturn.tlvIndirect << std::endl
+        << "   Stack: " << toReturn.stack << " (" << toReturn.recordsStack.size() << ")" << std::endl
+        << "Indirect: " << toReturn.stackIndirect << std::endl;
+
     return toReturn;
 }
 
