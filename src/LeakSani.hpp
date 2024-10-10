@@ -187,14 +187,22 @@ class LSan final: public ATracker {
             auto rwStuff = reinterpret_cast<void**>(it->second.pointer);
             auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(rwStuff[1]) & ~1);
             const auto& it = infos.find(ptr);
-            if (it != infos.end() && it->second.leakType > LeakType::globalDirect) {
-                it->second.leakType = LeakType::globalDirect;
-                const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
-                iCount += rCount;
-                iBytes += rBytes;
-                ++count;
-                bytes += it->second.size;
-                directs.insert(&it->second);
+            if (it != infos.end()) {
+                if (it->second.leakType > LeakType::globalDirect) {
+                    it->second.leakType = LeakType::globalDirect;
+                    const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
+                    iCount += rCount;
+                    iBytes += rBytes;
+                    ++count;
+                    bytes += it->second.size;
+                    directs.insert(&it->second);
+                }
+                if (it->second.size >= 4 * sizeof(void*)) {
+                    const auto ptrArr = reinterpret_cast<void**>(it->second.pointer);
+                    for (unsigned char i = 1; i < 4; ++i) {
+                        classifyPointerUnion<true>(ptrArr[i], directs, LeakType::globalDirect, LeakType::globalIndirect);
+                    }
+                }
             }
         }
         return std::make_tuple(count, bytes, iCount, iBytes);
