@@ -138,7 +138,7 @@ class LSan final: public ATracker {
         auto classWords = reinterpret_cast<void**>(cls);
         auto cachePtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[2]) & ((uintptr_t)1 << 48) - 1);
         const auto& cacheIt = infos.find(cachePtr);
-        if (cacheIt != infos.end()) {
+        if (cacheIt != infos.end() && cacheIt->second.leakType > LeakType::globalDirect) {
             const auto& [rCount, rBytes] = classifyRecord(cacheIt->second, LeakType::globalIndirect);
             cacheIt->second.leakType = LeakType::globalDirect;
             iCount += rCount;
@@ -151,18 +151,20 @@ class LSan final: public ATracker {
         auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
         const auto& it = infos.find(ptr);
         if (it != infos.end()) {
-            const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
-            it->second.leakType = LeakType::globalDirect;
-            iCount += rCount;
-            iBytes += rBytes;
-            ++count;
-            bytes += it->second.size;
-            directs.insert(&it->second);
+            if (it->second.leakType > LeakType::globalDirect) {
+                const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
+                it->second.leakType = LeakType::globalDirect;
+                iCount += rCount;
+                iBytes += rBytes;
+                ++count;
+                bytes += it->second.size;
+                directs.insert(&it->second);
+            }
 
             auto rwStuff = reinterpret_cast<void**>(it->second.pointer);
             auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(rwStuff[1]) & ~1);
             const auto& it = infos.find(ptr);
-            if (it != infos.end()) {
+            if (it != infos.end() && it->second.leakType > LeakType::globalDirect) {
                 const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
                 it->second.leakType = LeakType::globalDirect;
                 iCount += rCount;
