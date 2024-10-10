@@ -22,6 +22,8 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
+#include <iostream>
+
 #include <atomic>
 #include <map>
 #include <mutex>
@@ -153,6 +155,7 @@ class LSan final: public ATracker {
         if (it != infos.end()) {
             if (it->second.leakType > LeakType::globalDirect) {
                 it->second.leakType = LeakType::globalDirect;
+                // FIXME: What if already as indirect counted records are found elsewhere? Happens with this one:
                 const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
                 iCount += rCount;
                 iBytes += rBytes;
