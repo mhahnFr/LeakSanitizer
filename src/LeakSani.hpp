@@ -131,6 +131,26 @@ class LSan final: public ATracker {
         return std::make_tuple(directCount, directBytes, indirectCount, indirectBytes);
     }
 
+    template<bool Four = false>
+    constexpr inline auto classifyPointerUnion(void* ptr, std::set<MallocInfo*>& directs,
+                                               LeakType direct, LeakType indirect) -> std::pair<std::size_t, std::size_t> {
+        std::size_t count { 0 },
+                    bytes { 0 };
+
+        constexpr const auto order = Four ? 3 : 1;
+
+        const auto& it = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) & ~order));
+        if (it != infos.end() && it->second.leakType > direct) {
+            it->second.leakType = direct;
+            const auto& [c, b] = classifyRecord(it->second, indirect);
+            count = c;
+            bytes = b;
+            directs.insert(&it->second);
+        }
+
+        return std::make_pair(count, bytes);
+    }
+
     inline auto classifyClass(void* cls, std::set<MallocInfo*>& directs) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
         std::size_t count  { 0 },
                     bytes  { 0 },
