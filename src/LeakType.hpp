@@ -33,7 +33,11 @@ namespace lsan {
 enum class LeakType {
     reachableDirect,
     reachableIndirect,
-    
+
+    // TODO: Priority of Objective-C runtime stuff correct?
+    objcDirect,
+    objcIndirect,
+
     globalDirect,
     globalIndirect,
     
@@ -56,20 +60,23 @@ static inline auto isIndirect(const LeakType& type) -> bool {
     return type == LeakType::tlvIndirect
         || type == LeakType::globalIndirect
         || type == LeakType::reachableIndirect
-        || type == LeakType::unreachableIndirect;
+        || type == LeakType::unreachableIndirect
+        || type == LeakType::objcIndirect;
 }
 
 static inline auto operator<<(std::ostream& out, const LeakType& type) -> std::ostream& {
     switch (type) {
-        case LeakType::unclassified:        out << "unclassified";           break;
-        case LeakType::reachableDirect:     out << "stack";                  break;
-        case LeakType::reachableIndirect:   out << "via stack";              break;
-        case LeakType::unreachableDirect:   out << "lost";                   break;
-        case LeakType::unreachableIndirect: out << "via lost";               break;
-        case LeakType::globalDirect:        out << "global";                 break;
-        case LeakType::globalIndirect:      out << "via global";             break;
-        case LeakType::tlvDirect:           out << "thread-local value";     break;
-        case LeakType::tlvIndirect:         out << "via thread-local value"; break;
+        case LeakType::unclassified:        out << "unclassified";            break;
+        case LeakType::reachableDirect:     out << "stack";                   break;
+        case LeakType::reachableIndirect:   out << "via stack";               break;
+        case LeakType::unreachableDirect:   out << "lost";                    break;
+        case LeakType::unreachableIndirect: out << "via lost";                break;
+        case LeakType::globalDirect:        out << "global";                  break;
+        case LeakType::globalIndirect:      out << "via global";              break;
+        case LeakType::tlvDirect:           out << "thread-local value";      break;
+        case LeakType::tlvIndirect:         out << "via thread-local value";  break;
+        case LeakType::objcDirect:          out << "Objective-C runtime";     break;
+        case LeakType::objcIndirect:        out << "via Objective-C runtime"; break;
     }
     return out;
 }
@@ -91,6 +98,8 @@ constexpr static inline auto debugString(const LeakType& type) -> const char* {
         case LeakType::globalIndirect:      return "globalIndirect";
         case LeakType::tlvDirect:           return "tlvDirect";
         case LeakType::tlvIndirect:         return "tlvIndirect";
+        case LeakType::objcDirect:          return "objcDirect";
+        case LeakType::objcIndirect:        return "objcIndirect";
 
         default: return "Unknown";
     }
