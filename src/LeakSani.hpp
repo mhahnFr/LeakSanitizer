@@ -29,7 +29,6 @@
 #include <ostream>
 #include <regex>
 #include <set>
-#include <tuple>
 #include <utility>
 
 #include <pthread.h>
@@ -88,7 +87,7 @@ class LSan final: public ATracker {
     auto generateRegex(const char * regex) -> std::optional<std::regex>;
 
     auto classifyLeaks() -> LeakKindStats;
-    auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::pair<std::size_t, std::size_t>;
+    auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> CountAndBytes;
 
     /**
      * Creates a thread-safe copy of the thread-local tracker list.
@@ -106,7 +105,7 @@ class LSan final: public ATracker {
 
     inline auto classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
-                              std::set<MallocInfo*>& directs, bool skipClassifieds = false) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
+                              std::set<MallocInfo*>& directs, bool skipClassifieds = false) -> CountAndBytesAndIndirect {
         std::size_t directCount   { 0 },
                     indirectCount { 0 },
                     directBytes   { 0 },
@@ -131,7 +130,7 @@ class LSan final: public ATracker {
 
     template<bool Four = false>
     constexpr inline auto classifyPointerUnion(void* ptr, std::set<MallocInfo*>& directs,
-                                               LeakType direct, LeakType indirect) -> std::pair<std::size_t, std::size_t> {
+                                               LeakType direct, LeakType indirect) -> CountAndBytes {
         std::size_t count { 0 },
                     bytes { 0 };
 
@@ -149,7 +148,7 @@ class LSan final: public ATracker {
         return std::make_pair(count, bytes);
     }
 
-    inline auto classifyClass(void* cls, std::set<MallocInfo*>& directs) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
+    inline auto classifyClass(void* cls, std::set<MallocInfo*>& directs) -> CountAndBytesAndIndirect {
         std::size_t count  { 0 },
                     bytes  { 0 },
                     iCount { 0 },

@@ -78,7 +78,7 @@ static inline auto align(const void* ptr, bool up = true) -> uintptr_t {
     return align(reinterpret_cast<uintptr_t>(ptr), up);
 }
 
-auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std::pair<std::size_t, std::size_t> {
+auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> CountAndBytes {
     std::size_t count { 0 },
                 bytes { 0 };
     auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
