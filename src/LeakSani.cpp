@@ -273,6 +273,30 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     toReturn.bytesStack += stackHereBytes;
     toReturn.bytesStackIndirect += stackHereBytesIndirect;
 
+#ifdef LSAN_HANDLE_OBJC
+    out << clear << "Reachability analysis: Objective-C runtime...";
+    const auto& classNumber = objc_getClassList(nullptr, 0);
+    auto classes = new Class[classNumber];
+    objc_getClassList(classes, classNumber);
+    for (int i = 0; i < classNumber; ++i) {
+        {
+            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(classes[i], toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
+            toReturn.objC += count;
+            toReturn.objCIndirect += indirectCount;
+            toReturn.bytesObjC += bytes;
+            toReturn.bytesObjCIndirect += indirectBytes;
+        }
+        auto meta = object_getClass((id) classes[i]);
+        {
+            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(meta, toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
+            toReturn.objC += count;
+            toReturn.objCIndirect += indirectCount;
+            toReturn.bytesObjC += bytes;
+            toReturn.bytesObjCIndirect += indirectBytes;
+        }
+    }
+#endif
+
     out << clear << "Reachability analysis: Globals...";
     // Search in global space
     for (const auto& region : regions) {
@@ -304,29 +328,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         toReturn.recordsTlv.insert(&it->second);
     }
 
-#ifdef LSAN_HANDLE_OBJC
-    const auto& classNumber = objc_getClassList(nullptr, 0);
-    auto classes = new Class[classNumber];
-    objc_getClassList(classes, classNumber);
-    for (int i = 0; i < classNumber; ++i) {
-        {
-            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(classes[i], toReturn.recordsGlobal);
-            toReturn.global += count;
-            toReturn.globalIndirect += indirectCount;
-            toReturn.bytesGlobal += bytes;
-            toReturn.bytesGlobalIndirect += indirectBytes;
-        }
-        auto meta = object_getClass((id) classes[i]);
-        {
-            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(meta, toReturn.recordsGlobal);
-            toReturn.global += count;
-            toReturn.globalIndirect += indirectCount;
-            toReturn.bytesGlobal += bytes;
-            toReturn.bytesGlobalIndirect += indirectBytes;
-        }
-    }
-#endif
-
     out << clear << "Reachability analysis: Lost memory...";
     // All leaks still unclassified are unreachable, search for reachability inside them
     for (auto& [pointer, record] : infos) {
@@ -344,7 +345,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                     - toReturn.stack - toReturn.stackIndirect
                     - toReturn.global - toReturn.globalIndirect
                     - toReturn.lostIndirect
-                    - toReturn.tlv - toReturn.tlvIndirect;
+                    - toReturn.tlv - toReturn.tlvIndirect
+                    - toReturn.objC - toReturn.objCIndirect;
     for (const auto& record : toReturn.recordsLost) {
         if (record->leakType != LeakType::unreachableDirect) continue;
 
@@ -355,6 +357,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << "   Total: " << infos.size() << " (" << toReturn.getTotal() << ")"<< std::endl
         << "    Lost: " << toReturn.lost << " (" << toReturn.recordsLost.size() << ")" << std::endl
         << "Indirect: " << toReturn.lostIndirect << std::endl
+        << "    ObjC: " << toReturn.objC << " (" << toReturn.recordsObjC.size() << ")" << std::endl
+        << "Indirect: " << toReturn.objCIndirect << std::endl
         << "  Global: " << toReturn.global << " (" << toReturn.recordsGlobal.size() << ")" << std::endl
         << "Indirect: " << toReturn.globalIndirect << std::endl
         << "     TLV: " << toReturn.tlv << " (" << toReturn.recordsTlv.size() << ")" << std::endl
