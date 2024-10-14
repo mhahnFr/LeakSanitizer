@@ -275,25 +275,25 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
 #ifdef LSAN_HANDLE_OBJC
     out << clear << "Reachability analysis: Objective-C runtime...";
+    // Search in the Objective-C runtime
     const auto& classNumber = objc_getClassList(nullptr, 0);
     auto classes = new Class[classNumber];
     objc_getClassList(classes, classNumber);
     for (int i = 0; i < classNumber; ++i) {
-        {
-            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(classes[i], toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
-            toReturn.objC += count;
-            toReturn.objCIndirect += indirectCount;
-            toReturn.bytesObjC += bytes;
-            toReturn.bytesObjCIndirect += indirectBytes;
-        }
-        auto meta = object_getClass((id) classes[i]);
-        {
-            const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(meta, toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
-            toReturn.objC += count;
-            toReturn.objCIndirect += indirectCount;
-            toReturn.bytesObjC += bytes;
-            toReturn.bytesObjCIndirect += indirectBytes;
-        }
+        const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(classes[i], toReturn.recordsObjC,
+                                                                                 LeakType::objcDirect, LeakType::objcIndirect);
+        toReturn.objC += count;
+        toReturn.objCIndirect += indirectCount;
+        toReturn.bytesObjC += bytes;
+        toReturn.bytesObjCIndirect += indirectBytes;
+
+        const auto& meta = object_getClass(reinterpret_cast<id>(classes[i]));
+        const auto& [metaCount, metaBytes, metaIndirectCount, metaIndirectBytes] = classifyClass(meta, toReturn.recordsObjC,
+                                                                                                 LeakType::objcDirect, LeakType::objcIndirect);
+        toReturn.objC += metaCount;
+        toReturn.objCIndirect += metaIndirectCount;
+        toReturn.bytesObjC += metaBytes;
+        toReturn.bytesObjCIndirect += metaIndirectBytes;
     }
 #endif
 
