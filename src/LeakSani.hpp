@@ -149,7 +149,7 @@ class LSan final: public ATracker {
         return std::make_pair(count, bytes);
     }
 
-    inline auto classifyClass(void* cls, std::set<MallocInfo*>& directs) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
+    inline auto classifyClass(void* cls, std::set<MallocInfo*>& directs, LeakType direct, LeakType indirect) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {
         std::size_t count  { 0 },
                     bytes  { 0 },
                     iCount { 0 },
@@ -158,9 +158,9 @@ class LSan final: public ATracker {
         auto classWords = reinterpret_cast<void**>(cls);
         auto cachePtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[2]) & ((uintptr_t) 1 << 48) - 1);
         const auto& cacheIt = infos.find(cachePtr);
-        if (cacheIt != infos.end() && cacheIt->second.leakType > LeakType::globalDirect) {
-            cacheIt->second.leakType = LeakType::globalDirect;
-            const auto& [rCount, rBytes] = classifyRecord(cacheIt->second, LeakType::globalIndirect);
+        if (cacheIt != infos.end() && cacheIt->second.leakType > direct) {
+            cacheIt->second.leakType = direct;
+            const auto& [rCount, rBytes] = classifyRecord(cacheIt->second, indirect);
             iCount += rCount;
             iBytes += rBytes;
             ++count;
@@ -171,10 +171,10 @@ class LSan final: public ATracker {
         auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
         const auto& it = infos.find(ptr);
         if (it != infos.end()) {
-            if (it->second.leakType > LeakType::globalDirect) {
-                it->second.leakType = LeakType::globalDirect;
+            if (it->second.leakType > direct) {
+                it->second.leakType = direct;
                 // FIXME: What if already as indirect counted records are found elsewhere? Happens with this one:
-                const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
+                const auto& [rCount, rBytes] = classifyRecord(it->second, indirect);
                 iCount += rCount;
                 iBytes += rBytes;
                 ++count;
@@ -186,9 +186,9 @@ class LSan final: public ATracker {
             auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(rwStuff[1]) & ~1);
             const auto& it = infos.find(ptr);
             if (it != infos.end()) {
-                if (it->second.leakType > LeakType::globalDirect) {
-                    it->second.leakType = LeakType::globalDirect;
-                    const auto& [rCount, rBytes] = classifyRecord(it->second, LeakType::globalIndirect);
+                if (it->second.leakType > direct) {
+                    it->second.leakType = direct;
+                    const auto& [rCount, rBytes] = classifyRecord(it->second, indirect);
                     iCount += rCount;
                     iBytes += rBytes;
                     ++count;
@@ -198,7 +198,7 @@ class LSan final: public ATracker {
                 if (it->second.size >= 4 * sizeof(void*)) {
                     const auto ptrArr = reinterpret_cast<void**>(it->second.pointer);
                     for (unsigned char i = 1; i < 4; ++i) {
-                        classifyPointerUnion<true>(ptrArr[i], directs, LeakType::globalDirect, LeakType::globalIndirect);
+                        classifyPointerUnion<true>(ptrArr[i], directs, direct, indirect);
                     }
                 }
             }
