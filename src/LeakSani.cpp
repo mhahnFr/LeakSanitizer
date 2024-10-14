@@ -239,8 +239,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     const auto& [regions, locals] = getGlobalRegionsAndTLVs();
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
-        const auto& local = locals.find(it->first);
-        if (local != locals.end() || it->second.deleted || callstackHelper::getCallstackType(it->second.createdCallstack) != callstackHelper::CallstackType::USER) {
+//        const auto& local = locals.find(it->first);
+        if (/*local != locals.end() || */it->second.deleted/* || callstackHelper::getCallstackType(it->second.createdCallstack) != callstackHelper::CallstackType::USER*/) {
             // TODO: In the future only erase the deleted records
             it = infos.erase(it);
         } else {
