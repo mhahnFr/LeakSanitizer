@@ -128,7 +128,7 @@ struct MallocInfo {
     friend auto operator<<(std::ostream&, const MallocInfo&) -> std::ostream&;
 
 private:
-    void print(std::ostream& stream, const std::string& indent = "") const;
+    void print(std::ostream& stream, unsigned long indent = 0, unsigned long number = 0, unsigned long indent2 = 0) const;
 };
 }
 

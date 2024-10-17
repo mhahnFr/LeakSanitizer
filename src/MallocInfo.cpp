@@ -60,10 +60,19 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     return stream;
 }
 
-void MallocInfo::print(std::ostream& stream, const std::string& indent) const {
+void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long number, unsigned long indent2) const {
     using namespace formatter;
 
-    stream << indent << get<Style::ITALIC>
+    const auto& indentString = std::string(indent, ' ');
+    if (number > 0) {
+        const auto& numberString = std::to_string(number);
+        stream << std::string(indent2, ' ') << get<Style::AMBER>
+               << "#" << std::string(indent - numberString.size() - 2, ' ') << numberString
+               << clear<Style::AMBER> << ' ';
+    } else {
+        stream << indentString;
+    }
+    stream << get<Style::ITALIC>
            << format<Style::BOLD, Style::RED>("Leak") << " of size "
            << clear<Style::ITALIC>
            << bytesToString(size) << get<Style::ITALIC> << ", " << leakType;
@@ -78,15 +87,17 @@ void MallocInfo::print(std::ostream& stream, const std::string& indent) const {
         stream << ", " << count << " leak" << (count > 1 ? "s" : "") << " (" << bytesToString(bytes) << ") indirect";
     }
     stream << std::endl;
-    printCreatedCallstack(stream, indent);
+    printCreatedCallstack(stream, indentString);
 
     if (printIndirects && count > 0) {
-        stream << std::endl << indent << get<Style::AMBER> << "Indirect leak" << (count > 1 ? "s" : "") << ":" << clear<Style::AMBER>;
-        forEachIndirect(true, *this, [&stream, &indent](const auto& record) {
+        stream << std::endl << indentString << get<Style::AMBER> << "Indirect leak" << (count > 1 ? "s" : "") << ":" << clear<Style::AMBER>;
+        const auto& print = count > 1;
+        const auto& newIndent = indent + (print ? std::to_string(count).size() : 0) + 3;
+        forEachIndirect(true, *this, [&](const auto& record) {
             stream << std::endl;
-            record.print(stream, indent + "  ");
+            record.print(stream, newIndent, print ? ++number : 0, indent);
         });
-        stream << indent << format<Style::AMBER>("---------------") << std::endl;
+        stream << indentString << format<Style::AMBER>("---------------") << std::endl;
     }
 }
 }
