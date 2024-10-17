@@ -25,7 +25,7 @@
 #include "bytePrinter.hpp"
 
 namespace lsan {
-static bool printIndirects = true; // TODO: Make this configurable
+static bool printIndirects = false; // TODO: Make this configurable
 
 /**
  * Returns whether the first given leak type is greater than the other one.
