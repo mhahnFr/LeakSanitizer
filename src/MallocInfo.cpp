@@ -80,19 +80,13 @@ void MallocInfo::print(std::ostream& stream, const std::string& indent) const {
     stream << std::endl;
     printCreatedCallstack(stream, indent);
 
-    if (printIndirects) {
-        bool first = true;
-        forEachIndirect(true, *this, [&first, &stream, &indent](const auto& record) {
-            if (first) {
-                first = false;
-                stream << std::endl << indent << format<Style::AMBER>("Indirect leaks:");
-            }
+    if (printIndirects && count > 0) {
+        stream << std::endl << indent << get<Style::AMBER> << "Indirect leak" << (count > 1 ? "s" : "") << ":" << clear<Style::AMBER>;
+        forEachIndirect(true, *this, [&stream, &indent](const auto& record) {
             stream << std::endl;
             record.print(stream, indent + "  ");
         });
-        if (!first) {
-            stream << indent << format<Style::AMBER>("---------------") << std::endl;
-        }
+        stream << indent << format<Style::AMBER>("---------------") << std::endl;
     }
 }
 }
