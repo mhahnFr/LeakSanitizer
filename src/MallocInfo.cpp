@@ -56,16 +56,21 @@ static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Ar
 }
 
 auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
+    self.print(stream);
+    return stream;
+}
+
+void MallocInfo::print(std::ostream& stream, const std::string& indent) const {
     using namespace formatter;
 
-    stream << get<Style::ITALIC>
+    stream << indent << get<Style::ITALIC>
            << format<Style::BOLD, Style::RED>("Leak") << " of size "
            << clear<Style::ITALIC>
-           << bytesToString(self.size) << get<Style::ITALIC> << ", " << self.leakType;
+           << bytesToString(size) << get<Style::ITALIC> << ", " << leakType;
 
     std::size_t count { 0 },
                 bytes { 0 };
-    forEachIndirect(!printIndirects, self, [&](const auto& record) {
+    forEachIndirect(!printIndirects, *this, [&](const auto& record) {
         ++count;
         bytes += record.size;
     });
@@ -73,21 +78,21 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
         stream << ", " << count << " leak" << (count > 1 ? "s" : "") << " (" << bytesToString(bytes) << ") indirect";
     }
     stream << std::endl;
-    self.printCreatedCallstack(stream);
+    printCreatedCallstack(stream, indent);
 
     if (printIndirects) {
         bool first = true;
-        forEachIndirect(true, self, [&first, &stream](const auto& record) {
+        forEachIndirect(true, *this, [&first, &stream, &indent](const auto& record) {
             if (first) {
                 first = false;
-                stream << std::endl << format<Style::AMBER>("Indirect leaks:");
+                stream << std::endl << indent << format<Style::AMBER>("Indirect leaks:");
             }
-            stream << std::endl << record;
+            stream << std::endl;
+            record.print(stream, indent + "  ");
         });
         if (!first) {
-            stream << format<Style::AMBER>("---------------") << std::endl;
+            stream << indent << format<Style::AMBER>("---------------") << std::endl;
         }
     }
-    return stream;
 }
 }

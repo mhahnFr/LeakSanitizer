@@ -108,8 +108,8 @@ struct MallocInfo {
      *
      * @param out the output stream to print to
      */
-    inline void printCreatedCallstack(std::ostream& out) const {
-        callstackHelper::format(createdCallstack, out);
+    inline void printCreatedCallstack(std::ostream& out, const std::string& indent = "") const {
+        callstackHelper::format(createdCallstack, out, indent);
     }
     /**
      * Prints the callstack where this allocation was deallocated.
@@ -126,6 +126,9 @@ struct MallocInfo {
     }
     
     friend auto operator<<(std::ostream&, const MallocInfo&) -> std::ostream&;
+
+private:
+    void print(std::ostream& stream, const std::string& indent = "") const;
 };
 }
 
