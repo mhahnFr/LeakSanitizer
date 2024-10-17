@@ -699,8 +699,8 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
             for (const auto& record : stats.recordsStack) {
                 stream << *record << std::endl;
             }
-        } else {
-            stream << "Set LSAN_SHOW_REACHABLES to true to display reachable memory leaks." << std::endl;
+        } else if (stats.getTotalReachable() > 0) {
+            stream << "Set LSAN_SHOW_REACHABLES to true to display reachable memory leaks." << std::endl << std::endl;
         }
 
         if (self.callstackSizeExceeded) {
