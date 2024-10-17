@@ -43,6 +43,18 @@ static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs)
     return lhs > rhs;
 }
 
+template<typename F, typename... Args>
+static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Args... args) {
+    for (const auto& record : info.viaMeRecords) {
+        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, info.leakType) && !record->printedInRoot) {
+            func(*record, std::forward<Args>(args)...);
+            if (mark) {
+                record->printedInRoot = true;
+            }
+        }
+    }
+}
+
 auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     using formatter::Style;
     
@@ -53,13 +65,10 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
 
     std::size_t count { 0 },
                 bytes { 0 };
-    for (const auto& record : self.viaMeRecords) {
-        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, self.leakType) && !record->printedInRoot) {
-            ++count;
-            bytes += record->size;
-            record->printedInRoot = true;
-        }
-    }
+    forEachIndirect(true, self, [&](const auto& record) {
+        ++count;
+        bytes += record.size;
+    });
     if (count > 0) {
         stream << ", " << count << " leak" << (count > 1 ? "s" : "") << " (" << bytesToString(bytes) << ") indirect";
     }
