@@ -25,6 +25,8 @@
 #include "bytePrinter.hpp"
 
 namespace lsan {
+static bool printIndirects = true; // TODO: Make this configurable
+
 /**
  * Returns whether the first given leak type is greater than the other one.
  *
@@ -48,24 +50,22 @@ static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Ar
     for (const auto& record : info.viaMeRecords) {
         if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, info.leakType) && !record->printedInRoot) {
             func(*record, std::forward<Args>(args)...);
-            if (mark) {
-                record->printedInRoot = true;
-            }
+            record->printedInRoot = mark;
         }
     }
 }
 
 auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
-    using formatter::Style;
-    
-    stream << formatter::get<Style::ITALIC>
-           << formatter::format<Style::BOLD, Style::RED>("Leak") << " of size "
-           << formatter::clear<Style::ITALIC>
-           << bytesToString(self.size) << formatter::get<Style::ITALIC> << ", " << self.leakType;
+    using namespace formatter;
+
+    stream << get<Style::ITALIC>
+           << format<Style::BOLD, Style::RED>("Leak") << " of size "
+           << clear<Style::ITALIC>
+           << bytesToString(self.size) << get<Style::ITALIC> << ", " << self.leakType;
 
     std::size_t count { 0 },
                 bytes { 0 };
-    forEachIndirect(true, self, [&](const auto& record) {
+    forEachIndirect(!printIndirects, self, [&](const auto& record) {
         ++count;
         bytes += record.size;
     });
@@ -74,6 +74,20 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     }
     stream << std::endl;
     self.printCreatedCallstack(stream);
+
+    if (printIndirects) {
+        bool first = true;
+        forEachIndirect(true, self, [&first, &stream](const auto& record) {
+            if (first) {
+                first = false;
+                stream << std::endl << format<Style::AMBER>("Indirect leaks:");
+            }
+            stream << std::endl << record;
+        });
+        if (!first) {
+            stream << format<Style::AMBER>("---------------") << std::endl;
+        }
+    }
     return stream;
 }
 }
