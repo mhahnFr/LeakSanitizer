@@ -42,8 +42,9 @@
  #include "timing.hpp"
 #endif
 
-#include "wrappers/realAlloc.hpp"
+#include "helpers/LeakKindStats.hpp"
 #include "statistics/Stats.hpp"
+#include "wrappers/realAlloc.hpp"
 
 namespace lsan {
 /**
