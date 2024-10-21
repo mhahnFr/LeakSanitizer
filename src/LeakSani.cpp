@@ -707,6 +707,14 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 //                stream << std::endl << record->pointer << " ";
                 stream << *record << std::endl;
             }
+            for (const auto& record : stats.recordsObjC) {
+//                auto ptr = reinterpret_cast<void**>(record->pointer);
+//                for (std::size_t i = 0; i < record->size / 8; ++i) {
+//                    stream << ptr[i] << ", ";
+//                }
+//                stream << std::endl << record->pointer << " ";
+                stream << *record << std::endl;
+            }
             for (const auto& record : stats.recordsTlv) {
 //                auto ptr = reinterpret_cast<void**>(record->pointer);
 //                for (std::size_t i = 0; i < record->size / 8; ++i) {
