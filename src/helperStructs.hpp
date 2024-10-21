@@ -132,24 +132,6 @@ struct LeakKindStats {
     }
 };
 
-/**
- * This strcuture represents a memory region.
- */
-struct Region {
-    /** The begin of the region. */
-    void* begin,
-    /** The end of the region.   */
-        * end;
-
-    /**
-     * Constructs a region defined by the given bounds.
-     *
-     * @param begin the begin of the region
-     * @param end the end of the region
-     */
-    Region(void* begin, void* end): begin(begin), end(end) {}
-};
-
 using CountAndBytes = std::pair<std::size_t, std::size_t>;
 using CountAndBytesAndIndirect = std::tuple<std::size_t, std::size_t, std::size_t, std::size_t>;
 }

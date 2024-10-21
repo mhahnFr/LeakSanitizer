@@ -34,6 +34,7 @@
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 #include "crashWarner/exceptionHandler.hpp"
+#include "helpers/Region.hpp"
 #include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
 
