@@ -109,6 +109,9 @@ class LSan final: public ATracker {
         if (toReturn == infos.end()) {
             toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - 2 * sizeof(void*)));
         }
+        if (toReturn == infos.end()) {
+            toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - sizeof(void*)));
+        }
         return toReturn;
     }
 
