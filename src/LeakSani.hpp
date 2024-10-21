@@ -29,6 +29,7 @@
 #include <ostream>
 #include <regex>
 #include <set>
+#include <tuple>
 #include <utility>
 
 #include <pthread.h>
@@ -36,7 +37,6 @@
 
 #include "ATracker.hpp"
 #include "MallocInfo.hpp"
-#include "helperStructs.hpp"
 
 #ifdef BENCHMARK
  #include "timing.hpp"
@@ -53,6 +53,9 @@ namespace lsan {
  * It acts as an allocation tracker.
  */
 class LSan final: public ATracker {
+    using CountAndBytes = std::pair<std::size_t, std::size_t>;
+    using CountAndBytesAndIndirect = std::tuple<std::size_t, std::size_t, std::size_t, std::size_t>;
+
     std::set<pthread_key_t> keys;
     std::mutex tlsKeyMutex;
     std::map<std::pair<pthread_t, pthread_key_t>, const void*> tlsKeyValues;
