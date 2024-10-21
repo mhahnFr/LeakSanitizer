@@ -25,6 +25,8 @@
 #include "bytePrinter.hpp"
 
 namespace lsan {
+static bool printIndirects = false; // TODO: Make this configurable
+
 /**
  * Returns whether the first given leak type is greater than the other one.
  *
@@ -43,28 +45,59 @@ static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs)
     return lhs > rhs;
 }
 
+template<typename F, typename... Args>
+static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Args... args) {
+    for (const auto& record : info.viaMeRecords) {
+        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, info.leakType) && !record->printedInRoot) {
+            func(*record, std::forward<Args>(args)...);
+            record->printedInRoot = mark;
+        }
+    }
+}
+
 auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
-    using formatter::Style;
-    
-    stream << formatter::get<Style::ITALIC>
-           << formatter::format<Style::BOLD, Style::RED>("Leak") << " of size "
-           << formatter::clear<Style::ITALIC>
-           << bytesToString(self.size) << formatter::get<Style::ITALIC> << ", " << self.leakType;
+    self.print(stream);
+    return stream;
+}
+
+void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long number, unsigned long indent2) const {
+    using namespace formatter;
+
+    const auto& indentString = std::string(indent, ' ');
+    if (number > 0) {
+        const auto& numberString = std::to_string(number);
+        stream << std::string(indent2, ' ') << get<Style::AMBER>
+               << "#" << std::string(indent - numberString.size() - 2, ' ') << numberString
+               << clear<Style::AMBER> << ' ';
+    } else {
+        stream << indentString;
+    }
+    stream << get<Style::ITALIC>
+           << format<Style::BOLD, Style::RED>("Leak") << " of size "
+           << clear<Style::ITALIC>
+           << bytesToString(size) << get<Style::ITALIC> << ", " << leakType;
 
     std::size_t count { 0 },
                 bytes { 0 };
-    for (const auto& record : self.viaMeRecords) {
-        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, self.leakType) && !record->printedInRoot) {
-            ++count;
-            bytes += record->size;
-            record->printedInRoot = true;
-        }
-    }
+    forEachIndirect(!printIndirects, *this, [&](const auto& record) {
+        ++count;
+        bytes += record.size;
+    });
     if (count > 0) {
         stream << ", " << count << " leak" << (count > 1 ? "s" : "") << " (" << bytesToString(bytes) << ") indirect";
     }
     stream << std::endl;
-    self.printCreatedCallstack(stream);
-    return stream;
+    printCreatedCallstack(stream, indentString);
+
+    if (printIndirects && count > 0) {
+        stream << std::endl << indentString << get<Style::AMBER> << "Indirect leak" << (count > 1 ? "s" : "") << ":" << clear<Style::AMBER>;
+        const auto& print = count > 1;
+        const auto& newIndent = indent + (print ? std::to_string(count).size() : 0) + 3;
+        forEachIndirect(true, *this, [&](const auto& record) {
+            stream << std::endl;
+            record.print(stream, newIndent, print ? ++number : 0, indent);
+        });
+        stream << indentString << format<Style::AMBER>("---------------") << std::endl;
+    }
 }
 }

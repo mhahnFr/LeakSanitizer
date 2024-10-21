@@ -23,6 +23,7 @@
 #define callstackHelper_hpp
 
 #include <ostream>
+#include <string>
 
 #include <callstack.h>
 
@@ -54,7 +55,7 @@ auto getCallstackType(lcs::callstack & callstack) -> CallstackType;
  * @param callstack the callstack
  * @param stream the stream to print to
  */
-void format(lcs::callstack & callstack, std::ostream & stream);
+void format(lcs::callstack& callstack, std::ostream& stream, const std::string& indent = "");
 
 /**
  * Formats the given callstack onto the given output stream.
@@ -62,8 +63,8 @@ void format(lcs::callstack & callstack, std::ostream & stream);
  * @param callstack the callstack
  * @param out the stream to print to
  */
-static inline void format(lcs::callstack && callstack, std::ostream & out) {
-    format(callstack, out);
+static inline void format(lcs::callstack&& callstack, std::ostream& out, const std::string& indent = "") {
+    format(callstack, out, indent);
 }
 }
 

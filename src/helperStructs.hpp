@@ -22,6 +22,11 @@
 #ifndef helperStructs_hpp
 #define helperStructs_hpp
 
+#include <cstddef>
+#include <set>
+#include <tuple>
+#include <utility>
+
 #include "MallocInfo.hpp"
 
 namespace lsan {
@@ -152,6 +157,9 @@ struct Region {
      */
     Region(void* begin, void* end): begin(begin), end(end) {}
 };
+
+using CountAndBytes = std::pair<std::size_t, std::size_t>;
+using CountAndBytesAndIndirect = std::tuple<std::size_t, std::size_t, std::size_t, std::size_t>;
 }
 
 #endif /* helperStructs_hpp */

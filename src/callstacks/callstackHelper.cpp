@@ -21,7 +21,6 @@
 
 #include <map>
 #include <regex>
-#include <string>
 
 #include <lsan_internals.h>
 
@@ -269,7 +268,7 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
     out << clear<S> << std::endl;
 }
 
-void format(lcs::callstack & callstack, std::ostream & stream) {
+void format(lcs::callstack & callstack, std::ostream & stream, const std::string& indent) {
     using formatter::Style;
 
     if (!callstack_autoClearCaches) {
@@ -278,7 +277,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
         //
         //                          - mhahnFr
         if (callstack_getBinariesCached(callstack) == nullptr) {
-            stream << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
+            stream << indent << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
             return;
         }
     }
@@ -286,7 +285,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     const auto& size   = callstack_getFrameCount(callstack);
 
     if (frames == nullptr) {
-        stream << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
+        stream << indent << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
         return;
     }
 
@@ -299,23 +298,23 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
         } else if (firstHit && isFirstParty(binaryFile)) {
-            stream << formatter::get<Style::GREYED>
+            stream << indent << formatter::get<Style::GREYED>
                    << formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
             formatShared<Style::GREYED>(frames[i], stream);
         } else if (firstHit) {
             firstHit = false;
-            stream << formatter::get<Style::BOLD>
+            stream << indent << formatter::get<Style::BOLD>
                    << formatter::format<Style::ITALIC>(firstPrint ? "In: " : "in: ");
             formatShared<Style::BOLD>(frames[i], stream);
         } else {
-            stream << formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
+            stream << indent << formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
             formatShared<Style::NONE>(frames[i], stream);
         }
         firstPrint = false;
         ++printed;
     }
     if (i < size) {
-        stream << std::endl << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more line" + (size - i > 1 ? "s" : "") + "...") << std::endl;
+        stream << std::endl << indent << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more line" + (size - i > 1 ? "s" : "") + "...") << std::endl;
         getInstance().setCallstackSizeExceeded(true);
     }
 }
