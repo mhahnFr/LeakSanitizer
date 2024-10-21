@@ -104,6 +104,14 @@ class LSan final: public ATracker {
         userRegex = generateRegex(__lsan_firstPartyRegex);
     }
 
+    inline auto findWithSpecials(void* ptr) -> decltype(infos)::iterator {
+        auto toReturn = infos.find(ptr);
+        if (toReturn == infos.end()) {
+            toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - 2 * sizeof(void*)));
+        }
+        return toReturn;
+    }
+
     inline auto classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
                               std::set<MallocInfo*>& directs, bool skipClassifieds = false) -> std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> {

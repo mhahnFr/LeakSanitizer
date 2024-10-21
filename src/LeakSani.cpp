@@ -96,7 +96,7 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> std:
         const auto   endPtr = align(beginPtr + elem.get().size, false);
 
         for (uintptr_t it = beginPtr; it < endPtr; it += sizeof(uintptr_t)) {
-            const auto& record = infos.find(*reinterpret_cast<void**>(it));
+            const auto& record = findWithSpecials(*reinterpret_cast<void**>(it));
             if (record == infos.end()
                 || record->second.deleted
                 || record->second.pointer == info.pointer
