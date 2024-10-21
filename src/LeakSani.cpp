@@ -688,6 +688,11 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         for (const auto& record : stats.recordsLost) {
             if (record->leakType != LeakType::unreachableDirect) continue;
 
+//            auto ptr = reinterpret_cast<void**>(record->pointer);
+//            for (std::size_t i = 0; i < record->size / 8; ++i) {
+//                stream << ptr[i] << ", ";
+//            }
+//            stream << std::endl << record->pointer << " ";
             stream << *record << std::endl;
         }
 
@@ -695,12 +700,27 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
         if ((false)) { // TODO: If should show reachables
             for (const auto& record : stats.recordsGlobal) {
+//                auto ptr = reinterpret_cast<void**>(record->pointer);
+//                for (std::size_t i = 0; i < record->size / 8; ++i) {
+//                    stream << ptr[i] << ", ";
+//                }
+//                stream << std::endl << record->pointer << " ";
                 stream << *record << std::endl;
             }
             for (const auto& record : stats.recordsTlv) {
+//                auto ptr = reinterpret_cast<void**>(record->pointer);
+//                for (std::size_t i = 0; i < record->size / 8; ++i) {
+//                    stream << ptr[i] << ", ";
+//                }
+//                stream << std::endl << record->pointer << " ";
                 stream << *record << std::endl;
             }
             for (const auto& record : stats.recordsStack) {
+//                auto ptr = reinterpret_cast<void**>(record->pointer);
+//                for (std::size_t i = 0; i < record->size / 8; ++i) {
+//                    stream << ptr[i] << ", ";
+//                }
+//                stream << std::endl << record->pointer << " ";
                 stream << *record << std::endl;
             }
         } else {
