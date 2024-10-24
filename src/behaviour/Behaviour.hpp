@@ -32,7 +32,7 @@ class Behaviour {
 
 public:
     inline Behaviour():
-        _autoStatsActive(getBool("LSAN_AUTO_STATS"))
+        _autoStatsActive(get<bool>("LSAN_AUTO_STATS").value_or(false))
     {}
 
     inline auto statsActive() const -> bool {
