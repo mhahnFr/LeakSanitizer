@@ -22,14 +22,14 @@
 #ifndef Behaviour_hpp
 #define Behaviour_hpp
 
+#include <chrono>
+
 #include <lsan_internals.h>
 
 #include "helper.hpp"
 
 namespace lsan::behaviour {
 class Behaviour {
-    const bool _autoStatsActive = get<bool>("LSAN_AUTO_STATS").value_or(false);
-
     const std::optional<bool> _humanPrint     = get<bool>("LSAN_HUMAN_PRINT"),
                               _printCout      = get<bool>("LSAN_PRINT_COUT"),
                               _printFormatted = get<bool>("LSAN_PRINT_FORMATTED"),
@@ -48,6 +48,8 @@ class Behaviour {
                                      _firstPartyThreshold = get<std::size_t>("LSAN_FIRST_PARTY_THRESHOLD");
 
     const std::optional<const char*> _firstPartyRegex = getVariable("LSAN_FIRST_PARTY_REGEX");
+
+    const std::optional<std::chrono::nanoseconds> _autoStats = get<std::chrono::nanoseconds>("LSAN_AUTO_STATS");
 
     inline auto statsActiveInternal() const -> bool {
         return _statsActive ? *_statsActive : __lsan_statsActive;
@@ -78,11 +80,11 @@ public:
     ENV_OR_API(firstPartyRegex)
 
     inline auto statsActive() const -> bool {
-        return statsActiveInternal() || autoStatsActive();
+        return statsActiveInternal() || _autoStats;
     }
 
-    constexpr inline auto autoStatsActive() const -> bool {
-        return _autoStatsActive;
+    constexpr inline auto autoStats() const {
+        return _autoStats;
     }
 
 #undef ENV_OR_API
