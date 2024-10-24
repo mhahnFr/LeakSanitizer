@@ -24,6 +24,7 @@
 
 #include <cctype>
 #include <charconv>
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <optional>
@@ -101,6 +102,32 @@ constexpr inline auto getFrom(const char* value) -> std::optional<bool> {
     if (auto number = getFrom<std::size_t>(value)) {
         return number != 0;
     }
+    return std::nullopt;
+}
+
+template<>
+inline auto getFrom(const char* value) -> std::optional<std::chrono::nanoseconds> {
+    unsigned long count = 0;
+    auto [ptr, err] = std::from_chars(value, value + strlen(value), count);
+
+    if (err != std::errc()) {
+        return std::nullopt;
+    }
+
+    if (strcmp(ptr, "ns") == 0) {
+        return std::chrono::nanoseconds(count);
+    } else if (strcmp(ptr, "us") == 0) {
+        return std::chrono::microseconds(count);
+    } else if (strcmp(ptr, "ms") == 0) {
+        return std::chrono::milliseconds(count);
+    } else if (strcmp(ptr, "s") == 0) {
+        return std::chrono::seconds(count);
+    } else if (strcmp(ptr, "m") == 0) {
+        return std::chrono::minutes(count);
+    } else if (strcmp(ptr, "h") == 0) {
+        return std::chrono::hours(count);
+    }
+    // TODO: Default interpretation
     return std::nullopt;
 }
 }
