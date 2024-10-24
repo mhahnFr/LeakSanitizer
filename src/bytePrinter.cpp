@@ -25,6 +25,7 @@
 #include <lsan_internals.h>
 
 #include "bytePrinter.hpp"
+#include "lsanMisc.hpp"
 
 namespace lsan {
 /// Represents exactly 1 EiB. Needed for the calculations as starting point.
@@ -32,7 +33,7 @@ static constexpr unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024
 
 std::string bytesToString(unsigned long long amount) {
     std::stringstream s;
-    if (!__lsan_humanPrint || amount == 0) {
+    if (!getBehaviour().humanPrint() || amount == 0) {
         s << amount << " B";
     } else {
         const std::string sizes[] {"EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"};

@@ -283,7 +283,7 @@ static inline auto printCallstackSizeExceeded(std::ostream & stream) -> std::ost
            << formatter::format<Style::ITALIC>(" to see longer callstacks, increase the value of ")
            << formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << formatter::get<Style::GREYED>
            << " (__lsan_callstackSize)" << formatter::format<Style::ITALIC>(" (currently ")
-           << formatter::clear<Style::GREYED> << __lsan_callstackSize
+           << formatter::clear<Style::GREYED> << getBehaviour().callstackSize()
            << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
     
     return stream;
@@ -366,7 +366,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         if (!info.deleted && callstackHelper::getCallstackType(info.createdCallstack) == callstackHelper::CallstackType::USER) {
             ++count;
             bytes += info.size;
-            if (i < __lsan_leakCount) {
+            if (i < self.behaviour.leakCount()) {
                 if (isATTY()) {
                     stream << "\r                                    \r";
                 }
@@ -388,13 +388,13 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << "Hint:" << formatter::format<Style::GREYED, Style::ITALIC>(" to see more, increase the value of ")
                << "LSAN_LEAK_COUNT" << formatter::get<Style::GREYED> << " (__lsan_leakCount)"
                << formatter::format<Style::ITALIC>(" (currently ") << formatter::clear<Style::GREYED>
-               << __lsan_leakCount << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
+               << self.behaviour.leakCount() << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
     }
     
     if (count == 0) {
         stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
     }
-    if (__lsan_relativePaths && count > 0) {
+    if (self.behaviour.relativePaths() && count > 0) {
         stream << std::endl << printWorkingDirectory;
     }
     stream << maybeShowDeprecationWarnings;
@@ -409,7 +409,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     
     if (count > 0) {
         stream << std::endl << formatter::format<Style::BOLD>("Summary: ");
-        if (i == __lsan_leakCount && i < count) {
+        if (i == self.behaviour.leakCount() && i < count) {
             stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of ";
         }
         stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "

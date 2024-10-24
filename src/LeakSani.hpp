@@ -94,7 +94,7 @@ class LSan final: public ATracker {
      * Loads the user first party regular expression.
      */
     inline void loadUserRegex() {
-        userRegex = generateRegex(__lsan_firstPartyRegex);
+        userRegex = generateRegex(behaviour.firstPartyRegex());
     }
 
 protected:
