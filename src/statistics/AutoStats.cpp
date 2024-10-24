@@ -37,6 +37,7 @@ class AutoStats {
     bool threadRunning = false;
 
     static inline void printer() {
+        // TODO: Condition variable
         while (run) {
             const auto& begin = std::chrono::system_clock::now();
             __lsan_printStats();
@@ -52,8 +53,8 @@ public:
     inline AutoStats() {
         using namespace std::chrono_literals;
 
-        if (getBehaviour().autoStatsActive()) {
-            interval = 1s;
+        if (auto duration = getBehaviour().autoStats()) {
+            interval = std::chrono::duration_cast<std::chrono::microseconds>(*duration);
             statsThread = std::thread(printer);
             threadRunning = true;
         }
