@@ -28,20 +28,64 @@
 
 namespace lsan::behaviour {
 class Behaviour {
-    bool _autoStatsActive;
+    const bool _autoStatsActive = get<bool>("LSAN_AUTO_STATS").value_or(false);
+
+    const std::optional<bool> _humanPrint     = get<bool>("LSAN_HUMAN_PRINT"),
+                              _printCout      = get<bool>("LSAN_PRINT_COUT"),
+                              _printFormatted = get<bool>("LSAN_PRINT_FORMATTED"),
+                              _invalidCrash   = get<bool>("LSAN_INVALID_CRASH"),
+                              _invalidFree    = get<bool>("LSAN_INVALID_FREE"),
+                              _freeNull       = get<bool>("LSAN_FREE_NULL"),
+                              _zeroAllocation = get<bool>("LSAN_ZERO_ALLOCATION"),
+                              _statsActive    = get<bool>("LSAN_STATS_ACTIVE"),
+                              _printExitPoint = get<bool>("LSAN_PRINT_EXIT_POINT"),
+                              _printBinaries  = get<bool>("LSAN_PRINT_BINARIES"),
+                              _printFunctions = get<bool>("LSAN_PRINT_FUNCTIONS"),
+                              _relativePaths  = get<bool>("LSAN_RELATIVE_PATHS");
+
+    const std::optional<std::size_t> _leakCount           = get<std::size_t>("LSAN_LEAK_COUNT"),
+                                     _callstackSize       = get<std::size_t>("LSAN_CALLSTACK_SIZE"),
+                                     _firstPartyThreshold = get<std::size_t>("LSAN_FIRST_PARTY_THRESHOLD");
+
+    const std::optional<const char*> _firstPartyRegex = getVariable("LSAN_FIRST_PARTY_REGEX");
+
+    inline auto statsActiveInternal() const -> bool {
+        return _statsActive ? *_statsActive : __lsan_statsActive;
+    }
+
+#define ENV_OR_API(name)                       \
+inline auto name() const {                     \
+    return _##name ? *_##name : __lsan_##name; \
+}
 
 public:
-    inline Behaviour():
-        _autoStatsActive(get<bool>("LSAN_AUTO_STATS").value_or(false))
-    {}
+    ENV_OR_API(humanPrint)
+    ENV_OR_API(printCout)
+    ENV_OR_API(printFormatted)
+    ENV_OR_API(invalidCrash)
+    ENV_OR_API(invalidFree)
+    ENV_OR_API(freeNull)
+    ENV_OR_API(zeroAllocation)
+    ENV_OR_API(printExitPoint)
+    ENV_OR_API(printBinaries)
+    ENV_OR_API(printFunctions)
+    ENV_OR_API(relativePaths)
+
+    ENV_OR_API(leakCount)
+    ENV_OR_API(callstackSize)
+    ENV_OR_API(firstPartyThreshold)
+
+    ENV_OR_API(firstPartyRegex)
 
     inline auto statsActive() const -> bool {
-        return __lsan_statsActive || autoStatsActive();
+        return statsActiveInternal() || autoStatsActive();
     }
 
     constexpr inline auto autoStatsActive() const -> bool {
         return _autoStatsActive;
     }
+
+#undef ENV_OR_API
 };
 }
 
