@@ -83,8 +83,10 @@ static inline auto getMinMaxAvg(std::deque<std::chrono::nanoseconds> values) -> 
 }
 
 static inline auto operator<<(std::ostream& out, const Timings& timings) -> std::ostream& {
+    using namespace formatter;
+
     if (timings.tracking.empty() || timings.locking.empty() || timings.system.empty() || timings.total.empty()) {
-        return out << formatter::format<formatter::Style::ITALIC>("(Not available)") << std::endl;
+        return out << format<Style::ITALIC>("(Not available)") << std::endl;
     }
     
     const auto& [systemMin, systemMax, systemAvg, systemMed] = getMinMaxAvg(timings.system);
@@ -105,29 +107,37 @@ static inline auto operator<<(std::ostream& out, const Timings& timings) -> std:
                  trackPartMax = (trackingMax.count() / totalMaxD) * 100,
                  trackPartAvg = (trackingAvg / totalAvg) * 100;
 
-    out << "  System time (min, max, avg, med): "
-        << systemMin.count() << " ns (" << sysPartMin << " %), "
-        << systemMax.count() << " ns (" << sysPartMax << " %), "
-        << systemAvg         << " ns (" << sysPartAvg << " %), "
-        << systemMed         << " ns" << std::endl
+    out << "  System time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
+        << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "
 
-        << " Locking time (min, max, avg, med): "
-        << lockingMin.count() << " ns (" << lockPartMin << " %), "
-        << lockingMax.count() << " ns (" << lockPartMax << " %), "
-        << lockingAvg         << " ns (" << lockPartAvg << " %), "
-        << lockingMed         << " ns" << std::endl
+        << get<Style::GREEN>   << systemMin.count() << " ns (" << sysPartMin << " %), " << clear<Style::GREEN>
+        << get<Style::RED>     << systemMax.count() << " ns (" << sysPartMax << " %), " << clear<Style::RED>
+        << get<Style::MAGENTA> << systemAvg         << " ns (" << sysPartAvg << " %), " << clear<Style::MAGENTA>
+        << get<Style::BOLD>    << systemMed         << " ns" << clear<Style::BOLD> << std::endl
 
-        << "Tracking time (min, max, avg, med): "
-        << trackingMin.count() << " ns (" << trackPartMin << " %), "
-        << trackingMax.count() << " ns (" << trackPartMax << " %), "
-        << trackingAvg         << " ns (" << trackPartAvg << " %), "
-        << trackingMed         << " ns" << std::endl
+        << " Locking time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
+        << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "
 
-        << "   Total time (min, max, avg, med): "
-        << totalMin.count() << " ns, "
-        << totalMax.count() << " ns, "
-        << totalAvg         << " ns, "
-        << totalMed         << " ns" << std::endl;
+        << get<Style::GREEN>   << lockingMin.count() << " ns (" << lockPartMin << " %), " << clear<Style::GREEN>
+        << get<Style::RED>     << lockingMax.count() << " ns (" << lockPartMax << " %), " << clear<Style::RED>
+        << get<Style::MAGENTA> << lockingAvg         << " ns (" << lockPartAvg << " %), " << clear<Style::MAGENTA>
+        << get<Style::BOLD>    << lockingMed         << " ns" << clear<Style::BOLD> << std::endl
+
+        << "Tracking time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
+        << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "
+
+        << get<Style::GREEN>   << trackingMin.count() << " ns (" << trackPartMin << " %), " << clear<Style::GREEN>
+        << get<Style::RED>     << trackingMax.count() << " ns (" << trackPartMax << " %), " << clear<Style::RED>
+        << get<Style::MAGENTA> << trackingAvg         << " ns (" << trackPartAvg << " %), " << clear<Style::MAGENTA>
+        << get<Style::BOLD>    << trackingMed         << " ns" << clear<Style::BOLD> << std::endl
+
+        << "   Total time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
+        << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "
+
+        << get<Style::GREEN>   << totalMin.count() << " ns, " << clear<Style::GREEN>
+        << get<Style::RED>     << totalMax.count() << " ns, " << clear<Style::RED>
+        << get<Style::MAGENTA> << totalAvg         << " ns, " << clear<Style::MAGENTA>
+        << get<Style::BOLD>    << totalMed         << " ns" << clear<Style::BOLD> << std::endl;
 
     return out;
 }
