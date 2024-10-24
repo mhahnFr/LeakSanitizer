@@ -56,6 +56,16 @@ Adapt the value of the `INSTALL_PATH` argument to your needs.
 If you have downloaded a release or if you have created a portable build you can simply move the headers and the library
 anywhere you like.
 
+#### Build dependencies
+The LeakSanitizer adheres to the C++17 standard.
+
+Additionally, the following command line tools are needed to successfully build the sanitizer:
+- GNU compatible `make` command line tool
+- The `find` command line tool *(POSIX.1-2001)*
+- The `uname` command line tool *(POSIX.2)*
+
+All dependencies introduced by the [CallstackLibrary][5] are necessary as well (find them [here][11]).
+
 #### Uninstallation
 Uninstall the sanitizer by simply removing its library and its header files from the installation directory.  
 This can be done using the following command:
@@ -248,3 +258,4 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 [8]: #installation
 [9]: https://github.com/mhahnFr/LeakSanitizer/issues/new
 [10]: https://github.com/mhahnFr/LeakSanitizer/pulls
+[11]: https://github.com/mhahnFr/CallstackLibrary/blob/main/README.md#build-dependencies
