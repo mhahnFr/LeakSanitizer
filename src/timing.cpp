@@ -78,44 +78,43 @@ static inline auto operator<<(std::ostream& out, const Timings& timings) -> std:
         return out << formatter::format<formatter::Style::ITALIC>("(Not available)") << std::endl;
     }
     
-    const auto system   = getMinMaxAvg(timings.system);
-    const auto locking  = getMinMaxAvg(timings.locking);
-    const auto tracking = getMinMaxAvg(timings.tracking);
-    const auto total    = getMinMaxAvg(timings.total);
-    
-    const double totalMin = static_cast<double>(std::get<0>(total).count()),
-                 totalMax = static_cast<double>(std::get<1>(total).count()),
-                 totalAvg = std::get<2>(total);
-    
-    const double sysPartMin   = (std::get<0>(system).count() / totalMin) * 100,
-                 sysPartMax   = (std::get<1>(system).count() / totalMax) * 100,
-                 sysPartAvg   = (std::get<2>(system) / totalAvg) * 100,
-                 lockPartMin  = (std::get<0>(locking).count() / totalMin) * 100,
-                 lockPartMax  = (std::get<1>(locking).count() / totalMax) * 100,
-                 lockPartAvg  = (std::get<2>(locking) / totalAvg) * 100,
-                 trackPartMin = (std::get<0>(tracking).count() / totalMin) * 100,
-                 trackPartMax = (std::get<1>(tracking).count() / totalMax) * 100,
-                 trackPartAvg = (std::get<2>(tracking) / totalAvg) * 100;
-    
+    const auto& [systemMin, systemMax, systemAvg, systemMed] = getMinMaxAvg(timings.system);
+    const auto& [lockingMin, lockingMax, lockingAvg, lockingMed] = getMinMaxAvg(timings.locking);
+    const auto& [trackingMin, trackingMax, trackingAvg, trackingMed] = getMinMaxAvg(timings.tracking);
+    const auto& [totalMin, totalMax, totalAvg, totalMed] = getMinMaxAvg(timings.total);
+
+    const double totalMinD = static_cast<double>(totalMin.count()),
+                 totalMaxD = static_cast<double>(totalMax.count());
+
+    const double sysPartMin   = (systemMin.count() / totalMinD) * 100,
+                 sysPartMax   = (systemMax.count() / totalMaxD) * 100,
+                 sysPartAvg   = (systemAvg / totalAvg) * 100,
+                 lockPartMin  = (lockingMin.count() / totalMinD) * 100,
+                 lockPartMax  = (lockingMax.count() / totalMaxD) * 100,
+                 lockPartAvg  = (lockingAvg / totalAvg) * 100,
+                 trackPartMin = (trackingMin.count() / totalMinD) * 100,
+                 trackPartMax = (trackingMax.count() / totalMaxD) * 100,
+                 trackPartAvg = (trackingAvg / totalAvg) * 100;
+
     out << "  System time (min, max, avg): "
-        << std::get<0>(system).count() << " ns (" << sysPartMin << " %), "
-        << std::get<1>(system).count() << " ns (" << sysPartMax << " %), "
-        << std::get<2>(system)         << " ns (" << sysPartAvg << " %)" << std::endl
-    
+        << systemMin.count() << " ns (" << sysPartMin << " %), "
+        << systemMax.count() << " ns (" << sysPartMax << " %), "
+        << systemAvg         << " ns (" << sysPartAvg << " %)" << std::endl
+
         << " Locking time (min, max, avg): " 
-        << std::get<0>(locking).count() << " ns (" << lockPartMin << " %), "
-        << std::get<1>(locking).count() << " ns (" << lockPartMax << " %), "
-        << std::get<2>(locking)         << " ns (" << lockPartAvg << " %)" << std::endl
-    
+        << lockingMin.count() << " ns (" << lockPartMin << " %), "
+        << lockingMax.count() << " ns (" << lockPartMax << " %), "
+        << lockingAvg         << " ns (" << lockPartAvg << " %)" << std::endl
+
         << "Tracking time (min, max, avg): " 
-        << std::get<0>(tracking).count() << " ns (" << trackPartMin << " %), "
-        << std::get<1>(tracking).count() << " ns (" << trackPartMax << " %), "
-        << std::get<2>(tracking)         << " ns (" << trackPartAvg << " %)" << std::endl
-    
+        << trackingMin.count() << " ns (" << trackPartMin << " %), "
+        << trackingMax.count() << " ns (" << trackPartMax << " %), "
+        << trackingAvg         << " ns (" << trackPartAvg << " %)" << std::endl
+
         << "   Total time (min, max, avg): " 
-        << std::get<0>(total).count() << " ns, "
-        << std::get<1>(total).count() << " ns, "
-        << std::get<2>(total)         << " ns" << std::endl;
+        << totalMin.count() << " ns, "
+        << totalMax.count() << " ns, "
+        << totalAvg         << " ns" << std::endl;
     
     return out;
 }
