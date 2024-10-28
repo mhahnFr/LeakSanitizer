@@ -44,7 +44,18 @@ static inline void expectConsume(std::istream& in, char expected, bool skipWhite
     in.get();
 }
 
-static inline auto readString(std::istream& in) -> Value;
+static inline auto readString(std::istream& in) -> Value {
+    expectConsume(in, '"');
+
+    std::string buffer;
+    while (in.peek() != '"') {
+        if (in.peek() == '\\') in.get();
+        buffer += static_cast<char>(in.get());
+    }
+    expectConsume(in, '"');
+    return Value { Value::Type::String, buffer };
+}
+
 static inline auto readArray(std::istream& in) -> Value;
 static inline auto readPrimitive(std::istream& in) -> Value;
 
