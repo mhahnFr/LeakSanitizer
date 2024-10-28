@@ -64,7 +64,7 @@ static inline auto readPrimitive(std::istream& in) -> Value {
     if (buffer == "true" || buffer == "false") {
         return Value { Value::Type::Bool, buffer == "true" };
     } else if (buffer == "null") {
-        return Value { Value::Type::Null };
+        return Value { Value::Type::Null, 0 };
     }
     return Value { Value::Type::Int, std::strtol(buffer.c_str(), nullptr, 10) };
 }
@@ -110,7 +110,7 @@ static inline auto readObject(std::istream& in) -> Object {
 
             default: value = readPrimitive(in); break;
         }
-        toReturn.emplace(std::make_pair(name, value));
+        toReturn.emplace(std::make_pair(std::get<std::string>(name.value), value));
         skipWhitespaces(in);
         if (in.peek() == ',') {
             in.get();
@@ -122,6 +122,6 @@ static inline auto readObject(std::istream& in) -> Object {
 }
 
 auto parse(std::istream& stream) -> Object {
-    throw std::runtime_error("Unimplemented");
+    return readObject(stream);
 }
 }
