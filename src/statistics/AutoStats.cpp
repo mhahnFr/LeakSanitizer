@@ -21,6 +21,8 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 
 #include <lsan_stats.h>
@@ -30,22 +32,27 @@
 namespace lsan {
 namespace {
 class AutoStats {
-    static std::atomic_bool run;
-    static std::chrono::microseconds interval;
+    std::atomic_bool run = true;
+    std::chrono::nanoseconds interval;
 
     std::thread statsThread;
+    std::mutex mutex;
+    std::condition_variable cv;
     bool threadRunning = false;
 
-    static inline void printer() {
-        // TODO: Condition variable
-        while (run) {
+    inline void printer() {
+        std::chrono::nanoseconds sleepTime { 0 };
+        while (true) {
+            std::unique_lock lock { mutex };
+            cv.wait_for(lock, sleepTime);
+            if (!run) {
+                return;
+            }
             const auto& begin = std::chrono::system_clock::now();
             __lsan_printStats();
             __lsan_printFStats();
             const auto& elapsed = std::chrono::system_clock::now() - begin;
-            if (elapsed < interval) {
-                std::this_thread::sleep_for(interval - elapsed);
-            }
+            sleepTime = elapsed < interval ? interval - elapsed : std::chrono::nanoseconds { 0 };
         }
     }
 
@@ -54,22 +61,20 @@ public:
         using namespace std::chrono_literals;
 
         if (auto duration = getBehaviour().autoStats()) {
-            interval = std::chrono::duration_cast<std::chrono::microseconds>(*duration);
-            statsThread = std::thread(printer);
+            interval = *duration;
+            statsThread = std::thread(&AutoStats::printer, this);
             threadRunning = true;
         }
     }
 
     inline ~AutoStats() {
         run = false;
+        cv.notify_all();
         if (threadRunning) {
             statsThread.join();
         }
     }
 };
-
-std::atomic_bool AutoStats::run = true;
-std::chrono::microseconds AutoStats::interval;
 
 static AutoStats autoStats;
 }
