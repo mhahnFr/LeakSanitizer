@@ -56,8 +56,6 @@ static inline auto readString(std::istream& in) -> Value {
     return Value { Value::Type::String, buffer };
 }
 
-static inline auto readArray(std::istream& in) -> Value;
-
 static inline auto readPrimitive(std::istream& in) -> Value {
     std::string buffer;
     while (in.peek() != ',' && in.peek() != ']' && in.peek() != '}') {
@@ -69,6 +67,30 @@ static inline auto readPrimitive(std::istream& in) -> Value {
         return Value { Value::Type::Null };
     }
     return Value { Value::Type::Int, std::strtol(buffer.c_str(), nullptr, 10) };
+}
+
+static inline auto readArray(std::istream& in) -> Value {
+    expectConsume(in, '[');
+    skipWhitespaces(in);
+    auto content = std::vector<Value>();
+    while (in.peek() != ']') {
+        Value value;
+        switch (in.peek()) {
+            case '"': value = readString(in); break;
+            case '{': throw Exception("Nested objects are not supported");
+            case '[': value = readArray(in); break;
+
+            default: value = readPrimitive(in); break;
+        }
+        content.push_back(value);
+        skipWhitespaces(in);
+        if (in.peek() == ',') {
+            in.get();
+            skipWhitespaces(in);
+        }
+    }
+    expectConsume(in, ']');
+    return Value { Value::Type::Array, content };
 }
 
 static inline auto readObject(std::istream& in) -> Object {
