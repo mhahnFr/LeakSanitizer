@@ -29,11 +29,11 @@
 namespace lsan::json {
 struct Value {
     enum class Type {
-        Int, String, Array
+        Int, String, Array, Bool, Null
     };
 
     Type type;
-    std::variant<int, std::vector<Value>, std::string> value;
+    std::variant<long, std::vector<Value>, std::string, bool> value;
 };
 }
 

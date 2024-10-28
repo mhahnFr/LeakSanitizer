@@ -57,7 +57,19 @@ static inline auto readString(std::istream& in) -> Value {
 }
 
 static inline auto readArray(std::istream& in) -> Value;
-static inline auto readPrimitive(std::istream& in) -> Value;
+
+static inline auto readPrimitive(std::istream& in) -> Value {
+    std::string buffer;
+    while (in.peek() != ',' && in.peek() != ']' && in.peek() != '}') {
+        buffer += static_cast<char>(in.get());
+    }
+    if (buffer == "true" || buffer == "false") {
+        return Value { Value::Type::Bool, buffer == "true" };
+    } else if (buffer == "null") {
+        return Value { Value::Type::Null };
+    }
+    return Value { Value::Type::Int, std::strtol(buffer.c_str(), nullptr, 10) };
+}
 
 static inline auto readObject(std::istream& in) -> Object {
     expectConsume(in, '{');
