@@ -22,6 +22,60 @@
 #include "parser.hpp"
 
 namespace lsan::json {
+using Exception = std::runtime_error;
+
+static inline void skipWhitespaces(std::istream& in) {
+    while (std::isspace(in.peek())) {
+        in.get();
+    }
+}
+
+static inline void expect(std::istream& in, char expected, bool skipWhite = true) {
+    if (skipWhite) {
+        skipWhitespaces(in);
+    }
+    if (in.peek() != expected) {
+        throw Exception("Expected different character!");
+    }
+}
+
+static inline void expectConsume(std::istream& in, char expected, bool skipWhite = true) {
+    expect(in, expected, skipWhite);
+    in.get();
+}
+
+static inline auto readString(std::istream& in) -> Value;
+static inline auto readArray(std::istream& in) -> Value;
+static inline auto readPrimitive(std::istream& in) -> Value;
+
+static inline auto readObject(std::istream& in) -> Object {
+    expectConsume(in, '{');
+
+    auto toReturn = std::map<std::string, Value>();
+    skipWhitespaces(in);
+    while (in.peek() != '}') {
+        auto name = readString(in);
+        expectConsume(in, ':');
+        skipWhitespaces(in);
+        Value value;
+        switch (in.peek()) {
+            case '"': value = readString(in); break;
+            case '[': value = readArray(in);  break;
+            case '{': throw Exception("Nested objects are not supported.");
+
+            default: value = readPrimitive(in); break;
+        }
+        toReturn.emplace(std::make_pair(name, value));
+        skipWhitespaces(in);
+        if (in.peek() == ',') {
+            in.get();
+            skipWhitespaces(in);
+        }
+    }
+    expectConsume(in, '}');
+    return Object { toReturn };
+}
+
 auto parse(std::istream& stream) -> Object {
     throw std::runtime_error("Unimplemented");
 }
