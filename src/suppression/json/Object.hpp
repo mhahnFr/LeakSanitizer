@@ -35,7 +35,7 @@ struct Object {
     constexpr inline auto get(const std::string& name) -> std::optional<T> {
         const auto& it = content.find(name);
         if (it != content.end()) {
-            return get<T>(it->second.value);
+            return std::get<T>(it->second.value);
         }
         return std::nullopt;
     }
