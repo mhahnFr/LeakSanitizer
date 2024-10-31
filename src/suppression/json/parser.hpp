@@ -28,6 +28,10 @@
 
 namespace lsan::json {
 auto parse(std::istream& stream) -> Object;
+
+static inline auto parse(std::istream&& stream) -> Object {
+    return parse(stream);
+}
 }
 
 #endif /* parser_hpp */
