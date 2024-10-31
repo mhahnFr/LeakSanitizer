@@ -34,7 +34,7 @@ struct Object {
     inline Object(const ObjectContent& content): content(content) {}
 
     template<typename T>
-    constexpr inline auto get(const std::string& name) -> std::optional<T> {
+    constexpr inline auto get(const std::string& name) const -> std::optional<T> {
         const auto& it = content.find(name);
         if (it != content.end()) {
             return std::get<T>(it->second.value);
@@ -43,11 +43,11 @@ struct Object {
     }
 
     template<ValueType T>
-    constexpr inline auto get(const std::string& name) {
+    constexpr inline auto get(const std::string& name) const {
         return get<typename Trait<T>::Type>(name);
     }
 
-    inline auto getObject(const std::string& name) -> std::optional<Object> {
+    inline auto getObject(const std::string& name) const -> std::optional<Object> {
         if (auto object = get<ValueType::Object>(name)) {
             return Object { *object };
         }

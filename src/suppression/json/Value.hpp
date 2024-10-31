@@ -38,7 +38,7 @@ struct Value {
     > value;
 
     template<ValueType T>
-    constexpr inline auto as() {
+    constexpr inline auto as() const {
         return std::get<typename Trait<T>::Type>(value);
     }
 };
