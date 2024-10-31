@@ -69,6 +69,8 @@ static inline auto readPrimitive(std::istream& in) -> Value {
     return Value { ValueType::Int, std::strtol(buffer.c_str(), nullptr, 10) };
 }
 
+static inline auto readObject(std::istream& in) -> Value;
+
 static inline auto readArray(std::istream& in) -> Value {
     expectConsume(in, '[');
     skipWhitespaces(in);
@@ -77,8 +79,8 @@ static inline auto readArray(std::istream& in) -> Value {
         Value value;
         switch (in.peek()) {
             case '"': value = readString(in); break;
-            case '{': throw Exception("Nested objects are not supported");
-            case '[': value = readArray(in); break;
+            case '[': value = readArray(in);  break;
+            case '{': value = readObject(in); break;
 
             default: value = readPrimitive(in); break;
         }
@@ -93,7 +95,7 @@ static inline auto readArray(std::istream& in) -> Value {
     return Value { ValueType::Array, content };
 }
 
-static inline auto readObject(std::istream& in) -> Object {
+static inline auto readObject(std::istream& in) -> Value {
     expectConsume(in, '{');
 
     auto toReturn = std::map<std::string, Value>();
@@ -106,7 +108,7 @@ static inline auto readObject(std::istream& in) -> Object {
         switch (in.peek()) {
             case '"': value = readString(in); break;
             case '[': value = readArray(in);  break;
-            case '{': throw Exception("Nested objects are not supported.");
+            case '{': value = readObject(in); break;
 
             default: value = readPrimitive(in); break;
         }
@@ -118,10 +120,10 @@ static inline auto readObject(std::istream& in) -> Object {
         }
     }
     expectConsume(in, '}');
-    return Object { toReturn };
+    return { ValueType::Object, toReturn };
 }
 
 auto parse(std::istream& stream) -> Object {
-    return readObject(stream);
+    return readObject(stream).as<ValueType::Object>();
 }
 }
