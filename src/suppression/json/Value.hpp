@@ -22,18 +22,25 @@
 #ifndef Value_hpp
 #define Value_hpp
 
-#include <string>
 #include <variant>
-#include <vector>
+
+#include "Trait.hpp"
+#include "ValueType.hpp"
 
 namespace lsan::json {
 struct Value {
-    enum class Type {
-        Int, String, Array, Bool, Null
-    };
+    ValueType type;
+    std::variant<
+        Trait<ValueType::Int>::Type,
+        Trait<ValueType::Array>::Type,
+        Trait<ValueType::String>::Type,
+        Trait<ValueType::Bool>::Type
+    > value;
 
-    Type type;
-    std::variant<long, std::vector<Value>, std::string, bool> value;
+    template<ValueType T>
+    constexpr inline auto as() {
+        return std::get<typename Trait<T>::Type>(value);
+    }
 };
 }
 
