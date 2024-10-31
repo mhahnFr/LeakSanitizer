@@ -22,6 +22,7 @@
 #ifndef Trait_hpp
 #define Trait_hpp
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -29,6 +30,7 @@
 
 namespace lsan::json {
 struct Value;
+using ObjectContent = std::map<std::string, Value>;
 
 template<ValueType T>
 struct Trait;
@@ -51,7 +53,12 @@ struct Trait<ValueType::String> {
 template<>
 struct Trait<ValueType::Bool> {
     using Type = bool;
-}
+};
+
+template<>
+struct Trait<ValueType::Object> {
+    using Type = ObjectContent;
+};
 }
 
 #endif /* Trait_hpp */

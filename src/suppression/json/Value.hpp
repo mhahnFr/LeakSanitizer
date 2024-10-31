@@ -25,7 +25,6 @@
 #include <variant>
 
 #include "Trait.hpp"
-#include "ValueType.hpp"
 
 namespace lsan::json {
 struct Value {
@@ -34,7 +33,8 @@ struct Value {
         Trait<ValueType::Int>::Type,
         Trait<ValueType::Array>::Type,
         Trait<ValueType::String>::Type,
-        Trait<ValueType::Bool>::Type
+        Trait<ValueType::Bool>::Type,
+        Trait<ValueType::Object>::Type
     > value;
 
     template<ValueType T>

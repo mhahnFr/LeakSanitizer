@@ -24,7 +24,7 @@
 
 namespace lsan::json {
 enum class ValueType {
-    Int, String, Array, Bool, Null
+    Int, String, Array, Bool, Object, Null
 };
 }
 
