@@ -53,7 +53,7 @@ static inline auto readString(std::istream& in) -> Value {
         buffer += static_cast<char>(in.get());
     }
     expectConsume(in, '"');
-    return Value { Value::Type::String, buffer };
+    return Value { ValueType::String, buffer };
 }
 
 static inline auto readPrimitive(std::istream& in) -> Value {
@@ -62,11 +62,11 @@ static inline auto readPrimitive(std::istream& in) -> Value {
         buffer += static_cast<char>(in.get());
     }
     if (buffer == "true" || buffer == "false") {
-        return Value { Value::Type::Bool, buffer == "true" };
+        return Value { ValueType::Bool, buffer == "true" };
     } else if (buffer == "null") {
-        return Value { Value::Type::Null, 0 };
+        return Value { ValueType::Null, 0 };
     }
-    return Value { Value::Type::Int, std::strtol(buffer.c_str(), nullptr, 10) };
+    return Value { ValueType::Int, std::strtol(buffer.c_str(), nullptr, 10) };
 }
 
 static inline auto readArray(std::istream& in) -> Value {
@@ -90,7 +90,7 @@ static inline auto readArray(std::istream& in) -> Value {
         }
     }
     expectConsume(in, ']');
-    return Value { Value::Type::Array, content };
+    return Value { ValueType::Array, content };
 }
 
 static inline auto readObject(std::istream& in) -> Object {
