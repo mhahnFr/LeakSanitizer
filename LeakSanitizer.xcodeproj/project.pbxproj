@@ -36,6 +36,7 @@
 		BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF4368F32AACF04700252E2A /* crashWarner.cpp */; };
 		BF6D854E2CD3C97700316BFB /* ValueType.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D854D2CD3C97700316BFB /* ValueType.hpp */; };
 		BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D854F2CD3C98000316BFB /* Trait.hpp */; };
+		BF6D85542CD3DA9500316BFB /* Exception.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D85532CD3DA9500316BFB /* Exception.hpp */; };
 		BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */; };
 		BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
@@ -81,6 +82,7 @@
 		BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bytePrinter.hpp; sourceTree = "<group>"; };
 		BF6D854D2CD3C97700316BFB /* ValueType.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ValueType.hpp; sourceTree = "<group>"; };
 		BF6D854F2CD3C98000316BFB /* Trait.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Trait.hpp; sourceTree = "<group>"; };
+		BF6D85532CD3DA9500316BFB /* Exception.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Exception.hpp; sourceTree = "<group>"; };
 		BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LeakSani.hpp; sourceTree = "<group>"; };
 		BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeakSani.cpp; sourceTree = "<group>"; };
 		BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsanMisc.cpp; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 				BF3E50612CCFFF2900CB225E /* parser.cpp */,
 				BF6D854D2CD3C97700316BFB /* ValueType.hpp */,
 				BF6D854F2CD3C98000316BFB /* Trait.hpp */,
+				BF6D85532CD3DA9500316BFB /* Exception.hpp */,
 			);
 			path = json;
 			sourceTree = "<group>";
@@ -290,6 +293,7 @@
 				F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */,
 				BF3E505A2CCFF91C00CB225E /* Value.hpp in Headers */,
 				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
+				BF6D85542CD3DA9500316BFB /* Exception.hpp in Headers */,
 				BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */,
 				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
 				BF3E50602CCFFED300CB225E /* parser.hpp in Headers */,

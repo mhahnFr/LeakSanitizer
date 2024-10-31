@@ -21,9 +21,9 @@
 
 #include "parser.hpp"
 
-namespace lsan::json {
-using Exception = std::runtime_error;
+#include "Exception.hpp"
 
+namespace lsan::json {
 static inline void skipWhitespaces(std::istream& in) {
     while (std::isspace(in.peek())) {
         in.get();
@@ -35,7 +35,7 @@ static inline void expect(std::istream& in, char expected, bool skipWhite = true
         skipWhitespaces(in);
     }
     if (in.peek() != expected) {
-        throw Exception("Expected different character!");
+        throw Exception(expected, static_cast<char>(in.peek()), in.tellg());
     }
 }
 
