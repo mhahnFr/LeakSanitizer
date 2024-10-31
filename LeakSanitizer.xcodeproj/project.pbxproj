@@ -39,6 +39,8 @@
 		BF6D85542CD3DA9500316BFB /* Exception.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D85532CD3DA9500316BFB /* Exception.hpp */; };
 		BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */; };
 		BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
+		BFA6CD7C2CD3F3B800959363 /* Suppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */; };
+		BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */; };
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
 		BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC817142BEFB36E00332937 /* TLSTracker.cpp */; };
@@ -88,6 +90,8 @@
 		BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsanMisc.cpp; sourceTree = "<group>"; };
 		BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lsanMisc.hpp; sourceTree = "<group>"; };
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
+		BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Suppression.hpp; sourceTree = "<group>"; };
+		BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Suppression.cpp; sourceTree = "<group>"; };
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
@@ -123,8 +127,8 @@
 		BF3204F22AC5C625004EC77E /* callstacks */ = {
 			isa = PBXGroup;
 			children = (
-				BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */,
 				BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */,
+				BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */,
 			);
 			path = callstacks;
 			sourceTree = "<group>";
@@ -141,6 +145,8 @@
 			isa = PBXGroup;
 			children = (
 				BF3E50562CCFF8E800CB225E /* json */,
+				BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */,
+				BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */,
 			);
 			path = suppression;
 			sourceTree = "<group>";
@@ -163,8 +169,8 @@
 			isa = PBXGroup;
 			children = (
 				BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */,
-				BF23A2E0289ED24200B17349 /* Stats.cpp */,
 				BF23A2E1289ED24200B17349 /* Stats.hpp */,
+				BF23A2E0289ED24200B17349 /* Stats.cpp */,
 			);
 			path = statistics;
 			sourceTree = "<group>";
@@ -172,11 +178,11 @@
 		BF4368F22AACEFFE00252E2A /* crashWarner */ = {
 			isa = PBXGroup;
 			children = (
-				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
 				BF4368F62AACF06F00252E2A /* crash.hpp */,
 				BF4368F72AACF07700252E2A /* warn.hpp */,
-				BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */,
+				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
 				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
+				BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */,
 			);
 			path = crashWarner;
 			sourceTree = "<group>";
@@ -224,19 +230,19 @@
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
 				BF3E50512CCFE7ED00CB225E /* suppression */,
 				BFAFADC528B4FDA40060076C /* formatter.hpp */,
-				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */,
+				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */,
-				BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */,
 				BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */,
-				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
+				BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */,
 				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
-				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
+				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
-				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
+				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
-				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
+				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
 				BFC817152BEFB36E00332937 /* TLSTracker.hpp */,
+				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
 				BFC817182BEFB3C200332937 /* ATracker.hpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
 			);
@@ -246,10 +252,10 @@
 		BFAA94582B6C1E52007FC130 /* signals */ = {
 			isa = PBXGroup;
 			children = (
-				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
-				BFAA94522B6C12FF007FC130 /* signals.cpp */,
+				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
 				BFAA94532B6C12FF007FC130 /* signals.hpp */,
+				BFAA94522B6C12FF007FC130 /* signals.cpp */,
 			);
 			path = signals;
 			sourceTree = "<group>";
@@ -257,8 +263,8 @@
 		BFBCAD8A2ACF611A00C6B69F /* allocations */ = {
 			isa = PBXGroup;
 			children = (
-				BFBF736728832C3300BC4208 /* wrap_malloc.cpp */,
 				BFBF736928832F8100BC4208 /* wrap_malloc.hpp */,
+				BFBF736728832C3300BC4208 /* wrap_malloc.cpp */,
 				BF9623AC2AB36B86005FF2B7 /* interpose.hpp */,
 				BFBCAD892ACF376600C6B69F /* realAlloc.hpp */,
 			);
@@ -270,8 +276,8 @@
 			children = (
 				F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */,
 				F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */,
-				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
 				F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */,
+				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
 			);
 			path = allocators;
 			sourceTree = "<group>";
@@ -293,6 +299,7 @@
 				F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */,
 				BF3E505A2CCFF91C00CB225E /* Value.hpp in Headers */,
 				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
+				BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */,
 				BF6D85542CD3DA9500316BFB /* Exception.hpp in Headers */,
 				BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */,
 				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
@@ -396,6 +403,7 @@
 				BF3E50622CCFFF2900CB225E /* parser.cpp in Sources */,
 				BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */,
 				BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */,
+				BFA6CD7C2CD3F3B800959363 /* Suppression.cpp in Sources */,
 				BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */,
 				BF0F133B29194791008F0FCD /* LeakSani.cpp in Sources */,
 				BF0F133E29194794008F0FCD /* Stats.cpp in Sources */,
