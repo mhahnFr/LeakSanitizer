@@ -163,8 +163,8 @@ static inline auto loadDefaultSuppressions() -> const char* {
 }
 
 static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
-    // TODO: Load the user defined suppression file paths
-    return {};
+    // TODO: Support multiple files
+    return { __lsan_suppressionFile };
 }
 
 auto loadSuppressions() -> std::vector<suppression::Suppression> {
