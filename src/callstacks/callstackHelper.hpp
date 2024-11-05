@@ -23,8 +23,11 @@
 #define callstackHelper_hpp
 
 #include <ostream>
+#include <vector>
 
 #include <callstack.h>
+
+#include "../suppression/Suppression.hpp"
 
 /** This namespace includes the helper functions for the callstacks. */
 namespace lsan::callstackHelper {
@@ -64,6 +67,12 @@ void format(lcs::callstack & callstack, std::ostream & stream);
  */
 static inline void format(lcs::callstack && callstack, std::ostream & out) {
     format(callstack, out);
+}
+
+namespace v2 {
+using Suppressions = std::vector<suppression::Suppression>;
+
+auto isSuppressed(const Suppressions& suppressions, lcs::callstack& callstack) -> bool;
 }
 }
 

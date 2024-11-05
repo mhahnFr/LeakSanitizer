@@ -319,4 +319,11 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
         getInstance().setCallstackSizeExceeded(true);
     }
 }
+
+namespace v2 {
+auto isSuppressed(const Suppressions& suppressions, lcs::callstack& callstack) -> bool {
+    // TODO: Properly implement
+    return false;
+}
+}
 }
