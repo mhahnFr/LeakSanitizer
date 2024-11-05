@@ -20,6 +20,7 @@
  */
 
 #include <filesystem>
+#include <sstream>
 
 #if __has_include(<unistd.h>)
  #include <unistd.h>
@@ -35,6 +36,9 @@
 #include "formatter.hpp"
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
+
+#include "suppression/json/Exception.hpp"
+#include "suppression/json/parser.hpp"
 
 namespace lsan {
 auto getInstance() -> LSan & {
@@ -150,5 +154,23 @@ auto getTracker() -> ATracker& {
         return *tlsTracker;
     }
     return *static_cast<ATracker*>(tlv);
+}
+
+static inline auto loadDefaultSuppressions() -> const char* {
+    // TODO: Gather the default suppressions
+    return "[]";
+}
+
+auto loadSuppressions() -> std::vector<suppression::Suppression> {
+    auto toReturn = std::vector<suppression::Suppression>();
+    try {
+        toReturn.push_back(suppression::Suppression(json::parse(std::istringstream(loadDefaultSuppressions()))));
+    } catch (const json::Exception& e) {
+        using namespace formatter;
+        using namespace std::string_literals;
+
+        getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default suppression file: "s + e.what()) << std::endl;
+    }
+    return toReturn;
 }
 }

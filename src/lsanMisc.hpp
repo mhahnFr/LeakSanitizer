@@ -24,9 +24,12 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "ATracker.hpp"
 #include "LeakSani.hpp"
+
+#include "suppression/Suppression.hpp"
 
 namespace lsan {
 /**
@@ -91,6 +94,8 @@ auto has(const std::string & var) -> bool;
  * @return the tracker to be used
  */
 auto getTracker() -> ATracker&;
+
+auto loadSuppressions() -> std::vector<suppression::Suppression>;
 
 /**
  * Returns the current instance of the statistics object.
