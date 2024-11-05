@@ -20,6 +20,7 @@
  */
 
 #include <filesystem>
+#include <fstream>
 #include <sstream>
 
 #if __has_include(<unistd.h>)
@@ -161,6 +162,11 @@ static inline auto loadDefaultSuppressions() -> const char* {
     return "[]";
 }
 
+static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
+    // TODO: Load the user defined suppression file paths
+    return {};
+}
+
 auto loadSuppressions() -> std::vector<suppression::Suppression> {
     auto toReturn = std::vector<suppression::Suppression>();
     try {
@@ -171,6 +177,26 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
 
         getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default suppression file: "s + e.what()) << std::endl;
     }
+
+    for (const auto& file : getSuppressionFiles()) {
+        auto stream = std::ifstream();
+        stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+
+        try {
+            stream.open(file);
+            toReturn.push_back(suppression::Suppression(json::parse(stream)));
+        } catch (const std::exception& e) {
+            using namespace std::string_literals;
+            using namespace formatter;
+
+            if (stream.is_open()) {
+                stream.close();
+            }
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load suppression file \""s
+                                                                 + file.string() + "\": " + e.what()) << std::endl;
+        }
+    }
+
     return toReturn;
 }
 }
