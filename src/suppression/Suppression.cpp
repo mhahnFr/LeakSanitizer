@@ -42,7 +42,7 @@ Suppression::Suppression(const Object& object):
         if (functionObject.type == ValueType::Object) {
             const auto& theObject = Object(functionObject.as<ValueType::Object>());
             name = *theObject.get<ValueType::String>("name");
-            offset = *theObject.get<ValueType::Int>("offset");
+            offset = theObject.get<ValueType::Int>("offset");
         } else {
             name = functionObject.as<ValueType::String>();
         }
