@@ -184,7 +184,9 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
 
         try {
             stream.open(file);
-            toReturn.push_back(suppression::Suppression(json::parse(stream)));
+            const auto& suppressionObject = json::parse(stream);
+            // TODO: if suppressionObject is array, add all objects as suppressions
+            toReturn.push_back(suppression::Suppression(suppressionObject));
         } catch (const std::exception& e) {
             using namespace std::string_literals;
             using namespace formatter;
