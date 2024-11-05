@@ -189,11 +189,11 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
             using namespace std::string_literals;
             using namespace formatter;
 
-            if (stream.is_open()) {
-                stream.close();
-            }
             getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load suppression file \""s
                                                                  + file.string() + "\": " + e.what()) << std::endl;
+        }
+        if (stream.is_open()) {
+            stream.close();
         }
     }
 
