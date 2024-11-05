@@ -24,13 +24,29 @@
 namespace lsan::suppression {
 using namespace json;
 
+static inline auto getFunctionPair(const std::string& name, const std::optional<long>& offset) -> std::pair<uintptr_t, uintptr_t> {
+    // TODO: FIXME: Properly implement
+    return std::make_pair(0, 0);
+}
+
 Suppression::Suppression(const Object& object):
     name(object.get<ValueType::String>("name").value_or("<unnamed>")),
     size(object.get<ValueType::Int>("size"))
 {
-    /*
-     TODO: Parse in the TBD callstack array
-     It is either only the name (string) or an object with the name (string) and the offset (int)
-     */
+    const auto& functionArray = object.get<ValueType::Array>("functions");
+    topCallstack.reserve(functionArray->size());
+    for (const auto& functionObject : *functionArray) {
+        std::string         name;
+        std::optional<long> offset;
+
+        if (functionObject.type == ValueType::Object) {
+            const auto& theObject = Object(functionObject.as<ValueType::Object>());
+            name = *theObject.get<ValueType::String>("name");
+            offset = *theObject.get<ValueType::Int>("offset");
+        } else {
+            name = functionObject.as<ValueType::String>();
+        }
+        topCallstack.push_back(getFunctionPair(name, offset));
+    }
 }
 }
