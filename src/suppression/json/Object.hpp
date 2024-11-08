@@ -32,6 +32,7 @@ struct Object {
     ObjectContent content;
 
     inline Object(const ObjectContent& content): content(content) {}
+    inline Object(const Value& value): Object(value.as<ValueType::Object>()) {}
 
     template<typename T>
     constexpr inline auto get(const std::string& name) const -> std::optional<T> {
