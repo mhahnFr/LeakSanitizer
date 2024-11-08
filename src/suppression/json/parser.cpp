@@ -96,6 +96,7 @@ static inline auto readArray(std::istream& in) -> Value {
 }
 
 static inline auto readObject(std::istream& in) -> Value {
+    skipWhitespaces(in);
     expectConsume(in, '{');
 
     auto toReturn = std::map<std::string, Value>();
@@ -123,7 +124,14 @@ static inline auto readObject(std::istream& in) -> Value {
     return { ValueType::Object, toReturn };
 }
 
-auto parse(std::istream& stream) -> Object {
-    return readObject(stream).as<ValueType::Object>();
+auto parse(std::istream& in) -> Value {
+    skipWhitespaces(in);
+
+    switch (in.peek()) {
+        case '{': return readObject(in);
+        case '[': return readArray(in);
+
+        default: throw Exception('{', in.peek(), in.tellg());
+    }
 }
 }

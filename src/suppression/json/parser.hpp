@@ -27,10 +27,20 @@
 #include "Object.hpp"
 
 namespace lsan::json {
-auto parse(std::istream& stream) -> Object;
+auto parse(std::istream& stream) -> Value;
 
-static inline auto parse(std::istream&& stream) -> Object {
+static inline auto parse(std::istream&& stream) -> Value {
     return parse(stream);
+}
+
+template<ValueType T>
+constexpr inline auto parse(std::istream& stream) {
+    return parse(stream).as<T>();
+}
+
+template<ValueType T>
+constexpr inline auto parse(std::istream&& stream) {
+    return parse(stream).as<T>();
 }
 }
 
