@@ -323,21 +323,28 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
 namespace v2 {
 auto isSuppressed(const Suppressions& suppressions, lcs::callstack& callstack) -> bool {
     for (const auto& suppression : suppressions) {
-        for (std::size_t i = 0; i + suppression.topCallstack.size() <= callstack->backtraceSize; ++i) {
-            auto matched { false };
-            for (std::size_t j = 0; j < suppression.topCallstack.size(); ++j) {
-                const auto& frameAddress = uintptr_t(callstack->backtrace[i + j]);
-                const auto& range = suppression.topCallstack[j];
-                if (frameAddress >= range.first && frameAddress <= range.second) {
-                    matched = true;
-                } else {
-                    matched = false;
-                    break;
-                }
+        if (isSuppressed(suppression, callstack)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& callstack) -> bool {
+    for (std::size_t i = 0; i + suppression.topCallstack.size() <= callstack->backtraceSize; ++i) {
+        auto matched { false };
+        for (std::size_t j = 0; j < suppression.topCallstack.size(); ++j) {
+            const auto& frameAddress = uintptr_t(callstack->backtrace[i + j]);
+            const auto& range = suppression.topCallstack[j];
+            if (frameAddress >= range.first && frameAddress <= range.second) {
+                matched = true;
+            } else {
+                matched = false;
+                break;
             }
-            if (matched) {
-                return true;
-            }
+        }
+        if (matched) {
+            return true;
         }
     }
     return false;

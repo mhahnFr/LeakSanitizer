@@ -73,6 +73,7 @@ namespace v2 {
 using Suppressions = std::vector<suppression::Suppression>;
 
 auto isSuppressed(const Suppressions& suppressions, lcs::callstack& callstack) -> bool;
+auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& callstack) -> bool;
 }
 }
 
