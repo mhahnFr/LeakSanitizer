@@ -161,7 +161,6 @@ static inline auto loadDefaultSuppressions() -> const char* {
     // TODO: Gather the default suppressions
     return R"({
 "name": "<generated>",
-"size": 42,
 "functions": [
     { "name": "_objc_init", "offset": 675 }
 ]

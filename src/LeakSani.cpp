@@ -346,6 +346,18 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
+static inline auto isSuppressed(const callstackHelper::v2::Suppressions& suppressions, const MallocInfo& info) -> bool {
+    for (const auto& suppression : suppressions) {
+        if (suppression.size && *suppression.size != info.size) {
+            continue;
+        }
+        if (callstackHelper::v2::isSuppressed(suppression, info.createdCallstack)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     using formatter::Style;
     
@@ -357,13 +369,14 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                 bytes = 0,
                 count = 0,
                 total = self.infos.size();
+    const auto& suppressions = loadSuppressions();
     for (auto & [ptr, info] : self.infos) {
         if (isATTY()) {
             char buffer[7] {};
             std::snprintf(buffer, 7, "%05.2f", static_cast<double>(j) / total * 100);
             stream << "\rCollecting the leaks: " << formatter::format<Style::BOLD>(buffer) << " %";
         }
-        if (!info.deleted && callstackHelper::getCallstackType(info.createdCallstack) == callstackHelper::CallstackType::USER) {
+        if (!info.deleted && !isSuppressed(suppressions, info)) {
             ++count;
             bytes += info.size;
             if (i < __lsan_leakCount) {
