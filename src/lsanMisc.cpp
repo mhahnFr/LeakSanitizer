@@ -159,12 +159,21 @@ auto getTracker() -> ATracker& {
 
 static inline auto loadDefaultSuppressions() -> const char* {
     // TODO: Gather the default suppressions
-    return "[]";
+    return R"({
+"name": "<generated>",
+"size": 42,
+"functions": [
+    { "name": "_objc_init", "offset": 675 }
+]
+})";
 }
 
 static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
     // TODO: Support multiple files
-    return { __lsan_suppressionFile };
+    if (__lsan_suppressionFile != nullptr) {
+        return { __lsan_suppressionFile };
+    }
+    return {};
 }
 
 auto loadSuppressions() -> std::vector<suppression::Suppression> {
