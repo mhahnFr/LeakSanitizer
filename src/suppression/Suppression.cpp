@@ -21,12 +21,23 @@
 
 #include "Suppression.hpp"
 
+#include <cassert>
+#include <dlfcn.h>
+
 namespace lsan::suppression {
 using namespace json;
 
 static inline auto getFunctionPair(const std::string& name, const std::optional<long>& offset) -> std::pair<uintptr_t, uintptr_t> {
     // TODO: FIXME: Properly implement
-    return std::make_pair(0, 0);
+
+    const auto& addr = dlsym(RTLD_DEFAULT, name.c_str());
+    assert(addr != nullptr);
+    if (offset) {
+        const auto& rangeAddr = uintptr_t(addr) + *offset;
+        return std::make_pair(rangeAddr, rangeAddr);
+    }
+    const auto& begin = uintptr_t(addr);
+    return std::make_pair(begin, begin + 200); // FIXME: Length
 }
 
 Suppression::Suppression(const Object& object):
