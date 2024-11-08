@@ -159,12 +159,20 @@ auto getTracker() -> ATracker& {
 
 static inline auto loadDefaultSuppressions() -> const char* {
     // TODO: Gather the default suppressions
-    return R"({
-"name": "<generated>",
-"functions": [
+    return R"([
+{
+  "name": "<generated>",
+  "functions": [
     { "name": "_objc_init", "offset": 675 }
-]
-})";
+  ]
+},
+{
+  "name": "<generated 2>",
+  "functions": [
+    { "name": "_libxpc_initializer", "offset": 1009 }
+  ]
+}
+])";
 }
 
 static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
@@ -178,7 +186,14 @@ static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
 auto loadSuppressions() -> std::vector<suppression::Suppression> {
     auto toReturn = std::vector<suppression::Suppression>();
     try {
-        toReturn.push_back(suppression::Suppression(json::parse(std::istringstream(loadDefaultSuppressions()))));
+        const auto& json = json::parse(std::istringstream(loadDefaultSuppressions()));
+        if (json.is(json::ValueType::Array)) {
+            for (const auto& object : json.as<json::ValueType::Array>()) {
+                toReturn.push_back(json::Object(object));
+            }
+        } else {
+            toReturn.push_back(json::Object(json));
+        }
     } catch (const json::Exception& e) {
         using namespace formatter;
         using namespace std::string_literals;
@@ -193,8 +208,13 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
         try {
             stream.open(file);
             const auto& suppressionObject = json::parse(stream);
-            // TODO: if suppressionObject is array, add all objects as suppressions
-            toReturn.push_back(suppression::Suppression(suppressionObject));
+            if (suppressionObject.is(json::ValueType::Array)) {
+                for (const auto& object : suppressionObject.as<json::ValueType::Array>()) {
+                    toReturn.push_back(json::Object(object));
+                }
+            } else {
+                toReturn.push_back(json::Object(suppressionObject));
+            }
         } catch (const std::exception& e) {
             using namespace std::string_literals;
             using namespace formatter;
