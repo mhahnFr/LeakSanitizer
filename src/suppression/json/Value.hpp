@@ -41,6 +41,10 @@ struct Value {
     constexpr inline auto as() const {
         return std::get<typename Trait<T>::Type>(value);
     }
+
+    constexpr inline auto is(ValueType type) const -> bool {
+        return Value::type == type;
+    }
 };
 }
 
