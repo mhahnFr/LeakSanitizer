@@ -298,7 +298,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
         
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
-        } else if (firstHit && isFirstParty(binaryFile)) {
+        } else if (firstHit && (isFirstParty(binaryFile) || isTotallyIgnored(binaryFile))) {
             stream << formatter::get<Style::GREYED>
                    << formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
             formatShared<Style::GREYED>(frames[i], stream);
