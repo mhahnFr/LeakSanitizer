@@ -51,7 +51,7 @@ Suppression::Suppression(const Object& object):
         std::optional<long> offset;
 
         if (functionObject.type == ValueType::Object) {
-            const auto& theObject = Object(functionObject.as<ValueType::Object>());
+            const auto& theObject = Object(functionObject);
             name = *theObject.get<ValueType::String>("name");
             offset = theObject.get<ValueType::Int>("offset");
         } else {
