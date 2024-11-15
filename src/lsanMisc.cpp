@@ -163,13 +163,13 @@ static inline auto loadDefaultSuppressions() -> const char* {
 {
   "name": "<generated>",
   "functions": [
-    { "name": "_objc_init", "offset": 675 }
+    { "name": "__objc_init", "offset": 675 }
   ]
 },
 {
   "name": "<generated 2>",
   "functions": [
-    { "name": "_libxpc_initializer", "offset": 1009 }
+    { "name": "__libxpc_initializer", "offset": 1009 }
   ]
 }
 ])";

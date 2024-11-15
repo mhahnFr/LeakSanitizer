@@ -19,25 +19,23 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Suppression.hpp"
+#include <functionInfo/functionInfo.h>
 
-#include <cassert>
-#include <dlfcn.h>
+#include "Suppression.hpp"
 
 namespace lsan::suppression {
 using namespace json;
 
-static inline auto getFunctionPair(const std::string& name, const std::optional<long>& offset) -> std::pair<uintptr_t, uintptr_t> {
-    // TODO: FIXME: Properly implement
-
-    const auto& addr = dlsym(RTLD_DEFAULT, name.c_str());
-    assert(addr != nullptr);
-    if (offset) {
-        const auto& rangeAddr = uintptr_t(addr) + *offset;
-        return std::make_pair(rangeAddr, rangeAddr);
+static inline auto getFunctionPair(const std::string& name, const std::optional<long>& offset) -> std::pair<uintptr_t, std::size_t> {
+    const auto& result = functionInfo_load(name.c_str());
+    if (!result.found) {
+        throw std::runtime_error("Function '" + name + "' not found");
     }
-    const auto& begin = uintptr_t(addr);
-    return std::make_pair(begin, begin + 200); // FIXME: Length
+    if (offset) {
+        const auto& offsetted = result.begin + *offset;
+        return std::make_pair(offsetted, offsetted);
+    }
+    return std::make_pair(result.begin, result.length);
 }
 
 Suppression::Suppression(const Object& object):

@@ -39,7 +39,7 @@ struct Suppression {
     std::string name;
     std::optional<std::size_t> size;
 
-    std::vector<std::pair<uintptr_t, uintptr_t>> topCallstack;
+    std::vector<std::pair<uintptr_t, std::size_t>> topCallstack;
 
     Suppression(const json::Object& object);
 };
