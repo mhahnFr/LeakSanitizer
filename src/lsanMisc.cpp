@@ -167,6 +167,31 @@ static inline auto loadDefaultSuppressions() -> const char* {
   ]
 },
 {
+  "functions": [
+    { "name": "_libSystem_initializer", "offset": 244 }
+  ]
+},
+{
+  "functions": [
+    { "name": "_libSystem_initializer", "offset": 260 }
+  ]
+},
+{
+  "functions": [
+    { "name": "_libSystem_initializer", "offset": 276 }
+  ]
+},
+{
+  "functions": [
+    { "name": "___smakebuf", "offset": 384 }
+  ]
+},
+{
+  "functions": [
+    { "name": "-[NSApplication run]", "offset": 603 }
+  ]
+},
+{
   "name": "<generated 2>",
   "functions": [
     { "name": "__libxpc_initializer", "offset": 1009 }
