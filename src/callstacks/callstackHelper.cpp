@@ -336,7 +336,7 @@ auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& c
         for (std::size_t j = 0; j < suppression.topCallstack.size(); ++j) {
             const auto& frameAddress = uintptr_t(callstack->backtrace[i + j]);
             const auto& range = suppression.topCallstack[j];
-            if (frameAddress >= range.first && frameAddress <= range.second) {
+            if (frameAddress >= range.first && frameAddress <= range.first + range.second) {
                 matched = true;
             } else {
                 matched = false;

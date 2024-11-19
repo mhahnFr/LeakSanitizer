@@ -32,8 +32,7 @@ static inline auto getFunctionPair(const std::string& name, const std::optional<
         throw std::runtime_error("Function '" + name + "' not found");
     }
     if (offset) {
-        const auto& offsetted = result.begin + *offset;
-        return std::make_pair(offsetted, offsetted);
+        return std::make_pair(result.begin + *offset, 0);
     }
     return std::make_pair(result.begin, result.length);
 }
