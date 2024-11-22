@@ -43,6 +43,7 @@
 		BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */; };
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
+		BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */; };
 		BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC817142BEFB36E00332937 /* TLSTracker.cpp */; };
 		BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817152BEFB36E00332937 /* TLSTracker.hpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
@@ -95,6 +96,7 @@
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
+		BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FunctionNotFoundException.hpp; sourceTree = "<group>"; };
 		BFBCAD892ACF376600C6B69F /* realAlloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = realAlloc.hpp; sourceTree = "<group>"; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				BF3E50562CCFF8E800CB225E /* json */,
 				BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */,
 				BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */,
+				BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */,
 			);
 			path = suppression;
 			sourceTree = "<group>";
@@ -292,6 +295,7 @@
 				F16901522C403EF200EED0AE /* utils.hpp in Headers */,
 				BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */,
 				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
+				BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */,
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
 				F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */,
 				BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */,

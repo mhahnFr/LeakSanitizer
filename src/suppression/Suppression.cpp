@@ -21,6 +21,7 @@
 
 #include <functionInfo/functionInfo.h>
 
+#include "FunctionNotFoundException.hpp"
 #include "Suppression.hpp"
 
 namespace lsan::suppression {
@@ -29,7 +30,7 @@ using namespace json;
 static inline auto getFunctionPair(const std::string& name, const std::optional<long>& offset) -> std::pair<uintptr_t, std::size_t> {
     const auto& result = functionInfo_load(name.c_str());
     if (!result.found) {
-        throw std::runtime_error("Function '" + name + "' not found");
+        throw FunctionNotFoundException(name);
     }
     if (offset) {
         return std::make_pair(result.begin + *offset, 0);
