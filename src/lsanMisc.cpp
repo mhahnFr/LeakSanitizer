@@ -38,6 +38,8 @@
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 
+#include "suppression/FunctionNotFoundException.hpp"
+#include "suppression/Suppression.hpp"
 #include "suppression/json/Exception.hpp"
 #include "suppression/json/parser.hpp"
 
@@ -208,17 +210,28 @@ static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
     return {};
 }
 
+static inline void loadSuppressions(std::vector<suppression::Suppression>& content, const json::Value& object) {
+    if (object.is(json::ValueType::Array)) {
+        for (const auto& object : object.as<json::ValueType::Array>()) {
+            try {
+                content.push_back(json::Object(object));
+            } catch (const suppression::FunctionNotFoundException& e) {
+                using namespace formatter;
+                // TODO: If verbose
+                getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
+                                                                     + "\" ignored: Function \"" + e.getFunctionName()
+                                                                     + "\" not loaded.") << std::endl;
+            }
+        }
+    } else {
+        content.push_back(json::Object(object));
+    }
+}
+
 auto loadSuppressions() -> std::vector<suppression::Suppression> {
     auto toReturn = std::vector<suppression::Suppression>();
     try {
-        const auto& json = json::parse(std::istringstream(loadDefaultSuppressions()));
-        if (json.is(json::ValueType::Array)) {
-            for (const auto& object : json.as<json::ValueType::Array>()) {
-                toReturn.push_back(json::Object(object));
-            }
-        } else {
-            toReturn.push_back(json::Object(json));
-        }
+        loadSuppressions(toReturn, json::parse(std::istringstream(loadDefaultSuppressions())));
     } catch (const std::exception& e) {
         using namespace formatter;
         using namespace std::string_literals;
@@ -232,14 +245,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
 
         try {
             stream.open(file);
-            const auto& suppressionObject = json::parse(stream);
-            if (suppressionObject.is(json::ValueType::Array)) {
-                for (const auto& object : suppressionObject.as<json::ValueType::Array>()) {
-                    toReturn.push_back(json::Object(object));
-                }
-            } else {
-                toReturn.push_back(json::Object(suppressionObject));
-            }
+            loadSuppressions(toReturn, json::parse(stream));
         } catch (const std::exception& e) {
             using namespace std::string_literals;
             using namespace formatter;
