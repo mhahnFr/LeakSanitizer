@@ -219,7 +219,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
         } else {
             toReturn.push_back(json::Object(json));
         }
-    } catch (const json::Exception& e) {
+    } catch (const std::exception& e) {
         using namespace formatter;
         using namespace std::string_literals;
 
