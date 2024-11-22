@@ -165,7 +165,7 @@ static inline auto loadDefaultSuppressions() -> const char* {
 {
   "name": "<generated>",
   "functions": [
-    { "name": "__objc_init", "offset": 675 }
+    { "name": "__objc_init", "offset": 675, "library": "/usr/lib/libobjc.A.dylib" }
   ]
 },
 {

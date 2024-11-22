@@ -27,8 +27,10 @@
 namespace lsan::suppression {
 using namespace json;
 
-auto Suppression::getFunctionPair(const std::string& name, const std::optional<long>& offset) -> std::pair<uintptr_t, std::size_t> {
-    const auto& result = functionInfo_load(name.c_str());
+auto Suppression::getFunctionPair(const std::string& name,
+                                  const std::optional<long>& offset,
+                                  const std::optional<std::string>& library) -> std::pair<uintptr_t, std::size_t> {
+    const auto& result = functionInfo_loadHint(name.c_str(), library ? library->c_str() : nullptr);
     if (!result.found) {
         throw FunctionNotFoundException(name, Suppression::name);
     }
@@ -47,15 +49,17 @@ Suppression::Suppression(const Object& object):
     for (const auto& functionObject : *functionArray) {
         std::string         name;
         std::optional<long> offset;
+        std::optional<std::string> libraryName;
 
         if (functionObject.type == ValueType::Object) {
             const auto& theObject = Object(functionObject);
-            name = *theObject.get<ValueType::String>("name");
+            name = theObject.get<ValueType::String>("name").value();
             offset = theObject.get<ValueType::Int>("offset");
+            libraryName = theObject.get<ValueType::String>("library");
         } else {
             name = functionObject.as<ValueType::String>();
         }
-        topCallstack.push_back(getFunctionPair(name, offset));
+        topCallstack.push_back(getFunctionPair(name, offset, libraryName));
     }
 }
 }
