@@ -203,11 +203,15 @@ static inline auto loadDefaultSuppressions() -> const char* {
 }
 
 static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
-    // TODO: Support multiple files
+    auto toReturn = std::vector<std::filesystem::path>();
     if (__lsan_suppressionFile != nullptr) {
-        return { __lsan_suppressionFile };
+        auto stream = std::istringstream(__lsan_suppressionFile);
+        std::string s;
+        while (std::getline(stream, s, ':')) {
+            toReturn.push_back(s);
+        }
     }
-    return {};
+    return toReturn;
 }
 
 static inline void loadSuppressions(std::vector<suppression::Suppression>& content, const json::Value& object) {
