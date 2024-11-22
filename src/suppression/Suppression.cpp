@@ -44,9 +44,9 @@ Suppression::Suppression(const Object& object):
     name(object.get<ValueType::String>("name").value_or("<unnamed>")),
     size(object.get<ValueType::Int>("size"))
 {
-    const auto& functionArray = object.get<ValueType::Array>("functions");
-    topCallstack.reserve(functionArray->size());
-    for (const auto& functionObject : *functionArray) {
+    const auto functionArray = object.get<ValueType::Array>("functions").value();
+    topCallstack.reserve(functionArray.size());
+    for (const auto& functionObject : functionArray) {
         std::string         name;
         std::optional<long> offset;
         std::optional<std::string> libraryName;
