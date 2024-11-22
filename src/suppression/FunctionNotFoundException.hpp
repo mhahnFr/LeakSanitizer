@@ -27,8 +27,22 @@
 
 namespace lsan::suppression {
 class FunctionNotFoundException: public std::runtime_error {
+    const std::string functionName;
+    const std::string suppressionName;
+
 public:
-    inline FunctionNotFoundException(const std::string& function): std::runtime_error("Function '" + function + "' not found") {}
+    inline FunctionNotFoundException(const std::string& function, const std::string& suppressionName):
+        std::runtime_error("Function '" + function + "' not found for suppression '" + suppressionName + "'"),
+        functionName(function),
+        suppressionName(suppressionName) {}
+
+    constexpr inline auto getFunctionName() const -> const std::string& {
+        return functionName;
+    }
+
+    constexpr inline auto getSuppressionName() const -> const std::string& {
+        return suppressionName;
+    }
 };
 }
 
