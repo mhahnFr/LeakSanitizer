@@ -42,6 +42,9 @@ struct Suppression {
     std::vector<std::pair<uintptr_t, std::size_t>> topCallstack;
 
     Suppression(const json::Object& object);
+
+private:
+    auto getFunctionPair(const std::string& name, const std::optional<long>& offset) -> std::pair<uintptr_t, std::size_t>;
 };
 }
 
