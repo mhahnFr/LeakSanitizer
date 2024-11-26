@@ -118,7 +118,7 @@ constexpr static inline void printer(const std::string&                     mess
 template<typename F>
 static inline void withCallstack(const F & function) {
     auto callstack = lcs::callstack();
-    if (callstackHelper::getCallstackType(callstack) == callstackHelper::CallstackType::USER) {
+    if (callstackHelper::v2::isSuppressed(lsan::getSuppressions(), callstack)) {
         function(callstack);
     }
 }
