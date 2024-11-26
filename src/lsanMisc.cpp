@@ -221,10 +221,12 @@ static inline void loadSuppressions(std::vector<suppression::Suppression>& conte
                 content.push_back(json::Object(object));
             } catch (const suppression::FunctionNotFoundException& e) {
                 using namespace formatter;
-                // TODO: If verbose
-                getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
-                                                                     + "\" ignored: Function \"" + e.getFunctionName()
-                                                                     + "\" not loaded.") << std::endl;
+
+                if (__lsan_suppressionDevelopersMode) {
+                    getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
+                                                                         + "\" ignored: Function \"" + e.getFunctionName()
+                                                                         + "\" not loaded.") << std::endl;
+                }
             }
         }
     } else {
