@@ -296,6 +296,13 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
     return out;
 }
 
+auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
+    if (!suppressions) {
+        suppressions = loadSuppressions();
+    }
+    return *suppressions;
+}
+
 /**
  * Prints a deprecation notice using the given information.
  *
@@ -370,7 +377,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                 bytes = 0,
                 count = 0,
                 total = self.infos.size();
-    const auto& suppressions = loadSuppressions();
+    const auto& suppressions = self.getSuppressions();
     for (auto & [ptr, info] : self.infos) {
         if (isATTY()) {
             char buffer[7] {};

@@ -134,6 +134,10 @@ static inline auto printFormatted() -> bool {
 static inline auto getOutputStream() -> std::ostream & {
     return __lsan_printCout ? std::cout : std::clog;
 }
+
+static inline auto getSuppressions() -> const std::vector<suppression::Suppression>& {
+    return getInstance().getSuppressions();
+}
 }
 
 #endif /* lsanMisc_hpp */

@@ -30,6 +30,7 @@
 #include <regex>
 #include <set>
 #include <utility>
+#include <vector>
 
 #include <pthread.h>
 #include <lsan_internals.h>
@@ -43,6 +44,7 @@
 
 #include "allocations/realAlloc.hpp"
 #include "statistics/Stats.hpp"
+#include "suppression/Suppression.hpp"
 
 namespace lsan {
 /**
@@ -59,6 +61,7 @@ class LSan final: public ATracker {
     std::optional<std::optional<std::regex>> userRegex;
     /** The user regex error message.                                                   */
     std::optional<std::string> userRegexError;
+    std::optional<std::vector<suppression::Suppression>> suppressions;
     /** The registered thread-local allocation trackers.                                */
     std::set<ATracker*> tlsTrackers;
     /** The mutex to manage the access to the registered thread-local trackers.         */
@@ -200,7 +203,9 @@ public:
         }
         return userRegex.value();
     }
-    
+
+    auto getSuppressions() -> const std::vector<suppression::Suppression>&;
+
     /**
      * Returns the mutex for the allocations and tracking.
      *
