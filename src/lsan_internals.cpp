@@ -149,3 +149,4 @@ std::size_t __lsan_firstPartyThreshold = getSize_t("LSAN_FIRST_PARTY_THRESHOLD")
 
 const char * __lsan_firstPartyRegex = getVariable("LSAN_FIRST_PARTY_REGEX").value_or(nullptr);
 const char* __lsan_suppressionFile = getVariable("LSAN_SUPPRESSION_FILE").value_or(nullptr);
+bool __lsan_suppressionDevelopersMode = getBool("LSAN_SUPPRESSION_DEVELOPER").value_or(false);
