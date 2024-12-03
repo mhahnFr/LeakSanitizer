@@ -49,11 +49,16 @@ static inline void format(lcs::callstack && callstack, std::ostream & out) {
     format(callstack, out);
 }
 
-namespace v2 {
-using Suppressions = std::vector<suppression::Suppression>;
-
-auto isSuppressed(const Suppressions& suppressions, lcs::callstack& callstack) -> bool;
 auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& callstack) -> bool;
+
+template<typename It>
+constexpr inline auto isSuppressed(It suppBegin, It suppEnd, lcs::callstack& callstack) -> bool {
+    for (; suppBegin != suppEnd; ++suppBegin) {
+        if (isSuppressed(*suppBegin, callstack)) {
+            return true;
+        }
+    }
+    return false;
 }
 }
 

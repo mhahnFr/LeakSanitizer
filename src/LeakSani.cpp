@@ -353,12 +353,13 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
-static inline auto isSuppressed(const callstackHelper::v2::Suppressions& suppressions, const MallocInfo& info) -> bool {
+template<typename T>
+static inline constexpr auto isSuppressed(const T& suppressions, const MallocInfo& info) -> bool {
     for (const auto& suppression : suppressions) {
         if (suppression.size && *suppression.size != info.size) {
             continue;
         }
-        if (callstackHelper::v2::isSuppressed(suppression, info.createdCallstack)) {
+        if (callstackHelper::isSuppressed(suppression, info.createdCallstack)) {
             return true;
         }
     }
