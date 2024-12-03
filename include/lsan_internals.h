@@ -68,7 +68,7 @@ extern bool __lsan_printFormatted;
  *
  * @since 1.1
  */
-DEPRECATED("Since version 1.8 this is no longer supported")
+LSAN_DEPRECATED("Since version 1.8 this is no longer supported")
 extern bool __lsan_printLicense;
 
 /**
@@ -80,7 +80,7 @@ extern bool __lsan_printLicense;
  *
  * @since 1.4
  */
-DEPRECATED("Since version 1.8 this is no longer supported")
+LSAN_DEPRECATED("Since version 1.8 this is no longer supported")
 extern bool __lsan_printWebsite;
 
 /**
@@ -130,7 +130,7 @@ extern bool __lsan_zeroAllocation;
  *
  * @since 1.2
  */
-DEPRECATED("Since v1.5, replaced by __lsan_statsActive")
+LSAN_DEPRECATED("Since v1.5, replaced by __lsan_statsActive")
 extern bool __lsan_trackMemory;
 
 /**
