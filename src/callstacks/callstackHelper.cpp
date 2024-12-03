@@ -174,31 +174,6 @@ static inline auto isFirstParty(const char* file) -> bool {
     return callstack_autoClearCaches ? isFirstPartyCore(file) : isFirstPartyCached(file);
 }
 
-auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
-    const auto& frames = callstack_autoClearCaches ? callstack_getBinaries(callstack)
-                                                   : callstack_getBinariesCached(callstack);
-    if (frames == nullptr) return CallstackType::USER;
-
-    std::size_t firstPartyCount = 0;
-    const auto frameCount = callstack_getFrameCount(callstack);
-    for (std::size_t i = 0; i < frameCount; ++i) {
-        const auto binaryFile = frames[i].binaryFile;
-        
-        if (binaryFile == nullptr || frames[i].binaryFileIsSelf) {
-            continue;
-        } else if (isTotallyIgnored(binaryFile)) {
-            return CallstackType::HARD_IGNORE;
-        } else if (isFirstParty(binaryFile)) {
-            if (++firstPartyCount > __lsan_firstPartyThreshold) {
-                return CallstackType::FIRST_PARTY_ORIGIN;
-            }
-        } else {
-            return CallstackType::USER;
-        }
-    }
-    return CallstackType::FIRST_PARTY;
-}
-
 /**
  * @brief Returns the name of the binary file of the given callstack frame.
  *
