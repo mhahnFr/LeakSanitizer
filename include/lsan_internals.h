@@ -235,7 +235,7 @@ extern size_t __lsan_firstPartyThreshold;
 LSAN_DEPRECATED("Since version 1.11 this is no longer supported")
 extern const char * __lsan_firstPartyRegex;
 
-extern const char* __lsan_suppressionFile; // FIXME: Will not be part of the C API!
+extern const char* __lsan_suppressionFiles; // FIXME: Will not be part of the C API!
 extern bool __lsan_suppressionDevelopersMode; // FIXME: Will not be part of the C API!
 
 #ifdef __cplusplus

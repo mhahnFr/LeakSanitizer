@@ -171,8 +171,8 @@ static inline auto loadDefaultSuppressions() -> const char* {
 
 static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
     auto toReturn = std::vector<std::filesystem::path>();
-    if (__lsan_suppressionFile != nullptr) {
-        auto stream = std::istringstream(__lsan_suppressionFile);
+    if (__lsan_suppressionFiles != nullptr) {
+        auto stream = std::istringstream(__lsan_suppressionFiles);
         std::string s;
         while (std::getline(stream, s, ':')) {
             toReturn.push_back(s);
