@@ -120,14 +120,14 @@ inline auto getFrom(const char* value) -> std::optional<std::chrono::nanoseconds
         return std::chrono::microseconds(count);
     } else if (strcmp(ptr, "ms") == 0) {
         return std::chrono::milliseconds(count);
-    } else if (strcmp(ptr, "s") == 0) {
+    } else if (strcmp(ptr, "s") == 0 || *ptr == '\0') {
         return std::chrono::seconds(count);
     } else if (strcmp(ptr, "m") == 0) {
         return std::chrono::minutes(count);
     } else if (strcmp(ptr, "h") == 0) {
         return std::chrono::hours(count);
     }
-    // TODO: Default interpretation
+
     return std::nullopt;
 }
 }
