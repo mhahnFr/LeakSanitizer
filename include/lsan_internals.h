@@ -130,7 +130,7 @@ extern bool __lsan_zeroAllocation;
  *
  * @since 1.2
  */
-LSAN_DEPRECATED("Since v1.5, replaced by __lsan_statsActive")
+LSAN_DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
 extern bool __lsan_trackMemory;
 
 /**
