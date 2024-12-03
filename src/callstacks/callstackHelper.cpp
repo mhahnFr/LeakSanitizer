@@ -20,7 +20,6 @@
  */
 
 #include <map>
-#include <regex>
 #include <string>
 
 #include <lsan_internals.h>
@@ -39,8 +38,6 @@ namespace lsan::callstackHelper {
  * An enumeration containing the currently known classifications of a binary file path.
  */
 enum class Classification {
-    /** Indicates the file path should be ignored. */
-    ignored,
     /** Indicates the file path is first party.    */
     firstParty,
     /** Indicates the file path is user-defined.   */
@@ -49,18 +46,6 @@ enum class Classification {
 
 /** Caches the classifications of the file paths. */
 static std::map<const char*, Classification> cache;
-
-/**
- * Returns whether the given binary file name should be ignored totally.
- *
- * @param file the binary file name to be checked
- * @return whether to totally ignore the binary
- */
-static inline auto isTotallyIgnoredCore(const std::string& file) -> bool {
-    // So far totally ignored: Everything Objective-C and Swift (using ARC -> no leak).
-    return file.find("libobjc.A.dylib")    != std::string::npos
-        || file.rfind("/usr/lib/swift", 0) != std::string::npos;
-}
 
 /**
  * Returns whether the given binary file name represents a first party
@@ -82,9 +67,7 @@ static inline auto isFirstPartyCore(const std::string& file) -> bool {
  * @return the classification of the file name
  */
 static inline auto classify(const std::string& file) -> Classification {
-    if (isTotallyIgnoredCore(file)) {
-        return Classification::ignored;
-    } else if (isFirstPartyCore(file)) {
+    if (isFirstPartyCore(file)) {
         return Classification::firstParty;
     }
     return Classification::none;
@@ -100,34 +83,6 @@ static inline auto classifyAndCache(const char* file) -> Classification {
     const auto& toReturn = classify(file);
     cache.emplace(std::make_pair(file, toReturn));
     return toReturn;
-}
-
-/**
- * @brief Returns whether the given binary file name is totally ignored.
- *
- * Uses the cache as it sees fit.
- *
- * @param file the binary file name to be checked
- * @return whether the file name should be totally ignored
- */
-static inline auto isTotallyIgnoredCached(const char* file) -> bool {
-    const auto& it = cache.find(file);
-    if (it != cache.end()) {
-        return it->second == Classification::ignored;
-    }
-    return classifyAndCache(file) == Classification::ignored;
-}
-
-/**
- * @brief Returns whether the given binary file name should be totally ignored.
- *
- * Uses the cache if appropriate.
- *
- * @param file the binary file name to be checked
- * @return whether to totally ignore the file name
- */
-static inline auto isTotallyIgnored(const char* file) -> bool {
-    return callstack_autoClearCaches ? isTotallyIgnoredCore(file) : isTotallyIgnoredCached(file);
 }
 
 /**
@@ -257,7 +212,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
         
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
-        } else if (firstHit && (isFirstParty(binaryFile) || isTotallyIgnored(binaryFile))) {
+        } else if (firstHit && isFirstParty(binaryFile)) {
             stream << formatter::get<Style::GREYED>
                    << formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
             formatShared<Style::GREYED>(frames[i], stream);
