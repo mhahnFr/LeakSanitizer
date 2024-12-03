@@ -162,43 +162,10 @@ auto getTracker() -> ATracker& {
 static inline auto loadDefaultSuppressions() -> const char* {
     // TODO: Gather the default suppressions
     return R"([
-{
-  "name": "<generated>",
-  "functions": [
-    { "name": "__objc_init", "offset": 675, "library": "/usr/lib/libobjc.A.dylib" }
-  ]
-},
-{
-  "functions": [
-    { "name": "_libSystem_initializer", "offset": 244 }
-  ]
-},
-{
-  "functions": [
-    { "name": "_libSystem_initializer", "offset": 260 }
-  ]
-},
-{
-  "functions": [
-    { "name": "_libSystem_initializer", "offset": 276 }
-  ]
-},
-{
-  "functions": [
-    { "name": "___smakebuf", "offset": 384 }
-  ]
-},
-{
-  "functions": [
-    { "name": "-[NSApplication run]", "offset": 603 }
-  ]
-},
-{
-  "name": "<generated 2>",
-  "functions": [
-    { "name": "__libxpc_initializer", "offset": 1009 }
-  ]
-}
+{ "functions": [ "_libSystem_initializer" ] },
+{ "functions": [ "___smakebuf"            ] },
+{ "functions": [ "-[NSApplication run]"   ] },
+{ "functions": [ "__objc_init"            ] }
 ])";
 }
 
