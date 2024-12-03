@@ -40,19 +40,6 @@ namespace lsan {
 std::atomic_bool LSan::finished = false;
 std::atomic_bool LSan::preventDealloc = false;
 
-auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
-    if (regex == nullptr || *regex == '\0') {
-        return std::nullopt;
-    }
-    
-    try {
-        return std::regex(regex);
-    } catch (std::regex_error & e) {
-        userRegexError = e.what();
-        return std::nullopt;
-    }
-}
-
 /**
  * If the given pointer is a TLSTracker, it is deleted and the thread-local
  * value is set to point to the global tracker instance.
@@ -420,14 +407,6 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         stream << std::endl << printWorkingDirectory;
     }
     stream << maybeShowDeprecationWarnings;
-    if (self.userRegexError.has_value()) {
-        stream << std::endl << formatter::get<Style::RED>
-               << formatter::format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
-               << formatter::format<Style::ITALIC>("__lsan_firstPartyRegex") << ") "
-               << formatter::format<Style::BOLD>("ignored: ")
-               << formatter::format<Style::ITALIC, Style::BOLD>("\"" + self.userRegexError.value() + "\"")
-               << formatter::clear<Style::RED> << std::endl;
-    }
     
     if (count > 0) {
         stream << std::endl << formatter::format<Style::BOLD>("Summary: ");

@@ -27,7 +27,6 @@
 #include <mutex>
 #include <optional>
 #include <ostream>
-#include <regex>
 #include <set>
 #include <utility>
 #include <vector>
@@ -57,10 +56,6 @@ class LSan final: public ATracker {
     Stats stats;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
-    /** The optional user regular expression.                                           */
-    std::optional<std::optional<std::regex>> userRegex;
-    /** The user regex error message.                                                   */
-    std::optional<std::string> userRegexError;
     std::optional<std::vector<suppression::Suppression>> suppressions;
     /** The registered thread-local allocation trackers.                                */
     std::set<ATracker*> tlsTrackers;
@@ -73,30 +68,13 @@ class LSan final: public ATracker {
     /** The mutex to manage access to the allocation timings.                           */
     std::mutex timingMutex;
 #endif
-    
-    /**
-     * @brief Generates and returns a regular expression object for the given string.
-     *
-     * Sets the regex error message if the given string was not a valid regular expression.
-     *
-     * @param regex the string with the regular expression
-     * @return an optional regex object
-     */
-    auto generateRegex(const char * regex) -> std::optional<std::regex>;
-    
+
     /**
      * Creates a thread-safe copy of the thread-local tracker list.
      *
      * @return the copy
      */
     auto copyTrackerList() -> decltype(tlsTrackers);
-
-    /**
-     * Loads the user first party regular expression.
-     */
-    inline void loadUserRegex() {
-        userRegex = generateRegex(__lsan_firstPartyRegex);
-    }
 
 protected:
     virtual inline void addToStats(const MallocInfo& info) final override {
@@ -191,18 +169,6 @@ public:
         return timingMutex;
     }
 #endif
-    
-    /**
-     * Returns the user first party regular expression.
-     *
-     * @return the user regular expression
-     */
-    inline auto getUserRegex() -> const std::optional<std::regex> & {
-        if (!userRegex.has_value()) {
-            loadUserRegex();
-        }
-        return userRegex.value();
-    }
 
     auto getSuppressions() -> const std::vector<suppression::Suppression>&;
 
