@@ -317,25 +317,27 @@ static inline void printDeprecation(      std::ostream & out,
  * @return the given output stream
  */
 static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostream & {
-    using formatter::Style;
-    
+    using namespace formatter;
+
     if (has("LSAN_PRINT_STATS_ON_EXIT")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_STATS_ON_EXIT",
-                         "__lsan_printStatsOnExit",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.7"));
+        printDeprecation(out, "LSAN_PRINT_STATS_ON_EXIT", "__lsan_printStatsOnExit",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.7"));
     }
     if (has("LSAN_PRINT_LICENSE")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_LICENSE",
-                         "__lsan_printLicense",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.8"));
+        printDeprecation(out, "LSAN_PRINT_LICENSE", "__lsan_printLicense",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     if (has("LSAN_PRINT_WEBSITE")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_WEBSITE",
-                         "__lsan_printWebsite",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.8"));
+        printDeprecation(out, "LSAN_PRINT_WEBSITE", "__lsan_printWebsite",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.8"));
+    }
+    if (has("LSAN_FIRST_PARTY_THRESHOLD")) {
+        printDeprecation(out, "LSAN_FIRST_PARTY_THRESHOLD", "__lsan_firstPartyThreshold",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
+    }
+    if (has("LSAN_FIRST_PARTY_REGEX")) {
+        printDeprecation(out, "LSAN_FIRST_PARTY_REGEX", "__lsan_firstPartyRegex",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
     return out;
 }
