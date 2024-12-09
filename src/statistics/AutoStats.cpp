@@ -31,15 +31,27 @@
 
 namespace lsan {
 namespace {
+/**
+ * Cares about the automatic statistics printing.
+ */
 class AutoStats {
+    /** Whether the printing thread is allowed to run.             */
     std::atomic_bool run = true;
+    /** The interval between the prints.                           */
     std::chrono::nanoseconds interval;
 
+    /** The printing thread.                                       */
     std::thread statsThread;
+    /** The mutex to synchronize with the printing thread.         */
     std::mutex mutex;
+    /** The condition variable for the printing thread to wait on. */
     std::condition_variable cv;
+    /** Whether the printing thread is actually running.           */
     bool threadRunning = false;
 
+    /**
+     * The loop of the printing thread.
+     */
     inline void printer() {
         std::chrono::nanoseconds sleepTime { 0 };
         while (true) {
@@ -76,6 +88,7 @@ public:
     }
 };
 
+/** The hidden global variable of the auto stats printer. */
 static AutoStats autoStats;
 }
 }
