@@ -108,6 +108,11 @@ static inline void internalCleanUp() {
     delete std::addressof(getInstance());
 }
 
+/**
+ * Returns the behaviour object of the main class.
+ *
+ * @return the behaviour object of the main class
+ */
 static inline auto getBehaviour() -> const behaviour::Behaviour& {
     return getInstance().getBehaviour();
 }
