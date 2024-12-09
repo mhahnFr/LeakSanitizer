@@ -299,7 +299,7 @@ void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
     bool ignore = getTracker().ignoreMalloc;
     getTracker().ignoreMalloc = true;
     auto & out = getOutputStream();
-    if (__lsan_statsActive) {
+    if (getBehaviour().statsActive()) {
         __lsan_printStatsCore("memory fragmentation", width, out,
                               __lsan_printFragmentationByteBar,
                               __lsan_printFragmentationObjectBar);
@@ -324,7 +324,7 @@ void __lsan_printStatsWithWidth(std::size_t width) {
     bool ignore = getTracker().ignoreMalloc;
     getTracker().ignoreMalloc = true;
     auto & out = getOutputStream();
-    if (__lsan_statsActive) {
+    if (getBehaviour().statsActive()) {
         __lsan_printStatsCore("memory usage", width, out,
                               std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
                               std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));

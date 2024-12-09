@@ -33,27 +33,29 @@
  * output on terminals.
  */
 namespace lsan::formatter {
-/// An enumeration containing possible formats.
+/**
+ * An enumeration containing possible formats.
+ */
 enum class Style {
-    /// Represents the text color green.
+    /** Represents the text color green.                                              */
     GREEN,
-    /// Represents the text color red.
+    /** Represents the text color red.                                                */
     RED,
-    /// Represents the text color magenta.
+    /** Represents the text color magenta.                                            */
     MAGENTA,
-    /// Represents *italic* text.
+    /** Represents italic text.                                                       */
     ITALIC,
-    /// Represents underlined text.
+    /** Represents underlined text.                                                   */
     UNDERLINED,
-    /// Represents greyed color, that is, the current text color becomes less bright.
+    /** Represents greyed color, that is, the current text color becomes less bright. */
     GREYED,
-    /// Represents **bold** text.
+    /** Represents bold text.                                                         */
     BOLD,
-    /// Represents a filled element inside a bar.
+    /** Represents a filled element inside a bar.                                     */
     BAR_FILLED,
-    /// Represents an empty element inside a bar.
+    /** Represents an empty element inside a bar.                                     */
     BAR_EMPTY,
-    /// Represents no style.
+    /** Represents no style.                                                          */
     NONE
 };
     
