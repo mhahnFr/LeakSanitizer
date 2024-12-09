@@ -42,9 +42,23 @@ static inline auto getVariable(const char* name) -> std::optional<const char*> {
     return var == nullptr ? std::nullopt : std::optional(var);
 }
 
+/**
+ * Retrieves a value of the given type from the given string.
+ *
+ * @param value the string to retrieve the value from
+ * @return the optionally deducted value
+ * @tparam T the type of the value to be deducted
+ */
 template<typename T>
 constexpr inline auto getFrom(const char* value) -> std::optional<T>;
 
+/**
+ * Retrieves the value set in the environment variable of the given name.
+ *
+ * @param name the name of the environment variable
+ * @return the optionally deducted value stored in the variable
+ * @tparam T the type of the value to be deducted
+ */
 template<typename T>
 constexpr inline auto get(const char* name) -> std::optional<T> {
     if (auto var = getVariable(name)) {
