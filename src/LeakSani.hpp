@@ -54,6 +54,7 @@ namespace lsan {
 class LSan final: public ATracker {
     /** An object holding all statistics.                                               */
     Stats stats;
+    /** The behaviour handling object.                                                  */
     behaviour::Behaviour behaviour;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
@@ -286,6 +287,11 @@ public:
         return stats;
     }
 
+    /**
+     * Returns the behaviour object associated with this instance.
+     *
+     * @return the associated behaviour object
+     */
     constexpr inline auto getBehaviour() const -> const behaviour::Behaviour& {
         return behaviour;
     }
