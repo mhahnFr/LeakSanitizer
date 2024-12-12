@@ -175,8 +175,9 @@ static inline auto loadDefaultSuppressions() -> const char* {
 
 static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
     auto toReturn = std::vector<std::filesystem::path>();
-    if (__lsan_suppressionFiles != nullptr) {
-        auto stream = std::istringstream(__lsan_suppressionFiles);
+    const auto& files = getBehaviour().suppressionFiles();
+    if (files != nullptr) {
+        auto stream = std::istringstream(files);
         std::string s;
         while (std::getline(stream, s, ':')) {
             toReturn.push_back(s);
@@ -193,7 +194,7 @@ static inline void loadSuppressions(std::vector<suppression::Suppression>& conte
             } catch (const suppression::FunctionNotFoundException& e) {
                 using namespace formatter;
 
-                if (__lsan_suppressionDevelopersMode) {
+                if (getBehaviour().suppressionDevelopersMode()) {
                     getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
                                                                          + "\" ignored: Function \"" + e.getFunctionName()
                                                                          + "\" not loaded.") << std::endl;

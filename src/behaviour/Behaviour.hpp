@@ -33,6 +33,20 @@ namespace lsan::behaviour {
  * Represents the settings of the behaviours this sanitizer supports.
  */
 class Behaviour {
+#define FROM_ENV(type, name, envName, def) \
+private:\
+    const std::optional<type> _##name = get<type>("LSAN_" #envName);\
+public:\
+    constexpr inline auto name() const {\
+        return _##name.value_or(def);\
+    }\
+private:
+
+#define FROM_ENV_API(type, name, envName) NEW_ENV(type, name, envName, __lsan_##name)
+
+    FROM_ENV(bool, suppressionDevelopersMode, SUPPRESSION_DEVELOPER, false)
+    FROM_ENV(const char*, suppressionFiles, SUPPRESSION_FILES, nullptr)
+
     /** Whether to print human-readable.                                 */
     const std::optional<bool> _humanPrint     = get<bool>("LSAN_HUMAN_PRINT"),
     /** Whether to print to the standard output stream.                  */
@@ -121,6 +135,7 @@ public:
     }
 
 #undef ENV_OR_API
+#undef NEW_ENV
 };
 }
 

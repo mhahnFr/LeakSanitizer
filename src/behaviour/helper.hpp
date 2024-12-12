@@ -144,6 +144,11 @@ inline auto getFrom(const char* value) -> std::optional<std::chrono::nanoseconds
 
     return std::nullopt;
 }
+
+template<>
+constexpr inline auto getFrom(const char* value) -> std::optional<const char*> {
+    return value == nullptr ? std::nullopt : std::optional(value);
+}
 }
 
 #endif /* helper_hpp */

@@ -360,7 +360,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     
     std::lock_guard lock(self.infoMutex);
 
-    callstack_rawNames = __lsan_suppressionDevelopersMode;
+    callstack_rawNames = self.behaviour.suppressionDevelopersMode();
     callstack_autoClearCaches = false;
     std::size_t i     = 0,
                 j     = 0,
