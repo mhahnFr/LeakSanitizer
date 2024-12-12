@@ -101,9 +101,6 @@ public:
 
     ENV_OR_API(leakCount)
     ENV_OR_API(callstackSize)
-    ENV_OR_API(firstPartyThreshold)
-
-    ENV_OR_API(firstPartyRegex)
 
     /**
      * Returns whether the stats should be active.
