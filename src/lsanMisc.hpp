@@ -114,6 +114,15 @@ static inline void internalCleanUp() {
 }
 
 /**
+ * Returns the behaviour object of the main class.
+ *
+ * @return the behaviour object of the main class
+ */
+static inline auto getBehaviour() -> const behaviour::Behaviour& {
+    return getInstance().getBehaviour();
+}
+
+/**
  * Returns whether to print formatted, that is, whether `__lsan_printFormatted` is
  * `true` and the output stream is an interactive terminal.
  *
@@ -121,9 +130,9 @@ static inline void internalCleanUp() {
  */
 static inline auto printFormatted() -> bool {
     if (has("LSAN_PRINT_FORMATTED")) {
-        return __lsan_printFormatted;
+        return getBehaviour().printFormatted();
     }
-    return __lsan_printFormatted && isATTY();
+    return getBehaviour().printFormatted() && isATTY();
 }
 
 /**
@@ -132,7 +141,7 @@ static inline auto printFormatted() -> bool {
  * @return the output stream to print to
  */
 static inline auto getOutputStream() -> std::ostream & {
-    return __lsan_printCout ? std::cout : std::clog;
+    return getBehaviour().printCout() ? std::cout : std::clog;
 }
 
 static inline auto getSuppressions() -> const std::vector<suppression::Suppression>& {

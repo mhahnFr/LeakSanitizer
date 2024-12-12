@@ -242,8 +242,4 @@ extern bool __lsan_suppressionDevelopersMode; // FIXME: Will not be part of the 
 } // extern "C"
 #endif
 
-#ifndef VERSION
- #define VERSION "clean build"
-#endif
-
 #endif /* lsan_internals_h */

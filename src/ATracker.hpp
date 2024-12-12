@@ -57,7 +57,7 @@ protected:
      *
      * @param info the allocation record
      */
-    virtual inline void addToStats([[ maybe_unused ]] const MallocInfo& info) {}
+    virtual inline void maybeAddToStats([[ maybe_unused ]] const MallocInfo& info) {}
 
 public:
     virtual ~ATracker() = default;
@@ -76,9 +76,8 @@ public:
      */
     inline void addMalloc(MallocInfo&& info) {
         std::lock_guard lock { infoMutex };
-        if (__lsan_statsActive) {
-            addToStats(info);
-        }
+        
+        maybeAddToStats(info);
         infos.insert_or_assign(info.pointer, std::move(info));
     }
 

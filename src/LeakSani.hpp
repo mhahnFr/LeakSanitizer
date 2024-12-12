@@ -42,6 +42,7 @@
 #endif
 
 #include "allocations/realAlloc.hpp"
+#include "behaviour/Behaviour.hpp"
 #include "statistics/Stats.hpp"
 #include "suppression/Suppression.hpp"
 
@@ -54,6 +55,8 @@ namespace lsan {
 class LSan final: public ATracker {
     /** An object holding all statistics.                                               */
     Stats stats;
+    /** The behaviour handling object.                                                  */
+    behaviour::Behaviour behaviour;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
     std::optional<std::vector<suppression::Suppression>> suppressions;
@@ -77,8 +80,10 @@ class LSan final: public ATracker {
     auto copyTrackerList() -> decltype(tlsTrackers);
 
 protected:
-    virtual inline void addToStats(const MallocInfo& info) final override {
-        stats += info;
+    virtual inline void maybeAddToStats(const MallocInfo& info) final override {
+        if (behaviour.statsActive()) {
+            stats += info;
+        }
     }
 
 public:
@@ -249,8 +254,17 @@ public:
      *
      * @return the current statistics instance
      */
-    constexpr inline auto getStats() -> const Stats & {
+    constexpr inline auto getStats() const -> const Stats & {
         return stats;
+    }
+
+    /**
+     * Returns the behaviour object associated with this instance.
+     *
+     * @return the associated behaviour object
+     */
+    constexpr inline auto getBehaviour() const -> const behaviour::Behaviour& {
+        return behaviour;
     }
 
     friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;

@@ -43,6 +43,10 @@
 #include "suppression/json/Exception.hpp"
 #include "suppression/json/parser.hpp"
 
+#ifndef VERSION
+ #define VERSION "clean build"
+#endif
+
 namespace lsan {
 auto getInstance() -> LSan & {
     static auto instance = new LSan();
@@ -101,7 +105,7 @@ void exitHook() {
     auto & out = getOutputStream();
     out << std::endl << formatter::format<Style::GREEN>("Exiting");
     
-    if (__lsan_printExitPoint) {
+    if (getBehaviour().printExitPoint()) {
         out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
         callstackHelper::format(lcs::callstack(), out);
     }
@@ -112,7 +116,7 @@ void exitHook() {
 }
 
 auto maybeHintRelativePaths(std::ostream & out) -> std::ostream & {
-    if (__lsan_relativePaths) {
+    if (getBehaviour().relativePaths()) {
         out << printWorkingDirectory << std::endl;
     }
     return out;
@@ -127,7 +131,7 @@ auto printWorkingDirectory(std::ostream & out) -> std::ostream & {
 
 auto isATTY() -> bool {
 #ifdef LSAN_HAS_UNISTD
-    return isatty(__lsan_printCout ? STDOUT_FILENO : STDERR_FILENO);
+    return isatty(getBehaviour().printCout() ? STDOUT_FILENO : STDERR_FILENO);
 #else
     return __lsan_printFormatted;
 #endif
@@ -139,7 +143,7 @@ auto has(const std::string & var) -> bool {
 
 auto getTracker() -> ATracker& {
     auto& globalInstance = getInstance();
-    if (globalInstance.finished || __lsan_statsActive) return globalInstance;
+    if (globalInstance.finished || getBehaviour().statsActive()) return globalInstance;
 
     const auto& key = globalInstance.saniKey;
     auto tlv = pthread_getspecific(key);

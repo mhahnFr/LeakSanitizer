@@ -126,7 +126,7 @@ static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::
         return "<< Unknown >>";
     }
     
-    return __lsan_relativePaths ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
+    return getBehaviour().relativePaths() ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
 }
 
 /**
@@ -138,7 +138,7 @@ static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::
  * @return the name of the source file name of the given callstack frame
  */
 static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) -> std::string {
-    return __lsan_relativePaths ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
+    return getBehaviour().relativePaths() ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
 }
 
 /**
@@ -152,7 +152,7 @@ template<formatter::Style S>
 static inline void formatShared(const callstack_frame& frame, std::ostream & out) {
     using formatter::Style;
     
-    if (__lsan_printBinaries) {
+    if (getBehaviour().printBinaries()) {
         bool reset = false;
         if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
@@ -160,7 +160,7 @@ static inline void formatShared(const callstack_frame& frame, std::ostream & out
         out << formatter::format<Style::ITALIC>("(" + getCallstackFrameName(frame) + ")") << (reset ? formatter::get<S>() : "") << " ";
     }
     bool needsBrackets = false;
-    if (frame.sourceFile == nullptr || __lsan_printFunctions) {
+    if (frame.sourceFile == nullptr || getBehaviour().printFunctions()) {
         out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
         needsBrackets = true;
     }
@@ -207,7 +207,7 @@ void format(lcs::callstack & callstack, std::ostream & stream) {
     bool firstHit   = true,
          firstPrint = true;
     std::size_t i, printed;
-    for (i = printed = 0; i < size && printed < __lsan_callstackSize; ++i) {
+    for (i = printed = 0; i < size && printed < getBehaviour().callstackSize(); ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
