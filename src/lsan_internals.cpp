@@ -51,5 +51,3 @@ std::size_t __lsan_callstackSize       = get<std::size_t>("LSAN_CALLSTACK_SIZE")
 std::size_t __lsan_firstPartyThreshold = get<std::size_t>("LSAN_FIRST_PARTY_THRESHOLD").value_or(3);
 
 const char * __lsan_firstPartyRegex = getVariable("LSAN_FIRST_PARTY_REGEX").value_or(nullptr);
-const char* __lsan_suppressionFiles = getVariable("LSAN_SUPPRESSION_FILES").value_or(nullptr);
-bool __lsan_suppressionDevelopersMode = getBool("LSAN_SUPPRESSION_DEVELOPER").value_or(false);
