@@ -197,7 +197,7 @@ static inline void loadSuppressions(std::vector<suppression::Suppression>& conte
                 if (getBehaviour().suppressionDevelopersMode()) {
                     getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
                                                                          + "\" ignored: Function \"" + e.getFunctionName()
-                                                                         + "\" not loaded.") << std::endl;
+                                                                         + "\" not loaded.") << std::endl << std::endl;
                 }
             }
         }
@@ -214,7 +214,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
         using namespace formatter;
         using namespace std::string_literals;
 
-        getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default suppression file: "s + e.what()) << std::endl;
+        getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default suppression file: "s + e.what()) << std::endl << std::endl;
     }
 
     for (const auto& file : getSuppressionFiles()) {
@@ -229,7 +229,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
             using namespace formatter;
 
             getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load suppression file \""s
-                                                                 + file.string() + "\": " + e.what()) << std::endl;
+                                                                 + file.string() + "\": " + e.what()) << std::endl << std::endl;
         }
         if (stream.is_open()) {
             stream.close();
