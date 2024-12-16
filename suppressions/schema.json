@@ -23,6 +23,7 @@
       "functions": {
         "type": "array",
         "description": "The callstack of functions to match for this suppression object (function names as used by the linker)",
+        "minItems": 1,
         "items": {
           "type": [
             "string",

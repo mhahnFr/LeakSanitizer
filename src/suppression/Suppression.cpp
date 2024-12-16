@@ -45,6 +45,9 @@ Suppression::Suppression(const Object& object):
     size(object.get<ValueType::Int>("size"))
 {
     const auto functionArray = object.get<ValueType::Array>("functions").value();
+    if (functionArray.size() < 1) {
+        throw std::runtime_error("Function array empty");
+    }
     topCallstack.reserve(functionArray.size());
     for (const auto& functionObject : functionArray) {
         std::string         name;
