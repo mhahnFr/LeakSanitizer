@@ -22,12 +22,12 @@
 #include "defaultSuppression.hpp"
 
 extern "C" {
-#include "macos.h"
+#include "macos/core.h"
 }
 
 namespace lsan::suppression {
 auto getDefaultSuppression() -> std::vector<std::string> {
     // TODO: Choose the correct suppression file
-    return { std::string(reinterpret_cast<const char*>(suppressions_macos), suppressions_macos_len) };
+    return { std::string(reinterpret_cast<const char*>(suppressions_macos_core), suppressions_macos_core_len) };
 }
 }
