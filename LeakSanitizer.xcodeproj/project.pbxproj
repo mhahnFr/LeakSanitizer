@@ -388,7 +388,7 @@
 		};
 		F13529B32D1083FD002534D0 /* CallstackLibrary */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "-j $(ACTION)";
+			buildArgumentsString = "-j libcallstack.a $(ACTION)";
 			buildConfigurationList = F13529B42D1083FD002534D0 /* Build configuration list for PBXLegacyTarget "CallstackLibrary" */;
 			buildPhases = (
 			);
