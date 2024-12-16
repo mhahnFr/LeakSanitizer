@@ -34,10 +34,17 @@ SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
 OBJS  = $(patsubst %.cpp, %.o, $(SRC))
 DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 
+SUPP_SRC = $(shell find suppressions -name \*.json)
+SUPP_HS  = $(patsubst %.json, %.h, $(SUPP_SRC))
+
+#DEFAULT_SUPP_H = suppressions/defaultSuppression.h
+DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
+#DEFAULT_SUPP_JSON = suppressions/macos.json # TODO: Dependent on the system!
+
 BENCHMARK = false
 
 LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include -I suppressions
 
 ifeq ($(BENCHMARK),true)
 	CXXFLAGS += -DBENCHMARK
@@ -115,11 +122,17 @@ $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
+%.h: %.json
+	xxd -i -n $(basename $<) $< $@
+
+$(DEFAULT_SUPP_CPP): $(SUPP_HS)
+
 $(LIBCALLSTACK_A):
 	$(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) $(LIBCALLSTACK_NAME).a
 
 clean:
 	- $(RM) $(OBJS) $(DEPS)
+	- $(RM) $(SUPP_HS)
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) clean
 
 fclean: clean
