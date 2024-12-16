@@ -52,10 +52,23 @@
 		BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
 		BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F62CA8765500AEFD5A /* helper.hpp */; };
 		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
+		F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529B02D108324002534D0 /* defaultSuppression.hpp */; };
+		F13529B22D1083E0002534D0 /* defaultSuppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
 		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
 		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F13529B72D10842D002534D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF97EB4E28831E5B00DAF1FE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F13529B32D1083FD002534D0;
+			remoteInfo = CallstackLibrary;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		BF04B4B328F86EEA00051090 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
@@ -113,6 +126,9 @@
 		BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AutoStats.cpp; sourceTree = "<group>"; };
 		BFE023F22CA874D100AEFD5A /* Behaviour.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Behaviour.hpp; sourceTree = "<group>"; };
 		BFE023F62CA8765500AEFD5A /* helper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helper.hpp; sourceTree = "<group>"; };
+		F13529AD2D1076F4002534D0 /* macos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = macos.json; sourceTree = "<group>"; };
+		F13529AE2D10779B002534D0 /* defaultSuppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = defaultSuppression.cpp; sourceTree = "<group>"; };
+		F13529B02D108324002534D0 /* defaultSuppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = defaultSuppression.hpp; sourceTree = "<group>"; };
 		F16901512C403EF200EED0AE /* utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
@@ -156,6 +172,8 @@
 				BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */,
 				BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */,
 				BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */,
+				F13529B02D108324002534D0 /* defaultSuppression.hpp */,
+				F13529AE2D10779B002534D0 /* defaultSuppression.cpp */,
 			);
 			path = suppression;
 			sourceTree = "<group>";
@@ -214,8 +232,9 @@
 				BF5F19FC28B3F00600DAEDE7 /* README.md */,
 				BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */,
 				BF04B4B328F86EEA00051090 /* .gitignore */,
-				BF9DD3A428A6761400AEBC17 /* src */,
 				BF643E5C28A40C970080DB21 /* include */,
+				BF9DD3A428A6761400AEBC17 /* src */,
+				F13529AC2D10767E002534D0 /* suppressions */,
 				BF97EB5728831E5B00DAF1FE /* Products */,
 				BF378FB32919496000A4DAA9 /* Frameworks */,
 			);
@@ -291,6 +310,14 @@
 			path = behaviour;
 			sourceTree = "<group>";
 		};
+		F13529AC2D10767E002534D0 /* suppressions */ = {
+			isa = PBXGroup;
+			children = (
+				F13529AD2D1076F4002534D0 /* macos.json */,
+			);
+			path = suppressions;
+			sourceTree = "<group>";
+		};
 		F1B373972C67A0D700674C3C /* allocators */ = {
 			isa = PBXGroup;
 			children = (
@@ -311,6 +338,7 @@
 			files = (
 				F16901522C403EF200EED0AE /* utils.hpp in Headers */,
 				BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */,
+				F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */,
 				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
 				BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */,
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
@@ -330,6 +358,7 @@
 				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
 				BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */,
 				BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */,
+				F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */,
 				BF3E505E2CCFF96700CB225E /* Object.hpp in Headers */,
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
 				BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */,
@@ -357,6 +386,22 @@
 			passBuildSettingsInEnvironment = 1;
 			productName = LeakSanitizer_make;
 		};
+		F13529B32D1083FD002534D0 /* CallstackLibrary */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "-j $(ACTION)";
+			buildConfigurationList = F13529B42D1083FD002534D0 /* Build configuration list for PBXLegacyTarget "CallstackLibrary" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = CallstackLibrary;
+			dependencies = (
+			);
+			name = CallstackLibrary;
+			packageProductDependencies = (
+			);
+			passBuildSettingsInEnvironment = 1;
+			productName = CallstackLibrary;
+		};
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
@@ -364,6 +409,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF0F132629194652008F0FCD /* Build configuration list for PBXNativeTarget "LeakSanitizer" */;
 			buildPhases = (
+				F13529B92D10848E002534D0 /* ShellScript */,
 				BF0F131829194652008F0FCD /* Headers */,
 				BF0F131929194652008F0FCD /* Sources */,
 				BF0F131A29194652008F0FCD /* Frameworks */,
@@ -371,6 +417,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13529B82D10842D002534D0 /* PBXTargetDependency */,
 			);
 			name = LeakSanitizer;
 			productName = lsan;
@@ -393,6 +440,9 @@
 					BFB062292C397C1E0032E9C4 = {
 						CreatedOnToolsVersion = 15.2;
 					};
+					F13529B32D1083FD002534D0 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 				};
 			};
 			buildConfigurationList = BF97EB5128831E5B00DAF1FE /* Build configuration list for PBXProject "LeakSanitizer" */;
@@ -410,9 +460,31 @@
 			targets = (
 				BF0F131B29194652008F0FCD /* LeakSanitizer */,
 				BFB062292C397C1E0032E9C4 /* LeakSanitizer_make */,
+				F13529B32D1083FD002534D0 /* CallstackLibrary */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F13529B92D10848E002534D0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make src/suppression/defaultSuppression.o\nrm -f src/suppression/defaultSuppression.o\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BF0F131929194652008F0FCD /* Sources */ = {
@@ -438,10 +510,19 @@
 				BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */,
 				BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */,
 				BF0F134D291947A8008F0FCD /* signalHandlers.cpp in Sources */,
+				F13529B22D1083E0002534D0 /* defaultSuppression.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F13529B82D10842D002534D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F13529B32D1083FD002534D0 /* CallstackLibrary */;
+			targetProxy = F13529B72D10842D002534D0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		BF0F132429194652008F0FCD /* Debug */ = {
@@ -453,6 +534,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
@@ -460,6 +542,7 @@
 				HEADER_SEARCH_PATHS = (
 					CallstackLibrary/include,
 					include,
+					suppressions,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -482,6 +565,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
@@ -490,6 +574,7 @@
 				HEADER_SEARCH_PATHS = (
 					CallstackLibrary/include,
 					include,
+					suppressions,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -655,6 +740,39 @@
 			};
 			name = Release;
 		};
+		F13529B52D1083FD002534D0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		F13529B62D1083FD002534D0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -681,6 +799,15 @@
 			buildConfigurations = (
 				BFB0622A2C397C1E0032E9C4 /* Debug */,
 				BFB0622B2C397C1E0032E9C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F13529B42D1083FD002534D0 /* Build configuration list for PBXLegacyTarget "CallstackLibrary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F13529B52D1083FD002534D0 /* Debug */,
+				F13529B62D1083FD002534D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
