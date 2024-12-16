@@ -1,6 +1,10 @@
 [
-{ "functions": [ "_libSystem_initializer" ] },
-{ "functions": [ "___smakebuf"            ] },
-{ "functions": [ "-[NSApplication run]"   ] },
-{ "functions": [ "__objc_init"            ] }
+  {
+    "name": "libSystem initialization leaks",
+    "functions": [ "_libSystem_initializer" ]
+  },
+  {
+    "name": "Core file read/write buffer leaks",
+    "functions": [ "___smakebuf" ]
+  }
 ]
