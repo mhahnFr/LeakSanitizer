@@ -1,0 +1,6 @@
+[
+{ "functions": [ "_libSystem_initializer" ] },
+{ "functions": [ "___smakebuf"            ] },
+{ "functions": [ "-[NSApplication run]"   ] },
+{ "functions": [ "__objc_init"            ] }
+]
