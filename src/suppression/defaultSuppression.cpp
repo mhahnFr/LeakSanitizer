@@ -21,13 +21,30 @@
 
 #include "defaultSuppression.hpp"
 
+#ifdef __APPLE__
+# define LSAN_APPLE
+#elif defined(__linux__)
+# define LSAN_LINUX
+#endif
+
 extern "C" {
-#include "macos/core.h"
+#ifdef LSAN_APPLE
+# include <macos/core.h>
+# include <macos/objc.h>
+#endif
 }
 
 namespace lsan::suppression {
 auto getDefaultSuppression() -> std::vector<std::string> {
-    // TODO: Choose the correct suppression file
-    return { std::string(reinterpret_cast<const char*>(suppressions_macos_core), suppressions_macos_core_len) };
+    auto toReturn = std::vector<std::string>();
+
+#ifdef LSAN_APPLE
+    toReturn.insert(toReturn.cbegin(), {
+        std::string(reinterpret_cast<const char*>(suppressions_macos_core), suppressions_macos_core_len),
+        std::string(reinterpret_cast<const char*>(suppressions_macos_objc), suppressions_macos_objc_len),
+    });
+#endif
+
+    return toReturn;
 }
 }
