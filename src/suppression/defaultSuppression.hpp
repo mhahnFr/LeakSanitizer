@@ -22,8 +22,11 @@
 #ifndef defaultSuppression_hpp
 #define defaultSuppression_hpp
 
+#include <string>
+#include <vector>
+
 namespace lsan::suppression {
-auto getDefaultSuppression();
+auto getDefaultSuppression() -> std::vector<std::string>;
 }
 
 #endif /* defaultSuppression_hpp */

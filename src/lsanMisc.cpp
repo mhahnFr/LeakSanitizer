@@ -38,6 +38,7 @@
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 
+#include "suppression/defaultSuppression.hpp"
 #include "suppression/FunctionNotFoundException.hpp"
 #include "suppression/Suppression.hpp"
 #include "suppression/json/Exception.hpp"
@@ -163,16 +164,6 @@ auto getTracker() -> ATracker& {
     return *static_cast<ATracker*>(tlv);
 }
 
-static inline auto loadDefaultSuppressions() -> const char* {
-    // TODO: Gather the default suppressions
-    return R"([
-{ "functions": [ "_libSystem_initializer" ] },
-{ "functions": [ "___smakebuf"            ] },
-{ "functions": [ "-[NSApplication run]"   ] },
-{ "functions": [ "__objc_init"            ] }
-])";
-}
-
 static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
     auto toReturn = std::vector<std::filesystem::path>();
     const auto& files = getBehaviour().suppressionFiles();
@@ -208,13 +199,15 @@ static inline void loadSuppressions(std::vector<suppression::Suppression>& conte
 
 auto loadSuppressions() -> std::vector<suppression::Suppression> {
     auto toReturn = std::vector<suppression::Suppression>();
-    try {
-        loadSuppressions(toReturn, json::parse(std::istringstream(loadDefaultSuppressions())));
-    } catch (const std::exception& e) {
-        using namespace formatter;
-        using namespace std::string_literals;
+    for (const auto& file : suppression::getDefaultSuppression()) {
+        try {
+            loadSuppressions(toReturn, json::parse(std::istringstream(file)));
+        } catch (const std::exception& e) {
+            using namespace formatter;
+            using namespace std::string_literals;
 
-        getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default suppression file: "s + e.what()) << std::endl << std::endl;
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default suppression file: "s + e.what()) << std::endl << std::endl;
+        }
     }
 
     for (const auto& file : getSuppressionFiles()) {

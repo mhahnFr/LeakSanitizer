@@ -26,7 +26,8 @@ extern "C" {
 }
 
 namespace lsan::suppression {
-auto getDefaultSuppression() {
-    // TODO: Properly implement
+auto getDefaultSuppression() -> std::vector<std::string> {
+    // TODO: Choose the correct suppression file
+    return { std::string(reinterpret_cast<const char*>(suppressions_macos), suppressions_macos_len) };
 }
 }
