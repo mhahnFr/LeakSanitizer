@@ -37,9 +37,7 @@ DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 SUPP_SRC = $(shell find suppressions -name \*.json)
 SUPP_HS  = $(patsubst %.json, %.h, $(SUPP_SRC))
 
-#DEFAULT_SUPP_H = suppressions/defaultSuppression.h
 DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
-#DEFAULT_SUPP_JSON = suppressions/macos.json # TODO: Dependent on the system!
 
 BENCHMARK = false
 
