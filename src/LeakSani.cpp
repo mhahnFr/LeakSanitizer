@@ -239,10 +239,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << "Searching globals and compile time thread locals...";
     const auto& [regions, locals] = getGlobalRegionsAndTLVs();
     out << clear << "Collecting the leaks...";
-//    const auto& suppressions = getSuppressions();
     for (auto it = infos.begin(); it != infos.end();) {
 //        const auto& local = locals.find(it->first);
-        if (/*local != locals.end() || */it->second.deleted/* || isSuppressed(suppressions, it->second)*/) {
+        if (/*local != locals.end() || */it->second.deleted) {
             // TODO: In the future only erase the deleted records
             it = infos.erase(it);
         } else {
@@ -671,13 +670,13 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
-static inline void printRecord(std::ostream& out, const MallocInfo& info) {
-    auto ptr = reinterpret_cast<void**>(info.pointer);
-    for (std::size_t i = 0; i < info.size / 8; ++i) {
-        out << ptr[i] << ", ";
-    }
-    out << std::endl << info.pointer << " ";
-}
+//static inline void printRecord(std::ostream& out, const MallocInfo& info) {
+//    auto ptr = reinterpret_cast<void**>(info.pointer);
+//    for (std::size_t i = 0; i < info.size / 8; ++i) {
+//        out << ptr[i] << ", ";
+//    }
+//    out << std::endl << info.pointer << " ";
+//}
 
 auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     using namespace formatter;
@@ -708,7 +707,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         for (const auto& record : stats.recordsLost) {
             if (record->leakType != LeakType::unreachableDirect) continue;
 
-            printRecord(stream, *record);
+//            printRecord(stream, *record);
             stream << *record << std::endl;
         }
 
