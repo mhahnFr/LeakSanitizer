@@ -105,7 +105,7 @@ auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
 
-            if (__lsan_zeroAllocation && size == 0) {
+            if (getBehaviour().zeroAllocation() && size == 0) {
                 warn("Implementation-defined allocation of size 0");
             }
             tracker.addMalloc(MallocInfo(ptr, size));
@@ -127,7 +127,7 @@ auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
 
-            if (__lsan_zeroAllocation && size == 0) {
+            if (getBehaviour().zeroAllocation() && size == 0) {
                 warn("Implementation-defined allocation of size 0");
             }
             tracker.addMalloc(MallocInfo(ptr, count * size));
@@ -149,7 +149,7 @@ auto malloc_zone_valloc(malloc_zone_t* zone, std::size_t size) -> void* {
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
 
-            if (__lsan_zeroAllocation && size == 0) {
+            if (getBehaviour().zeroAllocation() && size == 0) {
                 warn("Implementation-defined allocation of size 0");
             }
             tracker.addMalloc(MallocInfo(ptr, size));
@@ -171,7 +171,7 @@ auto malloc_zone_memalign(malloc_zone_t* zone, std::size_t alignment, std::size_
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
 
-            if (__lsan_zeroAllocation && size == 0) {
+            if (getBehaviour().zeroAllocation() && size == 0) {
                 warn("Implementation-defined allocation of size 0");
             }
             tracker.addMalloc(MallocInfo(ptr, size));
@@ -237,11 +237,11 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, unsigned nu
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
             for (unsigned i = 0; i < num; ++i) {
-                if (to_be_freed[i] == nullptr && __lsan_freeNull) {
+                if (to_be_freed[i] == nullptr && getBehaviour().freeNull()) {
                     warn("Free of NULL");
                 } else if (to_be_freed[i] != nullptr) {
                     const auto& it = tracker.removeMalloc(to_be_freed[i]);
-                    if (__lsan_invalidFree && !it.first) {
+                    if (getBehaviour().invalidFree() && !it.first) {
                         crashOrWarn(createInvalidFreeMessage(to_be_freed[i], static_cast<bool>(it.second)), it.second);
                     }
                 }
@@ -262,11 +262,11 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
         const std::lock_guard lock { tracker.mutex };
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
-            if (ptr == nullptr && __lsan_freeNull) {
+            if (ptr == nullptr && getBehaviour().freeNull()) {
                 warn("Free of NULL");
             } else if (ptr != nullptr) {
                 const auto& it = tracker.removeMalloc(ptr);
-                if (__lsan_invalidFree && !it.first) {
+                if (getBehaviour().invalidFree() && !it.first) {
                     crashOrWarn(createInvalidFreeMessage(ptr, static_cast<bool>(it.second)), it.second);
                 }
             }
@@ -322,7 +322,7 @@ auto __lsan_malloc(std::size_t size) -> void* {
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
             BENCH({
-                if (__lsan_zeroAllocation && size == 0) {
+                if (getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, size));
@@ -350,7 +350,7 @@ auto __lsan_calloc(std::size_t objectSize, std::size_t count) -> void* {
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
             BENCH({
-                if (__lsan_zeroAllocation && objectSize * count == 0) {
+                if (getBehaviour().zeroAllocation() && objectSize * count == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, objectSize * count));
@@ -378,7 +378,7 @@ auto __lsan_valloc(std::size_t size) -> void* {
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
 
-            if (__lsan_zeroAllocation && size == 0) {
+            if (getBehaviour().zeroAllocation() && size == 0) {
                 warn("Implementation-defined allocation of size 0");
             }
             tracker.addMalloc(MallocInfo(ptr, size));
@@ -398,7 +398,7 @@ auto __lsan_aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
         if (!tracker.ignoreMalloc) {
             tracker.ignoreMalloc = true;
 
-            if (__lsan_zeroAllocation && size == 0) {
+            if (getBehaviour().zeroAllocation() && size == 0) {
                 warn("Implementation-defined allocation of size 0");
             }
             tracker.addMalloc(MallocInfo(ptr, size));
@@ -457,11 +457,11 @@ void __lsan_free(void* pointer) {
     if (!ignored) {
         tracker.ignoreMalloc = true;
         BENCH({
-            if (pointer == nullptr && __lsan_freeNull) {
+            if (pointer == nullptr && getBehaviour().freeNull()) {
                 warn("Free of NULL");
             } else if (pointer != nullptr) {
                 const auto& it = tracker.removeMalloc(pointer);
-                if (__lsan_invalidFree && !it.first) {
+                if (getBehaviour().invalidFree() && !it.first) {
                     crashOrWarn(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
                 }
             }
@@ -502,7 +502,7 @@ REPLACE(auto, posix_memalign)(void** memPtr, std::size_t alignment, std::size_t 
             if (alignment == 0 || alignment % 2 != 0 || alignment % sizeof(void*) != 0) {
                 warn("posix_memalign with invalid alignment of " + std::to_string(alignment));
             }
-            if (__lsan_zeroAllocation && size == 0) {
+            if (getBehaviour().zeroAllocation() && size == 0) {
                 warn("Implementation-defined allocation of size 0");
             }
             if (*memPtr != wasPtr) {

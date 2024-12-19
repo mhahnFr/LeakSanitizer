@@ -59,9 +59,10 @@ void addTotalTime(std::chrono::nanoseconds duration, AllocType type) {
  * @param values the values to examine
  * @return the minimal, maximal and average values
  */
-static inline auto getMinMaxAvg(const std::deque<std::chrono::nanoseconds>& values) -> std::tuple<std::chrono::nanoseconds, std::chrono::nanoseconds, double> {
-    std::chrono::nanoseconds total{0}, min{std::chrono::nanoseconds::max()}, max{0};
-    for (const auto value : values) {
+static inline auto getMinMaxAvg(std::deque<std::chrono::nanoseconds> values) -> std::tuple<std::chrono::nanoseconds,std::chrono::nanoseconds, double, double> {
+    std::sort(values.begin(), values.end());
+    std::chrono::nanoseconds total { 0 }, min { std::chrono::nanoseconds::max() }, max { 0 };
+    for (const auto& value : values) {
         total += value;
         if (value < min) {
             min = value;
@@ -70,53 +71,74 @@ static inline auto getMinMaxAvg(const std::deque<std::chrono::nanoseconds>& valu
             max = value;
         }
     }
-    return std::make_tuple(min, max, static_cast<double>(total.count()) / values.size());
+    double median { 0 };
+    if (values.size() % 2 == 0) {
+        const auto& value1 = values[values.size() / 2];
+        const auto& value2 = values[values.size() / 2 + 1];
+        median = (value1.count() + value2.count()) / 2;
+    } else {
+        median = values[values.size() / 2].count();
+    }
+    return std::make_tuple(min, max, static_cast<double>(total.count()) / values.size(), median);
 }
 
 static inline auto operator<<(std::ostream& out, const Timings& timings) -> std::ostream& {
+    using namespace formatter;
+
     if (timings.tracking.empty() || timings.locking.empty() || timings.system.empty() || timings.total.empty()) {
-        return out << formatter::format<formatter::Style::ITALIC>("(Not available)") << std::endl;
+        return out << format<Style::ITALIC>("(Not available)") << std::endl;
     }
     
-    const auto system   = getMinMaxAvg(timings.system);
-    const auto locking  = getMinMaxAvg(timings.locking);
-    const auto tracking = getMinMaxAvg(timings.tracking);
-    const auto total    = getMinMaxAvg(timings.total);
-    
-    const double totalMin = static_cast<double>(std::get<0>(total).count()),
-                 totalMax = static_cast<double>(std::get<1>(total).count()),
-                 totalAvg = std::get<2>(total);
-    
-    const double sysPartMin   = (std::get<0>(system).count() / totalMin) * 100,
-                 sysPartMax   = (std::get<1>(system).count() / totalMax) * 100,
-                 sysPartAvg   = (std::get<2>(system) / totalAvg) * 100,
-                 lockPartMin  = (std::get<0>(locking).count() / totalMin) * 100,
-                 lockPartMax  = (std::get<1>(locking).count() / totalMax) * 100,
-                 lockPartAvg  = (std::get<2>(locking) / totalAvg) * 100,
-                 trackPartMin = (std::get<0>(tracking).count() / totalMin) * 100,
-                 trackPartMax = (std::get<1>(tracking).count() / totalMax) * 100,
-                 trackPartAvg = (std::get<2>(tracking) / totalAvg) * 100;
-    
-    out << "  System time (min, max, avg): "
-        << std::get<0>(system).count() << " ns (" << sysPartMin << " %), "
-        << std::get<1>(system).count() << " ns (" << sysPartMax << " %), "
-        << std::get<2>(system)         << " ns (" << sysPartAvg << " %)" << std::endl
-    
-        << " Locking time (min, max, avg): " 
-        << std::get<0>(locking).count() << " ns (" << lockPartMin << " %), "
-        << std::get<1>(locking).count() << " ns (" << lockPartMax << " %), "
-        << std::get<2>(locking)         << " ns (" << lockPartAvg << " %)" << std::endl
-    
-        << "Tracking time (min, max, avg): " 
-        << std::get<0>(tracking).count() << " ns (" << trackPartMin << " %), "
-        << std::get<1>(tracking).count() << " ns (" << trackPartMax << " %), "
-        << std::get<2>(tracking)         << " ns (" << trackPartAvg << " %)" << std::endl
-    
-        << "   Total time (min, max, avg): " 
-        << std::get<0>(total).count() << " ns, "
-        << std::get<1>(total).count() << " ns, "
-        << std::get<2>(total)         << " ns" << std::endl;
-    
+    const auto& [systemMin, systemMax, systemAvg, systemMed] = getMinMaxAvg(timings.system);
+    const auto& [lockingMin, lockingMax, lockingAvg, lockingMed] = getMinMaxAvg(timings.locking);
+    const auto& [trackingMin, trackingMax, trackingAvg, trackingMed] = getMinMaxAvg(timings.tracking);
+    const auto& [totalMin, totalMax, totalAvg, totalMed] = getMinMaxAvg(timings.total);
+
+    const double totalMinD = static_cast<double>(totalMin.count()),
+                 totalMaxD = static_cast<double>(totalMax.count());
+
+    const double sysPartMin   = (systemMin.count() / totalMinD) * 100,
+                 sysPartMax   = (systemMax.count() / totalMaxD) * 100,
+                 sysPartAvg   = (systemAvg / totalAvg) * 100,
+                 lockPartMin  = (lockingMin.count() / totalMinD) * 100,
+                 lockPartMax  = (lockingMax.count() / totalMaxD) * 100,
+                 lockPartAvg  = (lockingAvg / totalAvg) * 100,
+                 trackPartMin = (trackingMin.count() / totalMinD) * 100,
+                 trackPartMax = (trackingMax.count() / totalMaxD) * 100,
+                 trackPartAvg = (trackingAvg / totalAvg) * 100;
+
+    out << "  System time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
+        << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "
+
+        << get<Style::GREEN>   << systemMin.count() << " ns (" << sysPartMin << " %), " << clear<Style::GREEN>
+        << get<Style::RED>     << systemMax.count() << " ns (" << sysPartMax << " %), " << clear<Style::RED>
+        << get<Style::MAGENTA> << systemAvg         << " ns (" << sysPartAvg << " %), " << clear<Style::MAGENTA>
+        << get<Style::BOLD>    << systemMed         << " ns" << clear<Style::BOLD> << std::endl
+
+        << " Locking time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
+        << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "
+
+        << get<Style::GREEN>   << lockingMin.count() << " ns (" << lockPartMin << " %), " << clear<Style::GREEN>
+        << get<Style::RED>     << lockingMax.count() << " ns (" << lockPartMax << " %), " << clear<Style::RED>
+        << get<Style::MAGENTA> << lockingAvg         << " ns (" << lockPartAvg << " %), " << clear<Style::MAGENTA>
+        << get<Style::BOLD>    << lockingMed         << " ns" << clear<Style::BOLD> << std::endl
+
+        << "Tracking time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
+        << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "
+
+        << get<Style::GREEN>   << trackingMin.count() << " ns (" << trackPartMin << " %), " << clear<Style::GREEN>
+        << get<Style::RED>     << trackingMax.count() << " ns (" << trackPartMax << " %), " << clear<Style::RED>
+        << get<Style::MAGENTA> << trackingAvg         << " ns (" << trackPartAvg << " %), " << clear<Style::MAGENTA>
+        << get<Style::BOLD>    << trackingMed         << " ns" << clear<Style::BOLD> << std::endl
+
+        << "   Total time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
+        << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "
+
+        << get<Style::GREEN>   << totalMin.count() << " ns, " << clear<Style::GREEN>
+        << get<Style::RED>     << totalMax.count() << " ns, " << clear<Style::RED>
+        << get<Style::MAGENTA> << totalAvg         << " ns, " << clear<Style::MAGENTA>
+        << get<Style::BOLD>    << totalMed         << " ns" << clear<Style::BOLD> << std::endl;
+
     return out;
 }
 

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "libSystem initialization leaks",
+    "functions": [ "_libSystem_initializer" ]
+  },
+  {
+    "name": "Core file read/write buffer leaks",
+    "functions": [ "___smakebuf" ]
+  }
+]

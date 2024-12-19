@@ -27,10 +27,10 @@
 #include <mutex>
 #include <optional>
 #include <ostream>
-#include <regex>
 #include <set>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 #include <pthread.h>
 #include <lsan_internals.h>
@@ -43,8 +43,10 @@
 #endif
 
 #include "helpers/LeakKindStats.hpp"
+#include "behaviour/Behaviour.hpp"
 #include "statistics/Stats.hpp"
 #include "wrappers/realAlloc.hpp"
+#include "suppression/Suppression.hpp"
 
 namespace lsan {
 /**
@@ -62,12 +64,11 @@ class LSan final: public ATracker {
     std::mutex tlsKeyValuesMutex;
     /** An object holding all statistics.                                               */
     Stats stats;
+    /** The behaviour handling object.                                                  */
+    behaviour::Behaviour behaviour;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
-    /** The optional user regular expression.                                           */
-    std::optional<std::optional<std::regex>> userRegex;
-    /** The user regex error message.                                                   */
-    std::optional<std::string> userRegexError;
+    std::optional<std::vector<suppression::Suppression>> suppressions;
     /** The registered thread-local allocation trackers.                                */
     std::set<ATracker*> tlsTrackers;
     /** The mutex to manage the access to the registered thread-local trackers.         */
@@ -80,16 +81,6 @@ class LSan final: public ATracker {
     std::mutex timingMutex;
 #endif
 
-    /**
-     * @brief Generates and returns a regular expression object for the given string.
-     *
-     * Sets the regex error message if the given string was not a valid regular expression.
-     *
-     * @param regex the string with the regular expression
-     * @return an optional regex object
-     */
-    auto generateRegex(const char * regex) -> std::optional<std::regex>;
-
     auto classifyLeaks() -> LeakKindStats;
     auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> CountAndBytes;
 
@@ -99,13 +90,6 @@ class LSan final: public ATracker {
      * @return the copy
      */
     auto copyTrackerList() -> decltype(tlsTrackers);
-
-    /**
-     * Loads the user first party regular expression.
-     */
-    inline void loadUserRegex() {
-        userRegex = generateRegex(__lsan_firstPartyRegex);
-    }
 
     inline auto classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
@@ -210,8 +194,10 @@ class LSan final: public ATracker {
     }
 
 protected:
-    virtual inline void addToStats(const MallocInfo& info) final override {
-        stats += info;
+    virtual inline void maybeAddToStats(const MallocInfo& info) final override {
+        if (behaviour.statsActive()) {
+            stats += info;
+        }
     }
 
 public:
@@ -303,19 +289,9 @@ public:
         return timingMutex;
     }
 #endif
-    
-    /**
-     * Returns the user first party regular expression.
-     *
-     * @return the user regular expression
-     */
-    inline auto getUserRegex() -> const std::optional<std::regex> & {
-        if (!userRegex.has_value()) {
-            loadUserRegex();
-        }
-        return userRegex.value();
-    }
-    
+
+    auto getSuppressions() -> const std::vector<suppression::Suppression>&;
+
     /**
      * Returns the mutex for the allocations and tracking.
      *
@@ -385,7 +361,7 @@ public:
      *
      * @return the current statistics instance
      */
-    constexpr inline auto getStats() -> const Stats & {
+    constexpr inline auto getStats() const -> const Stats & {
         return stats;
     }
 
@@ -396,6 +372,15 @@ public:
     auto hasTLSKey(const pthread_key_t& key) -> bool;
 
     virtual auto addTLSValue(const pthread_key_t& key, const void* value) -> bool final override;
+
+    /**
+     * Returns the behaviour object associated with this instance.
+     *
+     * @return the associated behaviour object
+     */
+    constexpr inline auto getBehaviour() const -> const behaviour::Behaviour& {
+        return behaviour;
+    }
 
     friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;
 };

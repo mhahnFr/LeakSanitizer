@@ -20,6 +20,8 @@
  */
 
 #include <filesystem>
+#include <fstream>
+#include <sstream>
 
 #if __has_include(<unistd.h>)
  #include <unistd.h>
@@ -35,6 +37,16 @@
 #include "formatter.hpp"
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
+
+#include "suppression/defaultSuppression.hpp"
+#include "suppression/FunctionNotFoundException.hpp"
+#include "suppression/Suppression.hpp"
+#include "suppression/json/Exception.hpp"
+#include "suppression/json/parser.hpp"
+
+#ifndef VERSION
+ #define VERSION "clean build"
+#endif
 
 namespace lsan {
 auto getInstance() -> LSan & {
@@ -99,7 +111,7 @@ void exitHook() {
 }
 
 auto maybeHintRelativePaths(std::ostream & out) -> std::ostream & {
-    if (__lsan_relativePaths) {
+    if (getBehaviour().relativePaths()) {
         out << printWorkingDirectory << std::endl;
     }
     return out;
@@ -114,7 +126,7 @@ auto printWorkingDirectory(std::ostream & out) -> std::ostream & {
 
 auto isATTY() -> bool {
 #ifdef LSAN_HAS_UNISTD
-    return isatty(__lsan_printCout ? STDOUT_FILENO : STDERR_FILENO);
+    return isatty(getBehaviour().printCout() ? STDOUT_FILENO : STDERR_FILENO);
 #else
     return __lsan_printFormatted;
 #endif
@@ -130,7 +142,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     if (getInstance().hasPrintedExit) return out;
 
     out << std::endl << formatter::format<Style::GREEN>("Exiting");
-    if (__lsan_printExitPoint) {
+    if (getBehaviour().printExitPoint()) {
         out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
         callstackHelper::format(lcs::callstack(), out);
     }
@@ -141,7 +153,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
 
 auto getTracker() -> ATracker& {
     auto& globalInstance = getInstance();
-    if (globalInstance.finished || __lsan_statsActive) return globalInstance;
+    if (globalInstance.finished || getBehaviour().statsActive()) return globalInstance;
 
     const auto& key = globalInstance.saniKey;
     auto tlv = pthread_getspecific(key);
@@ -159,5 +171,73 @@ auto getTracker() -> ATracker& {
         return *tlsTracker;
     }
     return *static_cast<ATracker*>(tlv);
+}
+
+static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
+    auto toReturn = std::vector<std::filesystem::path>();
+    const auto& files = getBehaviour().suppressionFiles();
+    if (files != nullptr) {
+        auto stream = std::istringstream(files);
+        std::string s;
+        while (std::getline(stream, s, ':')) {
+            toReturn.push_back(s);
+        }
+    }
+    return toReturn;
+}
+
+static inline void loadSuppressions(std::vector<suppression::Suppression>& content, const json::Value& object) {
+    if (object.is(json::ValueType::Array)) {
+        for (const auto& object : object.as<json::ValueType::Array>()) {
+            try {
+                content.push_back(json::Object(object));
+            } catch (const suppression::FunctionNotFoundException& e) {
+                using namespace formatter;
+
+                if (getBehaviour().suppressionDevelopersMode()) {
+                    getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
+                                                                         + "\" ignored: Function \"" + e.getFunctionName()
+                                                                         + "\" not loaded.") << std::endl << std::endl;
+                }
+            }
+        }
+    } else {
+        content.push_back(json::Object(object));
+    }
+}
+
+auto loadSuppressions() -> std::vector<suppression::Suppression> {
+    auto toReturn = std::vector<suppression::Suppression>();
+    for (const auto& file : suppression::getDefaultSuppression()) {
+        try {
+            loadSuppressions(toReturn, json::parse(std::istringstream(file)));
+        } catch (const std::exception& e) {
+            using namespace formatter;
+            using namespace std::string_literals;
+
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default suppression file: "s + e.what()) << std::endl << std::endl;
+        }
+    }
+
+    for (const auto& file : getSuppressionFiles()) {
+        auto stream = std::ifstream();
+        stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+
+        try {
+            stream.open(file);
+            loadSuppressions(toReturn, json::parse(stream));
+        } catch (const std::exception& e) {
+            using namespace std::string_literals;
+            using namespace formatter;
+
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load suppression file \""s
+                                                                 + file.string() + "\": " + e.what()) << std::endl << std::endl;
+        }
+        if (stream.is_open()) {
+            stream.close();
+        }
+    }
+
+    return toReturn;
 }
 }

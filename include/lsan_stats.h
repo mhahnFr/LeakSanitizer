@@ -40,7 +40,7 @@ extern "C" {
  *
  * Setting it to `true` will cause this sanitizer to print the statistics upon normal termination of the program.
  */
-DEPRECATED("Since version 1.7 this is no longer supported.")
+LSAN_DEPRECATED("Since version 1.7 this is no longer supported.")
 extern bool __lsan_printStatsOnExit;
 
 /**
@@ -102,7 +102,7 @@ size_t __lsan_getBytePeek();
  * @return Whether the memory statistics can safely be queried.
  * @since 1.1
  */
-DEPRECATED("Since v1.5, refer to __lsan_statsActive")
+LSAN_DEPRECATED("Since v1.5, refer to __lsan_statsActive")
 static inline bool __lsan_statsAvailable() {
     return __lsan_statsActive;
 }
@@ -117,7 +117,7 @@ static inline bool __lsan_statsAvailable() {
  * @return Whether the memory fragmentation statistics are available.
  * @since 1.2
  */
-DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+LSAN_DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
 static inline bool __lsan_fStatsAvailable() {
     return __lsan_statsActive;
 }
@@ -132,7 +132,7 @@ static inline bool __lsan_fStatsAvailable() {
  * @return Whether the memory fragmentation statistics are available.
  * @since 1.2
  */
-DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+LSAN_DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
 static inline bool __lsan_fragStatsAvailable() {
     return __lsan_statsActive;
 }
@@ -147,7 +147,7 @@ static inline bool __lsan_fragStatsAvailable() {
  * @return Whether the memory fragmentation statistics are available.
  * @since 1.2
  */
-DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
+LSAN_DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
 static inline bool __lsan_fragmentationStatsAvailable() {
     return __lsan_statsActive;
 }
@@ -213,7 +213,7 @@ static inline void __lsan_printFStats() {
  *
  * @since 1.2
  */
-DEPRECATED("Since v1.9 refer to __lsan_printFStats() or __lsan_printFragmentationStats()")
+LSAN_DEPRECATED("Since v1.9 refer to __lsan_printFStats() or __lsan_printFragmentationStats()")
 static inline void __lsan_printFragStats() {
     __lsan_printFragmentationStats();
 }
@@ -249,7 +249,7 @@ static inline void __lsan_printFStatsWithWidth(size_t width) {
  * @param width The width in characters the printed bar should have.
  * @since 1.2
  */
-DEPRECATED("Since v1.9 refer to __lsan_printFStatsWithWidth(size_t) or __lsan_printFragmentationStatsWithWidth(size_t)")
+LSAN_DEPRECATED("Since v1.9 refer to __lsan_printFStatsWithWidth(size_t) or __lsan_printFragmentationStatsWithWidth(size_t)")
 static inline void __lsan_printFragStatsWithWidth(size_t width) {
     __lsan_printFragmentationStatsWithWidth(width);
 }

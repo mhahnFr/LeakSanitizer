@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Objective-C runtime initialization",
+    "functions": [ "__objc_init" ]
+  },
+  {
+    "name": "CoreFoundation initialization",
+    "functions": [ "___CFInitialize" ]
+  },
+  {
+    "name": "Objective-C runtime image loading",
+    "functions": [ "_load_images" ]
+  },
+  {
+    "name": "Objective-C message sends",
+    "functions": [ "__objc_msgSend_uncached" ]
+  },
+  {
+    "name": "Objective-C class look-up",
+    "functions": [ "_look_up_class" ]
+  },
+  {
+    "name": "NSLog",
+    "functions": [ "_NSLog" ]
+  }
+]

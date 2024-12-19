@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,17 +19,33 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef deprecation_h
-#define deprecation_h
+#include "defaultSuppression.hpp"
 
-#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
-#elif defined(__GNUC__) || defined(__clang__)
- #define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
-#else
- #define LSAN_DEPRECATED(message)
+#ifdef __APPLE__
+# define LSAN_APPLE
+#elif defined(__linux__)
+# define LSAN_LINUX
 #endif
 
-#define LSAN_DEPRECATED_PLAIN LSAN_DEPRECATED("")
+extern "C" {
+#ifdef LSAN_APPLE
+# include <macos/core.h>
+# include <macos/objc.h>
+#endif
+}
 
-#endif /* deprecation_h */
+namespace lsan::suppression {
+auto getDefaultSuppression() -> std::vector<std::string> {
+    auto toReturn = std::vector<std::string>();
+
+#ifdef LSAN_APPLE
+    toReturn.insert(toReturn.cbegin(), {
+        std::string(reinterpret_cast<const char*>(suppressions_macos_core), suppressions_macos_core_len),
+        std::string(reinterpret_cast<const char*>(suppressions_macos_objc), suppressions_macos_objc_len),
+    });
+    // TODO: Swift, AppKit, ...
+#endif
+
+    return toReturn;
+}
+}

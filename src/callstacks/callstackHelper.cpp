@@ -20,7 +20,7 @@
  */
 
 #include <map>
-#include <regex>
+#include <string>
 
 #include <lsan_internals.h>
 
@@ -38,8 +38,6 @@ namespace lsan::callstackHelper {
  * An enumeration containing the currently known classifications of a binary file path.
  */
 enum class Classification {
-    /** Indicates the file path should be ignored. */
-    ignored,
     /** Indicates the file path is first party.    */
     firstParty,
     /** Indicates the file path is user-defined.   */
@@ -48,33 +46,6 @@ enum class Classification {
 
 /** Caches the classifications of the file paths. */
 static std::map<const char*, Classification> cache;
-
-/**
- * Returns whether the given binary file name should be ignored totally.
- *
- * @param file the binary file name to be checked
- * @return whether to totally ignore the binary
- */
-static inline auto isTotallyIgnoredCore(const std::string& file) -> bool {
-    // So far totally ignored: Everything Objective-C and Swift (using ARC -> no leak).
-    return file.find("libobjc.A.dylib")    != std::string::npos
-        || file.rfind("/usr/lib/swift", 0) != std::string::npos;
-}
-
-/**
- * Returns whether the given file name is matched by the user defined regex.
- *
- * @param file the file name to be checked
- * @return whether the name was matched
- */
-static inline auto isUserDefinedFirstParty(const std::string & file) -> bool {
-    const auto & regex = getInstance().getUserRegex();
-    if (!regex.has_value()) {
-        return false;
-    }
-    
-    return regex_search(file, regex.value());
-}
 
 /**
  * Returns whether the given binary file name represents a first party
@@ -86,8 +57,7 @@ static inline auto isUserDefinedFirstParty(const std::string & file) -> bool {
 static inline auto isFirstPartyCore(const std::string& file) -> bool {
     return file.rfind("/usr/lib", 0) != std::string::npos
         || file.rfind("/lib", 0)     != std::string::npos
-        || file.rfind("/System", 0)  != std::string::npos
-        || isUserDefinedFirstParty(file);
+        || file.rfind("/System", 0)  != std::string::npos;
 }
 
 /**
@@ -97,9 +67,7 @@ static inline auto isFirstPartyCore(const std::string& file) -> bool {
  * @return the classification of the file name
  */
 static inline auto classify(const std::string& file) -> Classification {
-    if (isTotallyIgnoredCore(file)) {
-        return Classification::ignored;
-    } else if (isFirstPartyCore(file)) {
+    if (isFirstPartyCore(file)) {
         return Classification::firstParty;
     }
     return Classification::none;
@@ -115,34 +83,6 @@ static inline auto classifyAndCache(const char* file) -> Classification {
     const auto& toReturn = classify(file);
     cache.emplace(std::make_pair(file, toReturn));
     return toReturn;
-}
-
-/**
- * @brief Returns whether the given binary file name is totally ignored.
- *
- * Uses the cache as it sees fit.
- *
- * @param file the binary file name to be checked
- * @return whether the file name should be totally ignored
- */
-static inline auto isTotallyIgnoredCached(const char* file) -> bool {
-    const auto& it = cache.find(file);
-    if (it != cache.end()) {
-        return it->second == Classification::ignored;
-    }
-    return classifyAndCache(file) == Classification::ignored;
-}
-
-/**
- * @brief Returns whether the given binary file name should be totally ignored.
- *
- * Uses the cache if appropriate.
- *
- * @param file the binary file name to be checked
- * @return whether to totally ignore the file name
- */
-static inline auto isTotallyIgnored(const char* file) -> bool {
-    return callstack_autoClearCaches ? isTotallyIgnoredCore(file) : isTotallyIgnoredCached(file);
 }
 
 /**
@@ -173,31 +113,6 @@ static inline auto isFirstParty(const char* file) -> bool {
     return callstack_autoClearCaches ? isFirstPartyCore(file) : isFirstPartyCached(file);
 }
 
-auto getCallstackType(lcs::callstack & callstack) -> CallstackType {
-    const auto& frames = callstack_autoClearCaches ? callstack_getBinaries(callstack)
-                                                   : callstack_getBinariesCached(callstack);
-    if (frames == nullptr) return CallstackType::USER;
-
-    std::size_t firstPartyCount = 0;
-    const auto frameCount = callstack_getFrameCount(callstack);
-    for (std::size_t i = 0; i < frameCount; ++i) {
-        const auto binaryFile = frames[i].binaryFile;
-        
-        if (binaryFile == nullptr || frames[i].binaryFileIsSelf) {
-            continue;
-        } else if (isTotallyIgnored(binaryFile)) {
-            return CallstackType::HARD_IGNORE;
-        } else if (isFirstParty(binaryFile)) {
-            if (++firstPartyCount > __lsan_firstPartyThreshold) {
-                return CallstackType::FIRST_PARTY_ORIGIN;
-            }
-        } else {
-            return CallstackType::USER;
-        }
-    }
-    return CallstackType::FIRST_PARTY;
-}
-
 /**
  * @brief Returns the name of the binary file of the given callstack frame.
  *
@@ -211,7 +126,7 @@ static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::
         return "<< Unknown >>";
     }
     
-    return __lsan_relativePaths ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
+    return getBehaviour().relativePaths() ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
 }
 
 /**
@@ -223,7 +138,7 @@ static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::
  * @return the name of the source file name of the given callstack frame
  */
 static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) -> std::string {
-    return __lsan_relativePaths ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
+    return getBehaviour().relativePaths() ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
 }
 
 /**
@@ -237,7 +152,7 @@ template<formatter::Style S>
 static inline void formatShared(const callstack_frame& frame, std::ostream& out) {
     using namespace formatter;
 
-    if (__lsan_printBinaries) {
+    if (getBehaviour().printBinaries()) {
         bool reset = false;
         if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
@@ -245,7 +160,7 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
         out << formatter::format<Style::ITALIC>("(" + formatString<Style::BLUE>(getCallstackFrameName(frame)) + ")") << (reset ? get<S>() : "") << " ";
     }
     bool needsBrackets = false;
-    if (frame.sourceFile == nullptr || __lsan_printFunctions) {
+    if (frame.sourceFile == nullptr || getBehaviour().printFunctions()) {
         out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
         needsBrackets = true;
     }
@@ -292,7 +207,7 @@ void format(lcs::callstack & callstack, std::ostream & stream, const std::string
     bool firstHit   = true,
          firstPrint = true;
     std::size_t i, printed;
-    for (i = printed = 0; i < size && printed < __lsan_callstackSize; ++i) {
+    for (i = printed = 0; i < size && printed < getBehaviour().callstackSize(); ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
@@ -317,5 +232,25 @@ void format(lcs::callstack & callstack, std::ostream & stream, const std::string
         stream << std::endl << indent << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more line" + (size - i > 1 ? "s" : "") + "...") << std::endl;
         getInstance().setCallstackSizeExceeded(true);
     }
+}
+
+auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& callstack) -> bool {
+    for (std::size_t i = 0; i + suppression.topCallstack.size() <= callstack->backtraceSize; ++i) {
+        auto matched { false };
+        for (std::size_t j = 0; j < suppression.topCallstack.size(); ++j) {
+            const auto& frameAddress = uintptr_t(callstack->backtrace[i + j]);
+            const auto& range = suppression.topCallstack[j];
+            if (frameAddress >= range.first && frameAddress <= range.first + range.second) {
+                matched = true;
+            } else {
+                matched = false;
+                break;
+            }
+        }
+        if (matched) {
+            return true;
+        }
+    }
+    return false;
 }
 }

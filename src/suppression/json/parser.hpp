@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,17 +19,29 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef deprecation_h
-#define deprecation_h
+#ifndef parser_hpp
+#define parser_hpp
 
-#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
-#elif defined(__GNUC__) || defined(__clang__)
- #define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
-#else
- #define LSAN_DEPRECATED(message)
-#endif
+#include <istream>
 
-#define LSAN_DEPRECATED_PLAIN LSAN_DEPRECATED("")
+#include "Object.hpp"
 
-#endif /* deprecation_h */
+namespace lsan::json {
+auto parse(std::istream& stream) -> Value;
+
+static inline auto parse(std::istream&& stream) -> Value {
+    return parse(stream);
+}
+
+template<ValueType T>
+constexpr inline auto parse(std::istream& stream) {
+    return parse(stream).as<T>();
+}
+
+template<ValueType T>
+constexpr inline auto parse(std::istream&& stream) {
+    return parse(stream).as<T>();
+}
+}
+
+#endif /* parser_hpp */

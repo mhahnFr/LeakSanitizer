@@ -49,19 +49,6 @@ namespace lsan {
 std::atomic_bool LSan::finished = false;
 std::atomic_bool LSan::preventDealloc = false;
 
-auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
-    if (regex == nullptr || *regex == '\0') {
-        return std::nullopt;
-    }
-    
-    try {
-        return std::regex(regex);
-    } catch (std::regex_error & e) {
-        userRegexError = e.what();
-        return std::nullopt;
-    }
-}
-
 constexpr static const auto alignment = sizeof(void*);
 
 static constexpr inline auto align(uintptr_t ptr, bool up = true) -> uintptr_t {
@@ -92,7 +79,7 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> Coun
             ++count;
             bytes += elem.get().size;
         }
-        
+
         const auto beginPtr = align(elem.get().pointer);
         const auto   endPtr = align(beginPtr + elem.get().size, false);
 
@@ -265,7 +252,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
-    const auto& [stackHereDirect, stackHereBytes, 
+    const auto& [stackHereDirect, stackHereBytes,
                  stackHereIndirect, stackHereBytesIndirect] = classifyLeaks(here, begin,
                                                                             LeakType::reachableDirect, LeakType::reachableIndirect,
                                                                             toReturn.recordsStack, true);
@@ -286,7 +273,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         toReturn.bytesGlobal += regionBytes;
         toReturn.bytesGlobalIndirect += regionBytesIndirect;
     }
-    
+
     out << clear << "Reachability analysis: Runtime thread-local variables...";
     // Search in the runtime thread locals
     for (const auto& key : keys) {
@@ -514,10 +501,10 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
     if (it->second.deleted) {
         return std::make_pair(false, std::ref(it->second));
     }
-    if (__lsan_statsActive) {
+    if (behaviour.statsActive()) {
         stats -= it->second;
     }
-    if (__lsan_statsActive) {
+    if (behaviour.statsActive()) {
         it->second.markDeleted();
     } else {
         infos.erase(it);
@@ -540,7 +527,7 @@ void LSan::changeMalloc(ATracker* tracker, MallocInfo&& info) {
         }
         return;
     }
-    if (__lsan_statsActive) {
+    if (behaviour.statsActive()) {
         stats.replaceMalloc(it->second.size, info.size);
     }
     infos.insert_or_assign(info.pointer, info);
@@ -563,7 +550,7 @@ static inline auto printCallstackSizeExceeded(std::ostream & stream) -> std::ost
            << formatter::format<Style::ITALIC>(" to see longer callstacks, increase the value of ")
            << formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << formatter::get<Style::GREYED>
            << " (__lsan_callstackSize)" << formatter::format<Style::ITALIC>(" (currently ")
-           << formatter::clear<Style::GREYED> << __lsan_callstackSize
+           << formatter::clear<Style::GREYED> << getBehaviour().callstackSize()
            << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
     
     return stream;
@@ -582,7 +569,7 @@ auto LSan::addTLSValue(const pthread_key_t& key, const void* value) -> bool {
     }
 
     std::lock_guard lock { tlsKeyValuesMutex };
-    
+
     tlsKeyValues.insert_or_assign(std::make_pair(pthread_self(), key), value);
 
     return true;
@@ -605,6 +592,13 @@ auto LSan::hasTLSKey(const pthread_key_t& key) -> bool {
     std::lock_guard lock { tlsKeyMutex };
 
     return keys.count(key) != 0;
+}
+
+auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
+    if (!suppressions) {
+        suppressions = loadSuppressions();
+    }
+    return *suppressions;
 }
 
 /**
@@ -634,27 +628,42 @@ static inline void printDeprecation(      std::ostream & out,
  * @return the given output stream
  */
 static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostream & {
-    using formatter::Style;
-    
+    using namespace formatter;
+
     if (has("LSAN_PRINT_STATS_ON_EXIT")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_STATS_ON_EXIT",
-                         "__lsan_printStatsOnExit",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.7"));
+        printDeprecation(out, "LSAN_PRINT_STATS_ON_EXIT", "__lsan_printStatsOnExit",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.7"));
     }
     if (has("LSAN_PRINT_LICENSE")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_LICENSE",
-                         "__lsan_printLicense",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.8"));
+        printDeprecation(out, "LSAN_PRINT_LICENSE", "__lsan_printLicense",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     if (has("LSAN_PRINT_WEBSITE")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_WEBSITE",
-                         "__lsan_printWebsite",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.8"));
+        printDeprecation(out, "LSAN_PRINT_WEBSITE", "__lsan_printWebsite",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.8"));
+    }
+    if (has("LSAN_FIRST_PARTY_THRESHOLD")) {
+        printDeprecation(out, "LSAN_FIRST_PARTY_THRESHOLD", "__lsan_firstPartyThreshold",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
+    }
+    if (has("LSAN_FIRST_PARTY_REGEX")) {
+        printDeprecation(out, "LSAN_FIRST_PARTY_REGEX", "__lsan_firstPartyRegex",
+                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
     return out;
+}
+
+template<typename T>
+static inline constexpr auto isSuppressed(const T& suppressions, const MallocInfo& info) -> bool {
+    for (const auto& suppression : suppressions) {
+        if (suppression.size && *suppression.size != info.size) {
+            continue;
+        }
+        if (callstackHelper::isSuppressed(suppression, info.createdCallstack)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
@@ -662,8 +671,9 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
     std::lock_guard lock(self.infoMutex);
 
+    callstack_rawNames = self.behaviour.suppressionDevelopersMode();
     callstack_autoClearCaches = false;
-    
+
     const auto& stats = self.classifyLeaks();
 
     // [x] classify the leaks
@@ -674,7 +684,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     // [x] print hint for how to make the rest visible
 
     if (stats.getTotal() > 0) {
-        // TODO: Optionally collaps identical callstacks
+        // TODO: Optionally collapse identical callstacks
         // TODO: Further formatting
         // TODO: Maybe split between direct and indirect?
         stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
@@ -682,7 +692,8 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl
                << std::endl;
 
-        for (const auto& record : stats.recordsLost) {
+        const auto& suppressions = self.getSuppressions();
+    for (const auto& record : stats.recordsLost) {
             if (record->leakType != LeakType::unreachableDirect) continue;
 
             stream << *record << std::endl;
@@ -708,7 +719,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
             stream << printCallstackSizeExceeded;
             self.callstackSizeExceeded = false;
         }
-        if (__lsan_relativePaths) {
+        if (self.behaviour.relativePaths()) {
             stream << printWorkingDirectory;
         }
     } else {
@@ -716,14 +727,6 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     }
 
     stream << maybeShowDeprecationWarnings;
-    if (self.userRegexError.has_value()) {
-        stream << std::endl << get<Style::RED>
-               << format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
-               << format<Style::ITALIC>("__lsan_firstPartyRegex") << ") "
-               << format<Style::BOLD>("ignored: ")
-               << format<Style::ITALIC, Style::BOLD>("\"" + self.userRegexError.value() + "\"")
-               << clear<Style::RED> << std::endl;
-    }
     if (stats.getTotal() > 0) {
         // TODO: Further formatting
         stream << std::endl << format<Style::BOLD>("Summary:") << std::endl

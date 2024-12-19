@@ -73,3 +73,6 @@ xcuserdata/
 
 *~
 .*
+
+suppressions/macos/*.h
+suppressions/*.h
