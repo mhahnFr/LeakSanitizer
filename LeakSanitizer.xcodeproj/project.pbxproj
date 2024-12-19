@@ -42,18 +42,18 @@
 		BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */; };
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
-		BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */; };
 		BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */; };
+		BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */; };
 		BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC817142BEFB36E00332937 /* TLSTracker.cpp */; };
 		BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817152BEFB36E00332937 /* TLSTracker.hpp */; };
 		BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCF0B252BDD54A900EE259C /* misc.cpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
 		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
+		BFDD6DFF2CC6B5D2008B9CDC /* Region.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */; };
+		BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */; };
 		BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */; };
 		BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
 		BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F62CA8765500AEFD5A /* helper.hpp */; };
-		BFDD6DFF2CC6B5D2008B9CDC /* Region.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */; };
-		BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */; };
 		F12CA5DD2CB40E6A00C93A2C /* libobjc.A.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */; };
 		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
@@ -129,21 +129,20 @@
 		BFCF0B252BDD54A900EE259C /* misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
+		BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Region.hpp; sourceTree = "<group>"; };
+		BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LeakKindStats.hpp; sourceTree = "<group>"; };
 		BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AutoStats.cpp; sourceTree = "<group>"; };
 		BFE023F22CA874D100AEFD5A /* Behaviour.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Behaviour.hpp; sourceTree = "<group>"; };
 		BFE023F62CA8765500AEFD5A /* helper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helper.hpp; sourceTree = "<group>"; };
+		F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libobjc.A.tbd; path = usr/lib/libobjc.A.tbd; sourceTree = SDKROOT; };
 		F13529AE2D10779B002534D0 /* defaultSuppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = defaultSuppression.cpp; sourceTree = "<group>"; };
 		F13529B02D108324002534D0 /* defaultSuppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = defaultSuppression.hpp; sourceTree = "<group>"; };
 		F13529BB2D109F4C002534D0 /* schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
-		F13529BC2D10A0A2002534D0 /* core.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = core.json; sourceTree = "<group>"; };
-		F13529BD2D10A499002534D0 /* objc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = objc.json; sourceTree = "<group>"; };
-		BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Region.hpp; sourceTree = "<group>"; };
-		BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LeakKindStats.hpp; sourceTree = "<group>"; };
-		F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libobjc.A.tbd; path = usr/lib/libobjc.A.tbd; sourceTree = SDKROOT; };
 		F16901512C403EF200EED0AE /* utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
 		F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ObjectPool.hpp; sourceTree = "<group>"; };
+		F1ACE4162D148B0F00E779A7 /* core.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = core.json; sourceTree = "<group>"; };
 		F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealAllocator.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -222,7 +221,6 @@
 				BF4368F62AACF06F00252E2A /* crash.hpp */,
 				BF4368F72AACF07700252E2A /* warn.hpp */,
 				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
-				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
 				BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */,
 				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
 				BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */,
@@ -348,8 +346,7 @@
 		F13529BA2D109417002534D0 /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				F13529BD2D10A499002534D0 /* objc.json */,
-				F13529BC2D10A0A2002534D0 /* core.json */,
+				F1ACE4162D148B0F00E779A7 /* core.json */,
 			);
 			path = macos;
 			sourceTree = "<group>";
