@@ -212,6 +212,19 @@ static inline void destroySaniKey(void* value) {
     }
 }
 
+template<typename T>
+static inline constexpr auto isSuppressed(const T& suppressions, const MallocInfo& info) -> bool {
+    for (const auto& suppression : suppressions) {
+        if (suppression.size && *suppression.size != info.size) {
+            continue;
+        }
+        if (callstackHelper::isSuppressed(suppression, info.createdCallstack)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 auto LSan::classifyLeaks() -> LeakKindStats {
     // TODO: Search on the other thread stacks
     auto toReturn = LeakKindStats();
@@ -226,9 +239,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << "Searching globals and compile time thread locals...";
     const auto& [regions, locals] = getGlobalRegionsAndTLVs();
     out << clear << "Collecting the leaks...";
+    const auto& suppressions = getSuppressions();
     for (auto it = infos.begin(); it != infos.end();) {
         const auto& local = locals.find(it->first);
-        if (local != locals.end() || it->second.deleted || callstackHelper::getCallstackType(it->second.createdCallstack) != callstackHelper::CallstackType::USER) {
+        if (local != locals.end() || it->second.deleted || isSuppressed(suppressions, it->second)) {
             // TODO: In the future only erase the deleted records
             it = infos.erase(it);
         } else {
@@ -653,19 +667,6 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
-template<typename T>
-static inline constexpr auto isSuppressed(const T& suppressions, const MallocInfo& info) -> bool {
-    for (const auto& suppression : suppressions) {
-        if (suppression.size && *suppression.size != info.size) {
-            continue;
-        }
-        if (callstackHelper::isSuppressed(suppression, info.createdCallstack)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     using namespace formatter;
 
@@ -692,7 +693,6 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl
                << std::endl;
 
-        const auto& suppressions = self.getSuppressions();
     for (const auto& record : stats.recordsLost) {
             if (record->leakType != LeakType::unreachableDirect) continue;
 
