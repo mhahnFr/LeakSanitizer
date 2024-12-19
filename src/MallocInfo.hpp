@@ -67,6 +67,7 @@ struct MallocInfo {
     mutable lcs::callstack createdCallstack;
     /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
+    std::optional<std::string> imageName;
 
     /** Indicates whether this record has been printed as a root. */
     bool printedInRoot = false;

@@ -76,6 +76,9 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
            << format<Style::BOLD, Style::RED>("Leak") << " of size "
            << clear<Style::ITALIC>
            << bytesToString(size) << get<Style::ITALIC> << ", " << leakType;
+    if (imageName) {
+        stream << " in " << format<Style::BLUE>(*imageName); // TODO: Relativate?
+    }
 
     std::size_t count { 0 },
                 bytes { 0 };

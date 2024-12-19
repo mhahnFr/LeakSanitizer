@@ -305,7 +305,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& [regionDirect, regionBytes,
                      regionIndirect, regionBytesIndirect] = classifyLeaks(align(region.begin), align(region.end, false),
                                                                           LeakType::globalDirect, LeakType::globalIndirect,
-                                                                          toReturn.recordsGlobal, true);
+                                                                          toReturn.recordsGlobal, true, region.name);
         toReturn.global += regionDirect;
         toReturn.globalIndirect += regionIndirect;
         toReturn.bytesGlobal += regionBytes;

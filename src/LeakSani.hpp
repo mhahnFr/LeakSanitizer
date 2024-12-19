@@ -104,7 +104,8 @@ class LSan final: public ATracker {
 
     inline auto classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
-                              std::set<MallocInfo*>& directs, bool skipClassifieds = false) -> CountAndBytesAndIndirect {
+                              std::set<MallocInfo*>& directs, bool skipClassifieds = false,
+                              const std::optional<std::string>& name = std::nullopt) -> CountAndBytesAndIndirect {
         std::size_t directCount   { 0 },
                     indirectCount { 0 },
                     directBytes   { 0 },
@@ -118,6 +119,7 @@ class LSan final: public ATracker {
                 record->second.leakType = direct;
                 ++directCount;
                 directBytes += record->second.size;
+                record->second.imageName = name;
                 directs.insert(&record->second);
             }
             const auto& [count, bytes] = classifyRecord(record->second, indirect);
