@@ -16,8 +16,9 @@
         "description": "The name of the suppression"
       },
       "size": {
-        "type": "number",
-        "description": "The byte amount of the memory leak to be suppressed"
+        "type": "integer",
+        "description": "The byte amount of the memory leak to be suppressed",
+        "minimum": 0
       },
       "functions": {
         "type": "array",
@@ -37,8 +38,9 @@
               "description": "The name of the function as used by the linker"
             },
             "offset": {
-              "type": "number",
-              "description": "The offset into the function"
+              "type": "integer",
+              "description": "The offset into the function",
+              "minimum": 0
             },
             "library": {
               "type": "string",
