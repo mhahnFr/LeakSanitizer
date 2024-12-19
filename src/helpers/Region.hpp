@@ -22,6 +22,8 @@
 #ifndef Region_hpp
 #define Region_hpp
 
+#include <string>
+
 namespace lsan {
 /**
  * This strcuture represents a memory region.
@@ -31,14 +33,7 @@ struct Region {
     void* begin,
     /** The end of the region.   */
         * end;
-
-    /**
-     * Constructs a region defined by the given bounds.
-     *
-     * @param begin the begin of the region
-     * @param end the end of the region
-     */
-    Region(void* begin, void* end): begin(begin), end(end) {}
+    std::string name;
 };
 }
 
