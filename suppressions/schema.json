@@ -6,9 +6,6 @@
   "description": "Array of leak suppressions",
   "items": {
     "type": "object",
-    "required": [
-      "functions"
-    ],
     "description": "Single memory leak suppression",
     "properties": {
       "name": {
@@ -19,6 +16,16 @@
         "type": "integer",
         "description": "The byte amount of the memory leak to be suppressed",
         "minimum": 0
+      },
+      "imageName": {
+        "type": "string",
+        "description": "The name of the runtime image the leak is in"
+      },
+      "type": {
+        "type": "integer",
+        "description": "The type of the leak",
+        "minimum": 0,
+        "maximum": 10
       },
       "functions": {
         "type": "array",

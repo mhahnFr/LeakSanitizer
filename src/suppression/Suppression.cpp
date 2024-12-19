@@ -40,29 +40,43 @@ auto Suppression::getFunctionPair(const std::string& name,
     return std::make_pair(result.begin, result.length);
 }
 
+static inline constexpr auto asLeakType(const std::optional<unsigned long>& number) -> std::optional<LeakType> {
+    if (number && *number > 10) {
+        throw std::runtime_error("Not a leak type: " + std::to_string(*number));
+    }
+    return number ? std::optional(LeakType(*number)) : std::nullopt;
+}
+
 Suppression::Suppression(const Object& object):
     name(object.get<ValueType::String>("name").value_or("<unnamed>")),
-    size(object.get<ValueType::Int>("size"))
+    size(object.get<ValueType::Int>("size")),
+    leakType(asLeakType(object.get<ValueType::Int>("type"))),
+    imageName(object.get<ValueType::String>("imageName"))
 {
-    const auto functionArray = object.get<ValueType::Array>("functions").value();
-    if (functionArray.size() < 1) {
-        throw std::runtime_error("Function array empty");
+    const auto& functionArray = object.get<ValueType::Array>("functions");
+    if (!imageName && !functionArray) {
+        throw std::runtime_error("Suppressions need either 'imageName' or 'functions'");
     }
-    topCallstack.reserve(functionArray.size());
-    for (const auto& functionObject : functionArray) {
-        std::string         name;
-        std::optional<long> offset;
-        std::optional<std::string> libraryName;
-
-        if (functionObject.type == ValueType::Object) {
-            const auto& theObject = Object(functionObject);
-            name = theObject.get<ValueType::String>("name").value();
-            offset = theObject.get<ValueType::Int>("offset");
-            libraryName = theObject.get<ValueType::String>("library");
-        } else {
-            name = functionObject.as<ValueType::String>();
+    if (functionArray) {
+        if (functionArray->size() < 1) {
+            throw std::runtime_error("Function array empty");
         }
-        topCallstack.push_back(getFunctionPair(name, offset, libraryName));
+        topCallstack.reserve(functionArray->size());
+        for (const auto& functionObject : *functionArray) {
+            std::string         name;
+            std::optional<long> offset;
+            std::optional<std::string> libraryName;
+
+            if (functionObject.type == ValueType::Object) {
+                const auto& theObject = Object(functionObject);
+                name = theObject.get<ValueType::String>("name").value();
+                offset = theObject.get<ValueType::Int>("offset");
+                libraryName = theObject.get<ValueType::String>("library");
+            } else {
+                name = functionObject.as<ValueType::String>();
+            }
+            topCallstack.push_back(getFunctionPair(name, offset, libraryName));
+        }
     }
 }
 }

@@ -29,15 +29,14 @@
 
 #include "json/Object.hpp"
 
+#include "../LeakType.hpp"
+
 namespace lsan::suppression {
-/*
- TODO: Once the reachbility is available, add the following information to this class:
- - leak type
- - runtime image name where the leak is found (optional)
- */
 struct Suppression {
     std::string name;
     std::optional<std::size_t> size;
+    std::optional<LeakType> leakType;
+    std::optional<std::string> imageName;
 
     std::vector<std::pair<uintptr_t, std::size_t>> topCallstack;
 
