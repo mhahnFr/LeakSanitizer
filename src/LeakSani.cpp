@@ -239,7 +239,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << "Searching globals and compile time thread locals...";
     const auto& [regions, locals] = getGlobalRegionsAndTLVs();
     out << clear << "Collecting the leaks...";
-    const auto& suppressions = getSuppressions();
+//    const auto& suppressions = getSuppressions();
     for (auto it = infos.begin(); it != infos.end();) {
 //        const auto& local = locals.find(it->first);
         if (/*local != locals.end() || */it->second.deleted/* || isSuppressed(suppressions, it->second)*/) {
@@ -671,6 +671,14 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
+static inline void printRecord(std::ostream& out, const MallocInfo& info) {
+    auto ptr = reinterpret_cast<void**>(info.pointer);
+    for (std::size_t i = 0; i < info.size / 8; ++i) {
+        out << ptr[i] << ", ";
+    }
+    out << std::endl << info.pointer << " ";
+}
+
 auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     using namespace formatter;
 
@@ -697,14 +705,10 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl
                << std::endl;
 
-    for (const auto& record : stats.recordsLost) {
+        for (const auto& record : stats.recordsLost) {
             if (record->leakType != LeakType::unreachableDirect) continue;
 
-//            auto ptr = reinterpret_cast<void**>(record->pointer);
-//            for (std::size_t i = 0; i < record->size / 8; ++i) {
-//                stream << ptr[i] << ", ";
-//            }
-//            stream << std::endl << record->pointer << " ";
+            printRecord(stream, *record);
             stream << *record << std::endl;
         }
 
@@ -712,35 +716,19 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
         if ((false)) { // TODO: If should show reachables
             for (const auto& record : stats.recordsGlobal) {
-//                auto ptr = reinterpret_cast<void**>(record->pointer);
-//                for (std::size_t i = 0; i < record->size / 8; ++i) {
-//                    stream << ptr[i] << ", ";
-//                }
-//                stream << std::endl << record->pointer << " ";
+//                printRecord(stream, *record);
                 stream << *record << std::endl;
             }
             for (const auto& record : stats.recordsObjC) {
-//                auto ptr = reinterpret_cast<void**>(record->pointer);
-//                for (std::size_t i = 0; i < record->size / 8; ++i) {
-//                    stream << ptr[i] << ", ";
-//                }
-//                stream << std::endl << record->pointer << " ";
+//                printRecord(stream, *record);
                 stream << *record << std::endl;
             }
             for (const auto& record : stats.recordsTlv) {
-//                auto ptr = reinterpret_cast<void**>(record->pointer);
-//                for (std::size_t i = 0; i < record->size / 8; ++i) {
-//                    stream << ptr[i] << ", ";
-//                }
-//                stream << std::endl << record->pointer << " ";
+//                printRecord(stream, *record);
                 stream << *record << std::endl;
             }
             for (const auto& record : stats.recordsStack) {
-//                auto ptr = reinterpret_cast<void**>(record->pointer);
-//                for (std::size_t i = 0; i < record->size / 8; ++i) {
-//                    stream << ptr[i] << ", ";
-//                }
-//                stream << std::endl << record->pointer << " ";
+//                printRecord(stream, *record);
                 stream << *record << std::endl;
             }
         } else if (stats.getTotalReachable() > 0) {
