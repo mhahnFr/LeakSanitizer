@@ -235,8 +235,6 @@ extern size_t __lsan_firstPartyThreshold;
 LSAN_DEPRECATED("Since version 1.11 this is no longer supported")
 extern const char* __lsan_firstPartyRegex;
 
-extern const char* __lsan_leakKinds;
-
 #ifdef __cplusplus
 } // extern "C"
 #endif
