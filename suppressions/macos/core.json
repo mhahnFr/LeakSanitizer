@@ -1,10 +1,10 @@
 [
   {
-    "name": "libSystem initialization leaks",
-    "functions": [ "_libSystem_initializer" ]
+    "name": "Everything in the DYLD",
+    "imageName": "/usr/lib/dyld"
   },
   {
-    "name": "Core file read/write buffer leaks",
-    "functions": [ "___smakebuf" ]
+    "name": "Everything in the Objective-C runtime",
+    "imageName": "/usr/lib/libobjc.A.dylib"
   }
 ]
