@@ -68,7 +68,7 @@ extern bool __lsan_printFormatted;
  *
  * @since 1.1
  */
-DEPRECATED("Since version 1.8 this is no longer supported")
+LSAN_DEPRECATED("Since version 1.8 this is no longer supported")
 extern bool __lsan_printLicense;
 
 /**
@@ -80,7 +80,7 @@ extern bool __lsan_printLicense;
  *
  * @since 1.4
  */
-DEPRECATED("Since version 1.8 this is no longer supported")
+LSAN_DEPRECATED("Since version 1.8 this is no longer supported")
 extern bool __lsan_printWebsite;
 
 /**
@@ -121,7 +121,7 @@ extern bool __lsan_freeNull;
 extern bool __lsan_zeroAllocation;
 
 /**
- * @deprecated Since 1.5, replaced by `__lsan_statsActive`. Will be removed in v2.
+ * @deprecated Since 1.5 replaced by `__lsan_statsActive`. Will be removed in v2.
  *
  * @brief If this value is set to `true`, the memory fragmentation can be analyzed.
  *
@@ -130,7 +130,7 @@ extern bool __lsan_zeroAllocation;
  *
  * @since 1.2
  */
-DEPRECATED("Since v1.5, replaced by __lsan_statsActive")
+LSAN_DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
 extern bool __lsan_trackMemory;
 
 /**
@@ -206,6 +206,9 @@ extern size_t __lsan_leakCount;
 extern size_t __lsan_callstackSize;
 
 /**
+ * @deprecated Since version 1.11 the old suppression system is no longer
+ * supported - use the new suppression files instead. Will be removed in version 2.
+ *
  * @brief This value defines the number of first party frames upon which callstacks
  * are considered to be first party.
  *
@@ -214,9 +217,13 @@ extern size_t __lsan_callstackSize;
  *
  * @since 1.7
  */
+LSAN_DEPRECATED("Since version 1.11 this is no longer supported")
 extern size_t __lsan_firstPartyThreshold;
 
 /**
+ * @deprecated Since version 1.11 the old suppression system is no longer
+ * supported - use the new suppression files instead. Will be removed in version 2.
+ *
  * @brief This string defines the regex pattern for which binary file
  * names are considered to be first party.
  *
@@ -225,16 +232,13 @@ extern size_t __lsan_firstPartyThreshold;
  *
  * @since 1.8
  */
+LSAN_DEPRECATED("Since version 1.11 this is no longer supported")
 extern const char* __lsan_firstPartyRegex;
 
 extern const char* __lsan_leakKinds;
 
 #ifdef __cplusplus
 } // extern "C"
-#endif
-
-#ifndef VERSION
- #define VERSION "clean build"
 #endif
 
 #endif /* lsan_internals_h */

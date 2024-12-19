@@ -56,6 +56,16 @@ Adapt the value of the `INSTALL_PATH` argument to your needs.
 If you have downloaded a release or if you have created a portable build you can simply move the headers and the library
 anywhere you like.
 
+#### Build dependencies
+The LeakSanitizer adheres to the C++17 standard.
+
+Additionally, the following command line tools are needed to successfully build the sanitizer:
+- GNU compatible `make` command line tool
+- The `find` command line tool *(POSIX.1-2001)*
+- The `uname` command line tool *(POSIX.2)*
+
+All dependencies introduced by the [CallstackLibrary][5] are necessary as well (find them [here][11]).
+
 #### Uninstallation
 Uninstall the sanitizer by simply removing its library and its header files from the installation directory.  
 This can be done using the following command:
@@ -167,24 +177,37 @@ The DWARF parser supports DWARF in version **2**, **3**, **4** and **5**.
 Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the following environment variables to
 their indicated values:
 
-| Name                         | Description                                                                    | Values            | Default value |
-|------------------------------|--------------------------------------------------------------------------------|-------------------|---------------|
-| `LSAN_HUMAN_PRINT`           | Print human-readably formatted                                                 | `true`, `false`   | `true`        |
-| `LSAN_PRINT_COUT`            | Print to the default output stream                                             | `true`, `false`   | `false`       |
-| `LSAN_PRINT_FORMATTED`       | Print using ANSI escape codes                                                  | `true`, `false`   | `true`        |
-| `LSAN_INVALID_CRASH`         | Terminate if an invalid action is detected                                     | `true`, `false`   | `true`        |
-| `LSAN_INVALID_FREE`          | Detect invalid de-allocations                                                  | `true`, `false`   | `true`        |
-| `LSAN_FREE_NULL`             | Issue a warning if `NULL` is `free`d                                           | `true`, `false`   | `false`       |
-| `LSAN_STATS_ACTIVE`          | Enable the statistical bookkeeping                                             | `true`, `false`   | `false`       |
-| `LSAN_LEAK_COUNT`            | The amount of leaks to be printed in detail                                    | `0` to `SIZE_MAX` | `100`         |
-| `LSAN_CALLSTACK_SIZE`        | The amount of frames to be printed in a callstack                              | `0` to `SIZE_MAX` | `20`          |
-| `LSAN_FIRST_PARTY_THRESHOLD` | **Since v1.7:** The amount of first party frames                               | `0` to `SIZE_MAX` | `3`           |
-| `LSAN_PRINT_EXIT_POINT`      | **Since v1.7:** Print the callstack of the exit point                          | `true`, `false`   | `false`       |
-| `LSAN_PRINT_BINARIES`        | **Since v1.8:** Print the binary file names                                    | `true`, `false`   | `true`        |
-| `LSAN_PRINT_FUNCTIONS`       | **Since v1.8:** Always print the function names                                | `true`, `false`   | `true`        |
-| `LSAN_RELATIVE_PATHS`        | **Since v1.8:** Allow relative paths to be printed                             | `true`, `false`   | `true`        |
-| `LSAN_ZERO_ALLOCATION`       | **Since v1.8:** Issue a warning when `0` byte are allocated                    | `true`, `false`   | `false`       |
-| `LSAN_FIRST_PARTY_REGEX`     | **Since v1.8:** Binary files matching this regex are considered "first party". | *Any regex*       | *None*        |
+| Name                         | Description                                                                              | Values              | Default value |
+|------------------------------|------------------------------------------------------------------------------------------|---------------------|---------------|
+| `LSAN_HUMAN_PRINT`           | Print human-readably formatted                                                           | `true`, `false`     | `true`        |
+| `LSAN_PRINT_COUT`            | Print to the default output stream                                                       | `true`, `false`     | `false`       |
+| `LSAN_PRINT_FORMATTED`       | Print using ANSI escape codes                                                            | `true`, `false`     | `true`        |
+| `LSAN_INVALID_CRASH`         | Terminate if an invalid action is detected                                               | `true`, `false`     | `true`        |
+| `LSAN_INVALID_FREE`          | Detect invalid de-allocations                                                            | `true`, `false`     | `true`        |
+| `LSAN_FREE_NULL`             | Issue a warning if `NULL` is `free`d                                                     | `true`, `false`     | `false`       |
+| `LSAN_STATS_ACTIVE`          | Enable the statistical bookkeeping                                                       | `true`, `false`     | `false`       |
+| `LSAN_LEAK_COUNT`            | The amount of leaks to be printed in detail                                              | `0` to `SIZE_MAX`   | `100`         |
+| `LSAN_CALLSTACK_SIZE`        | The amount of frames to be printed in a callstack                                        | `0` to `SIZE_MAX`   | `20`          |
+| `LSAN_FIRST_PARTY_THRESHOLD` | **Since v1.7:** The amount of first party frames                                         | `0` to `SIZE_MAX`   | `3`           |
+| `LSAN_PRINT_EXIT_POINT`      | **Since v1.7:** Print the callstack of the exit point                                    | `true`, `false`     | `false`       |
+| `LSAN_PRINT_BINARIES`        | **Since v1.8:** Print the binary file names                                              | `true`, `false`     | `true`        |
+| `LSAN_PRINT_FUNCTIONS`       | **Since v1.8:** Always print the function names                                          | `true`, `false`     | `true`        |
+| `LSAN_RELATIVE_PATHS`        | **Since v1.8:** Allow relative paths to be printed                                       | `true`, `false`     | `true`        |
+| `LSAN_ZERO_ALLOCATION`       | **Since v1.8:** Issue a warning when `0` byte are allocated                              | `true`, `false`     | `false`       |
+| `LSAN_FIRST_PARTY_REGEX`     | **Since v1.8:** Binary files matching this regex are considered "first party".           | *Any regex*         | *None*        |
+| `LSAN_AUTO_STATS`            | **Since v1.11:** Time interval between the automatically statistics printing (when set). | *Any time interval* | *None*        |
+
+> [!TIP]
+> `LSAN_AUTO_STATS` should be assigned a number with a time unit directly after the number.  
+> The following time units are available:
+> - `ns`: nanoseconds
+> - `us`: microseconds
+> - `ms`: milliseconds
+> - `s`: seconds
+> - `m`: minutes
+> - `h`: hours
+>
+> The default unit when none is given is seconds.
 
 More on the environment variables [here][2].
 
@@ -248,3 +271,4 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 [8]: #installation
 [9]: https://github.com/mhahnFr/LeakSanitizer/issues/new
 [10]: https://github.com/mhahnFr/LeakSanitizer/pulls
+[11]: https://github.com/mhahnFr/CallstackLibrary/blob/main/README.md#build-dependencies

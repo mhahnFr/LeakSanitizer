@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,17 +19,46 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef deprecation_h
-#define deprecation_h
+#ifndef Trait_hpp
+#define Trait_hpp
 
-#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
-#elif defined(__GNUC__) || defined(__clang__)
- #define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
-#else
- #define LSAN_DEPRECATED(message)
-#endif
+#include <map>
+#include <string>
+#include <vector>
 
-#define LSAN_DEPRECATED_PLAIN LSAN_DEPRECATED("")
+#include "ValueType.hpp"
 
-#endif /* deprecation_h */
+namespace lsan::json {
+struct Value;
+using ObjectContent = std::map<std::string, Value>;
+
+template<ValueType T>
+struct Trait;
+
+template<>
+struct Trait<ValueType::Int> {
+    using Type = long;
+};
+
+template<>
+struct Trait<ValueType::Array> {
+    using Type = std::vector<Value>;
+};
+
+template<>
+struct Trait<ValueType::String> {
+    using Type = std::string;
+};
+
+template<>
+struct Trait<ValueType::Bool> {
+    using Type = bool;
+};
+
+template<>
+struct Trait<ValueType::Object> {
+    using Type = ObjectContent;
+};
+}
+
+#endif /* Trait_hpp */

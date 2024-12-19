@@ -19,15 +19,13 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef helperStructs_hpp
-#define helperStructs_hpp
+#ifndef LeakKindStats_hpp
+#define LeakKindStats_hpp
 
 #include <cstddef>
 #include <set>
-#include <tuple>
-#include <utility>
 
-#include "MallocInfo.hpp"
+#include "../MallocInfo.hpp"
 
 namespace lsan {
 /**
@@ -139,27 +137,6 @@ struct LeakKindStats {
         return getLostBytes() + getReachableBytes();
     }
 };
-
-/**
- * This strcuture represents a memory region.
- */
-struct Region {
-    /** The begin of the region. */
-    void* begin,
-    /** The end of the region.   */
-        * end;
-
-    /**
-     * Constructs a region defined by the given bounds.
-     *
-     * @param begin the begin of the region
-     * @param end the end of the region
-     */
-    Region(void* begin, void* end): begin(begin), end(end) {}
-};
-
-using CountAndBytes = std::pair<std::size_t, std::size_t>;
-using CountAndBytesAndIndirect = std::tuple<std::size_t, std::size_t, std::size_t, std::size_t>;
 }
 
-#endif /* helperStructs_hpp */
+#endif /* LeakKindStats_hpp */

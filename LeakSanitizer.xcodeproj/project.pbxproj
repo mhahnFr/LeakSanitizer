@@ -28,23 +28,51 @@
 		BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */ = {isa = PBXBuildFile; fileRef = BF621FDC28A291DE00414EE4 /* lsan_internals.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF378FB52919496000A4DAA9 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
+		BF3E505A2CCFF91C00CB225E /* Value.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3E50592CCFF91C00CB225E /* Value.hpp */; };
+		BF3E505E2CCFF96700CB225E /* Object.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3E505B2CCFF96700CB225E /* Object.hpp */; };
+		BF3E50602CCFFED300CB225E /* parser.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3E505F2CCFFED300CB225E /* parser.hpp */; };
+		BF3E50622CCFFF2900CB225E /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3E50612CCFFF2900CB225E /* parser.cpp */; };
 		BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF4368F32AACF04700252E2A /* crashWarner.cpp */; };
+		BF6D854E2CD3C97700316BFB /* ValueType.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D854D2CD3C97700316BFB /* ValueType.hpp */; };
+		BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D854F2CD3C98000316BFB /* Trait.hpp */; };
+		BF6D85542CD3DA9500316BFB /* Exception.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D85532CD3DA9500316BFB /* Exception.hpp */; };
 		BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */; };
 		BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
+		BFA6CD7C2CD3F3B800959363 /* Suppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */; };
+		BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */; };
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
 		BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */; };
+		BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */; };
 		BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC817142BEFB36E00332937 /* TLSTracker.cpp */; };
 		BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817152BEFB36E00332937 /* TLSTracker.hpp */; };
 		BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCF0B252BDD54A900EE259C /* misc.cpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
 		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
+		BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */; };
+		BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
+		BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F62CA8765500AEFD5A /* helper.hpp */; };
+		BFDD6DFF2CC6B5D2008B9CDC /* Region.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */; };
+		BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */; };
 		F12CA5DD2CB40E6A00C93A2C /* libobjc.A.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */; };
 		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
+		F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529B02D108324002534D0 /* defaultSuppression.hpp */; };
+		F13529B22D1083E0002534D0 /* defaultSuppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
 		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
 		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F13529B72D10842D002534D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF97EB4E28831E5B00DAF1FE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F13529B32D1083FD002534D0;
+			remoteInfo = CallstackLibrary;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		BF04B4B328F86EEA00051090 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
@@ -59,6 +87,10 @@
 		BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = callstackHelper.hpp; sourceTree = "<group>"; };
 		BF34157C2A8405AD00DEEF10 /* deprecation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deprecation.h; sourceTree = "<group>"; };
 		BF378FB42919496000A4DAA9 /* libcallstack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcallstack.a; path = CallstackLibrary/libcallstack.a; sourceTree = "<group>"; };
+		BF3E50592CCFF91C00CB225E /* Value.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Value.hpp; sourceTree = "<group>"; };
+		BF3E505B2CCFF96700CB225E /* Object.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Object.hpp; sourceTree = "<group>"; };
+		BF3E505F2CCFFED300CB225E /* parser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = parser.hpp; sourceTree = "<group>"; };
+		BF3E50612CCFFF2900CB225E /* parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = parser.cpp; sourceTree = "<group>"; };
 		BF4368F32AACF04700252E2A /* crashWarner.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crashWarner.cpp; sourceTree = "<group>"; };
 		BF4368F62AACF06F00252E2A /* crash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = crash.hpp; sourceTree = "<group>"; };
 		BF4368F72AACF07700252E2A /* warn.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = warn.hpp; sourceTree = "<group>"; };
@@ -71,16 +103,21 @@
 		BF621FDC28A291DE00414EE4 /* lsan_internals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_internals.h; sourceTree = "<group>"; };
 		BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bytePrinter.cpp; sourceTree = "<group>"; };
 		BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bytePrinter.hpp; sourceTree = "<group>"; };
+		BF6D854D2CD3C97700316BFB /* ValueType.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ValueType.hpp; sourceTree = "<group>"; };
+		BF6D854F2CD3C98000316BFB /* Trait.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Trait.hpp; sourceTree = "<group>"; };
+		BF6D85532CD3DA9500316BFB /* Exception.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Exception.hpp; sourceTree = "<group>"; };
 		BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LeakSani.hpp; sourceTree = "<group>"; };
 		BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeakSani.cpp; sourceTree = "<group>"; };
 		BF7592282BB1799500891A55 /* LeakType.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LeakType.hpp; sourceTree = "<group>"; };
 		BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsanMisc.cpp; sourceTree = "<group>"; };
 		BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lsanMisc.hpp; sourceTree = "<group>"; };
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
+		BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Suppression.hpp; sourceTree = "<group>"; };
+		BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Suppression.cpp; sourceTree = "<group>"; };
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
-		BFAE06F32BF64689006D3196 /* helperStructs.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helperStructs.hpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
+		BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FunctionNotFoundException.hpp; sourceTree = "<group>"; };
 		BFBCAD892ACF376600C6B69F /* realAlloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = realAlloc.hpp; sourceTree = "<group>"; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
@@ -92,6 +129,16 @@
 		BFCF0B252BDD54A900EE259C /* misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
+		BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AutoStats.cpp; sourceTree = "<group>"; };
+		BFE023F22CA874D100AEFD5A /* Behaviour.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Behaviour.hpp; sourceTree = "<group>"; };
+		BFE023F62CA8765500AEFD5A /* helper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helper.hpp; sourceTree = "<group>"; };
+		F13529AE2D10779B002534D0 /* defaultSuppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = defaultSuppression.cpp; sourceTree = "<group>"; };
+		F13529B02D108324002534D0 /* defaultSuppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = defaultSuppression.hpp; sourceTree = "<group>"; };
+		F13529BB2D109F4C002534D0 /* schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
+		F13529BC2D10A0A2002534D0 /* core.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = core.json; sourceTree = "<group>"; };
+		F13529BD2D10A499002534D0 /* objc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = objc.json; sourceTree = "<group>"; };
+		BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Region.hpp; sourceTree = "<group>"; };
+		BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LeakKindStats.hpp; sourceTree = "<group>"; };
 		F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libobjc.A.tbd; path = usr/lib/libobjc.A.tbd; sourceTree = SDKROOT; };
 		F16901512C403EF200EED0AE /* utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
@@ -116,8 +163,8 @@
 		BF3204F22AC5C625004EC77E /* callstacks */ = {
 			isa = PBXGroup;
 			children = (
-				BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */,
 				BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */,
+				BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */,
 			);
 			path = callstacks;
 			sourceTree = "<group>";
@@ -131,12 +178,40 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		BF3E50512CCFE7ED00CB225E /* suppression */ = {
+			isa = PBXGroup;
+			children = (
+				BF3E50562CCFF8E800CB225E /* json */,
+				BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */,
+				BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */,
+				BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */,
+				F13529B02D108324002534D0 /* defaultSuppression.hpp */,
+				F13529AE2D10779B002534D0 /* defaultSuppression.cpp */,
+			);
+			path = suppression;
+			sourceTree = "<group>";
+		};
+		BF3E50562CCFF8E800CB225E /* json */ = {
+			isa = PBXGroup;
+			children = (
+				BF3E50592CCFF91C00CB225E /* Value.hpp */,
+				BF3E505B2CCFF96700CB225E /* Object.hpp */,
+				BF3E505F2CCFFED300CB225E /* parser.hpp */,
+				BF3E50612CCFFF2900CB225E /* parser.cpp */,
+				BF6D854D2CD3C97700316BFB /* ValueType.hpp */,
+				BF6D854F2CD3C98000316BFB /* Trait.hpp */,
+				BF6D85532CD3DA9500316BFB /* Exception.hpp */,
+			);
+			path = json;
+			sourceTree = "<group>";
+		};
 		BF41CC5D2A813B4500EAA3A1 /* statistics */ = {
 			isa = PBXGroup;
 			children = (
 				BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */,
-				BF23A2E0289ED24200B17349 /* Stats.cpp */,
 				BF23A2E1289ED24200B17349 /* Stats.hpp */,
+				BF23A2E0289ED24200B17349 /* Stats.cpp */,
+				BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */,
 			);
 			path = statistics;
 			sourceTree = "<group>";
@@ -144,9 +219,10 @@
 		BF4368F22AACEFFE00252E2A /* crashWarner */ = {
 			isa = PBXGroup;
 			children = (
-				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
 				BF4368F62AACF06F00252E2A /* crash.hpp */,
 				BF4368F72AACF07700252E2A /* warn.hpp */,
+				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
+				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
 				BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */,
 				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
 				BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */,
@@ -171,8 +247,9 @@
 				BF5F19FC28B3F00600DAEDE7 /* README.md */,
 				BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */,
 				BF04B4B328F86EEA00051090 /* .gitignore */,
-				BF9DD3A428A6761400AEBC17 /* src */,
 				BF643E5C28A40C970080DB21 /* include */,
+				BF9DD3A428A6761400AEBC17 /* src */,
+				F13529AC2D10767E002534D0 /* suppressions */,
 				BF97EB5728831E5B00DAF1FE /* Products */,
 				BF378FB32919496000A4DAA9 /* Frameworks */,
 			);
@@ -190,27 +267,29 @@
 			isa = PBXGroup;
 			children = (
 				F1B373972C67A0D700674C3C /* allocators */,
+				BFE023F12CA874AE00AEFD5A /* behaviour */,
 				BFAA94582B6C1E52007FC130 /* signals */,
 				BFBCAD8A2ACF611A00C6B69F /* wrappers */,
 				BF3204F22AC5C625004EC77E /* callstacks */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
+				BF3E50512CCFE7ED00CB225E /* suppression */,
+				BFDD6DFD2CC6B5A9008B9CDC /* helpers */,
 				BFAFADC528B4FDA40060076C /* formatter.hpp */,
-				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */,
+				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */,
-				BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */,
 				BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */,
-				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
+				BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */,
 				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
-				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
+				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
-				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
+				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
 				BF7592282BB1799500891A55 /* LeakType.hpp */,
-				BFAE06F32BF64689006D3196 /* helperStructs.hpp */,
-				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
+				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
 				BFC817152BEFB36E00332937 /* TLSTracker.hpp */,
+				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
 				BFC817182BEFB3C200332937 /* ATracker.hpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
 			);
@@ -220,10 +299,10 @@
 		BFAA94582B6C1E52007FC130 /* signals */ = {
 			isa = PBXGroup;
 			children = (
-				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
 				BF49A5D82899599300BC1FFD /* signalHandlers.hpp */,
-				BFAA94522B6C12FF007FC130 /* signals.cpp */,
+				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
 				BFAA94532B6C12FF007FC130 /* signals.hpp */,
+				BFAA94522B6C12FF007FC130 /* signals.cpp */,
 			);
 			path = signals;
 			sourceTree = "<group>";
@@ -239,13 +318,49 @@
 			path = wrappers;
 			sourceTree = "<group>";
 		};
+		BFDD6DFD2CC6B5A9008B9CDC /* helpers */ = {
+			isa = PBXGroup;
+			children = (
+				BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */,
+				BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */,
+			);
+			path = helpers;
+			sourceTree = "<group>";
+		};
+		BFE023F12CA874AE00AEFD5A /* behaviour */ = {
+			isa = PBXGroup;
+			children = (
+				BFE023F22CA874D100AEFD5A /* Behaviour.hpp */,
+				BFE023F62CA8765500AEFD5A /* helper.hpp */,
+			);
+			path = behaviour;
+			sourceTree = "<group>";
+		};
+		F13529AC2D10767E002534D0 /* suppressions */ = {
+			isa = PBXGroup;
+			children = (
+				F13529BB2D109F4C002534D0 /* schema.json */,
+				F13529BA2D109417002534D0 /* macos */,
+			);
+			path = suppressions;
+			sourceTree = "<group>";
+		};
+		F13529BA2D109417002534D0 /* macos */ = {
+			isa = PBXGroup;
+			children = (
+				F13529BD2D10A499002534D0 /* objc.json */,
+				F13529BC2D10A0A2002534D0 /* core.json */,
+			);
+			path = macos;
+			sourceTree = "<group>";
+		};
 		F1B373972C67A0D700674C3C /* allocators */ = {
 			isa = PBXGroup;
 			children = (
 				F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */,
 				F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */,
-				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
 				F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */,
+				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
 			);
 			path = allocators;
 			sourceTree = "<group>";
@@ -258,20 +373,34 @@
 			buildActionMask = 2147483647;
 			files = (
 				F16901522C403EF200EED0AE /* utils.hpp in Headers */,
+				BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */,
+				F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */,
 				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
+				BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */,
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
 				F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */,
 				BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */,
 				BF2C5CB42AEAB76A00DE2224 /* exceptionHandler.hpp in Headers */,
 				F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */,
+				BF3E505A2CCFF91C00CB225E /* Value.hpp in Headers */,
 				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
+				BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */,
+				BF6D85542CD3DA9500316BFB /* Exception.hpp in Headers */,
 				BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */,
+				BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */,
+				BFDD6DFF2CC6B5D2008B9CDC /* Region.hpp in Headers */,
 				BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */,
 				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
+				BF3E50602CCFFED300CB225E /* parser.hpp in Headers */,
+				BF6D854E2CD3C97700316BFB /* ValueType.hpp in Headers */,
 				BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */,
 				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
+				BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */,
 				BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */,
+				F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */,
+				BF3E505E2CCFF96700CB225E /* Object.hpp in Headers */,
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
+				BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */,
 				BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */,
 				BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */,
 				BF378F9F2919484100A4DAA9 /* signalHandlers.hpp in Headers */,
@@ -295,6 +424,22 @@
 			passBuildSettingsInEnvironment = 1;
 			productName = LeakSanitizer_make;
 		};
+		F13529B32D1083FD002534D0 /* CallstackLibrary */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "-j libcallstack.a $(ACTION)";
+			buildConfigurationList = F13529B42D1083FD002534D0 /* Build configuration list for PBXLegacyTarget "CallstackLibrary" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = CallstackLibrary;
+			dependencies = (
+			);
+			name = CallstackLibrary;
+			packageProductDependencies = (
+			);
+			passBuildSettingsInEnvironment = 1;
+			productName = CallstackLibrary;
+		};
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
@@ -302,6 +447,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF0F132629194652008F0FCD /* Build configuration list for PBXNativeTarget "LeakSanitizer" */;
 			buildPhases = (
+				F13529B92D10848E002534D0 /* ShellScript */,
 				BF0F131829194652008F0FCD /* Headers */,
 				BF0F131929194652008F0FCD /* Sources */,
 				BF0F131A29194652008F0FCD /* Frameworks */,
@@ -309,6 +455,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13529B82D10842D002534D0 /* PBXTargetDependency */,
 			);
 			name = LeakSanitizer;
 			productName = lsan;
@@ -322,7 +469,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = mhahnFr;
 				TargetAttributes = {
 					BF0F131B29194652008F0FCD = {
@@ -330,6 +477,9 @@
 					};
 					BFB062292C397C1E0032E9C4 = {
 						CreatedOnToolsVersion = 15.2;
+					};
+					F13529B32D1083FD002534D0 = {
+						CreatedOnToolsVersion = 16.2;
 					};
 				};
 			};
@@ -348,9 +498,31 @@
 			targets = (
 				BF0F131B29194652008F0FCD /* LeakSanitizer */,
 				BFB062292C397C1E0032E9C4 /* LeakSanitizer_make */,
+				F13529B32D1083FD002534D0 /* CallstackLibrary */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F13529B92D10848E002534D0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make src/suppression/defaultSuppression.o\nrm -f src/suppression/defaultSuppression.o\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BF0F131929194652008F0FCD /* Sources */ = {
@@ -359,11 +531,14 @@
 			files = (
 				F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */,
 				BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */,
+				BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */,
 				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
 				BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */,
+				BF3E50622CCFFF2900CB225E /* parser.cpp in Sources */,
 				BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */,
 				BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */,
 				BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */,
+				BFA6CD7C2CD3F3B800959363 /* Suppression.cpp in Sources */,
 				BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */,
 				BF0F133B29194791008F0FCD /* LeakSani.cpp in Sources */,
 				BF0F133E29194794008F0FCD /* Stats.cpp in Sources */,
@@ -374,10 +549,19 @@
 				BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */,
 				BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */,
 				BF0F134D291947A8008F0FCD /* signalHandlers.cpp in Sources */,
+				F13529B22D1083E0002534D0 /* defaultSuppression.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F13529B82D10842D002534D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F13529B32D1083FD002534D0 /* CallstackLibrary */;
+			targetProxy = F13529B72D10842D002534D0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		BF0F132429194652008F0FCD /* Debug */ = {
@@ -389,6 +573,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
@@ -396,14 +581,15 @@
 				HEADER_SEARCH_PATHS = (
 					CallstackLibrary/include,
 					include,
+					suppressions,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CallstackLibrary",
 				);
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
@@ -419,6 +605,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
@@ -427,14 +614,15 @@
 				HEADER_SEARCH_PATHS = (
 					CallstackLibrary/include,
 					include,
+					suppressions,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CallstackLibrary",
 				);
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
@@ -595,6 +783,39 @@
 			};
 			name = Release;
 		};
+		F13529B52D1083FD002534D0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		F13529B62D1083FD002534D0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -621,6 +842,15 @@
 			buildConfigurations = (
 				BFB0622A2C397C1E0032E9C4 /* Debug */,
 				BFB0622B2C397C1E0032E9C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F13529B42D1083FD002534D0 /* Build configuration list for PBXLegacyTarget "CallstackLibrary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F13529B52D1083FD002534D0 /* Debug */,
+				F13529B62D1083FD002534D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,17 +19,27 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef deprecation_h
-#define deprecation_h
+#ifndef Region_hpp
+#define Region_hpp
 
-#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
-#elif defined(__GNUC__) || defined(__clang__)
- #define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
-#else
- #define LSAN_DEPRECATED(message)
-#endif
+namespace lsan {
+/**
+ * This strcuture represents a memory region.
+ */
+struct Region {
+    /** The begin of the region. */
+    void* begin,
+    /** The end of the region.   */
+        * end;
 
-#define LSAN_DEPRECATED_PLAIN LSAN_DEPRECATED("")
+    /**
+     * Constructs a region defined by the given bounds.
+     *
+     * @param begin the begin of the region
+     * @param end the end of the region
+     */
+    Region(void* begin, void* end): begin(begin), end(end) {}
+};
+}
 
-#endif /* deprecation_h */
+#endif /* Region_hpp */

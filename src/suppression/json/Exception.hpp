@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,17 +19,19 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef deprecation_h
-#define deprecation_h
+#ifndef Exception_hpp
+#define Exception_hpp
 
-#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
-#elif defined(__GNUC__) || defined(__clang__)
- #define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
-#else
- #define LSAN_DEPRECATED(message)
-#endif
+#include <stdexcept>
 
-#define LSAN_DEPRECATED_PLAIN LSAN_DEPRECATED("")
+namespace lsan::json {
+class Exception: public std::runtime_error {
+public:
+    inline Exception(char expected, char got, long long pos):
+        std::runtime_error(std::string { "Expected '" } + expected + "', got '" + got + "', position: " + std::to_string(pos + 1)) {}
 
-#endif /* deprecation_h */
+    Exception() = delete;
+};
+}
+
+#endif /* Exception_hpp */

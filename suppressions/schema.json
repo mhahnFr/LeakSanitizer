@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "type": [
+    "array"
+  ],
+  "description": "Array of leak suppressions",
+  "items": {
+    "type": "object",
+    "required": [
+      "functions"
+    ],
+    "description": "Single memory leak suppression",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The name of the suppression"
+      },
+      "size": {
+        "type": "number",
+        "description": "The byte amount of the memory leak to be suppressed"
+      },
+      "functions": {
+        "type": "array",
+        "description": "The callstack of functions to match for this suppression object (function names as used by the linker)",
+        "minItems": 1,
+        "items": {
+          "type": [
+            "string",
+            "object"
+          ],
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the function as used by the linker"
+            },
+            "offset": {
+              "type": "number",
+              "description": "The offset into the function"
+            },
+            "library": {
+              "type": "string",
+              "description": "Hint in which runtime image to search for the function"
+            }
+          }
+        }
+      }
+    }
+  }
+}

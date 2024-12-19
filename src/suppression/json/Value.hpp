@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,17 +19,33 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef deprecation_h
-#define deprecation_h
+#ifndef Value_hpp
+#define Value_hpp
 
-#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
-#elif defined(__GNUC__) || defined(__clang__)
- #define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
-#else
- #define LSAN_DEPRECATED(message)
-#endif
+#include <variant>
 
-#define LSAN_DEPRECATED_PLAIN LSAN_DEPRECATED("")
+#include "Trait.hpp"
 
-#endif /* deprecation_h */
+namespace lsan::json {
+struct Value {
+    ValueType type;
+    std::variant<
+        Trait<ValueType::Int>::Type,
+        Trait<ValueType::Array>::Type,
+        Trait<ValueType::String>::Type,
+        Trait<ValueType::Bool>::Type,
+        Trait<ValueType::Object>::Type
+    > value;
+
+    template<ValueType T>
+    constexpr inline auto as() const {
+        return std::get<typename Trait<T>::Type>(value);
+    }
+
+    constexpr inline auto is(ValueType type) const -> bool {
+        return Value::type == type;
+    }
+};
+}
+
+#endif /* Value_hpp */

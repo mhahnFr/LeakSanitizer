@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2024  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,17 +19,14 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef deprecation_h
-#define deprecation_h
+#ifndef defaultSuppression_hpp
+#define defaultSuppression_hpp
 
-#if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
-#elif defined(__GNUC__) || defined(__clang__)
- #define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
-#else
- #define LSAN_DEPRECATED(message)
-#endif
+#include <string>
+#include <vector>
 
-#define LSAN_DEPRECATED_PLAIN LSAN_DEPRECATED("")
+namespace lsan::suppression {
+auto getDefaultSuppression() -> std::vector<std::string>;
+}
 
-#endif /* deprecation_h */
+#endif /* defaultSuppression_hpp */
