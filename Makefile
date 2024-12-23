@@ -80,10 +80,6 @@ default: $(NAME)
 bench:
 	$(MAKE) 'BENCHMARK=true'
 
-suppression_mode:
-	$(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) fclean
-	$(MAKE) 'LIBCALLSTACK_OPT=false'
-
 all: $(SHARED_L) $(DYLIB_NA)
 
 install:
