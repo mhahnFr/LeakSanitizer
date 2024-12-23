@@ -31,6 +31,10 @@
 
 #include "../LeakType.hpp"
 
+namespace lsan {
+struct MallocInfo;
+}
+
 namespace lsan::suppression {
 struct Suppression {
     std::string name;
@@ -41,6 +45,8 @@ struct Suppression {
     std::vector<std::pair<uintptr_t, std::size_t>> topCallstack;
 
     Suppression(const json::Object& object);
+
+    auto match(const MallocInfo& info) const -> bool;
 
 private:
     auto getFunctionPair(const std::string& name,

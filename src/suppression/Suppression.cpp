@@ -24,6 +24,8 @@
 #include "FunctionNotFoundException.hpp"
 #include "Suppression.hpp"
 
+#include "../MallocInfo.hpp"
+
 namespace lsan::suppression {
 using namespace json;
 
@@ -78,5 +80,16 @@ Suppression::Suppression(const Object& object):
             topCallstack.push_back(getFunctionPair(name, offset, libraryName));
         }
     }
+}
+
+auto Suppression::match(const MallocInfo& info) const -> bool {
+    if (size && info.size != *size) return false;
+    if (leakType && info.leakType != *leakType) return false;
+    // TODO: Image names with regex matching
+    if (imageName && info.imageName && *imageName != *info.imageName) return false;
+
+    if (topCallstack.empty() && !info.imageName) return false;
+
+    return topCallstack.empty() ? true : callstackHelper::isSuppressed(*this, info.createdCallstack);
 }
 }
