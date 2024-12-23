@@ -6,5 +6,21 @@
   {
     "name": "Everything in the Objective-C runtime",
     "imageName": "/usr/lib/libobjc.A.dylib"
+  },
+  {
+    "name": "Everything in the XPC library",
+    "imageName": "/usr/lib/system/libxpc.dylib"
+  },
+  {
+    "name": "Everything in the C system library",
+    "imageName": "/usr/lib/system/libsystem_c.dylib"
+  },
+  {
+    "name": "Everything in the system trace library",
+    "imageName": "/usr/lib/system/libsystem_trace.dylib"
+  },
+  {
+    "name": "Everything created by the system library initialization",
+    "functions": [ "_libSystem_initializer" ]
   }
 ]
