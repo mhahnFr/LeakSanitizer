@@ -212,17 +212,24 @@ static inline void destroySaniKey(void* value) {
     }
 }
 
-template<typename T>
-static inline constexpr auto isSuppressed(const T& suppressions, const MallocInfo& info) -> bool {
+static inline auto isSuppressed(const std::vector<suppression::Suppression>& suppressions, const MallocInfo& info) -> bool {
     for (const auto& suppression : suppressions) {
-        if (suppression.size && *suppression.size != info.size) {
-            continue;
-        }
-        if (callstackHelper::isSuppressed(suppression, info.createdCallstack)) {
+        if (suppression.match(info)) {
             return true;
         }
     }
     return false;
+}
+
+static inline auto applySuppressions(const std::set<MallocInfo*>& leaks, const std::vector<suppression::Suppression>& suppressions) {
+    for (const auto& leak : leaks) {
+        if (isSuppressed(suppressions, *leak)) {
+            for (const auto indirect : leak->viaMeRecords) {
+                indirect->printedInRoot = true;
+            }
+            leak->printedInRoot = true;
+        }
+    }
 }
 
 auto LSan::classifyLeaks() -> LeakKindStats {
@@ -356,12 +363,18 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     }
 
     out << clear << "Filtering the leaks...";
+    // TODO: Suppress everything from the DYLD
     for (const auto& leak : toReturn.recordsObjC) {
         for (const auto& indirect : leak->viaMeRecords) {
             indirect->printedInRoot = true;
         }
         leak->printedInRoot = true;
     }
+    const auto& suppressions = getSuppressions();
+    applySuppressions(toReturn.recordsStack, suppressions);
+    applySuppressions(toReturn.recordsGlobal, suppressions);
+    applySuppressions(toReturn.recordsTlv, suppressions);
+    applySuppressions(toReturn.recordsLost, suppressions);
 
     out << clear << clear;
 
@@ -727,15 +740,16 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << std::endl;
 
         for (const auto& record : stats.recordsLost) {
-            if (record->leakType != LeakType::unreachableDirect) continue;
+            if (record->leakType != LeakType::unreachableDirect || record->printedInRoot) continue;
 
 //            printRecord(stream, *record);
             stream << *record << std::endl;
+            record->printedInRoot = true;
         }
 
         // TODO: Possibility to show indirects
 
-        if ((false)) { // TODO: If should show reachables
+        if ((true)) { // TODO: If should show reachables
             printRecords(stats.recordsGlobal, stream);
             printRecords(stats.recordsTlv, stream);
             printRecords(stats.recordsStack, stream);
