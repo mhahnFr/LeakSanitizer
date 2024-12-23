@@ -680,13 +680,25 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
-//static inline void printRecord(std::ostream& out, const MallocInfo& info) {
-//    auto ptr = reinterpret_cast<void**>(info.pointer);
-//    for (std::size_t i = 0; i < info.size / 8; ++i) {
-//        out << ptr[i] << ", ";
-//    }
-//    out << std::endl << info.pointer << " ";
-//}
+static inline void printRecord(std::ostream& out, const MallocInfo& info) {
+    auto ptr = reinterpret_cast<void**>(info.pointer);
+    for (std::size_t i = 0; i < info.size / 8; ++i) {
+        out << ptr[i] << ", ";
+    }
+    out << std::endl << info.pointer << " ";
+}
+
+static inline void printRecords(const std::set<MallocInfo*>& records, std::ostream& out, bool printContent = false) {
+    for (const auto& record : records) {
+        if (!record->printedInRoot) {
+            if (printContent) {
+                printRecord(out, *record);
+            }
+            out << *record << std::endl;
+            record->printedInRoot = true;
+        }
+    }
+}
 
 auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     using namespace formatter;
@@ -724,22 +736,9 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         // TODO: Possibility to show indirects
 
         if ((false)) { // TODO: If should show reachables
-            for (const auto& record : stats.recordsGlobal) {
-//                printRecord(stream, *record);
-                stream << *record << std::endl;
-            }
-//            for (const auto& record : stats.recordsObjC) {
-////                printRecord(stream, *record);
-//                stream << *record << std::endl;
-//            }
-            for (const auto& record : stats.recordsTlv) {
-//                printRecord(stream, *record);
-                stream << *record << std::endl;
-            }
-            for (const auto& record : stats.recordsStack) {
-//                printRecord(stream, *record);
-                stream << *record << std::endl;
-            }
+            printRecords(stats.recordsGlobal, stream);
+            printRecords(stats.recordsTlv, stream);
+            printRecords(stats.recordsStack, stream);
         } else if (stats.getTotalReachable() > 0) {
             stream << "Set LSAN_SHOW_REACHABLES to true to display reachable memory leaks." << std::endl << std::endl;
         }
