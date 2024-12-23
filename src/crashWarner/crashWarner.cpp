@@ -119,7 +119,7 @@ template<typename F>
 static inline void withCallstack(const F & function) {
     auto callstack = lcs::callstack();
     const auto& suppressions = lsan::getSuppressions();
-    if (callstackHelper::isSuppressed(suppressions.cbegin(), suppressions.cend(), callstack)) {
+    if (!callstackHelper::isSuppressed(suppressions.cbegin(), suppressions.cend(), callstack)) {
         function(callstack);
     }
 }
