@@ -296,6 +296,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         toReturn.bytesObjC += metaBytes;
         toReturn.bytesObjCIndirect += metaIndirectBytes;
     }
+    delete[] classes;
 #endif
 
     out << clear << "Reachability analysis: Globals...";
