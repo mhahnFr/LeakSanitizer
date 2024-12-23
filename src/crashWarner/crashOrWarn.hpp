@@ -24,15 +24,15 @@
 
 #include <string>
 
-#include <lsan_internals.h>
-
 #include "crash.hpp"
 #include "warn.hpp"
+
+#include "../lsanMisc.hpp"
 
 namespace lsan {
 template<typename ...Args>
 constexpr static inline void crashOrWarn(Args&& ...args) {
-    if (__lsan_invalidCrash) {
+    if (getBehaviour().invalidCrash()) {
         crash(std::forward<Args>(args)...);
     } else {
         warn(std::forward<Args>(args)...);
