@@ -354,6 +354,15 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         toReturn.bytesLost += record->size;
     }
+
+    out << clear << "Filtering the leaks...";
+    for (const auto& leak : toReturn.recordsObjC) {
+        for (const auto& indirect : leak->viaMeRecords) {
+            indirect->printedInRoot = true;
+        }
+        leak->printedInRoot = true;
+    }
+
     out << clear << clear;
 
     out << "   Total: " << infos.size() << " (" << toReturn.getTotal() << ")"<< std::endl
@@ -719,10 +728,10 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 //                printRecord(stream, *record);
                 stream << *record << std::endl;
             }
-            for (const auto& record : stats.recordsObjC) {
-//                printRecord(stream, *record);
-                stream << *record << std::endl;
-            }
+//            for (const auto& record : stats.recordsObjC) {
+////                printRecord(stream, *record);
+//                stream << *record << std::endl;
+//            }
             for (const auto& record : stats.recordsTlv) {
 //                printRecord(stream, *record);
                 stream << *record << std::endl;
