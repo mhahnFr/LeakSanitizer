@@ -55,9 +55,6 @@ namespace lsan {
  * It acts as an allocation tracker.
  */
 class LSan final: public ATracker {
-    using CountAndBytes = std::pair<std::size_t, std::size_t>;
-    using CountAndBytesAndIndirect = std::tuple<std::size_t, std::size_t, std::size_t, std::size_t>;
-
     std::set<pthread_key_t> keys;
     std::mutex tlsKeyMutex;
     std::map<std::pair<pthread_t, pthread_key_t>, const void*> tlsKeyValues;
@@ -82,7 +79,7 @@ class LSan final: public ATracker {
 #endif
 
     auto classifyLeaks() -> LeakKindStats;
-    auto classifyRecord(MallocInfo& info, const LeakType& currentType) -> CountAndBytes;
+    void classifyRecord(MallocInfo& info, const LeakType& currentType);
 
     /**
      * Creates a thread-safe copy of the thread-local tracker list.
@@ -102,14 +99,10 @@ class LSan final: public ATracker {
         return toReturn;
     }
 
-    inline auto classifyLeaks(uintptr_t begin, uintptr_t end,
+    inline void classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
                               std::set<MallocInfo*>& directs, bool skipClassifieds = false,
-                              const std::optional<std::string>& name = std::nullopt) -> CountAndBytesAndIndirect {
-        std::size_t directCount   { 0 },
-                    indirectCount { 0 },
-                    directBytes   { 0 },
-                    indirectBytes { 0 };
+                              const std::optional<std::string>& name = std::nullopt) {
         for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
             if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
@@ -117,54 +110,33 @@ class LSan final: public ATracker {
             }
             if (record->second.leakType > direct) {
                 record->second.leakType = direct;
-                ++directCount;
-                directBytes += record->second.size;
                 record->second.imageName = name;
                 directs.insert(&record->second);
             }
-            const auto& [count, bytes] = classifyRecord(record->second, indirect);
-            indirectCount += count;
-            indirectBytes += bytes;
+            classifyRecord(record->second, indirect);
         }
-        return std::make_tuple(directCount, directBytes, indirectCount, indirectBytes);
     }
 
     template<bool Four = false>
-    constexpr inline auto classifyPointerUnion(void* ptr, std::set<MallocInfo*>& directs,
-                                               LeakType direct, LeakType indirect) -> CountAndBytes {
-        std::size_t count { 0 },
-                    bytes { 0 };
-
+    constexpr inline void classifyPointerUnion(void* ptr, std::set<MallocInfo*>& directs,
+                                               LeakType direct, LeakType indirect) {
         constexpr const auto order = Four ? 3 : 1;
 
         const auto& it = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) & ~order));
         if (it != infos.end() && it->second.leakType > direct) {
             it->second.leakType = direct;
-            const auto& [c, b] = classifyRecord(it->second, indirect);
-            count = c;
-            bytes = b;
+            classifyRecord(it->second, indirect);
             directs.insert(&it->second);
         }
-
-        return std::make_pair(count, bytes);
     }
 
-    inline auto classifyClass(void* cls, std::set<MallocInfo*>& directs, LeakType direct, LeakType indirect) -> CountAndBytesAndIndirect {
-        std::size_t count  { 0 },
-                    bytes  { 0 },
-                    iCount { 0 },
-                    iBytes { 0 };
-
+    inline void classifyClass(void* cls, std::set<MallocInfo*>& directs, LeakType direct, LeakType indirect) {
         auto classWords = reinterpret_cast<void**>(cls);
         auto cachePtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[2]) & ((uintptr_t) 1 << 48) - 1);
         const auto& cacheIt = infos.find(cachePtr);
         if (cacheIt != infos.end() && cacheIt->second.leakType > direct) {
             cacheIt->second.leakType = direct;
-            const auto& [rCount, rBytes] = classifyRecord(cacheIt->second, indirect);
-            iCount += rCount;
-            iBytes += rBytes;
-            ++count;
-            bytes += cacheIt->second.size;
+            classifyRecord(cacheIt->second, indirect);
             directs.insert(&cacheIt->second);
         }
 
@@ -173,12 +145,7 @@ class LSan final: public ATracker {
         if (it != infos.end()) {
             if (it->second.leakType > direct) {
                 it->second.leakType = direct;
-                // FIXME: What if already as indirect counted records are found elsewhere? Happens with this one:
-                const auto& [rCount, rBytes] = classifyRecord(it->second, indirect);
-                iCount += rCount;
-                iBytes += rBytes;
-                ++count;
-                bytes += it->second.size;
+                classifyRecord(it->second, indirect);
                 directs.insert(&it->second);
             }
 
@@ -188,11 +155,7 @@ class LSan final: public ATracker {
             if (it != infos.end()) {
                 if (it->second.leakType > direct) {
                     it->second.leakType = direct;
-                    const auto& [rCount, rBytes] = classifyRecord(it->second, indirect);
-                    iCount += rCount;
-                    iBytes += rBytes;
-                    ++count;
-                    bytes += it->second.size;
+                    classifyRecord(it->second, indirect);
                     directs.insert(&it->second);
                 }
                 if (it->second.size >= 4 * sizeof(void*)) {
@@ -203,7 +166,6 @@ class LSan final: public ATracker {
                 }
             }
         }
-        return std::make_tuple(count, bytes, iCount, iBytes);
     }
 
 protected:

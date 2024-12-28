@@ -66,9 +66,7 @@ static inline auto align(const void* ptr, bool up = true) -> uintptr_t {
     return align(reinterpret_cast<uintptr_t>(ptr), up);
 }
 
-auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> CountAndBytes {
-    std::size_t count { 0 },
-                bytes { 0 };
+void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
     auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
     stack.push(info);
     while (!stack.empty()) {
@@ -76,8 +74,6 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> Coun
         stack.pop();
         if (elem.get().leakType > currentType && elem.get().pointer != info.pointer) {
             elem.get().leakType = currentType;
-            ++count;
-            bytes += elem.get().size;
         }
 
         const auto beginPtr = align(elem.get().pointer);
@@ -96,7 +92,6 @@ auto LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) -> Coun
                 stack.push(record->second);
         }
     }
-    return std::make_pair(count, bytes);
 }
 
 static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
@@ -256,11 +251,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << clear << "Reachability analysis: Stack, part I...";
     for (auto& [ptr, record] : infos) {
         if (record.leakType == LeakType::reachableDirect) {
-            ++toReturn.stack;
-            toReturn.bytesStack += record.size;
-            const auto& [count, bytes] = classifyRecord(record, LeakType::reachableIndirect);
-            toReturn.stackIndirect += count;
-            toReturn.bytesStackIndirect += bytes;
+            classifyRecord(record, LeakType::reachableIndirect);
             toReturn.recordsStack.insert(&record);
         }
     }
@@ -269,14 +260,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     // Search on our stack
     const auto  here = align(__builtin_frame_address(0), false);
     const auto begin = align(findStackBegin());
-    const auto& [stackHereDirect, stackHereBytes,
-                 stackHereIndirect, stackHereBytesIndirect] = classifyLeaks(here, begin,
-                                                                            LeakType::reachableDirect, LeakType::reachableIndirect,
-                                                                            toReturn.recordsStack, true);
-    toReturn.stack += stackHereDirect;
-    toReturn.stackIndirect += stackHereIndirect;
-    toReturn.bytesStack += stackHereBytes;
-    toReturn.bytesStackIndirect += stackHereBytesIndirect;
+    classifyLeaks(here, begin,
+                  LeakType::reachableDirect, LeakType::reachableIndirect,
+                  toReturn.recordsStack, true);
 
 #ifdef LSAN_HANDLE_OBJC
     out << clear << "Reachability analysis: Objective-C runtime...";
@@ -285,20 +271,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto classes = new Class[classNumber];
     objc_getClassList(classes, classNumber);
     for (int i = 0; i < classNumber; ++i) {
-        const auto& [count, bytes, indirectCount, indirectBytes] = classifyClass(classes[i], toReturn.recordsObjC,
-                                                                                 LeakType::objcDirect, LeakType::objcIndirect);
-        toReturn.objC += count;
-        toReturn.objCIndirect += indirectCount;
-        toReturn.bytesObjC += bytes;
-        toReturn.bytesObjCIndirect += indirectBytes;
+        classifyClass(classes[i], toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
 
         const auto& meta = object_getClass(reinterpret_cast<id>(classes[i]));
-        const auto& [metaCount, metaBytes, metaIndirectCount, metaIndirectBytes] = classifyClass(meta, toReturn.recordsObjC,
-                                                                                                 LeakType::objcDirect, LeakType::objcIndirect);
-        toReturn.objC += metaCount;
-        toReturn.objCIndirect += metaIndirectCount;
-        toReturn.bytesObjC += metaBytes;
-        toReturn.bytesObjCIndirect += metaIndirectBytes;
+        classifyClass(meta, toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
     }
     delete[] classes;
 #endif
@@ -306,14 +282,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << clear << "Reachability analysis: Globals...";
     // Search in global space
     for (const auto& region : regions) {
-        const auto& [regionDirect, regionBytes,
-                     regionIndirect, regionBytesIndirect] = classifyLeaks(align(region.begin), align(region.end, false),
-                                                                          LeakType::globalDirect, LeakType::globalIndirect,
-                                                                          toReturn.recordsGlobal, true, region.name);
-        toReturn.global += regionDirect;
-        toReturn.globalIndirect += regionIndirect;
-        toReturn.bytesGlobal += regionBytes;
-        toReturn.bytesGlobalIndirect += regionBytesIndirect;
+        classifyLeaks(align(region.begin), align(region.end, false),
+                      LeakType::globalDirect, LeakType::globalIndirect,
+                      toReturn.recordsGlobal, true, region.name);
     }
 
     out << clear << "Reachability analysis: Runtime thread-local variables...";
@@ -326,11 +297,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         if (it == infos.end()) continue;
 
         it->second.leakType = LeakType::tlvDirect;
-        const auto& [count, bytes] = classifyRecord(it->second, LeakType::tlvIndirect);
-        toReturn.tlvIndirect += count;
-        toReturn.bytesTlvIndirect += bytes;
-        ++toReturn.tlv;
-        toReturn.bytesTlv += it->second.size;
+        classifyRecord(it->second, LeakType::tlvIndirect);
         toReturn.recordsTlv.insert(&it->second);
     }
 
@@ -341,9 +308,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             continue;
         }
         record.leakType = LeakType::unreachableDirect;
-        const auto& [count, bytes] = classifyRecord(record, LeakType::unreachableIndirect);
-        toReturn.lostIndirect += count;
-        toReturn.bytesLostIndirect += bytes;
+        classifyRecord(record, LeakType::unreachableIndirect);
         toReturn.recordsLost.insert(&record);
     }
     out << clear << "Enumerating lost memory leaks...";
@@ -360,10 +325,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     }
 
     out << clear << "Filtering the leaks...";
-    // TODO: Suppress everything from the DYLD
     for (const auto& leak : toReturn.recordsObjC) {
         leak->markSuppressed();
     }
+    // TODO: Suppress everything from the DYLD
     const auto& suppressions = getSuppressions();
     applySuppressions(toReturn.recordsStack, suppressions);
     applySuppressions(toReturn.recordsGlobal, suppressions);
@@ -724,7 +689,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     // [x] print summary again
     // [x] print hint for how to make the rest visible
 
-    if (stats.getTotal() > 0) {
+    if ((true)/*stats.getTotal() > 0*/) {
         // TODO: Optionally collapse identical callstacks
         // TODO: Further formatting
         // TODO: Maybe split between direct and indirect?
