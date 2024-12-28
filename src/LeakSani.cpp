@@ -311,20 +311,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         classifyRecord(record, LeakType::unreachableIndirect);
         toReturn.recordsLost.insert(&record);
     }
-    out << clear << "Enumerating lost memory leaks...";
-    toReturn.lost = infos.size()
-                    - toReturn.stack - toReturn.stackIndirect
-                    - toReturn.global - toReturn.globalIndirect
-                    - toReturn.lostIndirect
-                    - toReturn.tlv - toReturn.tlvIndirect
-                    - toReturn.objC - toReturn.objCIndirect;
-    for (const auto& record : toReturn.recordsLost) {
-        if (record->leakType != LeakType::unreachableDirect) continue;
 
-        toReturn.bytesLost += record->size;
-    }
-
-    out << clear << "Filtering the leaks...";
+    out << clear << "Filtering the memory leaks...";
     for (const auto& leak : toReturn.recordsObjC) {
         leak->markSuppressed();
     }
@@ -335,9 +323,30 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     applySuppressions(toReturn.recordsTlv, suppressions);
     applySuppressions(toReturn.recordsLost, suppressions);
 
+    out << clear << "Enumerating memory leaks...";
+#define ENUMERATE(records, count, bytes, indirect, indirectBytes) \
+for (const auto& leak : (records)) {                              \
+    if (leak->suppressed || leak->enumerated) continue;           \
+                                                                  \
+    ++(count);                                                    \
+    (bytes) += leak->size;                                        \
+    const auto& [a, b] = leak->enumerate();                       \
+    (indirect) += a;                                              \
+    (indirectBytes) += b;                                         \
+}
+    ENUMERATE(toReturn.recordsStack, toReturn.stack, toReturn.bytesStack,
+              toReturn.stackIndirect, toReturn.bytesStackIndirect)
+    ENUMERATE(toReturn.recordsGlobal, toReturn.global, toReturn.bytesGlobal,
+              toReturn.globalIndirect, toReturn.bytesGlobalIndirect)
+    ENUMERATE(toReturn.recordsTlv, toReturn.tlv, toReturn.bytesTlv,
+              toReturn.tlvIndirect, toReturn.bytesTlvIndirect)
+    ENUMERATE(toReturn.recordsLost, toReturn.lost, toReturn.bytesLost,
+              toReturn.lostIndirect, toReturn.bytesLostIndirect)
+#undef ENUMERATE
+
     out << clear << clear;
 
-    out << "   Total: " << infos.size() << " (" << toReturn.getTotal() << ")"<< std::endl
+    out << "   Total: " << toReturn.getTotal() << " (" << infos.size() << ")"<< std::endl
         << "    Lost: " << toReturn.lost << " (" << toReturn.recordsLost.size() << ")" << std::endl
         << "Indirect: " << toReturn.lostIndirect << std::endl
         << "    ObjC: " << toReturn.objC << " (" << toReturn.recordsObjC.size() << ")" << std::endl
@@ -662,7 +671,7 @@ static inline void printRecord(std::ostream& out, const MallocInfo& info) {
 
 static inline void printRecords(const std::set<MallocInfo*>& records, std::ostream& out, bool printContent = false) {
     for (const auto& record : records) {
-        if (!record->printedInRoot) {
+        if (!record->printedInRoot && !record->suppressed) {
             if (printContent) {
                 printRecord(out, *record);
             }
@@ -689,7 +698,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     // [x] print summary again
     // [x] print hint for how to make the rest visible
 
-    if ((true)/*stats.getTotal() > 0*/) {
+    if (stats.getTotal() > 0) {
         // TODO: Optionally collapse identical callstacks
         // TODO: Further formatting
         // TODO: Maybe split between direct and indirect?
@@ -699,7 +708,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
                << std::endl;
 
         for (const auto& record : stats.recordsLost) {
-            if (record->leakType != LeakType::unreachableDirect || record->printedInRoot) continue;
+            if (record->leakType != LeakType::unreachableDirect || record->printedInRoot || record->suppressed) continue;
 
 //            printRecord(stream, *record);
             stream << *record << std::endl;
