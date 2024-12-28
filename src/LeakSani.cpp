@@ -704,8 +704,11 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         // TODO: Maybe split between direct and indirect?
         stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
                << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
-               << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl
-               << std::endl;
+               << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable";
+        if (!self.behaviour.showReachables()) {
+            stream << format<Style::ITALIC>(" (not shown)");
+        }
+        stream << std::endl << std::endl;
 
         for (const auto& record : stats.recordsLost) {
             if (record->leakType != LeakType::unreachableDirect || record->printedInRoot || record->suppressed) continue;
@@ -740,7 +743,11 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         stream << std::endl << format<Style::BOLD>("Summary:") << std::endl
                << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
                << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
-               << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable" << std::endl;
+               << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable";
+        if (!self.behaviour.showReachables()) {
+            stream << format<Style::ITALIC>(" (not shown)");
+        }
+        stream << std::endl;
     }
 
     callstack_clearCaches();
