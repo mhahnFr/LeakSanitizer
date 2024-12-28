@@ -19,6 +19,8 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <filesystem>
+
 #include "MallocInfo.hpp"
 
 #include "formatter.hpp"
@@ -65,6 +67,13 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     return stream;
 }
 
+static inline auto maybeRelativate(const std::string& path) -> std::string {
+    if (!getBehaviour().relativePaths()) return path;
+
+    const auto& relative = std::filesystem::relative(path).string();
+    return relative.size() < path.size() ? relative : path;
+}
+
 void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long number, unsigned long indent2) const {
     using namespace formatter;
 
@@ -81,8 +90,8 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
            << format<Style::BOLD, Style::RED>("Leak") << " of size "
            << clear<Style::ITALIC>
            << bytesToString(size) << get<Style::ITALIC> << ", " << leakType;
-    if (imageName) {
-        stream << " in " << format<Style::BLUE>(*imageName); // TODO: Relativate?
+    if (imageName && getBehaviour().printBinaries()) {
+        stream << " in " << format<Style::BLUE>(maybeRelativate(*imageName));
     }
 
     std::size_t count { 0 },
