@@ -27,11 +27,9 @@
 # define LSAN_LINUX
 #endif
 
-extern "C" {
 #ifdef LSAN_APPLE
-# include <macos/core.h>
+# include <macos/core.hpp>
 #endif
-}
 
 namespace lsan::suppression {
 auto getDefaultSuppression() -> std::vector<std::string> {
@@ -39,7 +37,7 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 
 #ifdef LSAN_APPLE
     toReturn.insert(toReturn.cbegin(), {
-        std::string(reinterpret_cast<const char*>(suppressions_macos_core), suppressions_macos_core_len),
+        std::string(suppressions_macos_core),
     });
     // TODO: Swift, AppKit, ...
 #endif

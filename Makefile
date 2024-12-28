@@ -35,7 +35,7 @@ OBJS  = $(patsubst %.cpp, %.o, $(SRC))
 DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 
 SUPP_SRC = $(shell find suppressions -name \*.json)
-SUPP_HS  = $(patsubst %.json, %.h, $(SUPP_SRC))
+SUPP_HS  = $(patsubst %.json, %.hpp, $(SUPP_SRC))
 
 DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 
@@ -116,8 +116,10 @@ $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
-%.h: %.json
-	xxd -i -n $(basename $<) $< $@
+%.hpp: %.json
+	echo 'constexpr const char*' `echo $(basename $<) | tr /. _` '= R"(' >> $@
+	cat $< >> $@
+	echo '\n)";' >> $@
 
 $(DEFAULT_SUPP_CPP): $(SUPP_HS)
 
