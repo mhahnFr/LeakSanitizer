@@ -27,8 +27,6 @@
 #include "bytePrinter.hpp"
 
 namespace lsan {
-static bool printIndirects = false; // TODO: Make this configurable
-
 /**
  * Returns whether the first given leak type is greater than the other one.
  *
@@ -116,7 +114,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
 
     std::size_t count { 0 },
                 bytes { 0 };
-    forEachIndirect(!printIndirects, *this, [&](const auto& record) {
+    forEachIndirect(!getBehaviour().showIndirects(), *this, [&](const auto& record) {
         ++count;
         bytes += record.size;
     });
@@ -126,7 +124,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
     stream << std::endl;
     printCreatedCallstack(stream, indentString);
 
-    if (printIndirects && count > 0) {
+    if (getBehaviour().showIndirects() && count > 0) {
         stream << std::endl << indentString << get<Style::AMBER> << "Indirect leak" << (count > 1 ? "s" : "") << ":" << clear<Style::AMBER>;
         const auto& print = count > 1;
         const auto& newIndent = indent + (print ? std::to_string(count).size() : 0) + 3;

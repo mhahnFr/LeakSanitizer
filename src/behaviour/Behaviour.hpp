@@ -45,6 +45,7 @@ private:
 #define FROM_ENV_API(type, name, envName) FROM_ENV(type, name, envName, __lsan_##name)
 
     FROM_ENV(bool, suppressionDevelopersMode, SUPPRESSION_DEVELOPER, false)
+    FROM_ENV(bool, showIndirects, INDIRECT_LEAKS, false)
     FROM_ENV(const char*, suppressionFiles, SUPPRESSION_FILES, nullptr)
 
     FROM_ENV_API(bool, humanPrint,     HUMAN_PRINT)
