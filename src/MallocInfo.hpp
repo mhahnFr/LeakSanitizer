@@ -118,14 +118,16 @@ struct MallocInfo {
      * @param out the output stream to print to
      */
     inline void printDeletedCallstack(std::ostream& out) const {
-        if (!deletedCallstack.has_value()) {
+        if (!deletedCallstack) {
             throw std::runtime_error("MallocInfo: No deleted callstack! "
                                      "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");
         }
         
-        callstackHelper::format(deletedCallstack.value(), out);
+        callstackHelper::format(*deletedCallstack, out);
     }
-    
+
+    void markSuppressed();
+
     friend auto operator<<(std::ostream&, const MallocInfo&) -> std::ostream&;
 
 private:

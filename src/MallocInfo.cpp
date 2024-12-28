@@ -55,6 +55,11 @@ static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Ar
     }
 }
 
+void MallocInfo::markSuppressed() {
+    forEachIndirect(true, *this, [](const auto&){});
+    printedInRoot = true;
+}
+
 auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     self.print(stream);
     return stream;

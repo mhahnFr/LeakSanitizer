@@ -224,10 +224,7 @@ static inline auto isSuppressed(const std::vector<suppression::Suppression>& sup
 static inline auto applySuppressions(const std::set<MallocInfo*>& leaks, const std::vector<suppression::Suppression>& suppressions) {
     for (const auto& leak : leaks) {
         if (isSuppressed(suppressions, *leak)) {
-            for (const auto indirect : leak->viaMeRecords) {
-                indirect->printedInRoot = true;
-            }
-            leak->printedInRoot = true;
+            leak->markSuppressed();
         }
     }
 }
