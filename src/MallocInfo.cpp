@@ -50,7 +50,7 @@ static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs)
 template<typename F, typename... Args>
 static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Args... args) {
     for (const auto& record : info.viaMeRecords) {
-        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, info.leakType) && !record->printedInRoot) {
+        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, info.leakType) && !record->printedInRoot && !record->suppressed) {
             func(*record, std::forward<Args>(args)...);
             record->printedInRoot = mark;
         }
@@ -58,8 +58,28 @@ static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Ar
 }
 
 void MallocInfo::markSuppressed() {
-    forEachIndirect(true, *this, [](const auto&){});
-    printedInRoot = true;
+    for (const auto& record : viaMeRecords) {
+        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, leakType) && !record->suppressed) {
+            record->suppressed = true;
+        }
+    }
+    suppressed = true;
+}
+
+auto MallocInfo::enumerate() -> std::pair<std::size_t, std::size_t> {
+    std::size_t count { 0 },
+                bytes { 0 };
+
+    for (const auto& record : viaMeRecords) {
+        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, leakType) && !record->suppressed && !record->enumerated) {
+            ++count;
+            bytes += record->size;
+            record->enumerated = true;
+        }
+    }
+    enumerated = true;
+
+    return std::make_pair(count, bytes);
 }
 
 auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {

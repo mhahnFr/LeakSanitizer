@@ -71,6 +71,8 @@ struct MallocInfo {
 
     /** Indicates whether this record has been printed as a root. */
     bool printedInRoot = false;
+    bool suppressed = false;
+    bool enumerated = false;
 
     /**
      * Initializes this allocation record using the given information.
@@ -127,6 +129,7 @@ struct MallocInfo {
     }
 
     void markSuppressed();
+    auto enumerate() -> std::pair<std::size_t, std::size_t>;
 
     friend auto operator<<(std::ostream&, const MallocInfo&) -> std::ostream&;
 
