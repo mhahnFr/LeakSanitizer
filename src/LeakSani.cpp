@@ -362,10 +362,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << clear << "Filtering the leaks...";
     // TODO: Suppress everything from the DYLD
     for (const auto& leak : toReturn.recordsObjC) {
-        for (const auto& indirect : leak->viaMeRecords) {
-            indirect->printedInRoot = true;
-        }
-        leak->printedInRoot = true;
+        leak->markSuppressed();
     }
     const auto& suppressions = getSuppressions();
     applySuppressions(toReturn.recordsStack, suppressions);
