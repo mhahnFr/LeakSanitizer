@@ -61,8 +61,8 @@ The LeakSanitizer adheres to the C++17 standard.
 
 Additionally, the following command line tools are needed to successfully build the sanitizer:
 - GNU compatible `make` command line tool
-- The `find` command line tool *(POSIX.1-2001)*
 - The `uname` command line tool *(POSIX.2)*
+- The `cat` command line tool *(POSIX.2)*
 
 All dependencies introduced by the [CallstackLibrary][5] are necessary as well (find them [here][11]).
 
