@@ -715,9 +715,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
             record->printedInRoot = true;
         }
 
-        // TODO: Possibility to show indirects
-
-        if ((true)) { // TODO: If should show reachables
+        if (self.behaviour.showReachables()) {
             printRecords(stats.recordsGlobal, stream);
             printRecords(stats.recordsTlv, stream);
             printRecords(stats.recordsStack, stream);

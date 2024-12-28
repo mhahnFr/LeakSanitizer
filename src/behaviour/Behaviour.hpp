@@ -46,6 +46,7 @@ private:
 
     FROM_ENV(bool, suppressionDevelopersMode, SUPPRESSION_DEVELOPER, false)
     FROM_ENV(bool, showIndirects, INDIRECT_LEAKS, false)
+    FROM_ENV(bool, showReachables, REACHABLE_LEAKS, true)
     FROM_ENV(const char*, suppressionFiles, SUPPRESSION_FILES, nullptr)
 
     FROM_ENV_API(bool, humanPrint,     HUMAN_PRINT)
