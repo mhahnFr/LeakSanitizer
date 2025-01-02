@@ -27,6 +27,7 @@
 #include <optional>
 #include <ostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <callstack.h>
@@ -67,7 +68,7 @@ struct MallocInfo {
     mutable lcs::callstack createdCallstack;
     /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
-    std::optional<std::string> imageName;
+    std::pair<const char*, const char*> imageName = { nullptr, nullptr };
 
     bool printedInRoot = false;
     bool suppressed = false;

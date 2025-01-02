@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -86,9 +86,9 @@ auto Suppression::match(const MallocInfo& info) const -> bool {
     if (size && info.size != *size) return false;
     if (leakType && info.leakType != *leakType) return false;
     // TODO: Image names with regex matching
-    if (imageName && info.imageName && *imageName != *info.imageName) return false;
+    if (imageName && info.imageName.first != nullptr && *imageName != info.imageName.first) return false;
 
-    if (topCallstack.empty() && !info.imageName) return false;
+    if (topCallstack.empty() && info.imageName.first == nullptr) return false;
 
     return topCallstack.empty() ? true : callstackHelper::isSuppressed(*this, info.createdCallstack);
 }

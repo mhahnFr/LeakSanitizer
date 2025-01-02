@@ -19,7 +19,7 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <filesystem>
+#include <limits>
 
 #include "MallocInfo.hpp"
 
@@ -92,11 +92,12 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     return stream;
 }
 
-static inline auto maybeRelativate(const std::string& path) -> std::string {
-    if (!getBehaviour().relativePaths()) return path;
+static inline auto maybeRelativate(const std::pair<const char*, const char*>& path) -> const char* {
+    if (!getBehaviour().relativePaths()) return path.first;
 
-    const auto& relative = std::filesystem::relative(path).string();
-    return relative.size() < path.size() ? relative : path;
+    const auto& s1 = path.first == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.first);
+    const auto& s2 = path.second == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.second);
+    return s2 < s1 ? path.second : path.first;
 }
 
 void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long number, unsigned long indent2) const {
@@ -115,8 +116,8 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
            << format<Style::BOLD, Style::RED>("Leak") << " of size "
            << clear<Style::ITALIC>
            << bytesToString(size) << get<Style::ITALIC> << ", " << leakType;
-    if (imageName && getBehaviour().printBinaries()) {
-        stream << " in " << format<Style::BLUE>(maybeRelativate(*imageName));
+    if (imageName.first != nullptr && getBehaviour().printBinaries()) {
+        stream << " in " << format<Style::BLUE>(maybeRelativate(imageName));
     }
 
     std::size_t count { 0 },
