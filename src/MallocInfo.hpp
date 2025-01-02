@@ -133,7 +133,12 @@ struct MallocInfo {
     friend auto operator<<(std::ostream&, const MallocInfo&) -> std::ostream&;
 
 private:
+    bool flag = false;
+
     void print(std::ostream& stream, unsigned long indent = 0, unsigned long number = 0, unsigned long indent2 = 0) const;
+
+    template<typename F, typename... Args>
+    constexpr inline void forEachIndirect(bool mark, F func, Args... args) const;
 };
 }
 

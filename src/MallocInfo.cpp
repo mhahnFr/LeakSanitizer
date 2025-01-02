@@ -46,12 +46,16 @@ static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs)
 }
 
 template<typename F, typename... Args>
-static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Args... args) {
-    for (const auto& leak : info.viaMeRecords) {
+constexpr inline void MallocInfo::forEachIndirect(bool mark, F func, Args... args) const {
+    for (const auto& leak : viaMeRecords) {
+        leak.get().flag = false;
+    }
+    for (const auto& leak : viaMeRecords) {
         auto& record = leak.get();
-        if (isIndirect(record.leakType) && isConsideredGreater(record.leakType, info.leakType) && !record.printedInRoot && !record.suppressed) {
+        if (isIndirect(record.leakType) && isConsideredGreater(record.leakType, leakType) && !record.printedInRoot && !record.suppressed && !record.flag) {
             func(record, std::forward<Args>(args)...);
             record.printedInRoot = mark;
+            record.flag = true;
         }
     }
 }
@@ -117,7 +121,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
 
     std::size_t count { 0 },
                 bytes { 0 };
-    forEachIndirect(!getBehaviour().showIndirects(), *this, [&](const auto& record) {
+    forEachIndirect(!getBehaviour().showIndirects(), [&](const auto& record) {
         ++count;
         bytes += record.size;
     });
@@ -131,7 +135,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
         stream << std::endl << indentString << get<Style::AMBER> << "Indirect leak" << (count > 1 ? "s" : "") << ":" << clear<Style::AMBER>;
         const auto& print = count > 1;
         const auto& newIndent = indent + (print ? std::to_string(count).size() : 0) + 3;
-        forEachIndirect(true, *this, [&](const auto& record) {
+        forEachIndirect(true, [&](const auto& record) {
             stream << std::endl;
             record.print(stream, newIndent, print ? ++number : 0, indent);
         });
