@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -66,6 +66,7 @@ class LSan final: public ATracker {
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
     std::optional<std::vector<suppression::Suppression>> suppressions;
+    std::vector<std::pair<char*, char*>> binaryFilenames;
     /** The registered thread-local allocation trackers.                                */
     std::set<ATracker*> tlsTrackers;
     /** The mutex to manage the access to the registered thread-local trackers.         */
@@ -102,7 +103,7 @@ class LSan final: public ATracker {
     inline void classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
                               std::set<MallocInfo*>& directs, bool skipClassifieds = false,
-                              const std::optional<std::string>& name = std::nullopt) {
+                              const char* name = nullptr, const char* nameRelative = nullptr) {
         for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
             if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
@@ -110,7 +111,8 @@ class LSan final: public ATracker {
             }
             if (record->second.leakType > direct) {
                 record->second.leakType = direct;
-                record->second.imageName = name;
+                record->second.imageName.first = name;
+                record->second.imageName.second = nameRelative;
                 directs.insert(&record->second);
             }
             classifyRecord(record->second, indirect);

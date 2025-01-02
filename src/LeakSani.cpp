@@ -20,6 +20,7 @@
  */
 
 #include <algorithm>
+#include <filesystem>
 #include <stack>
 
 #include <lsan_internals.h>
@@ -106,7 +107,7 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
 }
 
 #ifdef __APPLE__
-static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t vmaddrslide, std::vector<Region>& regions, std::set<const void*>& tlvs, const std::string& name) {
+static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t vmaddrslide, std::vector<Region>& regions, std::set<const void*>& tlvs, const char* name, const char* relative) {
     if (header->magic != MH_MAGIC_64) return;
 
     load_command* lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(header) + sizeof(mach_header_64));
@@ -122,7 +123,7 @@ static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t v
                 // TODO: Filter out bss
                 if (seg->initprot & 2 && seg->initprot & 1) // 2: Read 1: Write
                 {
-                    regions.push_back(Region { reinterpret_cast<void*>(ptr), reinterpret_cast<void*>(end), name });
+                    regions.push_back(Region { reinterpret_cast<void*>(ptr), reinterpret_cast<void*>(end), name, relative });
 
                     auto sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(seg) + sizeof(*seg));
                     for (uint32_t i = 0; i < seg->nsects; ++i) {
@@ -146,21 +147,27 @@ static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t v
 }
 #endif
 
-static inline auto getGlobalRegionsAndTLVs() -> std::pair<std::vector<Region>, std::set<const void*>> {
+static inline auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::set<const void*>> {
     auto regions = std::vector<Region>();
     auto locals  = std::set<const void*>();
 
 #ifdef __APPLE__
     const uint32_t count = _dyld_image_count();
     for (uint32_t i = 0; i < count; ++i) {
-        getGlobalRegionsAndTLVs(_dyld_get_image_header(i), _dyld_get_image_vmaddr_slide(i), regions, locals, _dyld_get_image_name(i));
+        const auto& filename = strdup(_dyld_get_image_name(i));
+        const auto& relative = getBehaviour().relativePaths() ? strdup(std::filesystem::relative(filename).string().c_str()) : nullptr;
+        binaryFilenames.push_back({ filename, relative });
+        getGlobalRegionsAndTLVs(_dyld_get_image_header(i), _dyld_get_image_vmaddr_slide(i), regions, locals, filename, relative);
     }
 
     struct task_dyld_info dyldInfo;
     mach_msg_type_number_t infoCount = TASK_DYLD_INFO_COUNT;
     if (task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t) &dyldInfo, &infoCount) == KERN_SUCCESS) {
         struct dyld_all_image_infos* infos = (struct dyld_all_image_infos*) dyldInfo.all_image_info_addr;
-        getGlobalRegionsAndTLVs(infos->dyldImageLoadAddress, 0, regions, locals, infos->dyldPath);
+        const auto& filename = strdup(infos->dyldPath);
+        const auto& relative = getBehaviour().relativePaths() ? strdup(std::filesystem::relative(filename).string().c_str()) : nullptr;
+        binaryFilenames.push_back({ filename, relative });
+        getGlobalRegionsAndTLVs(infos->dyldImageLoadAddress, 0, regions, locals, filename, relative);
     } else {
         // TODO: Handle the error
     }
@@ -236,7 +243,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         return out << std::endl;
     };
     out << "Searching globals and compile time thread locals...";
-    const auto& [regions, locals] = getGlobalRegionsAndTLVs();
+    const auto& [regions, locals] = getGlobalRegionsAndTLVs(binaryFilenames);
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
 //        const auto& local = locals.find(it->first);
@@ -284,7 +291,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     for (const auto& region : regions) {
         classifyLeaks(align(region.begin), align(region.end, false),
                       LeakType::globalDirect, LeakType::globalIndirect,
-                      toReturn.recordsGlobal, true, region.name);
+                      toReturn.recordsGlobal, true, region.name, region.nameRelative);
     }
 
     out << clear << "Reachability analysis: Runtime thread-local variables...";
@@ -752,6 +759,10 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         stream << std::endl;
     }
 
+    for (const auto& string : self.binaryFilenames) {
+        std::free(string.first);
+        std::free(string.second);
+    }
     callstack_clearCaches();
     callstack_autoClearCaches = true;
     

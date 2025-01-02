@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -22,8 +22,6 @@
 #ifndef Region_hpp
 #define Region_hpp
 
-#include <string>
-
 namespace lsan {
 /**
  * This strcuture represents a memory region.
@@ -33,7 +31,8 @@ struct Region {
     void* begin,
     /** The end of the region.   */
         * end;
-    std::string name;
+    const char* name,
+              * nameRelative;
 };
 }
 
