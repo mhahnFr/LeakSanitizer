@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -47,18 +47,20 @@ static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs)
 
 template<typename F, typename... Args>
 static inline void forEachIndirect(bool mark, const MallocInfo& info, F func, Args... args) {
-    for (const auto& record : info.viaMeRecords) {
-        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, info.leakType) && !record->printedInRoot && !record->suppressed) {
-            func(*record, std::forward<Args>(args)...);
-            record->printedInRoot = mark;
+    for (const auto& leak : info.viaMeRecords) {
+        auto& record = leak.get();
+        if (isIndirect(record.leakType) && isConsideredGreater(record.leakType, info.leakType) && !record.printedInRoot && !record.suppressed) {
+            func(record, std::forward<Args>(args)...);
+            record.printedInRoot = mark;
         }
     }
 }
 
 void MallocInfo::markSuppressed() {
-    for (const auto& record : viaMeRecords) {
-        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, leakType) && !record->suppressed) {
-            record->suppressed = true;
+    for (const auto& leak : viaMeRecords) {
+        auto& record = leak.get();
+        if (isIndirect(record.leakType) && isConsideredGreater(record.leakType, leakType) && !record.suppressed) {
+            record.suppressed = true;
         }
     }
     suppressed = true;
@@ -68,11 +70,12 @@ auto MallocInfo::enumerate() -> std::pair<std::size_t, std::size_t> {
     std::size_t count { 0 },
                 bytes { 0 };
 
-    for (const auto& record : viaMeRecords) {
-        if (isIndirect(record->leakType) && isConsideredGreater(record->leakType, leakType) && !record->suppressed && !record->enumerated) {
+    for (const auto& leak : viaMeRecords) {
+        auto& record = leak.get();
+        if (isIndirect(record.leakType) && isConsideredGreater(record.leakType, leakType) && !record.suppressed && !record.enumerated) {
             ++count;
-            bytes += record->size;
-            record->enumerated = true;
+            bytes += record.size;
+            record.enumerated = true;
         }
     }
     enumerated = true;

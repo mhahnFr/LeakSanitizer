@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -26,8 +26,8 @@
 #include <functional>
 #include <optional>
 #include <ostream>
-#include <set>
 #include <string>
+#include <vector>
 
 #include <callstack.h>
 
@@ -57,7 +57,7 @@ struct MallocInfo {
     /** The type of leak this record has been classified as.      */
     LeakType leakType = LeakType::unclassified;
     /** The allocation records reachable via this record.         */
-    std::set<MallocInfo*> viaMeRecords;
+    std::vector<Ref> viaMeRecords;
 
     /** Indicating whether this allocation has been deallocated.  */
     bool deleted = false;
@@ -69,7 +69,6 @@ struct MallocInfo {
     mutable std::optional<lcs::callstack> deletedCallstack;
     std::optional<std::string> imageName;
 
-    /** Indicates whether this record has been printed as a root. */
     bool printedInRoot = false;
     bool suppressed = false;
     bool enumerated = false;

@@ -87,7 +87,7 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
                 || record->second.pointer == elem.get().pointer) {
                 continue;
             }
-            info.viaMeRecords.insert(&record->second);
+            info.viaMeRecords.push_back(record->second);
             if (record->second.leakType > currentType)
                 stack.push(record->second);
         }
