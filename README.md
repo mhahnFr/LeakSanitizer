@@ -259,7 +259,7 @@ If you experience any problems with the LeakSanitizer or if you have ideas to fu
 
 This project is licensed under the terms of the GNU GPL in version 3 or later.
 
-© Copyright 2022 - 2024 [mhahnFr][6] and contributors
+© Copyright 2022 - 2025 [mhahnFr][6] and contributors
 
 [1]: https://github.com/mhahnFr/LeakSanitizer/releases/latest
 [2]: https://github.com/mhahnFr/LeakSanitizer/wiki/Behaviour

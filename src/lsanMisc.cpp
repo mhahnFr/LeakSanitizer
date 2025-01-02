@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -61,7 +61,7 @@ auto getInstance() -> LSan & {
  * @return the given output stream
  */
 static inline auto printLicense(std::ostream & out) -> std::ostream & {
-    out << "Copyright (C) 2022 - 2024  mhahnFr and contributors"         << std::endl
+    out << "Copyright (C) 2022 - 2025  mhahnFr and contributors"         << std::endl
         << "Licensed under the terms of the GNU GPL version 3 or later." << std::endl
         << std::endl;
     

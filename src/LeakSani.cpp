@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -671,7 +671,7 @@ static inline void printRecord(std::ostream& out, const MallocInfo& info) {
 
 static inline void printRecords(const std::set<MallocInfo*>& records, std::ostream& out, bool printContent = false) {
     for (const auto& record : records) {
-        if (!record->printedInRoot && !record->suppressed) {
+        if (!record->printedInRoot && !record->suppressed && !record->printedInRoot) {
             if (printContent) {
                 printRecord(out, *record);
             }
