@@ -358,8 +358,6 @@ for (const auto& leak : (records)) {                              \
     out << "   Total: " << toReturn.getTotal() << " (" << infos.size() << ")"<< std::endl
         << "    Lost: " << toReturn.lost << " (" << toReturn.recordsLost.size() << ")" << std::endl
         << "Indirect: " << toReturn.lostIndirect << std::endl
-        << "    ObjC: " << toReturn.objC << " (" << toReturn.recordsObjC.size() << ")" << std::endl
-        << "Indirect: " << toReturn.objCIndirect << std::endl
         << "  Global: " << toReturn.global << " (" << toReturn.recordsGlobal.size() << ")" << std::endl
         << "Indirect: " << toReturn.globalIndirect << std::endl
         << "     TLV: " << toReturn.tlv << " (" << toReturn.recordsTlv.size() << ")" << std::endl

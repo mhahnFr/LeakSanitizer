@@ -36,8 +36,6 @@ struct LeakKindStats {
     std::size_t stack          = 0,
     /** The amount of leaks found via leaks on the stack.     */
                 stackIndirect  = 0,
-                objC           = 0,
-                objCIndirect   = 0,
     /** The amount of leaks in global space.                  */
                 global         = 0,
     /** The amount of leaks found via global leaks.           */
@@ -55,8 +53,6 @@ struct LeakKindStats {
     std::size_t bytesStack          = 0,
     /** The count of bytes found via the stack.               */
                 bytesStackIndirect  = 0,
-                bytesObjC           = 0,
-                bytesObjCIndirect   = 0,
     /** The count of bytes found in global space.             */
                 bytesGlobal         = 0,
     /** The count of bytes found via the global space.        */
@@ -95,7 +91,7 @@ struct LeakKindStats {
      * @return the total amount of reachable leaks
      */
     constexpr inline auto getTotalReachable() const -> std::size_t {
-        return stack + stackIndirect + global + globalIndirect + tlv + tlvIndirect + objC + objCIndirect;
+        return stack + stackIndirect + global + globalIndirect + tlv + tlvIndirect;
     }
 
     /**
@@ -124,8 +120,7 @@ struct LeakKindStats {
     constexpr inline auto getReachableBytes() const -> std::size_t {
         return bytesStack  + bytesStackIndirect
              + bytesGlobal + bytesGlobalIndirect
-             + bytesTlv    + bytesTlvIndirect
-             + bytesObjC   + bytesObjCIndirect;
+             + bytesTlv    + bytesTlvIndirect;
     }
 
     /**
