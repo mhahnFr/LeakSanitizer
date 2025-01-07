@@ -691,6 +691,20 @@ static inline void printRecords(const std::deque<MallocInfo::Ref>& records, std:
     }
 }
 
+static inline auto operator<<(std::ostream& out, const LeakKindStats& stats) -> std::ostream& {
+    using namespace formatter;
+
+    // TODO: Further formatting
+    // TODO: Maybe split between direct and indirect?
+    out << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
+        << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
+        << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable";
+    if (!getBehaviour().showReachables()) {
+        out << format<Style::ITALIC>(" (not shown)");
+    }
+    return out << std::endl;
+}
+
 auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     using namespace formatter;
 
@@ -700,25 +714,9 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     callstack_autoClearCaches = false;
 
     const auto& stats = self.classifyLeaks();
-
-    // [x] classify the leaks
-    // [x] create summary on the way
-    // [x] print summary
-    // [x] print lost memory - according to what types should be shown and with a note what kind of leak it is
-    // [x] print summary again
-    // [x] print hint for how to make the rest visible
-
     if (stats.getTotal() > 0) {
         // TODO: Optionally collapse identical callstacks
-        // TODO: Further formatting
-        // TODO: Maybe split between direct and indirect?
-        stream << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
-               << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
-               << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable";
-        if (!self.behaviour.showReachables()) {
-            stream << format<Style::ITALIC>(" (not shown)");
-        }
-        stream << std::endl << std::endl;
+        stream << stats << std::endl;
 
         for (const auto& leak : stats.recordsLost) {
             auto& record = leak.get();
@@ -752,15 +750,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
     stream << maybeShowDeprecationWarnings;
     if (stats.getTotal() > 0) {
-        // TODO: Further formatting
-        stream << std::endl << format<Style::BOLD>("Summary:") << std::endl
-               << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
-               << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
-               << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable";
-        if (!self.behaviour.showReachables()) {
-            stream << format<Style::ITALIC>(" (not shown)");
-        }
-        stream << std::endl;
+        stream << std::endl << format<Style::BOLD>("Summary:") << std::endl << stats;
     }
 
     for (const auto& string : self.binaryFilenames) {
