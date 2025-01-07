@@ -28,12 +28,10 @@
 #include <optional>
 #include <ostream>
 #include <set>
-#include <tuple>
 #include <utility>
 #include <vector>
 
 #include <pthread.h>
-#include <lsan_internals.h>
 
 #include "ATracker.hpp"
 #include "MallocInfo.hpp"
@@ -89,35 +87,12 @@ class LSan final: public ATracker {
      */
     auto copyTrackerList() -> decltype(tlsTrackers);
 
-    inline auto findWithSpecials(void* ptr) -> decltype(infos)::iterator {
-        auto toReturn = infos.find(ptr);
-        if (toReturn == infos.end()) {
-            toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - 2 * sizeof(void*)));
-        }
-        if (toReturn == infos.end()) {
-            toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - sizeof(void*)));
-        }
-        return toReturn;
-    }
+    auto findWithSpecials(void* ptr) -> decltype(infos)::iterator;
 
-    inline void classifyLeaks(uintptr_t begin, uintptr_t end,
-                              LeakType direct, LeakType indirect,
-                              std::deque<MallocInfo::Ref>& directs, bool skipClassifieds = false,
-                              const char* name = nullptr, const char* nameRelative = nullptr) {
-        for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
-            const auto& record = infos.find(*reinterpret_cast<void**>(it));
-            if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
-                continue;
-            }
-            if (record->second.leakType > direct) {
-                record->second.leakType = direct;
-                record->second.imageName.first = name;
-                record->second.imageName.second = nameRelative;
-                directs.push_back(record->second);
-            }
-            classifyRecord(record->second, indirect);
-        }
-    }
+    void classifyLeaks(uintptr_t begin, uintptr_t end,
+                       LeakType direct, LeakType indirect,
+                       std::deque<MallocInfo::Ref>& directs, bool skipClassifieds = false,
+                       const char* name = nullptr, const char* nameRelative = nullptr);
 
     template<bool Four = false>
     constexpr inline void classifyPointerUnion(void* ptr, std::deque<MallocInfo::Ref>& directs,
@@ -132,43 +107,7 @@ class LSan final: public ATracker {
         }
     }
 
-    inline void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect) {
-        auto classWords = reinterpret_cast<void**>(cls);
-        auto cachePtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[2]) & ((uintptr_t) 1 << 48) - 1);
-        const auto& cacheIt = infos.find(cachePtr);
-        if (cacheIt != infos.end() && cacheIt->second.leakType > direct) {
-            cacheIt->second.leakType = direct;
-            classifyRecord(cacheIt->second, indirect);
-            directs.push_back(cacheIt->second);
-        }
-
-        auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
-        const auto& it = infos.find(ptr);
-        if (it != infos.end()) {
-            if (it->second.leakType > direct) {
-                it->second.leakType = direct;
-                classifyRecord(it->second, indirect);
-                directs.push_back(it->second);
-            }
-
-            auto rwStuff = reinterpret_cast<void**>(it->second.pointer);
-            auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(rwStuff[1]) & ~1);
-            const auto& it = infos.find(ptr);
-            if (it != infos.end()) {
-                if (it->second.leakType > direct) {
-                    it->second.leakType = direct;
-                    classifyRecord(it->second, indirect);
-                    directs.push_back(it->second);
-                }
-                if (it->second.size >= 4 * sizeof(void*)) {
-                    const auto ptrArr = reinterpret_cast<void**>(it->second.pointer);
-                    for (unsigned char i = 1; i < 4; ++i) {
-                        classifyPointerUnion<true>(ptrArr[i], directs, direct, indirect);
-                    }
-                }
-            }
-        }
-    }
+    void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect);
 
 protected:
     virtual inline void maybeAddToStats(const MallocInfo& info) final override {

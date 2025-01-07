@@ -23,8 +23,6 @@
 #include <filesystem>
 #include <stack>
 
-#include <lsan_internals.h>
-
 #include <callstack_internals.h>
 
 #include "LeakSani.hpp"
@@ -65,6 +63,74 @@ static constexpr inline auto align(uintptr_t ptr, bool up = true) -> uintptr_t {
 
 static inline auto align(const void* ptr, bool up = true) -> uintptr_t {
     return align(reinterpret_cast<uintptr_t>(ptr), up);
+}
+
+auto LSan::findWithSpecials(void* ptr) -> decltype(infos)::iterator {
+    auto toReturn = infos.find(ptr);
+    if (toReturn == infos.end()) {
+        toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - 2 * sizeof(void*)));
+    }
+    if (toReturn == infos.end()) {
+        toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - sizeof(void*)));
+    }
+    return toReturn;
+}
+
+void LSan::classifyLeaks(uintptr_t begin, uintptr_t end,
+                         LeakType direct, LeakType indirect,
+                         std::deque<MallocInfo::Ref>& directs, bool skipClassifieds,
+                         const char* name, const char* nameRelative) {
+    for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
+        const auto& record = infos.find(*reinterpret_cast<void**>(it));
+        if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
+            continue;
+        }
+        if (record->second.leakType > direct) {
+            record->second.leakType = direct;
+            record->second.imageName.first = name;
+            record->second.imageName.second = nameRelative;
+            directs.push_back(record->second);
+        }
+        classifyRecord(record->second, indirect);
+    }
+}
+
+void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect) {
+    auto classWords = reinterpret_cast<void**>(cls);
+    auto cachePtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[2]) & ((uintptr_t) 1 << 48) - 1);
+    const auto& cacheIt = infos.find(cachePtr);
+    if (cacheIt != infos.end() && cacheIt->second.leakType > direct) {
+        cacheIt->second.leakType = direct;
+        classifyRecord(cacheIt->second, indirect);
+        directs.push_back(cacheIt->second);
+    }
+
+    auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
+    const auto& it = infos.find(ptr);
+    if (it != infos.end()) {
+        if (it->second.leakType > direct) {
+            it->second.leakType = direct;
+            classifyRecord(it->second, indirect);
+            directs.push_back(it->second);
+        }
+
+        auto rwStuff = reinterpret_cast<void**>(it->second.pointer);
+        auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(rwStuff[1]) & ~1);
+        const auto& it = infos.find(ptr);
+        if (it != infos.end()) {
+            if (it->second.leakType > direct) {
+                it->second.leakType = direct;
+                classifyRecord(it->second, indirect);
+                directs.push_back(it->second);
+            }
+            if (it->second.size >= 4 * sizeof(void*)) {
+                const auto ptrArr = reinterpret_cast<void**>(it->second.pointer);
+                for (unsigned char i = 1; i < 4; ++i) {
+                    classifyPointerUnion<true>(ptrArr[i], directs, direct, indirect);
+                }
+            }
+        }
+    }
 }
 
 void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
