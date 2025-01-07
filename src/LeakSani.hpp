@@ -102,7 +102,7 @@ class LSan final: public ATracker {
 
     inline void classifyLeaks(uintptr_t begin, uintptr_t end,
                               LeakType direct, LeakType indirect,
-                              std::set<MallocInfo*>& directs, bool skipClassifieds = false,
+                              std::deque<MallocInfo::Ref>& directs, bool skipClassifieds = false,
                               const char* name = nullptr, const char* nameRelative = nullptr) {
         for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
             const auto& record = infos.find(*reinterpret_cast<void**>(it));
@@ -113,14 +113,14 @@ class LSan final: public ATracker {
                 record->second.leakType = direct;
                 record->second.imageName.first = name;
                 record->second.imageName.second = nameRelative;
-                directs.insert(&record->second);
+                directs.push_back(record->second);
             }
             classifyRecord(record->second, indirect);
         }
     }
 
     template<bool Four = false>
-    constexpr inline void classifyPointerUnion(void* ptr, std::set<MallocInfo*>& directs,
+    constexpr inline void classifyPointerUnion(void* ptr, std::deque<MallocInfo::Ref>& directs,
                                                LeakType direct, LeakType indirect) {
         constexpr const auto order = Four ? 3 : 1;
 
@@ -128,18 +128,18 @@ class LSan final: public ATracker {
         if (it != infos.end() && it->second.leakType > direct) {
             it->second.leakType = direct;
             classifyRecord(it->second, indirect);
-            directs.insert(&it->second);
+            directs.push_back(it->second);
         }
     }
 
-    inline void classifyClass(void* cls, std::set<MallocInfo*>& directs, LeakType direct, LeakType indirect) {
+    inline void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect) {
         auto classWords = reinterpret_cast<void**>(cls);
         auto cachePtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[2]) & ((uintptr_t) 1 << 48) - 1);
         const auto& cacheIt = infos.find(cachePtr);
         if (cacheIt != infos.end() && cacheIt->second.leakType > direct) {
             cacheIt->second.leakType = direct;
             classifyRecord(cacheIt->second, indirect);
-            directs.insert(&cacheIt->second);
+            directs.push_back(cacheIt->second);
         }
 
         auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
@@ -148,7 +148,7 @@ class LSan final: public ATracker {
             if (it->second.leakType > direct) {
                 it->second.leakType = direct;
                 classifyRecord(it->second, indirect);
-                directs.insert(&it->second);
+                directs.push_back(it->second);
             }
 
             auto rwStuff = reinterpret_cast<void**>(it->second.pointer);
@@ -158,7 +158,7 @@ class LSan final: public ATracker {
                 if (it->second.leakType > direct) {
                     it->second.leakType = direct;
                     classifyRecord(it->second, indirect);
-                    directs.insert(&it->second);
+                    directs.push_back(it->second);
                 }
                 if (it->second.size >= 4 * sizeof(void*)) {
                     const auto ptrArr = reinterpret_cast<void**>(it->second.pointer);

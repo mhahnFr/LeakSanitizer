@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -23,7 +23,7 @@
 #define LeakKindStats_hpp
 
 #include <cstddef>
-#include <set>
+#include <deque>
 
 #include "../MallocInfo.hpp"
 
@@ -71,14 +71,14 @@ struct LeakKindStats {
                 bytesLostIndirect   = 0;
 
     /** The allocation records found on the stack.            */
-    std::set<MallocInfo*> recordsStack;
-    std::set<MallocInfo*> recordsObjC;
+    std::deque<MallocInfo::Ref> recordsStack;
+    std::deque<MallocInfo::Ref> recordsObjC;
     /** The allocation records found in global space.         */
-    std::set<MallocInfo*> recordsGlobal;
+    std::deque<MallocInfo::Ref> recordsGlobal;
     /** The allocation records found in thread-local storage. */
-    std::set<MallocInfo*> recordsTlv;
+    std::deque<MallocInfo::Ref> recordsTlv;
     /** The allocation records directly lost.                 */
-    std::set<MallocInfo*> recordsLost;
+    std::deque<MallocInfo::Ref> recordsLost;
 
     /**
      * Returns the total amount of lost memory leaks.

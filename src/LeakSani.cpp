@@ -223,10 +223,10 @@ static inline auto isSuppressed(const std::vector<suppression::Suppression>& sup
     return false;
 }
 
-static inline auto applySuppressions(const std::set<MallocInfo*>& leaks, const std::vector<suppression::Suppression>& suppressions) {
+static inline auto applySuppressions(const std::deque<MallocInfo::Ref>& leaks, const std::vector<suppression::Suppression>& suppressions) {
     for (const auto& leak : leaks) {
-        if (isSuppressed(suppressions, *leak)) {
-            leak->markSuppressed();
+        if (isSuppressed(suppressions, leak.get()) && !leak.get().suppressed) {
+            leak.get().markSuppressed();
         }
     }
 }
@@ -259,7 +259,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     for (auto& [ptr, record] : infos) {
         if (record.leakType == LeakType::reachableDirect) {
             classifyRecord(record, LeakType::reachableIndirect);
-            toReturn.recordsStack.insert(&record);
+            toReturn.recordsStack.push_back(record);
         }
     }
 
@@ -305,7 +305,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         it->second.leakType = LeakType::tlvDirect;
         classifyRecord(it->second, LeakType::tlvIndirect);
-        toReturn.recordsTlv.insert(&it->second);
+        toReturn.recordsTlv.push_back(it->second);
     }
 
     out << clear << "Reachability analysis: Lost memory...";
@@ -316,12 +316,14 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
         record.leakType = LeakType::unreachableDirect;
         classifyRecord(record, LeakType::unreachableIndirect);
-        toReturn.recordsLost.insert(&record);
+        toReturn.recordsLost.push_back(record);
     }
 
     out << clear << "Filtering the memory leaks...";
     for (const auto& leak : toReturn.recordsObjC) {
-        leak->markSuppressed();
+        if (!leak.get().suppressed) {
+            leak.get().markSuppressed();
+        }
     }
     // TODO: Suppress everything from the DYLD
     const auto& suppressions = getSuppressions();
@@ -333,11 +335,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << clear << "Enumerating memory leaks...";
 #define ENUMERATE(records, count, bytes, indirect, indirectBytes) \
 for (const auto& leak : (records)) {                              \
-    if (leak->suppressed || leak->enumerated) continue;           \
+    if (leak.get().suppressed || leak.get().enumerated) continue; \
                                                                   \
     ++(count);                                                    \
-    (bytes) += leak->size;                                        \
-    const auto& [a, b] = leak->enumerate();                       \
+    (bytes) += leak.get().size;                                   \
+    const auto& [a, b] = leak.get().enumerate();                  \
     (indirect) += a;                                              \
     (indirectBytes) += b;                                         \
 }
@@ -676,14 +678,15 @@ static inline void printRecord(std::ostream& out, const MallocInfo& info) {
     out << std::endl << info.pointer << " ";
 }
 
-static inline void printRecords(const std::set<MallocInfo*>& records, std::ostream& out, bool printContent = false) {
-    for (const auto& record : records) {
-        if (!record->printedInRoot && !record->suppressed && !record->printedInRoot) {
+static inline void printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, bool printContent = false) {
+    for (const auto& leak : records) {
+        auto& record = leak.get();
+        if (!record.printedInRoot && !record.suppressed && !record.printedInRoot) {
             if (printContent) {
-                printRecord(out, *record);
+                printRecord(out, record);
             }
-            out << *record << std::endl;
-            record->printedInRoot = true;
+            out << record << std::endl;
+            record.printedInRoot = true;
         }
     }
 }
@@ -717,12 +720,13 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         }
         stream << std::endl << std::endl;
 
-        for (const auto& record : stats.recordsLost) {
-            if (record->leakType != LeakType::unreachableDirect || record->printedInRoot || record->suppressed) continue;
+        for (const auto& leak : stats.recordsLost) {
+            auto& record = leak.get();
+            if (record.leakType != LeakType::unreachableDirect || record.printedInRoot || record.suppressed) continue;
 
 //            printRecord(stream, *record);
-            stream << *record << std::endl;
-            record->printedInRoot = true;
+            stream << record << std::endl;
+            record.printedInRoot = true;
         }
 
         if (self.behaviour.showReachables()) {
