@@ -110,7 +110,7 @@ class LSan final: public ATracker {
     }
 
     void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect);
-    auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::set<const void*>>;
+    auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::vector<const void*>>;
     auto isInDyld(const MallocInfo& info) const -> bool;
     auto isSuppressed(const MallocInfo& info) -> bool;
     void applySuppressions(const std::deque<MallocInfo::Ref>& leaks);

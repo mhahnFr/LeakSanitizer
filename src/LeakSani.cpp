@@ -172,7 +172,7 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
 }
 
 #ifdef __APPLE__
-static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t vmaddrslide, std::vector<Region>& regions, std::set<const void*>& tlvs, const char* name, const char* relative) {
+static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t vmaddrslide, std::vector<Region>& regions, std::vector<const void*>& tlvs, const char* name, const char* relative) {
     if (header->magic != MH_MAGIC_64) return;
 
     load_command* lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(header) + sizeof(mach_header_64));
@@ -197,7 +197,7 @@ static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t v
 
                             uintptr_t de = reinterpret_cast<uintptr_t>(desc) + sect->size;
                             for (tlv_descriptor* d = desc; reinterpret_cast<uintptr_t>(d) < de; ++d) {
-                                tlvs.insert(d->thunk(d));
+                                tlvs.push_back(d->thunk(d));
                             }
                         }
                         sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(sect) + sizeof(section_64));
@@ -212,9 +212,9 @@ static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t v
 }
 #endif
 
-auto LSan::getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::set<const void*>> {
+auto LSan::getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::vector<const void*>> {
     auto regions = std::vector<Region>();
-    auto locals  = std::set<const void*>();
+    auto locals  = std::vector<const void*>();
 
 #ifdef __APPLE__
     const uint32_t count = _dyld_image_count();
@@ -313,10 +313,12 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         return out << std::endl;
     };
     out << "Searching globals and compile time thread locals...";
-    const auto& [regions, locals] = getGlobalRegionsAndTLVs(binaryFilenames);
+    auto [regions, locals] = getGlobalRegionsAndTLVs(binaryFilenames);
+//    std::sort(locals.begin(), locals.end());
+
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
-//        const auto& local = locals.find(it->first);
+//        const auto& local = std::binary_search(locals.cbegin(), locals.cend(), it->first);
         if (/*local != locals.end() || */it->second.deleted) {
             // TODO: In the future only erase the deleted records
             it = infos.erase(it);
