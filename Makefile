@@ -1,7 +1,7 @@
 #
 # LeakSanitizer - Small library showing information about lost memory.
 #
-# Copyright (C) 2022 - 2024  mhahnFr
+# Copyright (C) 2022 - 2025  mhahnFr
 #
 # This file is part of the LeakSanitizer.
 #
@@ -117,7 +117,7 @@ $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 %.hpp: %.json
-	echo 'constexpr const char*' `echo $(basename $<) | tr /. _` '= R"(' >> $@
+	echo 'constexpr const char*' `echo $(basename $<) | tr /. _` '= R"(' > $@
 	cat $< >> $@
 	echo '\n)";' >> $@
 
