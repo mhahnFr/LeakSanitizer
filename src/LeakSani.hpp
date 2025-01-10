@@ -28,6 +28,7 @@
 #include <optional>
 #include <ostream>
 #include <set>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -110,7 +111,7 @@ class LSan final: public ATracker {
     }
 
     void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect);
-    auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::vector<const void*>>;
+    auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::vector<std::tuple<const void*, const char*, const char*>>>;
     auto isInDyld(const MallocInfo& info) const -> bool;
     auto isSuppressed(const MallocInfo& info) -> bool;
     void applySuppressions(const std::deque<MallocInfo::Ref>& leaks);

@@ -172,7 +172,10 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
 }
 
 #ifdef __APPLE__
-static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t vmaddrslide, std::vector<Region>& regions, std::vector<const void*>& tlvs, const char* name, const char* relative) {
+static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t vmaddrslide,
+                                           std::vector<Region>& regions,
+                                           std::vector<std::tuple<const void*, const char*, const char*>>& tlvs,
+                                           const char* name, const char* relative) {
     if (header->magic != MH_MAGIC_64) return;
 
     load_command* lc = reinterpret_cast<load_command*>(reinterpret_cast<uintptr_t>(header) + sizeof(mach_header_64));
@@ -197,7 +200,7 @@ static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t v
 
                             uintptr_t de = reinterpret_cast<uintptr_t>(desc) + sect->size;
                             for (tlv_descriptor* d = desc; reinterpret_cast<uintptr_t>(d) < de; ++d) {
-                                tlvs.push_back(d->thunk(d));
+                                tlvs.push_back(std::make_tuple(d->thunk(d), name, relative));
                             }
                         }
                         sect = reinterpret_cast<section_64*>(reinterpret_cast<uintptr_t>(sect) + sizeof(section_64));
@@ -212,9 +215,9 @@ static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t v
 }
 #endif
 
-auto LSan::getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::vector<const void*>> {
+auto LSan::getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::vector<std::tuple<const void*, const char*, const char*>>> {
     auto regions = std::vector<Region>();
-    auto locals  = std::vector<const void*>();
+    auto locals  = std::vector<std::tuple<const void*, const char*, const char*>>();
 
 #ifdef __APPLE__
     const uint32_t count = _dyld_image_count();
@@ -357,12 +360,12 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Reachability analysis: Compile-time thread-local variables...";
     // Search in compile-time thread locals - their wrapper will be suppressed
-    for (const auto& local : locals) {
-        const auto& it = infos.find(local);
+    for (const auto& [ptr, name, relative] : locals) {
+        const auto& it = infos.find(ptr);
         if (it == infos.end()) continue;
 
         classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
-                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv);
+                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, name, relative);
         it->second.suppressed = true;
     }
 
