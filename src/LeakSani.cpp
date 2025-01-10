@@ -308,19 +308,16 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto& out = getOutputStream();
     const auto& clear = [](std::ostream& out) -> std::ostream& {
         if (isATTY()) {
-            return out << "\r                                                        \r";
+            return out << "\r                                                             \r";
         }
         return out << std::endl;
     };
     out << "Searching globals and compile time thread locals...";
     auto [regions, locals] = getGlobalRegionsAndTLVs(binaryFilenames);
-//    std::sort(locals.begin(), locals.end());
 
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
-//        const auto& local = std::binary_search(locals.cbegin(), locals.cend(), it->first);
-        if (/*local != locals.end() || */it->second.deleted) {
-            // TODO: In the future only erase the deleted records
+        if (it->second.deleted) {
             it = infos.erase(it);
         } else {
             ++it;
@@ -357,6 +354,17 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     }
     delete[] classes;
 #endif
+
+    out << clear << "Reachability analysis: Compile-time thread-local variables...";
+    // Search in compile-time thread locals - their wrapper will be suppressed
+    for (const auto& local : locals) {
+        const auto& it = infos.find(local);
+        if (it == infos.end()) continue;
+
+        classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
+                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv);
+        it->second.suppressed = true;
+    }
 
     out << clear << "Reachability analysis: Runtime thread-local variables...";
     // Search in the runtime thread locals
