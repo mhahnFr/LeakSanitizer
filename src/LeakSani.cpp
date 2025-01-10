@@ -358,14 +358,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     delete[] classes;
 #endif
 
-    out << clear << "Reachability analysis: Globals...";
-    // Search in global space
-    for (const auto& region : regions) {
-        classifyLeaks(align(region.begin), align(region.end, false),
-                      LeakType::globalDirect, LeakType::globalIndirect,
-                      toReturn.recordsGlobal, true, region.name, region.nameRelative);
-    }
-
     out << clear << "Reachability analysis: Runtime thread-local variables...";
     // Search in the runtime thread locals
     for (const auto& key : keys) {
@@ -378,6 +370,14 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         it->second.leakType = LeakType::tlvDirect;
         classifyRecord(it->second, LeakType::tlvIndirect);
         toReturn.recordsTlv.push_back(it->second);
+    }
+
+    out << clear << "Reachability analysis: Globals...";
+    // Search in global space
+    for (const auto& region : regions) {
+        classifyLeaks(align(region.begin), align(region.end, false),
+                      LeakType::globalDirect, LeakType::globalIndirect,
+                      toReturn.recordsGlobal, true, region.name, region.nameRelative);
     }
 
     out << clear << "Reachability analysis: Lost memory...";
@@ -398,8 +398,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
     }
     applySuppressions(toReturn.recordsStack);
-    applySuppressions(toReturn.recordsGlobal);
     applySuppressions(toReturn.recordsTlv);
+    applySuppressions(toReturn.recordsGlobal);
     applySuppressions(toReturn.recordsLost);
 
     out << clear << "Enumerating memory leaks...";
@@ -415,10 +415,10 @@ for (const auto& leak : (records)) {                              \
 }
     ENUMERATE(toReturn.recordsStack, toReturn.stack, toReturn.bytesStack,
               toReturn.stackIndirect, toReturn.bytesStackIndirect)
-    ENUMERATE(toReturn.recordsGlobal, toReturn.global, toReturn.bytesGlobal,
-              toReturn.globalIndirect, toReturn.bytesGlobalIndirect)
     ENUMERATE(toReturn.recordsTlv, toReturn.tlv, toReturn.bytesTlv,
               toReturn.tlvIndirect, toReturn.bytesTlvIndirect)
+    ENUMERATE(toReturn.recordsGlobal, toReturn.global, toReturn.bytesGlobal,
+              toReturn.globalIndirect, toReturn.bytesGlobalIndirect)
     ENUMERATE(toReturn.recordsLost, toReturn.lost, toReturn.bytesLost,
               toReturn.lostIndirect, toReturn.bytesLostIndirect)
 #undef ENUMERATE
@@ -796,8 +796,8 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         }
 
         if (self.behaviour.showReachables()) {
-            printRecords(stats.recordsGlobal, stream);
             printRecords(stats.recordsTlv, stream);
+            printRecords(stats.recordsGlobal, stream);
             printRecords(stats.recordsStack, stream);
         } else if (stats.getTotalReachable() > 0) {
             stream << "Hint: Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
