@@ -33,7 +33,6 @@
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 #include "crashWarner/exceptionHandler.hpp"
-#include "helpers/Region.hpp"
 #include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
 
@@ -213,7 +212,7 @@ static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t v
 }
 #endif
 
-static inline auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::set<const void*>> {
+auto LSan::getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::set<const void*>> {
     auto regions = std::vector<Region>();
     auto locals  = std::set<const void*>();
 
@@ -223,7 +222,7 @@ static inline auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>&
         const auto& filename = strdup(_dyld_get_image_name(i));
         const auto& relative = getBehaviour().relativePaths() ? strdup(std::filesystem::relative(filename).string().c_str()) : nullptr;
         binaryFilenames.push_back({ filename, relative });
-        getGlobalRegionsAndTLVs(_dyld_get_image_header(i), _dyld_get_image_vmaddr_slide(i), regions, locals, filename, relative);
+        ::lsan::getGlobalRegionsAndTLVs(_dyld_get_image_header(i), _dyld_get_image_vmaddr_slide(i), regions, locals, filename, relative);
     }
 
     struct task_dyld_info dyldInfo;
@@ -233,7 +232,8 @@ static inline auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>&
         const auto& filename = strdup(infos->dyldPath);
         const auto& relative = getBehaviour().relativePaths() ? strdup(std::filesystem::relative(filename).string().c_str()) : nullptr;
         binaryFilenames.push_back({ filename, relative });
-        getGlobalRegionsAndTLVs(infos->dyldImageLoadAddress, 0, regions, locals, filename, relative);
+        dyldPath = filename;
+        ::lsan::getGlobalRegionsAndTLVs(infos->dyldImageLoadAddress, 0, regions, locals, filename, relative);
     } else {
         // TODO: Handle the error
     }
@@ -280,18 +280,22 @@ static inline void destroySaniKey(void* value) {
     }
 }
 
-static inline auto isSuppressed(const std::vector<suppression::Suppression>& suppressions, const MallocInfo& info) -> bool {
-    for (const auto& suppression : suppressions) {
-        if (suppression.match(info)) {
+auto LSan::isInDyld(const MallocInfo& info) const -> bool {
+    return info.imageName.first == dyldPath;
+}
+
+auto LSan::isSuppressed(const MallocInfo& info) -> bool {
+    for (const auto& suppression : getSuppressions()) {
+        if (isInDyld(info) || suppression.match(info)) {
             return true;
         }
     }
     return false;
 }
 
-static inline auto applySuppressions(const std::deque<MallocInfo::Ref>& leaks, const std::vector<suppression::Suppression>& suppressions) {
+void LSan::applySuppressions(const std::deque<MallocInfo::Ref>& leaks) {
     for (const auto& leak : leaks) {
-        if (isSuppressed(suppressions, leak.get()) && !leak.get().suppressed) {
+        if (isSuppressed(leak.get()) && !leak.get().suppressed) {
             leak.get().markSuppressed();
         }
     }
@@ -391,12 +395,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             leak.get().markSuppressed();
         }
     }
-    // TODO: Suppress everything from the DYLD
-    const auto& suppressions = getSuppressions();
-    applySuppressions(toReturn.recordsStack, suppressions);
-    applySuppressions(toReturn.recordsGlobal, suppressions);
-    applySuppressions(toReturn.recordsTlv, suppressions);
-    applySuppressions(toReturn.recordsLost, suppressions);
+    applySuppressions(toReturn.recordsStack);
+    applySuppressions(toReturn.recordsGlobal);
+    applySuppressions(toReturn.recordsTlv);
+    applySuppressions(toReturn.recordsLost);
 
     out << clear << "Enumerating memory leaks...";
 #define ENUMERATE(records, count, bytes, indirect, indirectBytes) \

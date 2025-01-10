@@ -41,6 +41,7 @@
 #endif
 
 #include "helpers/LeakKindStats.hpp"
+#include "helpers/Region.hpp"
 #include "behaviour/Behaviour.hpp"
 #include "statistics/Stats.hpp"
 #include "wrappers/realAlloc.hpp"
@@ -69,6 +70,7 @@ class LSan final: public ATracker {
     std::set<ATracker*> tlsTrackers;
     /** The mutex to manage the access to the registered thread-local trackers.         */
     std::mutex tlsTrackerMutex;
+    const char* dyldPath = nullptr;
 
 #ifdef BENCHMARK
     /** The registered timings of the allocations.                                      */
@@ -108,6 +110,10 @@ class LSan final: public ATracker {
     }
 
     void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect);
+    auto getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::set<const void*>>;
+    auto isInDyld(const MallocInfo& info) const -> bool;
+    auto isSuppressed(const MallocInfo& info) -> bool;
+    void applySuppressions(const std::deque<MallocInfo::Ref>& leaks);
 
 protected:
     virtual inline void maybeAddToStats(const MallocInfo& info) final override {

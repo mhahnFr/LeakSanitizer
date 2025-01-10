@@ -1,9 +1,5 @@
 [
   {
-    "name": "Everything in the DYLD",
-    "imageName": "/usr/lib/dyld"
-  },
-  {
     "name": "Everything in the Objective-C runtime",
     "imageName": "/usr/lib/libobjc.A.dylib"
   },
