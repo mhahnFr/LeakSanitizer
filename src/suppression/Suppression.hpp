@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -22,6 +22,7 @@
 #ifndef Suppression_hpp
 #define Suppression_hpp
 
+#include <cstdint>
 #include <optional>
 #include <utility>
 #include <string>
