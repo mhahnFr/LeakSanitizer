@@ -41,6 +41,10 @@
 #include <mach-o/dyld_images.h>
 
 #include <objc/runtime.h>
+#include <CoreFoundation/CFDictionary.h>
+
+#define OBJC_SUPPORT_EXTRA 1
+#include "objcSupport.hpp"
 #endif
 
 namespace lsan {
@@ -382,6 +386,34 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         classifyRecord(it->second, LeakType::tlvIndirect);
         toReturn.recordsTlv.push_back(it->second);
     }
+
+#ifdef LSAN_HANDLE_OBJC
+    out << clear << "Reachability analysis: Cocoa thread-local variables...";
+    // Search in the Cocoa runtime thread-locals
+    // TODO: Get dicts of all threads
+    const auto& dict = reinterpret_cast<CFDictionaryRef>(_2(_4(NSThread, currentThread), threadDictionary));
+    const auto& count = CFDictionaryGetCount(dict);
+    auto keys = new const void*[count];
+    auto values = new const void*[count];
+    CFDictionaryGetKeysAndValues(dict, keys, values);
+    for (CFIndex i = 0; i < count; ++i) {
+        const auto& keyIt = infos.find(keys[i]);
+        if (keyIt != infos.end()) {
+            classifyRecord(keyIt->second, LeakType::tlvIndirect);
+            keyIt->second.leakType = LeakType::tlvDirect;
+            // TODO: Add thread id / name?
+        }
+        const auto& valIt = infos.find(values[i]);
+        if (valIt != infos.end()) {
+            classifyRecord(valIt->second, LeakType::tlvIndirect);
+            keyIt->second.leakType = LeakType::tlvDirect;
+            // TODO: Add thread id / name?
+        }
+    }
+    delete[] keys;
+    delete[] values;
+
+#endif
 
     out << clear << "Reachability analysis: Globals...";
     // Search in global space
