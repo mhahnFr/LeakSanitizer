@@ -4,6 +4,10 @@
     "imageName": "/usr/lib/libobjc.A.dylib"
   },
   {
+    "name": "Everything in the Swift runtime",
+    "imageName": "^/usr/lib/swift/.*$"
+  },
+  {
     "name": "Everything in the XPC library",
     "imageName": "/usr/lib/system/libxpc.dylib"
   },
