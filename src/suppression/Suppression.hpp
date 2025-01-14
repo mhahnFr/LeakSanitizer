@@ -24,8 +24,9 @@
 
 #include <cstdint>
 #include <optional>
-#include <utility>
+#include <regex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "json/Object.hpp"
@@ -41,7 +42,7 @@ struct Suppression {
     std::string name;
     std::optional<std::size_t> size;
     std::optional<LeakType> leakType;
-    std::optional<std::string> imageName;
+    std::optional<std::regex> imageName;
 
     std::vector<std::pair<uintptr_t, std::size_t>> topCallstack;
 

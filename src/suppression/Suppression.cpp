@@ -85,8 +85,8 @@ Suppression::Suppression(const Object& object):
 auto Suppression::match(const MallocInfo& info) const -> bool {
     if (size && info.size != *size) return false;
     if (leakType && info.leakType != *leakType) return false;
-    // TODO: Image names with regex matching
-    if (imageName && info.imageName.first != nullptr && *imageName != info.imageName.first) return false;
+
+    if (imageName && info.imageName.first != nullptr && !std::regex_match(info.imageName.first, *imageName)) return false;
 
     if (topCallstack.empty() && info.imageName.first == nullptr) return false;
 
