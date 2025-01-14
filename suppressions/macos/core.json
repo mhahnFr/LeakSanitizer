@@ -22,5 +22,13 @@
   {
     "name": "Everything created by the system library initialization",
     "functions": [ "_libSystem_initializer" ]
+  },
+  {
+    "name": "Everything in various system libraries, I",
+    "imageName": "^/usr/lib/system/.*$"
+  },
+  {
+    "name": "Everything in various system libraries, II",
+    "imageName": "^/System/Library/.*$"
   }
 ]
