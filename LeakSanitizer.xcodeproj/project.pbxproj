@@ -54,6 +54,7 @@
 		BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */; };
 		BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
 		BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F62CA8765500AEFD5A /* helper.hpp */; };
+		F128723A2D36E0D200D5F0AF /* objcSupport.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F12872392D36E0D200D5F0AF /* objcSupport.hpp */; };
 		F12CA5DD2CB40E6A00C93A2C /* libobjc.A.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */; };
 		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
@@ -134,6 +135,7 @@
 		BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AutoStats.cpp; sourceTree = "<group>"; };
 		BFE023F22CA874D100AEFD5A /* Behaviour.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Behaviour.hpp; sourceTree = "<group>"; };
 		BFE023F62CA8765500AEFD5A /* helper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helper.hpp; sourceTree = "<group>"; };
+		F12872392D36E0D200D5F0AF /* objcSupport.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = objcSupport.hpp; sourceTree = "<group>"; };
 		F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libobjc.A.tbd; path = usr/lib/libobjc.A.tbd; sourceTree = SDKROOT; };
 		F13529AE2D10779B002534D0 /* defaultSuppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = defaultSuppression.cpp; sourceTree = "<group>"; };
 		F13529B02D108324002534D0 /* defaultSuppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = defaultSuppression.hpp; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
 				BFC817182BEFB3C200332937 /* ATracker.hpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
+				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -370,6 +373,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F16901522C403EF200EED0AE /* utils.hpp in Headers */,
+				F128723A2D36E0D200D5F0AF /* objcSupport.hpp in Headers */,
 				BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */,
 				F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */,
 				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
