@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -29,6 +29,7 @@
 
 #ifdef LSAN_APPLE
 # include <macos/core.hpp>
+# include <macos/misc.hpp>
 #endif
 
 namespace lsan::suppression {
@@ -38,6 +39,7 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 #ifdef LSAN_APPLE
     toReturn.insert(toReturn.cbegin(), {
         std::string(suppressions_macos_core),
+        std::string(suppressions_macos_misc),
     });
     // TODO: Swift, AppKit, ...
 #endif
