@@ -114,8 +114,11 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
     }
     stream << get<Style::ITALIC>
            << format<Style::BOLD, Style::RED>("Leak") << " of size "
-           << clear<Style::ITALIC>
-           << bytesToString(size) << get<Style::ITALIC> << ", " << leakType;
+           << clear<Style::ITALIC> << bytesToString(size) << get<Style::ITALIC>;
+    if ((true)) { // TODO: If more than one thread leaks and should show
+        stream << ", thread" << clear<Style::ITALIC> << " # " << threadId << get<Style::ITALIC>;
+    }
+    stream << ", " << leakType;
     if (imageName.first != nullptr && getBehaviour().printBinaries()) {
         stream << " in " << format<Style::BLUE>(maybeRelativate(imageName));
     }
