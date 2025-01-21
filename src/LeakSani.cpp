@@ -729,6 +729,14 @@ auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
     return *suppressions;
 }
 
+auto LSan::getThreadDescription(const std::thread::id& threadId) -> std::string {
+    if (threadId == mainId) {
+        return "main thread";
+    }
+    // TODO: Create thread number: 'thread # XX'
+    return "<< WIP >>";
+}
+
 /**
  * Prints a deprecation notice using the given information.
  *

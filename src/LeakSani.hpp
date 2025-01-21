@@ -72,6 +72,7 @@ class LSan final: public ATracker {
     /** The mutex to manage the access to the registered thread-local trackers.         */
     std::mutex tlsTrackerMutex;
     const char* dyldPath = nullptr;
+    const std::thread::id mainId = std::this_thread::get_id();
 
 #ifdef BENCHMARK
     /** The registered timings of the allocations.                                      */
@@ -214,6 +215,8 @@ public:
 #endif
 
     auto getSuppressions() -> const std::vector<suppression::Suppression>&;
+
+    auto getThreadDescription(const std::thread::id& threadId) -> std::string;
 
     /**
      * Returns the mutex for the allocations and tracking.
