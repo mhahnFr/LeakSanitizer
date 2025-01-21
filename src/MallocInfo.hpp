@@ -71,6 +71,7 @@ struct MallocInfo {
     mutable std::optional<lcs::callstack> deletedCallstack;
     std::pair<const char*, const char*> imageName = { nullptr, nullptr };
     std::thread::id threadId;
+    std::thread::id deletedId;
 
     bool printedInRoot = false;
     bool suppressed = false;
@@ -93,6 +94,7 @@ struct MallocInfo {
         deleted = true;
         deletedCallstack = lcs::callstack();
         freeTimestamp = std::chrono::system_clock::now();
+        deletedId = std::this_thread::get_id();
     }
     
     /**
