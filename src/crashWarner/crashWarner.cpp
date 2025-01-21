@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -72,6 +72,11 @@ constexpr static inline void printer(const std::string & message, lcs::callstack
     printer<Warning>(message, callstack);
 }
 
+// TODO: Replace by proper implementation!
+static inline auto getThreadNumber(const std::thread::id& id) -> unsigned long {
+    return *reinterpret_cast<const unsigned long*>(&id);
+}
+
 /**
  * Prints the given message, the allocation information found in the
  * optionally provided allocation record and the given callstack.
@@ -85,19 +90,25 @@ template<bool Warning>
 constexpr static inline void printer(const std::string&                     message,
                                      const std::optional<MallocInfo::CRef>& info,
                                      lcs::callstack&                        callstack) {
-    using formatter::Style;
-    
+    using namespace formatter;
+    using namespace std::string_literals;
+
     printer<Warning, false>(message, callstack);
 
     if (info.has_value()) {
         constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
         const auto& record = info.value().get();
-        
-        std::cerr << formatter::format<Style::ITALIC, colour>("Previously allocated here:") << std::endl;
+        const auto& showThread = false; // TODO: Properly implement
+
+        std::cerr << format<Style::ITALIC, colour>("Previously allocated"s
+                                                   + (showThread ? " by thread # " + std::to_string(getThreadNumber(record.threadId)) : "")
+                                                   + " here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
         if (record.deletedCallstack.has_value()) {
-            std::cerr << formatter::format<Style::ITALIC, colour>("Previously freed here:") << std::endl;
+            std::cerr << format<Style::ITALIC, colour>("Previously freed"s
+                                                       + (showThread ? " by thread # " + std::to_string(getThreadNumber(record.deletedId)) : "")
+                                                       + " here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
         }
