@@ -27,6 +27,7 @@
 #include <optional>
 #include <ostream>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -69,6 +70,7 @@ struct MallocInfo {
     /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
     std::pair<const char*, const char*> imageName = { nullptr, nullptr };
+    std::thread::id threadId;
 
     bool printedInRoot = false;
     bool suppressed = false;
@@ -80,7 +82,7 @@ struct MallocInfo {
      * @param pointer the pointer to the allocated piece of memory
      * @param size the size of the allocated piece of memory
      */
-    inline MallocInfo(void* const pointer, const std::size_t size): pointer(pointer), size(size) {}
+    inline MallocInfo(void* const pointer, const std::size_t size, const std::thread::id& id = std::this_thread::get_id()): pointer(pointer), size(size), threadId(id) {}
 
     /**
      * @brief Marks this allocation record as deleted.
