@@ -18,5 +18,9 @@
   {
     "name": "Everything in various system libraries, II",
     "imageName": "^/System/Library/.*$"
+  },
+  {
+    "name": "Everything created by the CoreFoundation - TODO: Make this unnecessary",
+    "functions": [ "___CFInitialize" ]
   }
 ]
