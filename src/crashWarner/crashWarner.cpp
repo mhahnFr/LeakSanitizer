@@ -72,11 +72,6 @@ constexpr static inline void printer(const std::string & message, lcs::callstack
     printer<Warning>(message, callstack);
 }
 
-// TODO: Replace by proper implementation!
-static inline auto getThreadNumber(const std::thread::id& id) -> unsigned long {
-    return *reinterpret_cast<const unsigned long*>(&id);
-}
-
 /**
  * Prints the given message, the allocation information found in the
  * optionally provided allocation record and the given callstack.
@@ -93,6 +88,8 @@ constexpr static inline void printer(const std::string&                     mess
     using namespace formatter;
     using namespace std::string_literals;
 
+    auto& main = getInstance();
+
     printer<Warning, false>(message, callstack);
 
     if (info.has_value()) {
@@ -101,20 +98,20 @@ constexpr static inline void printer(const std::string&                     mess
         const auto& showThread = false; // TODO: Properly implement
 
         std::cerr << format<Style::ITALIC, colour>("Previously allocated"s
-                                                   + (showThread ? " by thread # " + std::to_string(getThreadNumber(record.threadId)) : "")
+                                                   + (showThread ? " by " + main.getThreadDescription(record.threadId) : "")
                                                    + " here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
         if (record.deletedCallstack.has_value()) {
             std::cerr << format<Style::ITALIC, colour>("Previously freed"s
-                                                       + (showThread ? " by thread # " + std::to_string(getThreadNumber(record.deletedId)) : "")
+                                                       + (showThread ? " by " + main.getThreadDescription(record.deletedId) : "")
                                                        + " here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
         }
     }
     if constexpr (!Warning) {
-        getInstance().maybeHintCallstackSize(std::cerr);
+        main.maybeHintCallstackSize(std::cerr);
         std::cerr << maybeHintRelativePaths;
     }
 }
