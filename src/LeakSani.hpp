@@ -218,8 +218,6 @@ public:
 
     auto getSuppressions() -> const std::vector<suppression::Suppression>&;
 
-    auto getThreadDescription(const std::thread::id& threadId) -> std::string;
-
     /**
      * Returns the mutex for the allocations and tracking.
      *
