@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -87,6 +87,66 @@ REPLACE(auto, pthread_setspecific)(pthread_key_t key, const void* value) noexcep
         tracker.ignoreMalloc = ignored;
     }
     return real::pthread_setspecific(key, value);
+}
+
+namespace lsan::threadHelper {
+struct Payload {
+    void* (*function)(void*);
+    void* payload;
+};
+
+static inline auto threadStartHook(void* payload) -> void* {
+    const auto& arguments = static_cast<Payload*>(payload);
+
+    {
+        auto& tracker = getTracker();
+        std::lock_guard lock { tracker.mutex };
+        auto ignored = tracker.ignoreMalloc;
+        tracker.ignoreMalloc = true;
+
+        getInstance().addThread(ThreadInfo {
+            std::this_thread::get_id(),
+            pthread_self(),
+            __builtin_frame_address(0),
+        });
+
+        tracker.ignoreMalloc = ignored;
+    }
+
+    const auto& toReturn = arguments->function(arguments->payload);
+
+    {
+        auto& tracker = getTracker();
+        std::lock_guard lock { tracker.mutex };
+        auto ignored = tracker.ignoreMalloc;
+        tracker.ignoreMalloc = true;
+
+        delete arguments;
+        getInstance().removeThread(std::this_thread::get_id());
+
+        tracker.ignoreMalloc = ignored;
+    }
+
+    return toReturn;
+}
+}
+
+REPLACE(auto, pthread_create)(pthread_t* thread, const pthread_attr_t* attr, void* (*func)(void*), void* payload) -> int {
+    auto&tracker = getTracker();
+    int toReturn;
+    {
+        std::lock_guard lock { tracker.mutex };
+        auto ignored = tracker.ignoreMalloc;
+        tracker.ignoreMalloc = true;
+
+        auto arguments = new threadHelper::Payload { func, payload };
+        if ((toReturn = real::pthread_create(thread, attr, threadHelper::threadStartHook, arguments)) != 0) {
+            delete arguments;
+        }
+
+        tracker.ignoreMalloc = ignored;
+    }
+    return toReturn;
 }
 
 /*
