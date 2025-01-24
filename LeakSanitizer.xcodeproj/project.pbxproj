@@ -40,6 +40,7 @@
 		BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
 		BFA6CD7C2CD3F3B800959363 /* Suppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */; };
 		BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */; };
+		BFA95FB12D43FBDA0043C836 /* ThreadInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */; };
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
 		BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */; };
@@ -116,6 +117,7 @@
 		BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Suppression.hpp; sourceTree = "<group>"; };
 		BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Suppression.cpp; sourceTree = "<group>"; };
 		BFA95FAF2D43EE4E0043C836 /* misc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = misc.json; sourceTree = "<group>"; };
+		BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ThreadInfo.hpp; sourceTree = "<group>"; };
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
@@ -294,6 +296,7 @@
 				BFC817182BEFB3C200332937 /* ATracker.hpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
 				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
+				BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -400,6 +403,7 @@
 				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
 				BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */,
 				BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */,
+				BFA95FB12D43FBDA0043C836 /* ThreadInfo.hpp in Headers */,
 				F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */,
 				BF3E505E2CCFF96700CB225E /* Object.hpp in Headers */,
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
