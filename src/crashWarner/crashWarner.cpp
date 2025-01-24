@@ -88,30 +88,28 @@ constexpr static inline void printer(const std::string&                     mess
     using namespace formatter;
     using namespace std::string_literals;
 
-    auto& main = getInstance();
-
     printer<Warning, false>(message, callstack);
 
     if (info.has_value()) {
         constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
         const auto& record = info.value().get();
-        const auto& showThread = false; // TODO: Properly implement
+        const auto& showThread = true; // TODO: Properly implement
 
         std::cerr << format<Style::ITALIC, colour>("Previously allocated"s
-                                                   + (showThread ? " by " + main.getThreadDescription(record.threadId) : "")
+                                                   + (showThread ? " by " + formatThreadId(record.threadId) : "")
                                                    + " here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
         if (record.deletedCallstack.has_value()) {
             std::cerr << format<Style::ITALIC, colour>("Previously freed"s
-                                                       + (showThread ? " by " + main.getThreadDescription(record.deletedId) : "")
+                                                       + (showThread ? " by " + formatThreadId(record.deletedId) : "")
                                                        + " here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
         }
     }
     if constexpr (!Warning) {
-        main.maybeHintCallstackSize(std::cerr);
+        getInstance().maybeHintCallstackSize(std::cerr);
         std::cerr << maybeHintRelativePaths;
     }
 }

@@ -70,8 +70,7 @@ struct MallocInfo {
     /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
     std::pair<const char*, const char*> imageName = { nullptr, nullptr };
-    std::thread::id threadId;
-    std::thread::id deletedId;
+    unsigned long threadId, deletedId;
 
     bool printedInRoot = false;
     bool suppressed = false;
@@ -83,7 +82,8 @@ struct MallocInfo {
      * @param pointer the pointer to the allocated piece of memory
      * @param size the size of the allocated piece of memory
      */
-    inline MallocInfo(void* const pointer, const std::size_t size, const std::thread::id& id = std::this_thread::get_id()): pointer(pointer), size(size), threadId(id) {}
+    inline MallocInfo(void* const pointer, const std::size_t size, unsigned long id = getThreadId()):
+        pointer(pointer), size(size), threadId(id) {}
 
     /**
      * @brief Marks this allocation record as deleted.
@@ -94,7 +94,7 @@ struct MallocInfo {
         deleted = true;
         deletedCallstack = lcs::callstack();
         freeTimestamp = std::chrono::system_clock::now();
-        deletedId = std::this_thread::get_id();
+        deletedId = getThreadId();
     }
     
     /**
@@ -144,6 +144,8 @@ private:
 
     template<typename F, typename... Args>
     constexpr inline void forEachIndirect(bool mark, F func, Args... args) const;
+
+    static auto getThreadId() -> unsigned long;
 };
 }
 
