@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -104,6 +104,8 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream&;
 auto getTracker() -> ATracker&;
 
 auto loadSuppressions() -> std::vector<suppression::Suppression>;
+
+auto formatThreadId(unsigned long id) -> std::string;
 
 /**
  * Returns the current instance of the statistics object.

@@ -304,6 +304,10 @@ public:
     void addThread(ThreadInfo&& info);
     void removeThread(const std::thread::id& id);
 
+    inline auto getThreadId(const std::thread::id& id = std::this_thread::get_id()) -> unsigned long {
+        return id == mainId ? 0 : threads.at(id).getNumber();
+    }
+
     /**
      * Returns the behaviour object associated with this instance.
      *

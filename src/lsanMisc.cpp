@@ -240,4 +240,11 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
 
     return toReturn;
 }
+
+auto formatThreadId(unsigned long id) -> std::string {
+    if (id == 0) {
+        return "main thread";
+    }
+    return "thread # " + std::to_string(id);
+}
 }
