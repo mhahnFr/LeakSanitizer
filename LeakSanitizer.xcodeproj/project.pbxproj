@@ -115,6 +115,7 @@
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
 		BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Suppression.hpp; sourceTree = "<group>"; };
 		BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Suppression.cpp; sourceTree = "<group>"; };
+		BFA95FAF2D43EE4E0043C836 /* misc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = misc.json; sourceTree = "<group>"; };
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
@@ -350,6 +351,7 @@
 			isa = PBXGroup;
 			children = (
 				F1ACE4162D148B0F00E779A7 /* core.json */,
+				BFA95FAF2D43EE4E0043C836 /* misc.json */,
 			);
 			path = macos;
 			sourceTree = "<group>";
