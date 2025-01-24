@@ -36,6 +36,7 @@
 
 #include "ATracker.hpp"
 #include "MallocInfo.hpp"
+#include "ThreadInfo.hpp"
 
 #ifdef BENCHMARK
  #include "timing.hpp"
@@ -58,6 +59,7 @@ class LSan final: public ATracker {
     std::set<pthread_key_t> keys;
     std::mutex tlsKeyMutex;
     std::map<std::pair<pthread_t, pthread_key_t>, const void*> tlsKeyValues;
+    std::map<std::thread::id, ThreadInfo> threads;
     std::mutex tlsKeyValuesMutex;
     /** An object holding all statistics.                                               */
     Stats stats;
@@ -134,7 +136,7 @@ public:
     bool hasPrintedExit = false;
 
     LSan();
-   ~LSan();
+    ~LSan();
 
     LSan(const LSan&) = delete;
     LSan(LSan&&)      = delete;
@@ -226,7 +228,7 @@ public:
     constexpr inline auto getMutex() -> std::recursive_mutex & {
         return mutex;
     }
-    
+
     /**
      * Returns the mutex for the memory allocation infos.
      *
@@ -263,7 +265,7 @@ public:
      * @return the given output stream
      */
     auto maybeHintCallstackSize(std::ostream & out) const -> std::ostream &;
-    
+
     /**
      * Returns the globally tracked allocations.
      *
@@ -272,7 +274,7 @@ public:
     constexpr inline auto getFragmentationInfos() const -> const decltype(infos)& {
         return infos;
     }
-    
+
     /**
      * Sets whether the maximum callstack size has been exceeded during the printing.
      *
@@ -281,7 +283,7 @@ public:
     constexpr inline void setCallstackSizeExceeded(bool exceeded) {
         callstackSizeExceeded = exceeded;
     }
-    
+
     /**
      * Returns the current instance of the statistics object.
      *
@@ -298,6 +300,9 @@ public:
     auto hasTLSKey(const pthread_key_t& key) -> bool;
 
     virtual auto addTLSValue(const pthread_key_t& key, const void* value) -> bool final override;
+
+    void addThread(ThreadInfo&& info);
+    void removeThread(const std::thread::id& id);
 
     /**
      * Returns the behaviour object associated with this instance.

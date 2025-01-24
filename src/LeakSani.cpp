@@ -722,6 +722,14 @@ auto LSan::hasTLSKey(const pthread_key_t& key) -> bool {
     return keys.count(key) != 0;
 }
 
+void LSan::addThread(ThreadInfo&& info) {
+    threads.insert_or_assign(info.id, std::move(info));
+}
+
+void LSan::removeThread(const std::thread::id& id) {
+    threads.at(id).beginFrameAddress = std::nullopt;
+}
+
 auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
     if (!suppressions) {
         suppressions = loadSuppressions();
