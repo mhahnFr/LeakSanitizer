@@ -723,7 +723,7 @@ auto LSan::hasTLSKey(const pthread_key_t& key) -> bool {
 }
 
 void LSan::addThread(ThreadInfo&& info) {
-    threads.insert_or_assign(info.id, std::move(info));
+    threads.insert_or_assign(info.getId(), std::move(info));
 }
 
 void LSan::removeThread(const std::thread::id& id) {

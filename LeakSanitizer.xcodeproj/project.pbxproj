@@ -44,6 +44,7 @@
 		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
 		BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */; };
+		BFBF26C82D4402CC0034C570 /* ThreadInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */; };
 		BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */; };
 		BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC817142BEFB36E00332937 /* TLSTracker.cpp */; };
 		BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817152BEFB36E00332937 /* TLSTracker.hpp */; };
@@ -123,6 +124,7 @@
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FunctionNotFoundException.hpp; sourceTree = "<group>"; };
 		BFBCAD892ACF376600C6B69F /* realAlloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = realAlloc.hpp; sourceTree = "<group>"; };
+		BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreadInfo.cpp; sourceTree = "<group>"; };
 		BFBF736328831FC200BC4208 /* MallocInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MallocInfo.cpp; sourceTree = "<group>"; };
 		BFBF736428831FC200BC4208 /* MallocInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MallocInfo.hpp; sourceTree = "<group>"; };
 		BFBF736728832C3300BC4208 /* wrap_malloc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wrap_malloc.cpp; sourceTree = "<group>"; };
@@ -278,25 +280,26 @@
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
 				BF3E50512CCFE7ED00CB225E /* suppression */,
 				BFDD6DFD2CC6B5A9008B9CDC /* helpers */,
-				BFAFADC528B4FDA40060076C /* formatter.hpp */,
 				BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */,
 				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
-				BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */,
 				BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */,
 				BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */,
 				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
 				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
 				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
+				BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */,
+				BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
-				BF7592282BB1799500891A55 /* LeakType.hpp */,
 				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
 				BFC817152BEFB36E00332937 /* TLSTracker.hpp */,
 				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
 				BFC817182BEFB3C200332937 /* ATracker.hpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
 				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
-				BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */,
+				BF7592282BB1799500891A55 /* LeakType.hpp */,
+				BFAFADC528B4FDA40060076C /* formatter.hpp */,
+				BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -549,6 +552,7 @@
 				BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */,
 				BF0F133B29194791008F0FCD /* LeakSani.cpp in Sources */,
 				BF0F133E29194794008F0FCD /* Stats.cpp in Sources */,
+				BFBF26C82D4402CC0034C570 /* ThreadInfo.cpp in Sources */,
 				BF0F134129194797008F0FCD /* MallocInfo.cpp in Sources */,
 				BF0F1347291947A2008F0FCD /* wrap_malloc.cpp in Sources */,
 				BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */,

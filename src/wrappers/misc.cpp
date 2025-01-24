@@ -103,13 +103,7 @@ static inline auto threadStartHook(void* payload) -> void* {
         std::lock_guard lock { tracker.mutex };
         auto ignored = tracker.ignoreMalloc;
         tracker.ignoreMalloc = true;
-
-        getInstance().addThread(ThreadInfo {
-            std::this_thread::get_id(),
-            pthread_self(),
-            __builtin_frame_address(0),
-        });
-
+        getInstance().addThread(ThreadInfo());
         tracker.ignoreMalloc = ignored;
     }
 
