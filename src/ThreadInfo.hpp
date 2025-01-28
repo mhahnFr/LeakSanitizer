@@ -32,16 +32,18 @@ class ThreadInfo {
     static unsigned long threadId;
 
     unsigned long number = ++threadId;
+    std::size_t stackSize;
     std::thread::id id;
     pthread_t thread;
 
 public:
     void* beginFrameAddress;
 
-    inline ThreadInfo(const std::thread::id& id = std::this_thread::get_id(),
+    inline ThreadInfo(std::size_t stackSize,
+                      const std::thread::id& id = std::this_thread::get_id(),
                       const pthread_t& thread = pthread_self(),
                       void* beginFrameAddress = __builtin_frame_address(0)):
-        id(id), thread(thread), beginFrameAddress(beginFrameAddress) {}
+        stackSize(stackSize), id(id), thread(thread), beginFrameAddress(beginFrameAddress) {}
 
     constexpr inline auto getNumber() const -> unsigned long {
         return number;
@@ -53,6 +55,10 @@ public:
 
     constexpr inline auto getId() const -> const std::thread::id& {
         return id;
+    }
+
+    constexpr inline auto getStackSize() const -> std::size_t {
+        return stackSize;
     }
 };
 }
