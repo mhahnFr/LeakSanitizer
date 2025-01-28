@@ -56,11 +56,7 @@ namespace lsan {
  * It acts as an allocation tracker.
  */
 class LSan final: public ATracker {
-    std::set<pthread_key_t> keys;
-    std::mutex tlsKeyMutex;
-    std::map<std::pair<pthread_t, pthread_key_t>, const void*> tlsKeyValues;
     std::map<std::thread::id, ThreadInfo> threads;
-    std::mutex tlsKeyValuesMutex;
     /** An object holding all statistics.                                               */
     Stats stats;
     /** The behaviour handling object.                                                  */
@@ -290,13 +286,6 @@ public:
     constexpr inline auto getStats() const -> const Stats & {
         return stats;
     }
-
-    void addTLSKey(const pthread_key_t& key);
-    auto removeTLSKey(const pthread_key_t& key) -> bool;
-
-    auto hasTLSKey(const pthread_key_t& key) -> bool;
-
-    virtual auto addTLSValue(const pthread_key_t& key, const void* value) -> bool final override;
 
     void addThread(ThreadInfo&& info);
     void removeThread(const std::thread::id& id);
