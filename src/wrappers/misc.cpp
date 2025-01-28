@@ -33,7 +33,6 @@ REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
         auto ignoreMalloc = tracker.ignoreMalloc;
         tracker.ignoreMalloc = true;
 
-        getInstance().classifyStackLeaksShallow();
         if (__lsan_printExitPoint) {
             getOutputStream() << maybePrintExitPoint;
         }

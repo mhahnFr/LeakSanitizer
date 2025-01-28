@@ -263,22 +263,6 @@ auto LSan::getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryF
     return std::make_pair(regions, locals);
 }
 
-void LSan::classifyStackLeaksShallow() {
-    std::lock_guard lock(infoMutex);
-
-    // TODO: Care about the stack direction
-    // TODO: Care about the stacks of leaked threads
-
-    const auto  here = align(__builtin_frame_address(0), false);
-    const auto begin = align(findStackBegin());
-    for (uintptr_t it = here; it < begin; it += sizeof(uintptr_t)) {
-        const auto& record = infos.find(*reinterpret_cast<void**>(it));
-        if (record != infos.end() && !record->second.deleted) {
-            record->second.leakType = LeakType::reachableDirect;
-        }
-    }
-}
-
 /**
  * If the given pointer is a TLSTracker, it is deleted and the thread-local
  * value is set to point to the global tracker instance.
@@ -346,28 +330,12 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
     }
 
-    out << clear << "Reachability analysis: Stack, part I...";
-    for (auto& [ptr, record] : infos) {
-        if (record.leakType == LeakType::reachableDirect) {
-            classifyRecord(record, LeakType::reachableIndirect);
-            toReturn.recordsStack.push_back(record);
-        }
-    }
-
-    out << clear << "Reachability analysis: Stack, part II...";
-    // Search on our stack
-    const auto  here = align(__builtin_frame_address(0), false);
-    const auto begin = align(findStackBegin());
-    classifyLeaks(here, begin,
-                  LeakType::reachableDirect, LeakType::reachableIndirect,
-                  toReturn.recordsStack, true);
-
-    out << clear << "Reachability analysis: Stacks V2...";
+    out << clear << "Reachability analysis: Stacks...";
     for (const auto& [tid, info] : threads) {
         const auto& leak = strdup(formatThreadId(info.getNumber()).c_str()); // TODO: Cache this!
 
         const auto& nativeThread = pthread_mach_thread_np(info.getThread());
-        if (thread_suspend(nativeThread) != KERN_SUCCESS) {
+        if (std::this_thread::get_id() != info.getId() && thread_suspend(nativeThread) != KERN_SUCCESS) {
             // TODO: Handle
         }
         const auto& top = align(info.getStackTop());
@@ -378,7 +346,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             sp = uintptr_t(info.getStackTop()) - info.getStackSize();
         }
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, leak);
-        if (thread_resume(nativeThread) != KERN_SUCCESS) {
+        if (std::this_thread::get_id() != info.getId() && thread_resume(nativeThread) != KERN_SUCCESS) {
             // TODO: Handle
         }
     }
@@ -601,14 +569,13 @@ void LSan::registerTracker(ATracker* tracker) {
     ignoreMalloc = true;
     tlsTrackers.insert(tracker);
 
-    if (std::this_thread::get_id() != mainId) {
-        addThread({
-            findStackSize(),
-            std::this_thread::get_id(),
-            pthread_self(),
-            findStackBegin(),
-        });
-    }
+    addThread({
+        findStackSize(),
+        findStackBegin(),
+        std::this_thread::get_id() == mainId ? 0 : ThreadInfo::createThreadId(),
+        std::this_thread::get_id(),
+        pthread_self(),
+    });
 
     ignoreMalloc = ignore;
 }

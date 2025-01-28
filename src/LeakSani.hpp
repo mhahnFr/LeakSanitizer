@@ -291,7 +291,6 @@ public:
         return stats;
     }
 
-    void classifyStackLeaksShallow();
     void addTLSKey(const pthread_key_t& key);
     auto removeTLSKey(const pthread_key_t& key) -> bool;
 
