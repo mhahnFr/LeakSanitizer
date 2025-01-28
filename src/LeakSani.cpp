@@ -370,12 +370,12 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         if (thread_suspend(nativeThread) != KERN_SUCCESS) {
             // TODO: Handle
         }
-        const auto& top = align(info.beginFrameAddress);
+        const auto& top = align(info.getStackTop());
         auto sp = uintptr_t(0);
         auto count = std::size_t(0);
         if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
                                                &sp, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE) {
-            sp = uintptr_t(info.beginFrameAddress) - info.getStackSize();
+            sp = uintptr_t(info.getStackTop()) - info.getStackSize();
         }
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, leak);
         if (thread_resume(nativeThread) != KERN_SUCCESS) {

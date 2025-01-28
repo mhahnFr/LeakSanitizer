@@ -31,19 +31,19 @@ namespace lsan {
 class ThreadInfo {
     static unsigned long threadId;
 
-    unsigned long number = ++threadId;
+    unsigned long number;
     std::size_t stackSize;
     std::thread::id id;
     pthread_t thread;
+    void* stackTop;
 
 public:
-    void* beginFrameAddress;
-
     inline ThreadInfo(std::size_t stackSize,
+                      void* stackTop = __builtin_frame_address(0),
+                      unsigned long number = createThreadId(),
                       const std::thread::id& id = std::this_thread::get_id(),
-                      const pthread_t& thread = pthread_self(),
-                      void* beginFrameAddress = __builtin_frame_address(0)):
-        stackSize(stackSize), id(id), thread(thread), beginFrameAddress(beginFrameAddress) {}
+                      const pthread_t& thread = pthread_self()):
+        number(number), stackSize(stackSize), id(id), thread(thread), stackTop(stackTop) {}
 
     constexpr inline auto getNumber() const -> unsigned long {
         return number;
@@ -59,6 +59,14 @@ public:
 
     constexpr inline auto getStackSize() const -> std::size_t {
         return stackSize;
+    }
+
+    constexpr inline auto getStackTop() const -> void* {
+        return stackTop;
+    }
+
+    static inline auto createThreadId() -> unsigned long {
+        return ++threadId;
     }
 };
 }
