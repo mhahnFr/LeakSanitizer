@@ -175,6 +175,17 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
     return toReturn;
 }
 
+static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size_t {
+    std::size_t toReturn;
+
+    // TODO: Linux version
+#ifdef __APPLE__
+    toReturn = pthread_get_stacksize_np(thread);
+#endif
+
+    return toReturn;
+}
+
 #ifdef __APPLE__
 static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t vmaddrslide,
                                            std::vector<Region>& regions,
@@ -570,11 +581,14 @@ void LSan::registerTracker(ATracker* tracker) {
     ignoreMalloc = true;
     tlsTrackers.insert(tracker);
 
-    addThread({
-        std::this_thread::get_id(),
-        pthread_self(),
-        findStackBegin(),
-    });
+    if (std::this_thread::get_id() != mainId) {
+        addThread({
+            findStackSize(),
+            std::this_thread::get_id(),
+            pthread_self(),
+            findStackBegin(),
+        });
+    }
 
     ignoreMalloc = ignore;
 }
