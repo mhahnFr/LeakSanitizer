@@ -390,20 +390,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         it->second.suppressed = true;
     }
 
-    out << clear << "Reachability analysis: Runtime thread-local variables...";
-    // Search in the runtime thread locals
-    for (const auto& key : keys) {
-        const auto value = pthread_getspecific(key);
-        if (value == nullptr) continue;
-
-        const auto& it = infos.find(value);
-        if (it == infos.end()) continue;
-
-        it->second.leakType = LeakType::tlvDirect;
-        classifyRecord(it->second, LeakType::tlvIndirect);
-        toReturn.recordsTlv.push_back(it->second);
-    }
-
 #ifdef LSAN_HANDLE_OBJC
     out << clear << "Reachability analysis: Cocoa thread-local variables...";
     // Search in the Cocoa runtime thread-locals

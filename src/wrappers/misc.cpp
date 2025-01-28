@@ -43,51 +43,6 @@ REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
     real::exit(code);
 }
 
-REPLACE(auto, pthread_key_create)(pthread_key_t* key, void (*func)(void*)) noexcept(noexcept(::pthread_key_create(key, func))) -> int {
-    pthread_key_t* copy = key;
-    if (copy == nullptr) {
-        crash("Call to pthread_key_create(pthread_key_t*, void (*)(void*)) with NULL as key");
-    }
-    const auto& toReturn = real::pthread_key_create(key, func);
-    auto& tracker = getTracker();
-    {
-        std::lock_guard lock { tracker.mutex };
-        auto ignored = tracker.ignoreMalloc;
-        tracker.ignoreMalloc = true;
-        getInstance().addTLSKey(*key);
-        tracker.ignoreMalloc = ignored;
-    }
-    return toReturn;
-}
-
-REPLACE(auto, pthread_key_delete)(pthread_key_t key) noexcept(noexcept(::pthread_key_delete(key))) -> int {
-    auto& tracker = getTracker();
-    {
-        std::lock_guard lock { tracker.mutex };
-        auto ignored = tracker.ignoreMalloc;
-        tracker.ignoreMalloc = true;
-        if (!getInstance().removeTLSKey(key)) {
-            warn("Call to pthread_key_delete(pthread_key_t) with invalid key");
-        }
-        tracker.ignoreMalloc = ignored;
-    }
-    return real::pthread_key_delete(key);
-}
-
-REPLACE(auto, pthread_setspecific)(pthread_key_t key, const void* value) noexcept(noexcept(::pthread_setspecific(key, value))) -> int {
-    auto& tracker = getTracker();
-    {
-        std::lock_guard lock { tracker.mutex };
-        auto ignored = tracker.ignoreMalloc;
-        tracker.ignoreMalloc = true;
-        if (!tracker.addTLSValue(key, value)) {
-            warn("Call to pthread_setspecific(pthread_key_t, const void*) with invalid key");
-        }
-        tracker.ignoreMalloc = ignored;
-    }
-    return real::pthread_setspecific(key, value);
-}
-
 /*
  * The following function replacement is a hack to convince the linker on Linux
  * to always link with the LeakSanitizer, even in the case no allocation function
