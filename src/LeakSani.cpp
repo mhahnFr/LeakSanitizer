@@ -356,6 +356,14 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
     }
 
+    out << clear << "Reachability analysis: Thread-locals V2...";
+    for (const auto& [_, info] : threads) {
+        // TODO: Thread name / id
+        const auto& begin = align(uintptr_t(info.getThread()));
+        const auto& end = align(begin + __PTHREAD_SIZE__, false);
+        classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv);
+    }
+
 #ifdef LSAN_HANDLE_OBJC
     out << clear << "Reachability analysis: Objective-C runtime...";
     // Search in the Objective-C runtime
