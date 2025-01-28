@@ -37,6 +37,10 @@
 #include "signals/signalHandlers.hpp"
 
 #ifdef __APPLE__
+extern "C" {
+#include <mach/thread_state.h>
+}
+
 #include <mach-o/dyld.h>
 #include <mach-o/dyld_images.h>
 
@@ -358,9 +362,18 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                   LeakType::reachableDirect, LeakType::reachableIndirect,
                   toReturn.recordsStack, true);
 
-    out << clear << "Reachability analysis: Foreign stacks...";
+    out << clear << "Reachability analysis: Stacks V2...";
     for (const auto& [tid, info] : threads) {
+        const auto& leak = strdup(formatThreadId(info.getNumber()).c_str()); // TODO: Cache this!
 
+        const auto& top = align(info.beginFrameAddress);
+        auto sp = uintptr_t(0);
+        auto count = std::size_t(0);
+        if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
+                                               &sp, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE) {
+            sp = uintptr_t(info.beginFrameAddress) - info.getStackSize();
+        }
+        classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, leak);
     }
 
 #ifdef LSAN_HANDLE_OBJC
