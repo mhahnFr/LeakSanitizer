@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -125,8 +125,6 @@ public:
     virtual auto maybeChangeMalloc([[ maybe_unused ]] const MallocInfo& info) -> bool {
         return false;
     }
-
-    virtual auto addTLSValue(const pthread_key_t& key, const void* value) -> bool = 0;
 };
 }
 
