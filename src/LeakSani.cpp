@@ -250,14 +250,15 @@ auto LSan::getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryF
     struct task_dyld_info dyldInfo;
     mach_msg_type_number_t infoCount = TASK_DYLD_INFO_COUNT;
     if (task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t) &dyldInfo, &infoCount) == KERN_SUCCESS) {
-        struct dyld_all_image_infos* infos = (struct dyld_all_image_infos*) dyldInfo.all_image_info_addr;
+        auto infos = reinterpret_cast<struct dyld_all_image_infos*>(dyldInfo.all_image_info_addr);
         const auto& filename = strdup(infos->dyldPath);
         const auto& relative = getBehaviour().relativePaths() ? strdup(std::filesystem::relative(filename).string().c_str()) : nullptr;
         binaryFilenames.push_back({ filename, relative });
         dyldPath = filename;
         ::lsan::getGlobalRegionsAndTLVs(infos->dyldImageLoadAddress, 0, regions, locals, filename, relative);
     } else {
-        // TODO: Handle the error
+        using namespace formatter;
+        getOutputStream() << format<Style::RED>("LSan: Error: Failed to load the DYLD. Leak classification may be incomplete.") << std::endl;
     }
 #endif
     return std::make_pair(regions, locals);
@@ -332,11 +333,15 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Reachability analysis: Stacks...";
     for (const auto& [tid, info] : threads) {
+        using namespace formatter;
+
         const auto& leak = strdup(formatThreadId(info.getNumber()).c_str()); // TODO: Cache this!
 
         const auto& nativeThread = pthread_mach_thread_np(info.getThread());
+        auto resume = true;
         if (std::this_thread::get_id() != info.getId() && thread_suspend(nativeThread) != KERN_SUCCESS) {
-            // TODO: Handle
+            resume = false;
+            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + formatThreadId(info.getNumber()) + ".") << std::endl;
         }
         const auto& top = align(info.getStackTop());
         auto sp = uintptr_t(0);
@@ -346,8 +351,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             sp = uintptr_t(info.getStackTop()) - info.getStackSize();
         }
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, leak);
-        if (std::this_thread::get_id() != info.getId() && thread_resume(nativeThread) != KERN_SUCCESS) {
-            // TODO: Handle
+        if (resume && std::this_thread::get_id() != info.getId() && thread_resume(nativeThread) != KERN_SUCCESS) {
+            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume " + formatThreadId(info.getNumber()) + ".") << std::endl;
         }
     }
 
