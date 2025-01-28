@@ -36,11 +36,11 @@ class ThreadInfo {
     pthread_t thread;
 
 public:
-    std::optional<void*> beginFrameAddress;
+    void* beginFrameAddress;
 
     inline ThreadInfo(const std::thread::id& id = std::this_thread::get_id(),
                       const pthread_t& thread = pthread_self(),
-                      const std::optional<void*>& beginFrameAddress = __builtin_frame_address(0)):
+                      void* beginFrameAddress = __builtin_frame_address(0)):
         id(id), thread(thread), beginFrameAddress(beginFrameAddress) {}
 
     constexpr inline auto getNumber() const -> unsigned long {

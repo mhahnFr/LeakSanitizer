@@ -347,6 +347,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                   LeakType::reachableDirect, LeakType::reachableIndirect,
                   toReturn.recordsStack, true);
 
+    out << clear << "Reachability analysis: Foreign stacks...";
+    for (const auto& [tid, info] : threads) {
+
+    }
+
 #ifdef LSAN_HANDLE_OBJC
     out << clear << "Reachability analysis: Objective-C runtime...";
     // Search in the Objective-C runtime
@@ -564,6 +569,13 @@ void LSan::registerTracker(ATracker* tracker) {
     auto ignore = ignoreMalloc;
     ignoreMalloc = true;
     tlsTrackers.insert(tracker);
+
+    addThread({
+        std::this_thread::get_id(),
+        pthread_self(),
+        findStackBegin(),
+    });
+
     ignoreMalloc = ignore;
 }
 
@@ -574,6 +586,7 @@ void LSan::deregisterTracker(ATracker* tracker) {
     auto ignore = ignoreMalloc;
     ignoreMalloc = true;
     tlsTrackers.erase(tracker);
+    removeThread(std::this_thread::get_id());
     ignoreMalloc = ignore;
 }
 
@@ -727,7 +740,7 @@ void LSan::addThread(ThreadInfo&& info) {
 }
 
 void LSan::removeThread(const std::thread::id& id) {
-    threads.at(id).beginFrameAddress = std::nullopt;
+    threads.erase(id);
 }
 
 auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
