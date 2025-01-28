@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -34,7 +34,6 @@ class TLSTracker: public ATracker {
 private:
     /** Indicates whether the tracking has finished. */
     std::atomic_bool finished = false;
-    std::map<pthread_key_t, const void*> tlsKeyValues;
 
 public:
     TLSTracker();
@@ -56,8 +55,6 @@ public:
     virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
 
     virtual void finish() final override;
-
-    virtual auto addTLSValue(const pthread_key_t& key, const void* value) -> bool final override;
 };
 }
 

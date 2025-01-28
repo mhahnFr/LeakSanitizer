@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -128,14 +128,6 @@ auto TLSTracker::maybeChangeMalloc(const MallocInfo& info) -> bool {
         return false;
     }
     infos.insert_or_assign(info.pointer, std::move(info));
-    return true;
-}
-
-auto TLSTracker::addTLSValue(const pthread_key_t& key, const void* value) -> bool {
-    if (!getInstance().hasTLSKey(key)) {
-        return false;
-    }
-    tlsKeyValues.insert_or_assign(key, value);
     return true;
 }
 }
