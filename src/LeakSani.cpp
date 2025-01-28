@@ -366,6 +366,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     for (const auto& [tid, info] : threads) {
         const auto& leak = strdup(formatThreadId(info.getNumber()).c_str()); // TODO: Cache this!
 
+        const auto& nativeThread = pthread_mach_thread_np(info.getThread());
+        if (thread_suspend(nativeThread) != KERN_SUCCESS) {
+            // TODO: Handle
+        }
         const auto& top = align(info.beginFrameAddress);
         auto sp = uintptr_t(0);
         auto count = std::size_t(0);
@@ -374,6 +378,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             sp = uintptr_t(info.beginFrameAddress) - info.getStackSize();
         }
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, leak);
+        if (thread_resume(nativeThread) != KERN_SUCCESS) {
+            // TODO: Handle
+        }
     }
 
 #ifdef LSAN_HANDLE_OBJC
