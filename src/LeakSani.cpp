@@ -575,6 +575,7 @@ void LSan::registerTracker(ATracker* tracker) {
         std::this_thread::get_id(),
         pthread_self(),
     });
+    isThreaded = isThreaded || std::this_thread::get_id() != mainId;
 
     ignoreMalloc = ignore;
 }

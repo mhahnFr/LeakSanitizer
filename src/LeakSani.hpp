@@ -71,6 +71,7 @@ class LSan final: public ATracker {
     std::mutex tlsTrackerMutex;
     const char* dyldPath = nullptr;
     const std::thread::id mainId = std::this_thread::get_id();
+    bool isThreaded = false;
 
 #ifdef BENCHMARK
     /** The registered timings of the allocations.                                      */
