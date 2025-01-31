@@ -115,7 +115,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
     stream << get<Style::ITALIC>
            << format<Style::BOLD, Style::RED>("Leak") << " of size "
            << clear<Style::ITALIC> << bytesToString(size) << get<Style::ITALIC>;
-    if ((true)) { // TODO: If more than one thread leaks and should show
+    if (getInstance().getIsThreaded()) {
         stream << ", " << clear<Style::ITALIC> << formatThreadId(threadId) << get<Style::ITALIC>;
     }
     stream << ", " << leakType;
