@@ -133,7 +133,7 @@ public:
     bool hasPrintedExit = false;
 
     LSan();
-    ~LSan();
+   ~LSan();
 
     LSan(const LSan&) = delete;
     LSan(LSan&&)      = delete;
@@ -300,6 +300,10 @@ public:
      */
     constexpr inline auto getBehaviour() const -> const behaviour::Behaviour& {
         return behaviour;
+    }
+
+    constexpr inline auto getIsThreaded() const -> bool {
+        return isThreaded;
     }
 
     friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;

@@ -93,7 +93,7 @@ constexpr static inline void printer(const std::string&                     mess
     if (info.has_value()) {
         constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
         const auto& record = info.value().get();
-        const auto& showThread = true; // TODO: Properly implement
+        const auto& showThread = getInstance().getIsThreaded();
 
         std::cerr << format<Style::ITALIC, colour>("Previously allocated"s
                                                    + (showThread ? " by " + formatThreadId(record.threadId) : "")
