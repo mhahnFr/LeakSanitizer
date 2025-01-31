@@ -309,7 +309,6 @@ void LSan::applySuppressions(const std::deque<MallocInfo::Ref>& leaks) {
 }
 
 auto LSan::classifyLeaks() -> LeakKindStats {
-    // TODO: Search on the other thread stacks
     auto toReturn = LeakKindStats();
 
     auto& out = getOutputStream();
