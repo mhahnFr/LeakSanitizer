@@ -319,7 +319,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         return out << std::endl;
     };
     out << "Searching globals and compile time thread locals...";
-    auto [regions, locals] = getGlobalRegionsAndTLVs(binaryFilenames);
+    const auto& [regions, locals] = getGlobalRegionsAndTLVs(binaryFilenames);
 
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
