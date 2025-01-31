@@ -590,6 +590,16 @@ void LSan::deregisterTracker(ATracker* tracker) {
     ignoreMalloc = ignore;
 }
 
+auto LSan::getThreadId(const std::thread::id& id) -> unsigned long {
+    if (id == mainId) return 0;
+
+    const auto& threadIt = threads.find(id);
+    if (threadIt == threads.end()) {
+        return std::numeric_limits<unsigned long>::max();
+    }
+    return threadIt->second.getNumber();
+}
+
 void LSan::absorbLeaks(PoolMap<const void *const, MallocInfo>&& leaks) {
     std::lock_guard lock { mutex };
     std::lock_guard lock1 { infoMutex };
