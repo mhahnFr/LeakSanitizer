@@ -335,7 +335,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     for (const auto& [tid, info] : threads) {
         using namespace formatter;
 
-        const auto& leak = strdup(formatThreadId(info.getNumber()).c_str()); // TODO: Cache this!
+        const auto& leak = isThreaded ? strdup(formatThreadId(info.getNumber()).c_str()) : nullptr; // TODO: Cache this!
 
         const auto& nativeThread = pthread_mach_thread_np(info.getThread());
         auto resume = true;
