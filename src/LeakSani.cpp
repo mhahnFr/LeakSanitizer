@@ -388,7 +388,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         if (it == infos.end()) continue;
 
         classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
-                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, name, relative);
+                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, name, relative);
         it->second.suppressed = true;
     }
 
