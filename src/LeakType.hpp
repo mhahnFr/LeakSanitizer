@@ -31,21 +31,21 @@ namespace lsan {
  * The order indicates the classification priority.
  */
 enum class LeakType {
-    reachableDirect,
-    reachableIndirect,
-
     objcDirect,
     objcIndirect,
 
-    tlvDirect,
-    tlvIndirect,
+    reachableDirect,
+    reachableIndirect,
 
     globalDirect,
     globalIndirect,
 
+    tlvDirect,
+    tlvIndirect,
+
     unreachableIndirect,
     unreachableDirect,
-    
+
     unclassified
 };
 

@@ -330,6 +330,21 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
     }
 
+#ifdef LSAN_HANDLE_OBJC
+    out << clear << "Reachability analysis: Objective-C runtime...";
+    // Search in the Objective-C runtime
+    const auto& classNumber = objc_getClassList(nullptr, 0);
+    auto classes = new Class[classNumber];
+    objc_getClassList(classes, classNumber);
+    for (int i = 0; i < classNumber; ++i) {
+        classifyClass(classes[i], toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
+
+        const auto& meta = object_getClass(reinterpret_cast<id>(classes[i]));
+        classifyClass(meta, toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
+    }
+    delete[] classes;
+#endif
+
     out << clear << "Reachability analysis: Stacks...";
     for (const auto& [tid, info] : threads) {
         using namespace formatter;
@@ -358,6 +373,14 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
     }
 
+    out << clear << "Reachability analysis: Globals...";
+    // Search in global space
+    for (const auto& region : regions) {
+        classifyLeaks(align(region.begin), align(region.end, false),
+                      LeakType::globalDirect, LeakType::globalIndirect,
+                      toReturn.recordsGlobal, false, region.name, region.nameRelative);
+    }
+
     out << clear << "Reachability analysis: Thread-locals V2...";
     for (const auto& [_, info] : threads) {
         // TODO: Thread name / id
@@ -365,21 +388,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& end = align(begin + __PTHREAD_SIZE__, false);
         classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv);
     }
-
-#ifdef LSAN_HANDLE_OBJC
-    out << clear << "Reachability analysis: Objective-C runtime...";
-    // Search in the Objective-C runtime
-    const auto& classNumber = objc_getClassList(nullptr, 0);
-    auto classes = new Class[classNumber];
-    objc_getClassList(classes, classNumber);
-    for (int i = 0; i < classNumber; ++i) {
-        classifyClass(classes[i], toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
-
-        const auto& meta = object_getClass(reinterpret_cast<id>(classes[i]));
-        classifyClass(meta, toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
-    }
-    delete[] classes;
-#endif
 
     out << clear << "Reachability analysis: Compile-time thread-local variables...";
     // Search in compile-time thread locals - their wrapper will be suppressed
@@ -421,14 +429,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     delete[] values;
 
 #endif
-
-    out << clear << "Reachability analysis: Globals...";
-    // Search in global space
-    for (const auto& region : regions) {
-        classifyLeaks(align(region.begin), align(region.end, false),
-                      LeakType::globalDirect, LeakType::globalIndirect,
-                      toReturn.recordsGlobal, true, region.name, region.nameRelative);
-    }
 
     out << clear << "Reachability analysis: Lost memory...";
     // All leaks still unclassified are unreachable, search for reachability inside them
@@ -844,8 +844,8 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         }
 
         if (self.behaviour.showReachables()) {
-            printRecords(stats.recordsTlv, stream);
             printRecords(stats.recordsGlobal, stream);
+            printRecords(stats.recordsTlv, stream);
             printRecords(stats.recordsStack, stream);
         } else if (stats.getTotalReachable() > 0) {
             stream << "Hint: Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
