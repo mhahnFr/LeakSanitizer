@@ -837,7 +837,7 @@ static inline auto operator<<(std::ostream& out, const LeakKindStats& stats) -> 
     // TODO: Further formatting
     // TODO: Maybe split between direct and indirect?
     out << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
-        << "       " << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << std::endl
+        << "       " << get<Style::BOLD> << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << clear<Style::BOLD> << std::endl
         << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable";
     if (!getBehaviour().showReachables()) {
         out << format<Style::ITALIC>(" (not shown)");
