@@ -377,17 +377,17 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 #endif
 
     out << clear << "Reachability analysis: Stacks...";
-    for (const auto& [tid, info] : threads) {
+    for (const auto& [_, info] : threads) {
         using namespace formatter;
 
-        const auto& leak = isThreaded ? strdup(formatThreadId(info.getNumber()).c_str()) : nullptr; // TODO: Cache this!
+        const auto& threadDesc = getThreadDescription(info.getNumber(), info.getThread());
 
         const auto& selfThread = std::this_thread::get_id() == info.getId();
         const auto& nativeThread = pthread_mach_thread_np(info.getThread());
         auto resume = true;
         if (!selfThread && thread_suspend(nativeThread) != KERN_SUCCESS) {
             resume = false;
-            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + formatThreadId(info.getNumber()) + ".") << std::endl;
+            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
         }
         const auto& top = align(info.getStackTop());
         auto sp = uintptr_t(0);
@@ -398,9 +398,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                                                       &sp, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE) {
             sp = uintptr_t(info.getStackTop()) - info.getStackSize();
         }
-        classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, leak);
+        classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, isThreaded ? threadDesc.c_str() : nullptr);
         if (resume && !selfThread && thread_resume(nativeThread) != KERN_SUCCESS) {
-            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume " + formatThreadId(info.getNumber()) + ".") << std::endl;
+            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume " + threadDesc + ".") << std::endl;
         }
     }
 
@@ -412,13 +412,13 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                       toReturn.recordsGlobal, false, region.name, region.nameRelative);
     }
 
-    out << clear << "Reachability analysis: Thread-locals V2...";
+    out << clear << "Reachability analysis: Thread-locals...";
     for (const auto& [_, info] : threads) {
-        const auto& leak = isThreaded ? strdup(formatThreadId(info.getNumber()).c_str()) : nullptr; // TODO: Cache this!
+        const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
         const auto& begin = align(uintptr_t(info.getThread()));
         const auto& end = align(begin + __PTHREAD_SIZE__, false);
-        classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, leak);
+        classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
     }
 
     out << clear << "Reachability analysis: Compile-time thread-local variables...";
@@ -442,20 +442,20 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto values = new const void*[count];
     CFDictionaryGetKeysAndValues(dict, keys, values);
     for (CFIndex i = 0; i < count; ++i) {
-        const auto& leak = isThreaded ? strdup(formatThreadId(threads.at(std::this_thread::get_id()).getNumber()).c_str()) : nullptr; // TODO: Cache this!
+        const auto& threadDesc = isThreaded ? getThreadDescription(getThreadId()).c_str() : nullptr;
 
         const auto& keyIt = infos.find(keys[i]);
         if (keyIt != infos.end()) {
             classifyRecord(keyIt->second, LeakType::tlvIndirect);
             keyIt->second.leakType = LeakType::tlvDirect;
-            keyIt->second.imageName.first = leak;
+            keyIt->second.imageName.first = threadDesc;
             toReturn.recordsTlv.push_back(keyIt->second);
         }
         const auto& valIt = infos.find(values[i]);
         if (valIt != infos.end()) {
             classifyRecord(valIt->second, LeakType::tlvIndirect);
             keyIt->second.leakType = LeakType::tlvDirect;
-            valIt->second.imageName.first = leak;
+            valIt->second.imageName.first = threadDesc;
             toReturn.recordsTlv.push_back(valIt->second);
         }
     }
