@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -212,7 +212,7 @@ void format(lcs::callstack & callstack, std::ostream & stream, const std::string
         
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
-        } else if (firstHit && isFirstParty(binaryFile)) {
+        } else if (firstHit && (isFirstParty(binaryFile) || frames[i].binaryFileIsSelf)) {
             stream << indent << formatter::get<Style::GREYED>
                    << formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
             formatShared<Style::GREYED>(frames[i], stream);
