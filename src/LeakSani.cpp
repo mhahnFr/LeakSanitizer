@@ -383,10 +383,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Reachability analysis: Thread-locals V2...";
     for (const auto& [_, info] : threads) {
-        // TODO: Thread name / id
+        const auto& leak = isThreaded ? strdup(formatThreadId(info.getNumber()).c_str()) : nullptr; // TODO: Cache this!
+
         const auto& begin = align(uintptr_t(info.getThread()));
         const auto& end = align(begin + __PTHREAD_SIZE__, false);
-        classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv);
+        classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, leak);
     }
 
     out << clear << "Reachability analysis: Compile-time thread-local variables...";
@@ -410,19 +411,21 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto values = new const void*[count];
     CFDictionaryGetKeysAndValues(dict, keys, values);
     for (CFIndex i = 0; i < count; ++i) {
+        const auto& leak = isThreaded ? strdup(formatThreadId(threads.at(std::this_thread::get_id()).getNumber()).c_str()) : nullptr; // TODO: Cache this!
+
         const auto& keyIt = infos.find(keys[i]);
         if (keyIt != infos.end()) {
             classifyRecord(keyIt->second, LeakType::tlvIndirect);
             keyIt->second.leakType = LeakType::tlvDirect;
+            keyIt->second.imageName.first = leak;
             toReturn.recordsTlv.push_back(keyIt->second);
-            // TODO: Add thread id / name?
         }
         const auto& valIt = infos.find(values[i]);
         if (valIt != infos.end()) {
             classifyRecord(valIt->second, LeakType::tlvIndirect);
             keyIt->second.leakType = LeakType::tlvDirect;
+            valIt->second.imageName.first = leak;
             toReturn.recordsTlv.push_back(valIt->second);
-            // TODO: Add thread id / name?
         }
     }
     delete[] keys;
