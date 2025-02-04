@@ -90,26 +90,27 @@ constexpr static inline void printer(const std::string&                     mess
 
     printer<Warning, false>(message, callstack);
 
+    auto& instance = getInstance();
     if (info.has_value()) {
         constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
         const auto& record = info.value().get();
-        const auto& showThread = getInstance().getIsThreaded();
+        const auto& showThread = instance.getIsThreaded();
 
         std::cerr << format<Style::ITALIC, colour>("Previously allocated"s
-                                                   + (showThread ? " by " + formatThreadId(record.threadId) : "")
+                                                   + (showThread ? " by " + instance.getThreadDescription(record.threadId) : "")
                                                    + " here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
         if (record.deletedCallstack.has_value()) {
             std::cerr << format<Style::ITALIC, colour>("Previously freed"s
-                                                       + (showThread ? " by " + formatThreadId(record.deletedId) : "")
+                                                       + (showThread ? " by " + instance.getThreadDescription(record.deletedId) : "")
                                                        + " here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
         }
     }
     if constexpr (!Warning) {
-        getInstance().maybeHintCallstackSize(std::cerr);
+        instance.maybeHintCallstackSize(std::cerr);
         std::cerr << maybeHintRelativePaths;
     }
 }
