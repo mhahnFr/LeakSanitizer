@@ -105,8 +105,6 @@ auto getTracker() -> ATracker&;
 
 auto loadSuppressions() -> std::vector<suppression::Suppression>;
 
-auto formatThreadId(unsigned long id) -> std::string;
-
 /**
  * Returns the current instance of the statistics object.
  *
