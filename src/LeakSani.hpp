@@ -29,6 +29,7 @@
 #include <ostream>
 #include <set>
 #include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -65,6 +66,7 @@ class LSan final: public ATracker {
     bool callstackSizeExceeded = false;
     std::optional<std::vector<suppression::Suppression>> suppressions;
     std::vector<std::pair<char*, char*>> binaryFilenames;
+    std::unordered_map<unsigned long, std::string> threadDescriptions;
     /** The registered thread-local allocation trackers.                                */
     std::set<ATracker*> tlsTrackers;
     /** The mutex to manage the access to the registered thread-local trackers.         */
@@ -292,6 +294,7 @@ public:
     void removeThread(const std::thread::id& id);
 
     auto getThreadId(const std::thread::id& id = std::this_thread::get_id()) -> unsigned long;
+    auto getThreadDescription(unsigned long id, const std::optional<pthread_t>& thread = std::nullopt) -> const std::string&;
 
     /**
      * Returns the behaviour object associated with this instance.

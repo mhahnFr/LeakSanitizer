@@ -308,6 +308,37 @@ void LSan::applySuppressions(const std::deque<MallocInfo::Ref>& leaks) {
     }
 }
 
+auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>& thread) -> const std::string& {
+    using namespace std::string_literals;
+
+    const auto& it = threadDescriptions.find(id);
+    if (it != threadDescriptions.end()) {
+        return it->second;
+    }
+    std::string desc;
+    if (id == 0) {
+        desc = "main thread";
+    } else {
+        desc = "thread # " + std::to_string(id);
+
+        std::optional<pthread_t> t = thread;
+        if (!t) {
+            const auto& it = std::find_if(threads.cbegin(), threads.cend(), [id](const auto& element) {
+                return element.second.getNumber() == id;
+            });
+            if (it != threads.end()) {
+                t = it->second.getThread();
+            }
+        }
+        const constexpr auto BUFFER_SIZE = 1024u;
+        char buffer[BUFFER_SIZE];
+        if (t && pthread_getname_np(*t, buffer, BUFFER_SIZE) == 0 && buffer[0] != '\0') {
+            desc += " ("s + buffer + ")";
+        }
+    }
+    return threadDescriptions.emplace(std::make_pair(id, std::move(desc))).first->second;
+}
+
 auto LSan::classifyLeaks() -> LeakKindStats {
     auto toReturn = LeakKindStats();
 
