@@ -336,21 +336,24 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         const auto& leak = isThreaded ? strdup(formatThreadId(info.getNumber()).c_str()) : nullptr; // TODO: Cache this!
 
+        const auto& selfThread = std::this_thread::get_id() == info.getId();
         const auto& nativeThread = pthread_mach_thread_np(info.getThread());
         auto resume = true;
-        if (std::this_thread::get_id() != info.getId() && thread_suspend(nativeThread) != KERN_SUCCESS) {
+        if (!selfThread && thread_suspend(nativeThread) != KERN_SUCCESS) {
             resume = false;
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + formatThreadId(info.getNumber()) + ".") << std::endl;
         }
         const auto& top = align(info.getStackTop());
         auto sp = uintptr_t(0);
         auto count = std::size_t(0);
-        if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
-                                               &sp, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE) {
+        if (selfThread) {
+            sp = uintptr_t(__builtin_frame_address(0));
+        } else if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
+                                                      &sp, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE) {
             sp = uintptr_t(info.getStackTop()) - info.getStackSize();
         }
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, leak);
-        if (resume && std::this_thread::get_id() != info.getId() && thread_resume(nativeThread) != KERN_SUCCESS) {
+        if (resume && !selfThread && thread_resume(nativeThread) != KERN_SUCCESS) {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume " + formatThreadId(info.getNumber()) + ".") << std::endl;
         }
     }
