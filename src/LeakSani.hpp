@@ -81,7 +81,7 @@ class LSan final: public ATracker {
 #endif
 
     auto classifyLeaks() -> LeakKindStats;
-    void classifyRecord(MallocInfo& info, const LeakType& currentType);
+    void classifyRecord(MallocInfo& info, const LeakType& currentType, bool reclassify = false);
 
     /**
      * Creates a thread-safe copy of the thread-local tracker list.
@@ -95,7 +95,7 @@ class LSan final: public ATracker {
     void classifyLeaks(uintptr_t begin, uintptr_t end,
                        LeakType direct, LeakType indirect,
                        std::deque<MallocInfo::Ref>& directs, bool skipClassifieds = false,
-                       const char* name = nullptr, const char* nameRelative = nullptr);
+                       const char* name = nullptr, const char* nameRelative = nullptr, bool reclassify = false);
 
     template<bool Four = false>
     constexpr inline void classifyPointerUnion(void* ptr, std::deque<MallocInfo::Ref>& directs,

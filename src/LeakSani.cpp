@@ -86,19 +86,19 @@ auto LSan::findWithSpecials(void* ptr) -> decltype(infos)::iterator {
 void LSan::classifyLeaks(uintptr_t begin, uintptr_t end,
                          LeakType direct, LeakType indirect,
                          std::deque<MallocInfo::Ref>& directs, bool skipClassifieds,
-                         const char* name, const char* nameRelative) {
+                         const char* name, const char* nameRelative, bool reclassify) {
     for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
         const auto& record = infos.find(*reinterpret_cast<void**>(it));
         if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
             continue;
         }
-        if (record->second.leakType > direct) {
+        if (record->second.leakType > direct || reclassify) {
             record->second.leakType = direct;
             record->second.imageName.first = name;
             record->second.imageName.second = nameRelative;
             directs.push_back(record->second);
         }
-        classifyRecord(record->second, indirect);
+        classifyRecord(record->second, indirect, reclassify);
     }
 }
 
@@ -140,13 +140,13 @@ void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakTy
     }
 }
 
-void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
+void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, bool reclassify) {
     auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
     stack.push(info);
     while (!stack.empty()) {
         auto& elem = stack.top();
         stack.pop();
-        if (elem.get().leakType > currentType && elem.get().pointer != info.pointer) {
+        if ((elem.get().leakType > currentType || reclassify) && elem.get().pointer != info.pointer) {
             elem.get().leakType = currentType;
         }
 
@@ -162,7 +162,7 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType) {
                 continue;
             }
             info.viaMeRecords.push_back(record->second);
-            if (record->second.leakType > currentType)
+            if (record->second.leakType > currentType || reclassify)
                 stack.push(record->second);
         }
     }
@@ -388,7 +388,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         if (it == infos.end()) continue;
 
         classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
-                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, name, relative);
+                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, name, relative, true);
         it->second.suppressed = true;
     }
 
