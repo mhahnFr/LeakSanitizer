@@ -406,12 +406,14 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         if (keyIt != infos.end()) {
             classifyRecord(keyIt->second, LeakType::tlvIndirect);
             keyIt->second.leakType = LeakType::tlvDirect;
+            toReturn.recordsTlv.push_back(keyIt->second);
             // TODO: Add thread id / name?
         }
         const auto& valIt = infos.find(values[i]);
         if (valIt != infos.end()) {
             classifyRecord(valIt->second, LeakType::tlvIndirect);
             keyIt->second.leakType = LeakType::tlvDirect;
+            toReturn.recordsTlv.push_back(valIt->second);
             // TODO: Add thread id / name?
         }
     }
