@@ -4,5 +4,8 @@
   },
   {
     "imageName": "/usr/lib/libicucore.A.dylib"
+  },
+  {
+    "imageName": "/usr/lib/libxml2.2.dylib"
   }
 ]
