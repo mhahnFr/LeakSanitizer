@@ -21,7 +21,7 @@
 
 #include "TLSTracker.hpp"
 
-#include "lsanMisc.hpp"
+#include "../lsanMisc.hpp"
 
 namespace lsan {
 TLSTracker::TLSTracker() {

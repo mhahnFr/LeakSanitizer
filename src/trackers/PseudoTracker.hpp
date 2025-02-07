@@ -23,7 +23,8 @@
 #define PseudoTracker_hpp
 
 #include "ATracker.hpp"
-#include "lsanMisc.hpp"
+
+#include "../lsanMisc.hpp"
 
 namespace lsan {
 class PseudoTracker final: public ATracker {

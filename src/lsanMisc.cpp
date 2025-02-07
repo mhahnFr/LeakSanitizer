@@ -32,11 +32,9 @@
 #include <lsan_internals.h>
 #include <callstack.h>
 
+#include "formatter.hpp"
 #include "lsanMisc.hpp"
 
-#include "formatter.hpp"
-#include "PseudoTracker.hpp"
-#include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 
 #include "suppression/defaultSuppression.hpp"
@@ -44,6 +42,9 @@
 #include "suppression/Suppression.hpp"
 #include "suppression/json/Exception.hpp"
 #include "suppression/json/parser.hpp"
+
+#include "trackers/PseudoTracker.hpp"
+#include "trackers/TLSTracker.hpp"
 
 #ifndef VERSION
  #define VERSION "clean build"

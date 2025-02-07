@@ -247,6 +247,17 @@
 			path = include;
 			sourceTree = "<group>";
 		};
+		BF7ACDAE2D561DAC00629378 /* trackers */ = {
+			isa = PBXGroup;
+			children = (
+				BFC817182BEFB3C200332937 /* ATracker.hpp */,
+				BF7ACDAC2D5619AE00629378 /* PseudoTracker.hpp */,
+				BFC817152BEFB36E00332937 /* TLSTracker.hpp */,
+				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
+			);
+			path = trackers;
+			sourceTree = "<group>";
+		};
 		BF97EB4D28831E5B00DAF1FE = {
 			isa = PBXGroup;
 			children = (
@@ -282,6 +293,7 @@
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
 				BF3E50512CCFE7ED00CB225E /* suppression */,
 				BFDD6DFD2CC6B5A9008B9CDC /* helpers */,
+				BF7ACDAE2D561DAC00629378 /* trackers */,
 				BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */,
 				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */,
@@ -294,10 +306,6 @@
 				BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
 				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
-				BFC817152BEFB36E00332937 /* TLSTracker.hpp */,
-				BFC817142BEFB36E00332937 /* TLSTracker.cpp */,
-				BF7ACDAC2D5619AE00629378 /* PseudoTracker.hpp */,
-				BFC817182BEFB3C200332937 /* ATracker.hpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
 				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
 				BF7592282BB1799500891A55 /* LeakType.hpp */,

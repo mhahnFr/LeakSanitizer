@@ -35,7 +35,6 @@
 
 #include <pthread.h>
 
-#include "ATracker.hpp"
 #include "MallocInfo.hpp"
 #include "ThreadInfo.hpp"
 
@@ -43,12 +42,13 @@
  #include "timing.hpp"
 #endif
 
+#include "behaviour/Behaviour.hpp"
 #include "helpers/LeakKindStats.hpp"
 #include "helpers/Region.hpp"
-#include "behaviour/Behaviour.hpp"
 #include "statistics/Stats.hpp"
-#include "wrappers/realAlloc.hpp"
 #include "suppression/Suppression.hpp"
+#include "trackers/ATracker.hpp"
+#include "wrappers/realAlloc.hpp"
 
 namespace lsan {
 /**

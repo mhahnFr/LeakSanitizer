@@ -30,11 +30,11 @@
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
-#include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 #include "crashWarner/exceptionHandler.hpp"
 #include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
+#include "trackers/TLSTracker.hpp"
 
 #ifdef __APPLE__
 extern "C" {
