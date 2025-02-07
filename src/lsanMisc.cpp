@@ -35,6 +35,7 @@
 #include "lsanMisc.hpp"
 
 #include "formatter.hpp"
+#include "PseudoTracker.hpp"
 #include "TLSTracker.hpp"
 #include "callstacks/callstackHelper.hpp"
 
@@ -151,20 +152,27 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     return out;
 }
 
+static constexpr inline auto newLocalTracker(bool pseudo) -> ATracker* {
+    if (pseudo) {
+        return new PseudoTracker();
+    }
+    return new TLSTracker();
+}
+
 auto getTracker() -> ATracker& {
     auto& globalInstance = getInstance();
-    if (globalInstance.finished || getBehaviour().statsActive()) return globalInstance;
+    if (globalInstance.finished) return globalInstance;
 
     const auto& key = globalInstance.saniKey;
     auto tlv = pthread_getspecific(key);
     if (tlv == nullptr) {
         pthread_setspecific(key, std::addressof(globalInstance));
-        TLSTracker* tlsTracker;
+        ATracker* tlsTracker;
         {
             std::lock_guard lock(globalInstance.mutex);
             auto ignore = globalInstance.ignoreMalloc;
             globalInstance.ignoreMalloc = true;
-            tlsTracker = new TLSTracker();
+            tlsTracker = newLocalTracker(getBehaviour().statsActive());
             pthread_setspecific(key, tlsTracker);
             globalInstance.ignoreMalloc = ignore;
         }

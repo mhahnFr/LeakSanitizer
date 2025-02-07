@@ -274,7 +274,7 @@ static inline void destroySaniKey(void* value) {
     auto& globalInstance = getInstance();
     if (value != std::addressof(globalInstance)) {
         pthread_setspecific(globalInstance.saniKey, std::addressof(globalInstance));
-        auto tracker = static_cast<TLSTracker*>(value);
+        auto tracker = static_cast<ATracker*>(value);
         if (!globalInstance.preventDealloc) {
             std::lock_guard lock(globalInstance.mutex);
             auto ignore = globalInstance.ignoreMalloc;
