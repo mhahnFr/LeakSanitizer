@@ -291,7 +291,8 @@ public:
     }
 
     void addThread(ThreadInfo&& info);
-    void removeThread(const std::thread::id& id);
+    void addThread();
+    void removeThread(const std::thread::id& id = std::this_thread::get_id());
 
     auto getThreadId(const std::thread::id& id = std::this_thread::get_id()) -> unsigned long;
     auto getThreadDescription(unsigned long id, const std::optional<pthread_t>& thread = std::nullopt) -> const std::string&;

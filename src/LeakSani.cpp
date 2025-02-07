@@ -588,14 +588,7 @@ void LSan::finish() {
     }
 }
 
-void LSan::registerTracker(ATracker* tracker) {
-    std::lock_guard lock1 { mutex };
-    std::lock_guard lock { tlsTrackerMutex };
-
-    auto ignore = ignoreMalloc;
-    ignoreMalloc = true;
-    tlsTrackers.insert(tracker);
-
+void LSan::addThread() {
     addThread({
         findStackSize(),
         findStackBegin(),
@@ -604,7 +597,16 @@ void LSan::registerTracker(ATracker* tracker) {
         pthread_self(),
     });
     isThreaded = isThreaded || std::this_thread::get_id() != mainId;
+}
 
+void LSan::registerTracker(ATracker* tracker) {
+    std::lock_guard lock1 { mutex };
+    std::lock_guard lock { tlsTrackerMutex };
+
+    auto ignore = ignoreMalloc;
+    ignoreMalloc = true;
+    tlsTrackers.insert(tracker);
+    addThread();
     ignoreMalloc = ignore;
 }
 
@@ -615,7 +617,7 @@ void LSan::deregisterTracker(ATracker* tracker) {
     auto ignore = ignoreMalloc;
     ignoreMalloc = true;
     tlsTrackers.erase(tracker);
-    removeThread(std::this_thread::get_id());
+    removeThread();
     ignoreMalloc = ignore;
 }
 
