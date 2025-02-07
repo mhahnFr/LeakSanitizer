@@ -153,14 +153,14 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     return out;
 }
 
-static constexpr inline auto newLocalTracker(bool pseudo) -> ATracker* {
+static constexpr inline auto newLocalTracker(bool pseudo) -> trackers::ATracker* {
     if (pseudo) {
-        return new PseudoTracker();
+        return new trackers::PseudoTracker();
     }
-    return new TLSTracker();
+    return new trackers::TLSTracker();
 }
 
-auto getTracker() -> ATracker& {
+auto getTracker() -> trackers::ATracker& {
     auto& globalInstance = getInstance();
     if (globalInstance.finished) return globalInstance;
 
@@ -168,7 +168,7 @@ auto getTracker() -> ATracker& {
     auto tlv = pthread_getspecific(key);
     if (tlv == nullptr) {
         pthread_setspecific(key, std::addressof(globalInstance));
-        ATracker* tlsTracker;
+        trackers::ATracker* tlsTracker;
         {
             std::lock_guard lock(globalInstance.mutex);
             auto ignore = globalInstance.ignoreMalloc;
@@ -179,7 +179,7 @@ auto getTracker() -> ATracker& {
         }
         return *tlsTracker;
     }
-    return *static_cast<ATracker*>(tlv);
+    return *static_cast<trackers::ATracker*>(tlv);
 }
 
 static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {

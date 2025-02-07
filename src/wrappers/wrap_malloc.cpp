@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -196,7 +196,7 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
                                          MALLOC_PTR_IN_USE_RANGE_TYPE,
                                          reinterpret_cast<vm_address_t>(zone),
                                          nullptr, [](task_t, auto context, unsigned, auto array, unsigned count) {
-                auto& tracker = *reinterpret_cast<ATracker*>(context);
+                auto& tracker = *reinterpret_cast<trackers::ATracker*>(context);
                 for (unsigned i = 0; i < count; ++i) {
                     tracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
                 }

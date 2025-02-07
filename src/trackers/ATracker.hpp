@@ -35,7 +35,7 @@
 
 #include "../allocators/PoolAllocator.hpp"
 
-namespace lsan {
+namespace lsan::trackers {
 /**
  * This class represents the base of an allocation tracker.
  */

@@ -56,7 +56,7 @@ namespace lsan {
  *
  * It acts as an allocation tracker.
  */
-class LSan final: public ATracker {
+class LSan final: public trackers::ATracker {
     std::map<std::thread::id, ThreadInfo> threads;
     /** An object holding all statistics.                                               */
     Stats stats;

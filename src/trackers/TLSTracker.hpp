@@ -26,7 +26,7 @@
 
 #include "ATracker.hpp"
 
-namespace lsan {
+namespace lsan::trackers {
 /**
  * This class represents a thread-local allocation tracker.
  */

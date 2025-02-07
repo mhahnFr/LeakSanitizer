@@ -23,7 +23,7 @@
 
 #include "../lsanMisc.hpp"
 
-namespace lsan {
+namespace lsan::trackers {
 TLSTracker::TLSTracker() {
     getInstance().registerTracker(this);
 }

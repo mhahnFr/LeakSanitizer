@@ -101,7 +101,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream&;
  *
  * @return the tracker to be used
  */
-auto getTracker() -> ATracker&;
+auto getTracker() -> trackers::ATracker&;
 
 auto loadSuppressions() -> std::vector<suppression::Suppression>;
 

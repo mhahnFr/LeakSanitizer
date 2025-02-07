@@ -26,7 +26,7 @@
 
 #include "../lsanMisc.hpp"
 
-namespace lsan {
+namespace lsan::trackers {
 class PseudoTracker final: public ATracker {
     LSan& main = getInstance();
 
