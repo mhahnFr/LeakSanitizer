@@ -208,7 +208,12 @@ void format(lcs::callstack & callstack, std::ostream & stream, const std::string
          firstPrint = true;
     std::size_t i, printed;
 
-    const auto& maxCount = std::to_string(size).size();
+    std::size_t toSkip = 0;
+    if (size > 9) {
+        for (; toSkip < size && (frames[toSkip].binaryFile == nullptr || frames[toSkip].binaryFileIsSelf); ++toSkip);
+    }
+    const auto& maxCount = std::to_string(size - toSkip).size();
+
     for (i = printed = 0; i < size && printed < getBehaviour().callstackSize(); ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
