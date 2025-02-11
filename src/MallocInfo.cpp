@@ -123,7 +123,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
         stream << ", " << clear<Style::ITALIC> << desc << get<Style::ITALIC>;
     }
     stream << ", " << leakType;
-    if (print && imageName.first != nullptr && getBehaviour().printBinaries()) {
+    if (print && imageName.first != nullptr) {
         stream << " in " << format<Style::BLUE>(maybeRelativate(imageName));
     }
 
