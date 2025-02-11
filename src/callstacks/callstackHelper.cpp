@@ -207,22 +207,26 @@ void format(lcs::callstack & callstack, std::ostream & stream, const std::string
     bool firstHit   = true,
          firstPrint = true;
     std::size_t i, printed;
+
+    const auto& maxCount = std::to_string(size).size();
     for (i = printed = 0; i < size && printed < getBehaviour().callstackSize(); ++i) {
         const auto binaryFile = frames[i].binaryFile;
         
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
         } else if (firstHit && (isFirstParty(binaryFile) || frames[i].binaryFileIsSelf)) {
+            const auto& number = std::to_string(printed + 1);
             stream << indent << formatter::get<Style::GREYED>
-                   << formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
+                   << formatter::format<Style::ITALIC>("# " + std::string(maxCount - number.size(), ' ') + number + ": ");
             formatShared<Style::GREYED>(frames[i], stream);
         } else if (firstHit) {
             firstHit = false;
             stream << indent << formatter::get<Style::BOLD>
-                   << formatter::format<Style::ITALIC>(firstPrint ? "In: " : "in: ");
+                   << formatter::format<Style::ITALIC>(std::string(maxCount - 1, ' ') + " ->  ");
             formatShared<Style::BOLD>(frames[i], stream);
         } else {
-            stream << indent << formatter::format<Style::ITALIC>(firstPrint ? "At: " : "at: ");
+            const auto& number = std::to_string(printed + 1);
+            stream << indent << formatter::format<Style::ITALIC>("# " + std::string(maxCount - number.size(), ' ') + number + ": ");
             formatShared<Style::NONE>(frames[i], stream);
         }
         firstPrint = false;
