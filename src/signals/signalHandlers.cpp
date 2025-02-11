@@ -344,7 +344,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
     using namespace formatter;
 
     getTracker().ignoreMalloc = true;
-    const auto reason = getReason(signalCode, info->si_code);
+    const auto& reason = getReason(signalCode, info->si_code);
     crashForce(formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
                + (hasAddress(signalCode) ? " on address " + formatString<Style::BOLD>(utils::toString(info->si_addr)) : ""),
