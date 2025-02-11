@@ -206,17 +206,25 @@ void format(lcs::callstack & callstack, std::ostream & stream, const std::string
 
     bool firstHit   = true,
          firstPrint = true;
-    std::size_t i, printed;
+    std::size_t i, printed, maxCount = 1;
 
-    std::size_t toSkip = 0;
-    if (size > 9) {
-        for (; toSkip < size && (frames[toSkip].binaryFile == nullptr || frames[toSkip].binaryFileIsSelf); ++toSkip);
+    if (getBehaviour().callstackSize() > 9) {
+        std::size_t toSkip = 0;
+        if (size > 9) {
+            for (; toSkip < size && (frames[toSkip].binaryFile == nullptr || frames[toSkip].binaryFileIsSelf); ++toSkip);
+        }
+        if (size - toSkip > 9) {
+            if (size - toSkip < 100) {
+                maxCount = 2;
+            } else {
+                maxCount = std::to_string(size - toSkip).size();
+            }
+        }
     }
-    const auto& maxCount = std::to_string(size - toSkip).size();
 
     for (i = printed = 0; i < size && printed < getBehaviour().callstackSize(); ++i) {
         const auto binaryFile = frames[i].binaryFile;
-        
+
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
         } else if (firstHit && (isFirstParty(binaryFile) || frames[i].binaryFileIsSelf)) {
