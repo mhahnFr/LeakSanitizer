@@ -183,7 +183,11 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
     out << clear<S> << std::endl;
 }
 
-void format(lcs::callstack & callstack, std::ostream & stream, const std::string& indent) {
+static inline auto getIndent(std::string::size_type indent, char indentChar = ' ') -> std::string {
+    return indent > 0 ? std::string(indent, indentChar) : std::string();
+}
+
+void format(lcs::callstack& callstack, std::ostream& stream, const std::string& indent) {
     using formatter::Style;
 
     if (!callstack_autoClearCaches) {
@@ -223,23 +227,23 @@ void format(lcs::callstack & callstack, std::ostream & stream, const std::string
     }
 
     for (i = printed = 0; i < size && printed < getBehaviour().callstackSize(); ++i) {
-        const auto binaryFile = frames[i].binaryFile;
+        const auto& binaryFile = frames[i].binaryFile;
 
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
         } else if (firstHit && (isFirstParty(binaryFile) || frames[i].binaryFileIsSelf)) {
             const auto& number = std::to_string(printed + 1);
             stream << indent << formatter::get<Style::GREYED>
-                   << formatter::format<Style::ITALIC>("# " + std::string(maxCount - number.size(), ' ') + number + ": ");
+                   << formatter::format<Style::ITALIC>("# " + getIndent(maxCount - number.size()) + number + ": ");
             formatShared<Style::GREYED>(frames[i], stream);
         } else if (firstHit) {
             firstHit = false;
             stream << indent << formatter::get<Style::BOLD>
-                   << formatter::format<Style::ITALIC>(std::string(maxCount - 1, ' ') + " ->  ");
+                   << formatter::format<Style::ITALIC>(getIndent(maxCount - 1) + " ->  ");
             formatShared<Style::BOLD>(frames[i], stream);
         } else {
             const auto& number = std::to_string(printed + 1);
-            stream << indent << formatter::format<Style::ITALIC>("# " + std::string(maxCount - number.size(), ' ') + number + ": ");
+            stream << indent << formatter::format<Style::ITALIC>("# " + getIndent(maxCount - number.size()) + number + ": ");
             formatShared<Style::NONE>(frames[i], stream);
         }
         firstPrint = false;
