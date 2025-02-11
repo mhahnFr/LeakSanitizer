@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -197,8 +197,8 @@ static inline auto getReasonTRAP(int code) -> std::optional<std::string> {
  * @return the optional explanation
  */
 static inline auto getReason(int signalCode, int code) -> std::optional<std::string> {
-    using formatter::Style;
-    
+    using namespace formatter;
+
     switch (signalCode) {
         case SIGSEGV: return getReasonSEGV(code);
         case SIGILL:  return getReasonILL(code);
@@ -208,13 +208,13 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
     }
     
     switch (code) {
-        case SI_USER:  return "Sent by " + formatter::formatString<Style::BOLD>("kill")     + "(2)";
-        case SI_QUEUE: return "Sent by " + formatter::formatString<Style::BOLD>("sigqueue") + "(3)";
+        case SI_USER:  return "Sent by " + formatString<Style::BOLD>("kill")     + "(2)";
+        case SI_QUEUE: return "Sent by " + formatString<Style::BOLD>("sigqueue") + "(3)";
         case SI_TIMER: return "POSIX timer expired";
         case SI_MESGQ: return "POSIX message queue state changed";
             
 #ifdef SI_TKILL
-        case SI_TKILL: return formatter::formatString<Style::BOLD>("tkill") + "(2) or " + formatter::formatString<Style::BOLD>("tgkill") + "(2)";
+        case SI_TKILL: return formatString<Style::BOLD>("tkill") + "(2) or " + formatString<Style::BOLD>("tgkill") + "(2)";
 #endif
 #ifdef SI_KERNEL
         case SI_KERNEL: return "Sent by the kernel";
@@ -341,28 +341,28 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 }
 
 [[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
-    using formatter::Style;
+    using namespace formatter;
 
     getTracker().ignoreMalloc = true;
     const auto reason = getReason(signalCode, info->si_code);
-    crashForce(formatter::formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
+    crashForce(formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
-               + (hasAddress(signalCode) ? " on address " + formatter::formatString<Style::BOLD>(utils::toString(info->si_addr)) : ""),
+               + (hasAddress(signalCode) ? " on address " + formatString<Style::BOLD>(utils::toString(info->si_addr)) : ""),
                reason.has_value()
-                ? std::optional(formatter::formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, info->si_code).value_or("Unknown reason") + ")")
+                ? std::optional(formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, info->si_code).value_or("Unknown reason") + ")")
                 : std::nullopt,
                createCallstackFor(ptr));
 }
 
 void callstack(int, siginfo_t*, void* context) {
-    using formatter::Style;
-    
+    using namespace formatter;
+
     auto& tracker = getTracker();
     bool ignore = tracker.ignoreMalloc;
     tracker.ignoreMalloc = true;
 
     auto& out = getOutputStream();
-    out << formatter::format<Style::ITALIC>("The current callstack:") << std::endl;
+    out << format<Style::ITALIC>("The current callstack:") << std::endl;
     callstackHelper::format(createCallstackFor(context), out);
     out << std::endl;
     
