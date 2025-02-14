@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -58,6 +58,7 @@ class AutoStats {
             std::unique_lock lock { mutex };
             cv.wait_for(lock, sleepTime);
             if (!run) {
+                getTracker().ignoreMalloc = true;
                 return;
             }
             const auto& begin = std::chrono::system_clock::now();
@@ -73,9 +74,13 @@ public:
         using namespace std::chrono_literals;
 
         if (auto duration = getBehaviour().autoStats()) {
+            auto& instance = getTracker();
+            auto ignored = instance.ignoreMalloc;
+            instance.ignoreMalloc = true;
             interval = *duration;
             statsThread = std::thread(&AutoStats::printer, this);
             threadRunning = true;
+            instance.ignoreMalloc = ignored;
         }
     }
 
@@ -83,7 +88,17 @@ public:
         run = false;
         cv.notify_all();
         if (threadRunning) {
+            /*
+             * `getInstance()` must be called here to prevent the creation of a
+             * new local tracker - since this destructor will be ran in an
+             * `atexit` handler of the system.
+             *                                                      - mhahnFr
+             */
+            auto& tracker = getInstance();
+            auto ignored = tracker.ignoreMalloc;
+            tracker.ignoreMalloc = true;
             statsThread.join();
+            tracker.ignoreMalloc = ignored;
         }
     }
 };
