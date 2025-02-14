@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -43,8 +43,11 @@ enum class Style {
     RED,
     /** Represents the text color magenta.                                            */
     MAGENTA,
+    /** Represents the text color amber (dark yellow).                                */
     AMBER,
+    /** Represents the text color blue.                                               */
     BLUE,
+    /** Represents the text color cyan.                                               */
     CYAN,
     /** Represents italic text.                                                       */
     ITALIC,
