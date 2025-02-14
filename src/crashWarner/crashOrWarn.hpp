@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -21,8 +21,6 @@
 
 #ifndef crashOrWarn_hpp
 #define crashOrWarn_hpp
-
-#include <string>
 
 #include "crash.hpp"
 #include "warn.hpp"
