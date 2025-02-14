@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -28,6 +28,15 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan {
+/**
+ * @brief Loads the function of the given name.
+ *
+ * Allocations made by this process are ignored.
+ *
+ * @param name the name of the function to load
+ * @return the loaded function
+ * @tparam T the type of the function
+ */
 template<typename T>
 static inline auto loadFunction(const char* name) -> T* {
     auto& tracker = getTracker();
