@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -43,6 +43,7 @@ auto __lsan_getCurrentByteCount()   -> std::size_t { return getStats().getCurren
 auto __lsan_getMallocPeek() -> std::size_t { return getStats().getMallocPeek(); }
 auto __lsan_getBytePeek()   -> std::size_t { return getStats().getBytePeek();   }
 
+/** The color for the bar elements to be used. */
 static constexpr inline auto BAR_COLOR = formatter::Style::CYAN;
 
 /**
