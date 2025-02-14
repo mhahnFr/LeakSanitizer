@@ -28,6 +28,12 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan {
+/**
+ * Calls either @c crash or @c warn with the given arguments.
+ *
+ * @param args the arguments to forward
+ * @tparam Args the type of the arguments to forward
+ */
 template<typename ...Args>
 constexpr static inline void crashOrWarn(Args&& ...args) {
     if (getBehaviour().invalidCrash()) {
