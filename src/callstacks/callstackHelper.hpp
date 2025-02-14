@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -50,8 +50,26 @@ static inline void format(lcs::callstack&& callstack, std::ostream& out, const s
     format(callstack, out, indent);
 }
 
+/**
+ * Returns whether the given callstack is suppressed by the given suppression.
+ *
+ * @param suppression the suppression
+ * @param callstack the callstack to be checked
+ * @return whether the callstack is suppressed by the given suppression
+ */
 auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& callstack) -> bool;
 
+/**
+ * @brief Returns whether the given callstack is suppressed by at least one
+ * suppression of the given range.
+ *
+ * A callstack is never matched by an empty range of suppressions.
+ *
+ * @param suppBegin the beginning of the suppressions range
+ * @param suppEnd the end of the suppressions range
+ * @param callstack the callstack to be checked
+ * @return whether the callstack was matched
+ */
 template<typename It>
 constexpr inline auto isSuppressed(It suppBegin, It suppEnd, lcs::callstack& callstack) -> bool {
     for (; suppBegin != suppEnd; ++suppBegin) {
