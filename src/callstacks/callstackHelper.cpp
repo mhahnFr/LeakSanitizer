@@ -183,6 +183,13 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
     out << clear<S> << std::endl;
 }
 
+/**
+ * Creates and indent string if the given indentation is bigger than zero.
+ *
+ * @param indent the amount of indentation
+ * @param indentChar the character to indent with
+ * @return a suitable indentation string
+ */
 static inline auto getIndent(std::string::size_type indent, char indentChar = ' ') -> std::string {
     return indent > 0 ? std::string(indent, indentChar) : std::string();
 }
