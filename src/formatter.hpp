@@ -24,8 +24,6 @@
 
 #include <string>
 
-#include <lsan_internals.h>
-
 #include "lsanMisc.hpp"
 
 /**
