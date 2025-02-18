@@ -28,6 +28,7 @@
 namespace lsan {
 /** Represents exactly 1 EiB. Needed for the calculations as starting point. */
 static constexpr unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL;
+/** An array of the byte entities, going from EiB to single bytes.           */
 static constexpr const char* sizes[] { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
 
 auto bytesToString(unsigned long long amount) -> std::string {
