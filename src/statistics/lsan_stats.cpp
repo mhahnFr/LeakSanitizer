@@ -297,10 +297,11 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
 
 void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
     using formatter::Style;
-    
-    std::lock_guard lock(getInstance().mutex);
-    bool ignore = getTracker().ignoreMalloc;
-    getTracker().ignoreMalloc = true;
+
+    auto& tracker = getTracker();
+    std::lock_guard lock { tracker.mutex };
+    bool ignore = tracker.ignoreMalloc;
+    tracker.ignoreMalloc = true;
     auto & out = getOutputStream();
     if (getBehaviour().statsActive()) {
         __lsan_printStatsCore("memory fragmentation", width, out,
@@ -317,15 +318,16 @@ void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
             << "true" << formatter::format<Style::RED, Style::ITALIC>("?")
             << std::endl << std::endl;
     }
-    getTracker().ignoreMalloc = ignore;
+    tracker.ignoreMalloc = ignore;
 }
 
 void __lsan_printStatsWithWidth(std::size_t width) {
     using formatter::Style;
-    
-    std::lock_guard lock(getInstance().mutex);
-    bool ignore = getTracker().ignoreMalloc;
-    getTracker().ignoreMalloc = true;
+
+    auto& tracker = getTracker();
+    std::lock_guard lock { tracker.mutex };
+    bool ignore = tracker.ignoreMalloc;
+    tracker.ignoreMalloc = true;
     auto & out = getOutputStream();
     if (getBehaviour().statsActive()) {
         __lsan_printStatsCore("memory usage", width, out,
@@ -341,5 +343,5 @@ void __lsan_printStatsWithWidth(std::size_t width) {
             << "true" << formatter::format<Style::RED, Style::ITALIC>("?")
             << std::endl << std::endl;
     }
-    getTracker().ignoreMalloc = ignore;
+    tracker.ignoreMalloc = ignore;
 }
