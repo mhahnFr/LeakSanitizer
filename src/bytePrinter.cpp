@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -21,8 +21,6 @@
 
 #include <iomanip>
 #include <sstream>
-
-#include <lsan_internals.h>
 
 #include "bytePrinter.hpp"
 #include "lsanMisc.hpp"
