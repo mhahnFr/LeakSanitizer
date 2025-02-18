@@ -42,7 +42,13 @@ auto bytesToString(unsigned long long amount) -> std::string {
                 const unsigned char digitCount = preDot < 10 ? 1 :
                                                 (preDot < 100 ? 2 :
                                                 (preDot < 1000 ? 3 : 4));
+
+                auto& tracker = getTracker();
+                std::lock_guard lock { tracker.mutex };
+                auto ignored = tracker.ignoreMalloc;
+                tracker.ignoreMalloc = false;
                 s << std::setprecision(digitCount + 2) << static_cast<double>(amount) / multiplier << " " << sizes[i];
+                tracker.ignoreMalloc = ignored;
                 break;
             }
         }
