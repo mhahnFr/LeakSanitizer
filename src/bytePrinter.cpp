@@ -28,13 +28,13 @@
 namespace lsan {
 /** Represents exactly 1 EiB. Needed for the calculations as starting point. */
 static constexpr unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL;
+static constexpr const char* sizes[] { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
 
 auto bytesToString(unsigned long long amount) -> std::string {
     std::stringstream s;
     if (!getBehaviour().humanPrint() || amount == 0) {
         s << amount << " B";
     } else {
-        const std::string sizes[] {"EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"};
         unsigned long long multiplier = exabyte;
         for (std::size_t i = 0; i < std::size(sizes); ++i, multiplier /= 1024) {
             if (multiplier <= amount) {
