@@ -46,8 +46,6 @@ class AutoStats {
     std::mutex mutex;
     /** The condition variable for the printing thread to wait on. */
     std::condition_variable cv;
-    /** Whether the printing thread is actually running.           */
-    bool threadRunning = false;
 
     /**
      * The loop of the printing thread.
@@ -79,7 +77,6 @@ public:
             instance.ignoreMalloc = true;
             interval = *duration;
             statsThread = std::thread(&AutoStats::printer, this);
-            threadRunning = true;
             instance.ignoreMalloc = ignored;
         }
     }
@@ -87,7 +84,7 @@ public:
     inline ~AutoStats() {
         run = false;
         cv.notify_all();
-        if (threadRunning) {
+        if (statsThread.joinable()) {
             /*
              * `getInstance()` must be called here to prevent the creation of a
              * new local tracker - since this destructor will be ran in an
