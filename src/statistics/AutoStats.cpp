@@ -19,7 +19,6 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
@@ -36,10 +35,9 @@ namespace {
  */
 class AutoStats {
     /** Whether the printing thread is allowed to run.             */
-    std::atomic_bool run = true;
+    bool run = true;
     /** The interval between the prints.                           */
     std::chrono::nanoseconds interval;
-
     /** The printing thread.                                       */
     std::thread statsThread;
     /** The mutex to synchronize with the printing thread.         */
@@ -53,11 +51,14 @@ class AutoStats {
     inline void printer() {
         std::chrono::nanoseconds sleepTime { 0 };
         while (true) {
-            std::unique_lock lock { mutex };
-            cv.wait_for(lock, sleepTime);
-            if (!run) {
-                getTracker().ignoreMalloc = true;
-                return;
+            {
+                std::unique_lock lock { mutex };
+                cv.wait_for(lock, sleepTime, [this] {
+                    return !run;
+                });
+                if (!run) {
+                    return;
+                }
             }
             const auto& begin = std::chrono::system_clock::now();
             __lsan_printStats();
@@ -72,30 +73,19 @@ public:
         using namespace std::chrono_literals;
 
         if (auto duration = getBehaviour().autoStats()) {
-            auto& instance = getTracker();
-            auto ignored = instance.ignoreMalloc;
-            instance.ignoreMalloc = true;
             interval = *duration;
             statsThread = std::thread(&AutoStats::printer, this);
-            instance.ignoreMalloc = ignored;
         }
     }
 
     inline ~AutoStats() {
-        run = false;
+        {
+            std::lock_guard lock { mutex };
+            run = false;
+        }
         cv.notify_all();
         if (statsThread.joinable()) {
-            /*
-             * `getInstance()` must be called here to prevent the creation of a
-             * new local tracker - since this destructor will be ran in an
-             * `atexit` handler of the system.
-             *                                                      - mhahnFr
-             */
-            auto& tracker = getInstance();
-            auto ignored = tracker.ignoreMalloc;
-            tracker.ignoreMalloc = true;
             statsThread.join();
-            tracker.ignoreMalloc = ignored;
         }
     }
 };
