@@ -31,6 +31,10 @@
 # include <macos/AppKit.hpp>
 # include <macos/core.hpp>
 # include <macos/misc.hpp>
+
+# elif defined(LSAN_LINUX)
+# include <linux/core.hpp>
+
 #endif
 
 namespace lsan::suppression {
@@ -44,6 +48,12 @@ auto getDefaultSuppression() -> std::vector<std::string> {
         std::string(suppressions_macos_misc),
     });
     // TODO: Swift, AppKit, ...
+
+#elif defined(LSAN_LINUX)
+    toReturn.insert(toReturn.cBegin(), {
+        std::string(suppressions_linux_core),
+    });
+
 #endif
 
     return toReturn;

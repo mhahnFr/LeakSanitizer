@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Initialization of the dynamic linker",
+    "functions": [
+      "call_init",
+      "_dl_init"
+    ]
+  },
+  {
+    "name": "Output buffer allocation",
+    "functions": [ "__printf" ]
+  },
+  {
+    "name": "Input buffer allocation",
+    "functions": [ "fgets" ]
+  }
+]
