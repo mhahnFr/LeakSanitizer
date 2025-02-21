@@ -27,8 +27,8 @@
 #include "realAlloc.hpp"
 
 #ifdef __APPLE__
- #include <mach/mach_init.h>
- #include <malloc/malloc.h>
+# include <mach/mach_init.h>
+# include <malloc/malloc.h>
 #endif
 
 #include "../LeakSani.hpp"
@@ -92,25 +92,66 @@ static inline auto createInvalidFreeMessage(const void* address, bool doubleFree
         + " for address " + formatString<Style::BOLD>(utils::toString(address));
 }
 
+template<typename F, typename ...Args>
+inline void ifNotIgnored(F&& func, Args&& ...args) {
+    static_assert(std::is_invocable_v<F, trackers::ATracker&,
+#ifdef BENCHMARK
+                  std::chrono::nanoseconds&&,
+#endif
+                  Args...>,
+                  "The given function is called with the tracker and its given arguments");
+
+    auto& tracker = getTracker();
+    BENCH(std::lock_guard lock { tracker.mutex };, std::chrono::nanoseconds, lockingTime);
+    if (!tracker.ignoreMalloc) {
+        tracker.ignoreMalloc = true;
+        std::invoke(std::move(func), tracker,
+#ifdef BENCHMARK
+                    std::move(lockingTime),
+#endif
+                    std::move(args)...);
+        tracker.ignoreMalloc = false;
+    }
+}
+
+#ifdef BENCHMARK
+# define LOCKING_TIME , auto&& lockingTime
+
+# define ADD_TIME(sys, lock, track, type) do {              \
+    const auto& __sys   = (sys);                            \
+    const auto& __lock  = (lock);                           \
+    const auto& __track = (track);                          \
+    const auto& __type  = (type);                           \
+                                                            \
+    timing::addTotalTime(__sys + __lock + __track, __type); \
+    timing::addTrackingTime(__track, __type);               \
+    timing::addSystemTime(__sys, __type);                   \
+    timing::addLockingTime(__lock, __type);                 \
+} while (0)
+
+#else
+# define LOCKING_TIME
+
+# define ADD_TIME(sys, lock, track, type)
+#endif
+
 #ifdef __APPLE__
 auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
     if (zone == nullptr) {
         crashForce("Called with NULL as zone");
     }
 
-    auto ptr = ::malloc_zone_malloc(zone, size);
+    BENCH(auto ptr = ::malloc_zone_malloc(zone, size);, std::chrono::nanoseconds, sysTime);
     if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-
-            if (getBehaviour().zeroAllocation() && size == 0) {
-                warn("Implementation-defined allocation of size 0");
-            }
-            tracker.addMalloc(MallocInfo(ptr, size));
-            tracker.ignoreMalloc = false;
-        }
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                if (getBehaviour().zeroAllocation() && size == 0) {
+                    warn("Implementation-defined allocation of size 0");
+                }
+                tracker.addMalloc(MallocInfo(ptr, size));
+            }, std::chrono::nanoseconds, trackingTime);
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
+        });
     }
     return ptr;
 }
@@ -120,19 +161,17 @@ auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size
         crashForce("Called with NULL as zone");
     }
 
-    auto ptr = ::malloc_zone_calloc(zone, count, size);
+    BENCH(auto ptr = ::malloc_zone_calloc(zone, count, size);, std::chrono::nanoseconds, sysTime);
     if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-
-            if (getBehaviour().zeroAllocation() && size == 0) {
-                warn("Implementation-defined allocation of size 0");
-            }
-            tracker.addMalloc(MallocInfo(ptr, count * size));
-            tracker.ignoreMalloc = false;
-        }
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                if (getBehaviour().zeroAllocation() && size == 0) {
+                    warn("Implementation-defined allocation of size 0");
+                }
+                tracker.addMalloc(MallocInfo(ptr, count * size));
+            }, std::chrono::nanoseconds, trackingTime);
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::calloc);
+        });
     }
     return ptr;
 }
@@ -142,19 +181,17 @@ auto malloc_zone_valloc(malloc_zone_t* zone, std::size_t size) -> void* {
         crashForce("Called with NULL as zone");
     }
 
-    auto ptr = ::malloc_zone_valloc(zone, size);
+    BENCH(auto ptr = ::malloc_zone_valloc(zone, size);, std::chrono::nanoseconds, sysTime);
     if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-
-            if (getBehaviour().zeroAllocation() && size == 0) {
-                warn("Implementation-defined allocation of size 0");
-            }
-            tracker.addMalloc(MallocInfo(ptr, size));
-            tracker.ignoreMalloc = false;
-        }
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                if (getBehaviour().zeroAllocation() && size == 0) {
+                    warn("Implementation-defined allocation of size 0");
+                }
+                tracker.addMalloc(MallocInfo(ptr, size));
+            }, std::chrono::nanoseconds, trackingTime);
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
+        });
     }
     return ptr;
 }
@@ -164,19 +201,17 @@ auto malloc_zone_memalign(malloc_zone_t* zone, std::size_t alignment, std::size_
         crashForce("Called with NULL as zone");
     }
 
-    auto ptr = ::malloc_zone_memalign(zone, alignment, size);
+    BENCH(auto ptr = ::malloc_zone_memalign(zone, alignment, size);, std::chrono::nanoseconds, sysTime);
     if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-
-            if (getBehaviour().zeroAllocation() && size == 0) {
-                warn("Implementation-defined allocation of size 0");
-            }
-            tracker.addMalloc(MallocInfo(ptr, size));
-            tracker.ignoreMalloc = false;
-        }
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                if (getBehaviour().zeroAllocation() && size == 0) {
+                    warn("Implementation-defined allocation of size 0");
+                }
+                tracker.addMalloc(MallocInfo(ptr, size));
+            }, std::chrono::nanoseconds, trackingTime);
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
+        });
     }
     return ptr;
 }
@@ -186,43 +221,50 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
         crashForce("Destroying NULL zone");
     }
 
+    BENCH_ONLY(bool ignored = true;
+               std::chrono::nanoseconds trackingTimeOut;
+               std::chrono::nanoseconds lockingTimeOut;)
     if (!LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-            zone->introspect->enumerator(mach_task_self_,
-                                         &tracker,
-                                         MALLOC_PTR_IN_USE_RANGE_TYPE,
-                                         reinterpret_cast<vm_address_t>(zone),
-                                         nullptr, [](task_t, auto context, unsigned, auto array, unsigned count) {
-                auto& tracker = *reinterpret_cast<trackers::ATracker*>(context);
-                for (unsigned i = 0; i < count; ++i) {
-                    tracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
-                }
-            });
-            tracker.ignoreMalloc = false;
-        }
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                zone->introspect->enumerator(mach_task_self_,
+                                             &tracker,
+                                             MALLOC_PTR_IN_USE_RANGE_TYPE,
+                                             reinterpret_cast<vm_address_t>(zone),
+                                             nullptr, [](auto, auto context, auto, auto array, auto count) {
+                    auto& tracker = *reinterpret_cast<trackers::ATracker*>(context);
+                    for (unsigned i = 0; i < count; ++i) {
+                        tracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
+                    }
+                });
+            }, std::chrono::nanoseconds, trackingTime);
+            BENCH_ONLY({
+                ignored = false;
+                trackingTimeOut = trackingTime;
+                lockingTimeOut = lockingTime;
+            })
+        });
     }
-
-    ::malloc_destroy_zone(zone);
+    BENCH(::malloc_destroy_zone(zone);, std::chrono::nanoseconds, sysTime);
+    BENCH_ONLY(if (!ignored) {
+        getTracker().withIgnoration(true, [&] {
+            ADD_TIME(sysTime, lockingTimeOut, trackingTimeOut, timing::AllocType::free);
+        });
+    })
 }
 
 auto malloc_zone_batch_malloc(malloc_zone_t* zone, std::size_t size, void** results, unsigned num_requested) -> unsigned {
     if (zone == nullptr) {
         crashForce("Batch allocating with NULL zone");
     }
-    auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested);
+    BENCH(auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested);, std::chrono::nanoseconds, sysTime);
     if (!LSan::finished && batched > 0) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-            for (std::size_t i = 0; i < batched; ++i) {
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH(for (std::size_t i = 0; i < batched; ++i) {
                 tracker.addMalloc(MallocInfo(results[i], size));
-            }
-            tracker.ignoreMalloc = false;
-        }
+            }, std::chrono::nanoseconds, trackingTime);
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
+        });
     }
     return batched;
 }
@@ -231,25 +273,36 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, unsigned nu
     if (zone == nullptr) {
         crashForce("Batch free with NULL zone");
     }
+    BENCH_ONLY(bool ignored = true;
+               std::chrono::nanoseconds trackingTimeOut;
+               std::chrono::nanoseconds lockingTimeOut;)
     if (!LSan::finished && num > 0) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-            for (unsigned i = 0; i < num; ++i) {
-                if (to_be_freed[i] == nullptr && getBehaviour().freeNull()) {
-                    warn("Free of NULL");
-                } else if (to_be_freed[i] != nullptr) {
-                    const auto& it = tracker.removeMalloc(to_be_freed[i]);
-                    if (getBehaviour().invalidFree() && !it.first) {
-                        crashOrWarn(createInvalidFreeMessage(to_be_freed[i], static_cast<bool>(it.second)), it.second);
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                for (unsigned i = 0; i < num; ++i) {
+                    if (to_be_freed[i] == nullptr && getBehaviour().freeNull()) {
+                        warn("Free of NULL");
+                    } else if (to_be_freed[i] != nullptr) {
+                        const auto& it = tracker.removeMalloc(to_be_freed[i]);
+                        if (getBehaviour().invalidFree() && !it.first) {
+                            crashOrWarn(createInvalidFreeMessage(to_be_freed[i], bool(it.second)), it.second);
+                        }
                     }
                 }
-            }
-            tracker.ignoreMalloc = false;
-        }
+            }, std::chrono::nanoseconds, trackingTime);
+            BENCH_ONLY({
+                ignored = false;
+                trackingTimeOut = trackingTime;
+                lockingTimeOut = lockingTime;
+            })
+        });
     }
-    ::malloc_zone_batch_free(zone, to_be_freed, num);
+    BENCH(::malloc_zone_batch_free(zone, to_be_freed, num);, std::chrono::nanoseconds, sysTime);
+    BENCH_ONLY(if (!ignored) {
+        getTracker().withIgnoration(true, [&] {
+            ADD_TIME(sysTime, lockingTimeOut, trackingTimeOut, timing::AllocType::free);
+        });
+    })
 }
 
 void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
@@ -257,23 +310,34 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
         crashForce("Called with NULL as zone");
     }
 
+    BENCH_ONLY(bool ignored = true;
+               std::chrono::nanoseconds trackingTimeOut;
+               std::chrono::nanoseconds lockingTimeOut;)
     if (!LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-            if (ptr == nullptr && getBehaviour().freeNull()) {
-                warn("Free of NULL");
-            } else if (ptr != nullptr) {
-                const auto& it = tracker.removeMalloc(ptr);
-                if (getBehaviour().invalidFree() && !it.first) {
-                    crashOrWarn(createInvalidFreeMessage(ptr, static_cast<bool>(it.second)), it.second);
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                if (ptr == nullptr && getBehaviour().freeNull()) {
+                    warn("Free of NULL");
+                } else if (ptr != nullptr) {
+                    const auto& it = tracker.removeMalloc(ptr);
+                    if (getBehaviour().invalidFree() && !it.first) {
+                        crashOrWarn(createInvalidFreeMessage(ptr, bool(it.second)), it.second);
+                    }
                 }
-            }
-            tracker.ignoreMalloc = false;
-        }
+            }, std::chrono::nanoseconds, trackingTime);
+            BENCH_ONLY({
+                ignored = false;
+                trackingTimeOut = trackingTime;
+                lockingTimeOut = lockingTime;
+            })
+        });
     }
-    ::malloc_zone_free(zone, ptr);
+    BENCH(::malloc_zone_free(zone, ptr);, std::chrono::nanoseconds, sysTime);
+    BENCH_ONLY(if (!ignored) {
+        getTracker().withIgnoration(true, [&] {
+            ADD_TIME(sysTime, lockingTimeOut, trackingTimeOut, timing::AllocType::free);
+        });
+    })
 }
 
 auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, std::size_t size) -> void* {
@@ -316,26 +380,15 @@ auto __lsan_malloc(std::size_t size) -> void* {
     BENCH(auto ptr = real::malloc(size);, std::chrono::nanoseconds, systemTime);
 
     if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
-        BENCH(const std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
-
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
                 if (getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, size));
             }, std::chrono::nanoseconds, trackingTime);
-
-            BENCH_ONLY({
-                timing::addTotalTime(systemTime + lockingTime + trackingTime, timing::AllocType::malloc);
-                timing::addTrackingTime(trackingTime, timing::AllocType::malloc);
-                timing::addSystemTime(systemTime, timing::AllocType::malloc);
-                timing::addLockingTime(lockingTime, timing::AllocType::malloc);
-            })
-            tracker.ignoreMalloc = false;
-        }
+            ADD_TIME(systemTime, lockingTime, trackingTime, timing::AllocType::malloc);
+        });
     }
     return ptr;
 }
@@ -344,66 +397,49 @@ auto __lsan_calloc(std::size_t objectSize, std::size_t count) -> void* {
     BENCH(auto ptr = real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
 
     if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
-        BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
-
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
                 if (getBehaviour().zeroAllocation() && objectSize * count == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, objectSize * count));
             }, std::chrono::nanoseconds, trackingTime);
-
-            BENCH_ONLY({
-                timing::addTotalTime(sysTime + lockingTime + trackingTime, timing::AllocType::calloc);
-                timing::addTrackingTime(trackingTime, timing::AllocType::calloc);
-                timing::addSystemTime(sysTime, timing::AllocType::calloc);
-                timing::addLockingTime(lockingTime, timing::AllocType::calloc);
-            })
-            tracker.ignoreMalloc = false;
-        }
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::calloc);
+        });
     }
     return ptr;
 }
 
 auto __lsan_valloc(std::size_t size) -> void* {
-    auto ptr = real::valloc(size);
+    BENCH(auto ptr = real::valloc(size);, std::chrono::nanoseconds, sysTime);
 
     if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-
-            if (getBehaviour().zeroAllocation() && size == 0) {
-                warn("Implementation-defined allocation of size 0");
-            }
-            tracker.addMalloc(MallocInfo(ptr, size));
-            tracker.ignoreMalloc = false;
-        }
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                if (getBehaviour().zeroAllocation() && size == 0) {
+                    warn("Implementation-defined allocation of size 0");
+                }
+                tracker.addMalloc(MallocInfo(ptr, size));
+            }, std::chrono::nanoseconds, trackingTime);
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
+        });
     }
     return ptr;
 }
 
 auto __lsan_aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
-    auto ptr = real::aligned_alloc(alignment, size);
+    BENCH(auto ptr = real::aligned_alloc(alignment, size);, std::chrono::nanoseconds, sysTime);
 
     if (ptr != nullptr && !LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-
-            if (getBehaviour().zeroAllocation() && size == 0) {
-                warn("Implementation-defined allocation of size 0");
-            }
-            tracker.addMalloc(MallocInfo(ptr, size));
-            tracker.ignoreMalloc = false;
-        }
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                if (getBehaviour().zeroAllocation() && size == 0) {
+                    warn("Implementation-defined allocation of size 0");
+                }
+                tracker.addMalloc(MallocInfo(ptr, size));
+            }, std::chrono::nanoseconds, trackingTime);
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
+        });
     }
     return ptr;
 }
@@ -450,12 +486,10 @@ void __lsan_free(void* pointer) {
         return;
     }
 
-    auto& tracker = getTracker();
-    BENCH(const std::lock_guard lock { tracker.mutex };, std::chrono::nanoseconds, lockingTime);
-    BENCH_ONLY(std::chrono::nanoseconds trackingTime;)
-    auto ignored = tracker.ignoreMalloc;
-    if (!ignored) {
-        tracker.ignoreMalloc = true;
+    BENCH_ONLY(bool ignored = true;
+               std::chrono::nanoseconds lockingTimeOut;
+               std::chrono::nanoseconds trackingTime;)
+    ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
         BENCH({
             if (pointer == nullptr && getBehaviour().freeNull()) {
                 warn("Free of NULL");
@@ -466,18 +500,18 @@ void __lsan_free(void* pointer) {
                 }
             }
         }, std::chrono::nanoseconds, trackingTimeLocal);
-        BENCH_ONLY(trackingTime = trackingTimeLocal;)
-    }
-    BENCH(real::free(pointer);, std::chrono::nanoseconds, systemTime);
+        BENCH_ONLY({
+            trackingTime = trackingTimeLocal;
+            ignored = false;
+            lockingTimeOut = lockingTime;
+        })
+    });
+    BENCH(real::free(pointer);, std::chrono::nanoseconds, sysTime);
     BENCH_ONLY(if (!ignored) {
-        timing::addTotalTime(systemTime + lockingTime + trackingTime, timing::AllocType::free);
-        timing::addTrackingTime(trackingTime, timing::AllocType::free);
-        timing::addSystemTime(systemTime, timing::AllocType::free);
-        timing::addLockingTime(lockingTime, timing::AllocType::free);
+        getTracker().withIgnoration(true, [&] {
+            ADD_TIME(sysTime, lockingTimeOut, trackingTime, timing::AllocType::free);
+        });
     })
-    if (!ignored) {
-        tracker.ignoreMalloc = false;
-    }
 }
 
 #ifdef __linux__
@@ -491,25 +525,22 @@ REPLACE(auto, posix_memalign)(void** memPtr, std::size_t alignment, std::size_t 
     }
 
     auto wasPtr = *memPtr;
-    auto toReturn = real::posix_memalign(memPtr, alignment, size);
+    BENCH(auto toReturn = real::posix_memalign(memPtr, alignment, size);, std::chrono::nanoseconds, sysTime);
     if (!LSan::finished) {
-        auto& tracker = getTracker();
-        const std::lock_guard lock { tracker.mutex };
-
-        if (!tracker.ignoreMalloc) {
-            tracker.ignoreMalloc = true;
-
-            if (alignment == 0 || alignment % 2 != 0 || alignment % sizeof(void*) != 0) {
-                warn("posix_memalign with invalid alignment of " + std::to_string(alignment));
-            }
-            if (getBehaviour().zeroAllocation() && size == 0) {
-                warn("Implementation-defined allocation of size 0");
-            }
-            if (*memPtr != wasPtr) {
-                tracker.addMalloc(MallocInfo(*memPtr, size));
-            }
-            tracker.ignoreMalloc = false;
-        }
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
+            BENCH({
+                if (alignment == 0 || alignment % 2 != 0 || alignment % sizeof(void*) != 0) {
+                    warn("posix_memalign with invalid alignment of " + std::to_string(alignment));
+                }
+                if (getBehaviour().zeroAllocation() && size == 0) {
+                    warn("Implementation-defined allocation of size 0");
+                }
+                if (*memPtr != wasPtr) {
+                    tracker.addMalloc(MallocInfo(*memPtr, size));
+                }
+            }, std::chrono::nanoseconds, trackingTime);
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
+        });
     }
     return toReturn;
 }
