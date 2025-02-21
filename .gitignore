@@ -74,5 +74,6 @@ xcuserdata/
 *~
 .*
 
+suppressions/linux/*.hpp
 suppressions/macos/*.hpp
 suppressions/*.hpp
