@@ -85,6 +85,11 @@ public:
 
     template<typename F, typename ...Args>
     inline auto withIgnorationResult(bool ignore, F&& func, Args&& ...args) -> typename std::invoke_result<F, Args...>::type {
+        static_assert(std::is_invocable_v<F, Args...>,
+                      "Given function must be callable with the given arguments");
+        static_assert(!std::is_same_v<std::remove_cv_t<std::invoke_result_t<F, Args...>>, void>,
+                      "Given function must not return void");
+
         std::lock_guard lock { mutex };
         auto ignored = ignoreMalloc;
         ignoreMalloc = ignore;
@@ -95,6 +100,9 @@ public:
 
     template<typename F, typename ...Args>
     inline void withIgnoration(bool ignore, F&& func, Args&& ...args) {
+        static_assert(std::is_invocable_v<F, Args...>,
+                      "Given function must be callable with the given arguments");
+
         std::lock_guard lock { mutex };
         auto ignored = ignoreMalloc;
         ignoreMalloc = ignore;
