@@ -83,6 +83,25 @@ public:
         infos.insert_or_assign(info.pointer, std::move(info));
     }
 
+    template<typename F, typename ...Args>
+    inline auto withIgnorationResult(bool ignore, F&& func, Args&& ...args) -> typename std::invoke_result<F, Args...>::type {
+        std::lock_guard lock { mutex };
+        auto ignored = ignoreMalloc;
+        ignoreMalloc = ignore;
+        const auto& toReturn = std::invoke(std::move(func), std::move(args)...);
+        ignoreMalloc = ignored;
+        return toReturn;
+    }
+
+    template<typename F, typename ...Args>
+    inline void withIgnoration(bool ignore, F&& func, Args&& ...args) {
+        std::lock_guard lock { mutex };
+        auto ignored = ignoreMalloc;
+        ignoreMalloc = ignore;
+        std::invoke(std::move(func), std::move(args)...);
+        ignoreMalloc = ignored;
+    }
+
     /**
      * Attempts to remove the allocation record for the given pointer.
      *
