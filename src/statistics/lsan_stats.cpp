@@ -296,52 +296,46 @@ static inline void __lsan_printFragmentationByteBar(std::size_t width, std::ostr
 }
 
 void __lsan_printFragmentationStatsWithWidth(std::size_t width) {
-    using formatter::Style;
+    using namespace formatter;
 
-    auto& tracker = getTracker();
-    std::lock_guard lock { tracker.mutex };
-    bool ignore = tracker.ignoreMalloc;
-    tracker.ignoreMalloc = true;
-    auto & out = getOutputStream();
-    if (getBehaviour().statsActive()) {
-        __lsan_printStatsCore("memory fragmentation", width, out,
-                              __lsan_printFragmentationByteBar,
-                              __lsan_printFragmentationObjectBar);
-    } else {
-        out << formatter::get<Style::RED>
-            << formatter::format<Style::BOLD>("No memory fragmentation stats available at the moment!")
-            << std::endl
-            << formatter::format<Style::ITALIC>("Hint: Did you set ")
-            << formatter::clear<Style::RED>
-            << "LSAN_STATS_ACTIVE (" << formatter::format<Style::GREYED>("__lsan_statsActive") << ")"
-            << formatter::format<Style::ITALIC, Style::RED>(" to ")
-            << "true" << formatter::format<Style::RED, Style::ITALIC>("?")
-            << std::endl << std::endl;
-    }
-    tracker.ignoreMalloc = ignore;
+    getTracker().withIgnoration(true, [=] {
+        auto& out = getOutputStream();
+        if (getBehaviour().statsActive()) {
+            __lsan_printStatsCore("memory fragmentation", width, out,
+                                  __lsan_printFragmentationByteBar,
+                                  __lsan_printFragmentationObjectBar);
+        } else {
+            out << get<Style::RED>
+                << format<Style::BOLD>("No memory fragmentation stats available at the moment!")
+                << std::endl
+                << format<Style::ITALIC>("Hint: Did you set ")
+                << clear<Style::RED>
+                << "LSAN_STATS_ACTIVE (" << format<Style::GREYED>("__lsan_statsActive") << ")"
+                << format<Style::ITALIC, Style::RED>(" to ")
+                << "true" << format<Style::RED, Style::ITALIC>("?")
+                << std::endl << std::endl;
+        }
+    });
 }
 
 void __lsan_printStatsWithWidth(std::size_t width) {
-    using formatter::Style;
+    using namespace formatter;
 
-    auto& tracker = getTracker();
-    std::lock_guard lock { tracker.mutex };
-    bool ignore = tracker.ignoreMalloc;
-    tracker.ignoreMalloc = true;
-    auto & out = getOutputStream();
-    if (getBehaviour().statsActive()) {
-        __lsan_printStatsCore("memory usage", width, out,
-                              std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
-                              std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
-    } else {
-        out << formatter::get<Style::RED>
-            << formatter::format<Style::BOLD>("No memory statistics available at the moment!") << std::endl
-            << formatter::format<Style::ITALIC>("Hint: Did you set ")
-            << formatter::clear<Style::RED>
-            << "LSAN_STATS_ACTIVE (" << formatter::format<Style::GREYED>("__lsan_statsActive") << ")"
-            << formatter::format<Style::ITALIC, Style::RED>(" to ")
-            << "true" << formatter::format<Style::RED, Style::ITALIC>("?")
-            << std::endl << std::endl;
-    }
-    tracker.ignoreMalloc = ignore;
+    getTracker().withIgnoration(true, [=] {
+        auto& out = getOutputStream();
+        if (getBehaviour().statsActive()) {
+            __lsan_printStatsCore("memory usage", width, out,
+                                  std::bind(__lsan_printBar, __lsan_getCurrentByteCount(), __lsan_getBytePeek(), std::placeholders::_1, bytesToString(__lsan_getBytePeek()), std::placeholders::_2),
+                                  std::bind(__lsan_printBar, __lsan_getCurrentMallocCount(), __lsan_getMallocPeek(), std::placeholders::_1, std::to_string(__lsan_getMallocPeek()) + " objects", std::placeholders::_2));
+        } else {
+            out << get<Style::RED>
+                << format<Style::BOLD>("No memory statistics available at the moment!") << std::endl
+                << format<Style::ITALIC>("Hint: Did you set ")
+                << clear<Style::RED>
+                << "LSAN_STATS_ACTIVE (" << format<Style::GREYED>("__lsan_statsActive") << ")"
+                << format<Style::ITALIC, Style::RED>(" to ")
+                << "true" << format<Style::RED, Style::ITALIC>("?")
+                << std::endl << std::endl;
+        }
+    });
 }
