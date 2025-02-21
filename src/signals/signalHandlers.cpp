@@ -25,9 +25,9 @@
 #include <string>
 
 #ifdef __APPLE__
- #define _XOPEN_SOURCE
- #include <ucontext.h>
- #undef _XOPEN_SOURCE
+# define _XOPEN_SOURCE
+# include <ucontext.h>
+# undef _XOPEN_SOURCE
 #endif /* __APPLE__ */
 
 #include <lsan_internals.h>
@@ -357,16 +357,12 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 void callstack(int, siginfo_t*, void* context) {
     using namespace formatter;
 
-    auto& tracker = getTracker();
-    bool ignore = tracker.ignoreMalloc;
-    tracker.ignoreMalloc = true;
-
-    auto& out = getOutputStream();
-    out << format<Style::ITALIC>("The current callstack:") << std::endl;
-    callstackHelper::format(createCallstackFor(context), out);
-    out << std::endl;
-    
-    tracker.ignoreMalloc = ignore;
+    getTracker().withIgnoration(true, [&context] {
+        auto& out = getOutputStream();
+        out << format<Style::ITALIC>("The current callstack:") << std::endl;
+        callstackHelper::format(createCallstackFor(context), out);
+        out << std::endl;
+    });
 }
 
 void stats(int) {
