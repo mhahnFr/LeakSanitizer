@@ -169,14 +169,10 @@ auto getTracker() -> trackers::ATracker& {
     if (tlv == nullptr) {
         pthread_setspecific(key, std::addressof(globalInstance));
         trackers::ATracker* tlsTracker;
-        {
-            std::lock_guard lock(globalInstance.mutex);
-            auto ignore = globalInstance.ignoreMalloc;
-            globalInstance.ignoreMalloc = true;
+        globalInstance.withIgnoration(true, [&] {
             tlsTracker = newLocalTracker(getBehaviour().statsActive());
             pthread_setspecific(key, tlsTracker);
-            globalInstance.ignoreMalloc = ignore;
-        }
+        });
         return *tlsTracker;
     }
     return *static_cast<trackers::ATracker*>(tlv);
