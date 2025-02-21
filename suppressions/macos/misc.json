@@ -7,5 +7,11 @@
   },
   {
     "imageName": "/usr/lib/libxml2.2.dylib"
+  },
+  {
+    "imageName": "/usr/lib/libenergytrace.dylib"
+  },
+  {
+    "imageName": "/usr/lib/libapp_launch_measurement.dylib"
   }
 ]
