@@ -50,7 +50,7 @@ auto getDefaultSuppression() -> std::vector<std::string> {
     // TODO: Swift, AppKit, ...
 
 #elif defined(LSAN_LINUX)
-    toReturn.insert(toReturn.cBegin(), {
+    toReturn.insert(toReturn.cbegin(), {
         std::string(suppressions_linux_core),
     });
 
