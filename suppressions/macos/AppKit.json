@@ -1,0 +1,12 @@
+[
+  {
+    "functions": [ "+[NSApplication initialize]" ]
+  },
+  {
+    "functions": [ "-[NSApplication init]" ]
+  },
+  {
+    "FIXME": "Belongs to Foundation",
+    "functions": [ "-[NSProcessInfo arguments]" ]
+  }
+]

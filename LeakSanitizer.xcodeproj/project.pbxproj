@@ -66,6 +66,7 @@
 		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
 		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
+		F1E0904D2D68DEC800F79FA2 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1E0904C2D68DEC800F79FA2 /* CoreFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -153,6 +154,8 @@
 		F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ObjectPool.hpp; sourceTree = "<group>"; };
 		F1ACE4162D148B0F00E779A7 /* core.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = core.json; sourceTree = "<group>"; };
 		F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealAllocator.hpp; sourceTree = "<group>"; };
+		F1E0904B2D68DE9500F79FA2 /* AppKit.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AppKit.json; sourceTree = "<group>"; };
+		F1E0904C2D68DEC800F79FA2 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,6 +165,7 @@
 			files = (
 				F12CA5DD2CB40E6A00C93A2C /* libobjc.A.tbd in Frameworks */,
 				BF378FB52919496000A4DAA9 /* libcallstack.a in Frameworks */,
+				F1E0904D2D68DEC800F79FA2 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,6 +184,7 @@
 		BF378FB32919496000A4DAA9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F1E0904C2D68DEC800F79FA2 /* CoreFoundation.framework */,
 				F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */,
 				BF378FB42919496000A4DAA9 /* libcallstack.a */,
 			);
@@ -367,6 +372,7 @@
 		F13529BA2D109417002534D0 /* macos */ = {
 			isa = PBXGroup;
 			children = (
+				F1E0904B2D68DE9500F79FA2 /* AppKit.json */,
 				F1ACE4162D148B0F00E779A7 /* core.json */,
 				BFA95FAF2D43EE4E0043C836 /* misc.json */,
 			);
