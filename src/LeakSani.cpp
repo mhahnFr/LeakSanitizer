@@ -276,11 +276,9 @@ static inline void destroySaniKey(void* value) {
         pthread_setspecific(globalInstance.saniKey, std::addressof(globalInstance));
         auto tracker = static_cast<trackers::ATracker*>(value);
         if (!globalInstance.preventDealloc) {
-            std::lock_guard lock(globalInstance.mutex);
-            auto ignore = globalInstance.ignoreMalloc;
-            globalInstance.ignoreMalloc = true;
-            delete tracker;
-            globalInstance.ignoreMalloc = ignore;
+            globalInstance.withIgnoration(true, [&tracker] {
+                delete tracker;
+            });
         } else {
             tracker->needsDealloc = true;
         }
@@ -529,31 +527,33 @@ static inline auto createSaniKey() -> pthread_key_t {
 }
 
 LSan::LSan(): saniKey(createSaniKey()) {
+    using namespace signals;
+
     atexit(exitHook);
 
-    signals::registerFunction(signals::handlers::stats, SIGUSR1);
+    registerFunction(handlers::stats, SIGUSR1);
     
-    signals::registerFunction(signals::asHandler(signals::handlers::callstack), SIGUSR2, false);
+    registerFunction(asHandler(handlers::callstack), SIGUSR2, false);
     
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSEGV);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGABRT);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTERM);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGALRM);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGPIPE);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGFPE);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGILL);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGQUIT);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGHUP);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGBUS);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGXFSZ);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGXCPU);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSYS);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGVTALRM);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGPROF);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTRAP);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGSEGV);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGABRT);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGTERM);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGALRM);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGPIPE);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGFPE);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGILL);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGQUIT);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGHUP);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGBUS);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGXFSZ);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGXCPU);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGSYS);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGVTALRM);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGPROF);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGTRAP);
 
 #if defined(__APPLE__) || defined(SIGEMT)
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGEMT);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGEMT);
 #endif
 
     std::set_terminate(exceptionHandler);
@@ -603,22 +603,20 @@ void LSan::registerTracker(ATracker* tracker) {
     std::lock_guard lock1 { mutex };
     std::lock_guard lock { tlsTrackerMutex };
 
-    auto ignore = ignoreMalloc;
-    ignoreMalloc = true;
-    tlsTrackers.insert(tracker);
-    addThread();
-    ignoreMalloc = ignore;
+    withIgnoration(true, [&] {
+        tlsTrackers.insert(tracker);
+        addThread();
+    });
 }
 
 void LSan::deregisterTracker(ATracker* tracker) {
     std::lock_guard lock1 { mutex };
     std::lock_guard lock { tlsTrackerMutex };
 
-    auto ignore = ignoreMalloc;
-    ignoreMalloc = true;
-    tlsTrackers.erase(tracker);
-    removeThread();
-    ignoreMalloc = ignore;
+    withIgnoration(true, [&] {
+        tlsTrackers.erase(tracker);
+        removeThread();
+    });
 }
 
 auto LSan::getThreadId(const std::thread::id& id) -> unsigned long {
@@ -635,11 +633,10 @@ void LSan::absorbLeaks(PoolMap<const void *const, MallocInfo>&& leaks) {
     std::lock_guard lock { mutex };
     std::lock_guard lock1 { infoMutex };
 
-    auto ignore = ignoreMalloc;
-    ignoreMalloc = true;
-    infos.get_allocator().merge(leaks.get_allocator());
-    infos.merge(std::move(leaks));
-    ignoreMalloc = ignore;
+    withIgnoration(true, [&] {
+        infos.get_allocator().merge(leaks.get_allocator());
+        infos.merge(std::move(leaks));
+    });
 }
 
 // FIXME: Though unlikely, the invalidly freed record ref can become invalid throughout this process
