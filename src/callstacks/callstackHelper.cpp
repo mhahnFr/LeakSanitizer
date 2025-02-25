@@ -266,13 +266,17 @@ auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& c
     for (std::size_t i = 0; i + suppression.topCallstack.size() <= callstack->backtraceSize; ++i) {
         auto matched { false };
         for (std::size_t j = 0; j < suppression.topCallstack.size(); ++j) {
-            const auto& frameAddress = uintptr_t(callstack->backtrace[i + j]);
-            const auto& range = suppression.topCallstack[j];
-            if (frameAddress >= range.first && frameAddress <= range.first + range.second) {
-                matched = true;
+            if (suppression.topCallstack[j].first == suppression::Suppression::Type::range) {
+                const auto& frameAddress = uintptr_t(callstack->backtrace[i + j]);
+                const auto& range = suppression.getTopCallstack<suppression::Suppression::Type::range>(j);
+                if (frameAddress >= range.first && frameAddress <= range.first + range.second) {
+                    matched = true;
+                } else {
+                    matched = false;
+                    break;
+                }
             } else {
-                matched = false;
-                break;
+                throw std::runtime_error("Unhandled suppression function matching type");
             }
         }
         if (matched) {
