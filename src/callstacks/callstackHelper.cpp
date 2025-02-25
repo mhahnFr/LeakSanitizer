@@ -262,21 +262,55 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
     }
 }
 
+static inline auto match(const suppression::Suppression::RangeOrRegexType& supp, const callstack_frame* frame, uintptr_t address) -> bool {
+    if (supp.first == suppression::Suppression::Type::range) {
+        const auto& range = std::get<suppression::Suppression::RangeType>(supp.second);
+        return address >= range.first && address <= range.first + range.second;
+    }
+    for (const auto& regex : std::get<suppression::Suppression::RegexType>(supp.second)) {
+        if (frame->binaryFileIsSelf || std::regex_match(frame->binaryFile, regex)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& callstack) -> bool {
+    callstack_frame* binaries = nullptr;
+    if (suppression.hasRegexes) {
+        binaries = callstack_autoClearCaches ? callstack_getBinaries(callstack) : callstack_getBinariesCached(callstack);
+    }
     for (std::size_t i = 0; i + suppression.topCallstack.size() <= callstack->backtraceSize; ++i) {
         auto matched { false };
-        for (std::size_t j = 0; j < suppression.topCallstack.size(); ++j) {
-            if (suppression.topCallstack[j].first == suppression::Suppression::Type::range) {
-                const auto& frameAddress = uintptr_t(callstack->backtrace[i + j]);
-                const auto& range = suppression.getTopCallstack<suppression::Suppression::Type::range>(j);
-                if (frameAddress >= range.first && frameAddress <= range.first + range.second) {
+
+        for (std::size_t j = 0, k = i; j < suppression.topCallstack.size() && k < callstack->backtraceSize; /*++k*/) {
+            const auto& address = uintptr_t(callstack->backtrace[k]);
+            const auto& hereMatch = match(suppression.topCallstack[j], binaries + k, address);
+            if (suppression.topCallstack[j].first == suppression::Suppression::Type::regex) {
+                auto nextMatch = false;
+                if (j + 1 < suppression.topCallstack.size()) {
+                    nextMatch = match(suppression.topCallstack[j + 1], binaries + k, address);
+                }
+
+                matched = hereMatch;
+                if (nextMatch) {
+                    ++j;
+                    continue;
+                }
+                ++k;
+                if (hereMatch) {
+                    continue;
+                }
+                return false;
+            } else {
+                if (hereMatch) {
                     matched = true;
                 } else {
                     matched = false;
                     break;
                 }
-            } else {
-                throw std::runtime_error("Unhandled suppression function matching type");
+                ++j;
+                ++k;
             }
         }
         if (matched) {
