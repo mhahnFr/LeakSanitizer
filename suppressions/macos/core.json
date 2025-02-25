@@ -22,5 +22,19 @@
   {
     "name": "Everything created by the CoreFoundation - TODO: Make this unnecessary",
     "functions": [ "___CFInitialize" ]
+  },
+  {
+    "name": "Everything entirely created by the system",
+    "functions": [
+      {
+        "libraryRegex": [
+          "^/System/Library/.*$",
+          "^/usr/lib/system/.*$",
+          "/usr/lib/libobjc.A.dylib",
+          "/usr/lib/dyld",
+          "^/usr/lib/swift/.*$"
+        ]
+      }
+    ]
   }
 ]
