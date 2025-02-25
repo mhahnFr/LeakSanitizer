@@ -29,12 +29,13 @@
 namespace lsan::suppression {
 using namespace json;
 
-auto Suppression::getFunctionPair(const std::string& name,
-                                  const std::optional<long>& offset,
-                                  const std::optional<std::string>& library) -> std::pair<uintptr_t, std::size_t> {
+static inline auto getFunctionPair(const std::string& name,
+                                   const std::optional<long>& offset,
+                                   const std::optional<std::string>& library,
+                                   const std::string& suppName) -> std::pair<uintptr_t, std::size_t> {
     const auto& result = functionInfo_loadHint(name.c_str(), library ? library->c_str() : nullptr);
     if (!result.found) {
-        throw FunctionNotFoundException(name, Suppression::name);
+        throw FunctionNotFoundException(name, suppName);
     }
     if (offset) {
         return std::make_pair(result.begin + *offset, 0);
@@ -47,6 +48,43 @@ static inline constexpr auto asLeakType(const std::optional<unsigned long>& numb
         throw std::runtime_error("Not a leak type: " + std::to_string(*number));
     }
     return number ? std::optional(LeakType(*number)) : std::nullopt;
+}
+
+static inline auto getCallstackObject(const Value& object, const std::string& suppName) -> decltype(Suppression::topCallstack)::value_type {
+    if (object.type == ValueType::String) {
+        return {
+            Suppression::Type::range,
+            getFunctionPair(object.as<ValueType::String>(),
+                            std::nullopt, std::nullopt, suppName)
+        };
+    } else if (object.type == ValueType::Object) {
+        const auto& theObject = Object(object);
+        if (const auto& name = theObject.get<ValueType::String>("name")) {
+            return {
+                Suppression::Type::range,
+                getFunctionPair(*name,
+                                theObject.get<ValueType::Int>("offset"),
+                                theObject.get<ValueType::String>("library"),
+                                suppName)
+            };
+        } else {
+            const auto& libraryRegex = theObject.content.at("libraryRegex");
+            auto regexes = std::vector<std::regex>();
+            if (libraryRegex.type == ValueType::String) {
+                regexes.push_back(std::regex(libraryRegex.as<ValueType::String>()));
+            } else if (libraryRegex.type == ValueType::Array) {
+                const auto& array = libraryRegex.as<ValueType::Array>();
+                regexes.reserve(array.size());
+                for (const auto& regex : array) {
+                    regexes.push_back(std::regex(regex.as<ValueType::String>()));
+                }
+            } else {
+                throw std::runtime_error("Library regex value is neither an array nor a (regex) string");
+            }
+            return { Suppression::Type::regex, regexes };
+        }
+    }
+    throw std::runtime_error("Unsupported value in function array");
 }
 
 Suppression::Suppression(const Object& object):
@@ -65,19 +103,9 @@ Suppression::Suppression(const Object& object):
         }
         topCallstack.reserve(functionArray->size());
         for (const auto& functionObject : *functionArray) {
-            std::string         name;
-            std::optional<long> offset;
-            std::optional<std::string> libraryName;
-
-            if (functionObject.type == ValueType::Object) {
-                const auto& theObject = Object(functionObject);
-                name = theObject.get<ValueType::String>("name").value();
-                offset = theObject.get<ValueType::Int>("offset");
-                libraryName = theObject.get<ValueType::String>("library");
-            } else {
-                name = functionObject.as<ValueType::String>();
-            }
-            topCallstack.push_back(getFunctionPair(name, offset, libraryName));
+            auto&& frame = getCallstackObject(functionObject, name);
+            hasRegexes = hasRegexes || frame.first == Type::regex;
+            topCallstack.push_back(std::move(frame));
         }
     }
 }

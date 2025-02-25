@@ -68,11 +68,6 @@ struct Suppression {
     Suppression(const json::Object& object);
 
     auto match(const MallocInfo& info) const -> bool;
-
-private:
-    auto getFunctionPair(const std::string& name,
-                         const std::optional<long>& offset,
-                         const std::optional<std::string>& library) -> std::pair<uintptr_t, std::size_t>;
 };
 }
 
