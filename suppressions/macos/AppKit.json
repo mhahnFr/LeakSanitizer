@@ -8,5 +8,19 @@
   {
     "FIXME": "Belongs to Foundation",
     "functions": [ "-[NSProcessInfo arguments]" ]
+  },
+  {
+    "name": "Allocations by [NSApp run]",
+    "functions": [
+      {
+        "libraryRegex": [
+          "^/System/Library/.*$",
+          "^/usr/lib/system/.*$",
+          "/usr/lib/libobjc.A.dylib",
+          "/usr/lib/dyld"
+        ]
+      },
+      "-[NSApplication run]"
+    ]
   }
 ]
