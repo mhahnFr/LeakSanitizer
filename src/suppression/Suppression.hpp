@@ -44,6 +44,10 @@ struct Suppression {
         regex, range
     };
 
+    using RangeType = std::pair<uintptr_t, std::size_t>;
+    using RegexType = std::vector<std::regex>;
+    using RangeOrRegexType = std::pair<Type, std::variant<RegexType, RangeType>>;
+
     std::string name;
     std::optional<std::size_t> size;
     std::optional<LeakType> leakType;
@@ -55,15 +59,15 @@ struct Suppression {
 
     template<>
     inline constexpr auto getTopCallstack<Type::regex>(unsigned long i) const -> const auto& {
-        return std::get<std::vector<std::regex>>(topCallstack[i].second);
+        return std::get<RegexType>(topCallstack[i].second);
     }
 
     template<>
     inline constexpr auto getTopCallstack<Type::range>(unsigned long i) const -> const auto& {
-        return std::get<std::pair<uintptr_t, std::size_t>>(topCallstack[i].second);
+        return std::get<RangeType>(topCallstack[i].second);
     }
 
-    std::vector<std::pair<Type, std::variant<std::vector<std::regex>, std::pair<uintptr_t, std::size_t>>>> topCallstack;
+    std::vector<RangeOrRegexType> topCallstack;
 
     Suppression(const json::Object& object);
 
