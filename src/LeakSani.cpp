@@ -757,6 +757,13 @@ auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
     return *suppressions;
 }
 
+auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
+    if (!systemLibraries) {
+        systemLibraries = loadSystemLibraries();
+    }
+    return *systemLibraries;
+}
+
 /**
  * Prints a deprecation notice using the given information.
  *

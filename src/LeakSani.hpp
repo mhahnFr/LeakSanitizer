@@ -27,6 +27,7 @@
 #include <mutex>
 #include <optional>
 #include <ostream>
+#include <regex>
 #include <set>
 #include <tuple>
 #include <unordered_map>
@@ -65,6 +66,7 @@ class LSan final: public trackers::ATracker {
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
     std::optional<std::vector<suppression::Suppression>> suppressions;
+    std::optional<std::vector<std::regex>> systemLibraries;
     std::vector<std::pair<char*, char*>> binaryFilenames;
     std::unordered_map<unsigned long, std::string> threadDescriptions;
     /** The registered thread-local allocation trackers.                                */
@@ -216,6 +218,7 @@ public:
 #endif
 
     auto getSuppressions() -> const std::vector<suppression::Suppression>&;
+    auto getSystemLibraries() -> const std::vector<std::regex>&;
 
     /**
      * Returns the mutex for the allocations and tracking.
