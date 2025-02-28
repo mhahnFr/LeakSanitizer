@@ -178,9 +178,8 @@ auto getTracker() -> trackers::ATracker& {
     return *static_cast<trackers::ATracker*>(tlv);
 }
 
-static inline auto getSuppressionFiles() -> std::vector<std::filesystem::path> {
+static inline auto getFiles(const char* files) -> std::vector<std::filesystem::path> {
     auto toReturn = std::vector<std::filesystem::path>();
-    const auto& files = getBehaviour().suppressionFiles();
     if (files != nullptr) {
         auto stream = std::istringstream(files);
         std::string s;
@@ -224,7 +223,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
         }
     }
 
-    for (const auto& file : getSuppressionFiles()) {
+    for (const auto& file : getFiles(getBehaviour().suppressionFiles())) {
         auto stream = std::ifstream();
         stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
 
