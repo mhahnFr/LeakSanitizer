@@ -274,7 +274,9 @@ static inline auto match(const suppression::Suppression::RangeOrRegexType& supp,
         return address >= range.first && address <= range.first + range.second;
     }
     for (const auto& regex : std::get<suppression::Suppression::RegexType>(supp.second)) {
-        if (frame->binaryFileIsSelf || std::regex_match(frame->binaryFile, regex)) {
+        if (frame->binaryFileIsSelf
+            || (std::regex_match("LSAN_SYSTEM_LIBRARIES", regex) && isFirstParty(frame->binaryFile))
+            || std::regex_match(frame->binaryFile, regex)) {
             return true;
         }
     }

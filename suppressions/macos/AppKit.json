@@ -12,14 +12,7 @@
   {
     "name": "Allocations by [NSApp run]",
     "functions": [
-      {
-        "libraryRegex": [
-          "^/System/Library/.*$",
-          "^/usr/lib/system/.*$",
-          "/usr/lib/libobjc.A.dylib",
-          "/usr/lib/dyld"
-        ]
-      },
+      { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
       "-[NSApplication run]"
     ]
   }
