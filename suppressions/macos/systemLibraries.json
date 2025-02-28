@@ -1,0 +1,14 @@
+[
+  "^/System/Library/.*$",
+  "^/usr/lib/system/.*$",
+  "^/usr/lib/swift/.*$",
+  "/usr/lib/libobjc.A.dylib",
+  "/usr/lib/libc\\+\\+abi.dylib",
+  "/usr/lib/dyld",
+
+  "/usr/lib/libMobileGestalt.dylib",
+  "/usr/lib/libicucore.A.dylib",
+  "/usr/lib/libxml2.2.dylib",
+  "/usr/lib/libenergytrace.dylib",
+  "/usr/lib/libapp_launch_measurement.dylib"
+]
