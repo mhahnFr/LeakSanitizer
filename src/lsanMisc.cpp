@@ -231,11 +231,58 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
             stream.open(file);
             loadSuppressions(toReturn, json::parse(stream));
         } catch (const std::exception& e) {
-            using namespace std::string_literals;
             using namespace formatter;
 
-            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load suppression file \""s
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load suppression file \""
                                                                  + file.string() + "\": " + e.what()) << std::endl << std::endl;
+        }
+        if (stream.is_open()) {
+            stream.close();
+        }
+    }
+
+    return toReturn;
+}
+
+static inline void loadSystemLibraryFile(std::vector<std::regex>& content, const json::Value& object) {
+    using namespace json;
+    if (!object.is(ValueType::Array)) {
+        throw std::runtime_error("System libraries should be defined as a top level string array");
+    }
+    for (const auto& value : object.as<ValueType::Array>()) {
+        if (!value.is(ValueType::String)) {
+            throw std::runtime_error("System library regex was not a string");
+        }
+
+        content.push_back(std::regex(value.as<ValueType::String>()));
+    }
+}
+
+auto loadSystemLibraries() -> std::vector<std::regex> {
+    auto toReturn = std::vector<std::regex>();
+
+    for (const auto& file : suppression::getSystemLibraryFiles()) {
+        try {
+            loadSystemLibraryFile(toReturn, json::parse(std::istringstream(file)));
+        } catch (const std::exception& e) {
+            using namespace formatter;
+            using namespace std::string_literals;
+
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default system library file: "s + e.what()) << std::endl << std::endl;
+        }
+    }
+
+    for (const auto& file : getFiles(getBehaviour().systemLibraryFiles())) {
+        auto stream = std::ifstream();
+        stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+
+        try {
+            stream.open(file);
+            loadSystemLibraryFile(toReturn, json::parse(stream));
+        } catch (const std::exception& e) {
+            using namespace formatter;
+
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load system library file \"" + file.string() + "\": " + e.what()) << std::endl << std::endl;
         }
         if (stream.is_open()) {
             stream.close();

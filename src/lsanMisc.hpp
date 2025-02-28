@@ -104,6 +104,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream&;
 auto getTracker() -> trackers::ATracker&;
 
 auto loadSuppressions() -> std::vector<suppression::Suppression>;
+auto loadSystemLibraries() -> std::vector<std::regex>;
 
 /**
  * Returns the current instance of the statistics object.
@@ -154,6 +155,10 @@ static inline auto getOutputStream() -> std::ostream & {
 
 static inline auto getSuppressions() -> const std::vector<suppression::Suppression>& {
     return getInstance().getSuppressions();
+}
+
+static inline auto getSystemLibraries() -> const std::vector<std::regex>& {
+    return getInstance().getSystemLibraries();
 }
 }
 
