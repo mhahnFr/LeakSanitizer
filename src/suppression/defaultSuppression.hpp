@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -27,6 +27,7 @@
 
 namespace lsan::suppression {
 auto getDefaultSuppression() -> std::vector<std::string>;
+auto getSystemLibraryFiles() -> std::vector<std::string>;
 }
 
 #endif /* defaultSuppression_hpp */
