@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -67,7 +67,7 @@ private:
     FROM_ENV_API(std::size_t, leakCount, LEAK_COUNT)
     FROM_ENV_API(std::size_t, callstackSize, CALLSTACK_SIZE)
 
-    /** The time interval between the automatical statistics printing.   */
+    /** The time interval between the automatically statistics printing.   */
     const std::optional<std::chrono::nanoseconds> _autoStats = get<std::chrono::nanoseconds>("LSAN_AUTO_STATS");
 
     /**
@@ -91,7 +91,7 @@ public:
     }
 
     /**
-     * Returns the optionally set time interval between automatical stats printing.
+     * Returns the optionally set time interval between automatically stats printing.
      *
      * @return the optional time interval
      */
