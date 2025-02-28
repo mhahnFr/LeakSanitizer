@@ -55,9 +55,15 @@ static std::map<const char*, Classification> cache;
  * @return whether the given binary file name is first party
  */
 static inline auto isFirstPartyCore(const std::string& file) -> bool {
-    return file.rfind("/usr/lib", 0) != std::string::npos
-        || file.rfind("/lib", 0)     != std::string::npos
-        || file.rfind("/System", 0)  != std::string::npos;
+    auto toReturn = false;
+
+    for (const auto& regex : getSystemLibraries()) {
+        if (std::regex_match(file, regex)) {
+            return true;
+        }
+    }
+
+    return toReturn;
 }
 
 /**
