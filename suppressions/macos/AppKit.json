@@ -6,14 +6,20 @@
     "functions": [ "-[NSApplication init]" ]
   },
   {
-    "FIXME": "Belongs to Foundation",
-    "functions": [ "-[NSProcessInfo arguments]" ]
-  },
-  {
     "name": "Allocations by [NSApp run]",
     "functions": [
       { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
       "-[NSApplication run]"
     ]
+  },
+  {
+    "functions": [
+      { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
+      "-[NSApplication setActivationPolicy:]"
+    ]
+  },
+  {
+    "FIXME": "Belongs to Foundation",
+    "functions": [ "-[NSProcessInfo arguments]" ]
   }
 ]
