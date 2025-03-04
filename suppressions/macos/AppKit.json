@@ -19,6 +19,18 @@
     ]
   },
   {
+    "functions": [
+      { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
+      "-[NSWindow initWithContentRect:styleMask:backing:defer:]"
+    ]
+  },
+  {
+    "functions": [
+      { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
+      "-[NSWindow makeKeyAndOrderFront:]"
+    ]
+  },
+  {
     "FIXME": "Belongs to Foundation",
     "functions": [ "-[NSProcessInfo arguments]" ]
   }
