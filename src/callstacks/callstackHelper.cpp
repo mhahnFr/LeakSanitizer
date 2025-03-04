@@ -54,7 +54,7 @@ static std::map<const char*, Classification> cache;
  * @param file the binary file name to be checked
  * @return whether the given binary file name is first party
  */
-static inline auto isFirstPartyCore(const std::string& file) -> bool {
+static inline auto isFirstPartyCore(const char* file) -> bool {
     auto toReturn = false;
 
     for (const auto& regex : getSystemLibraries()) {
@@ -72,7 +72,7 @@ static inline auto isFirstPartyCore(const std::string& file) -> bool {
  * @param file the binary file name to be checked
  * @return the classification of the file name
  */
-static inline auto classify(const std::string& file) -> Classification {
+static inline auto classify(const char* file) -> Classification {
     if (isFirstPartyCore(file)) {
         return Classification::firstParty;
     }
