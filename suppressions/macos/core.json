@@ -1,23 +1,7 @@
 [
   {
-    "name": "Everything in the Objective-C runtime",
-    "imageName": "/usr/lib/libobjc.A.dylib"
-  },
-  {
-    "name": "Everything in the Swift runtime",
-    "imageName": "^/usr/lib/swift/.*$"
-  },
-  {
     "name": "Everything created by the system library initialization",
     "functions": [ "_libSystem_initializer" ]
-  },
-  {
-    "name": "Everything in various system libraries, I",
-    "imageName": "^/usr/lib/system/.*$"
-  },
-  {
-    "name": "Everything in various system libraries, II",
-    "imageName": "^/System/Library/.*$"
   },
   {
     "name": "Everything created by the CoreFoundation - TODO: Make this unnecessary",
