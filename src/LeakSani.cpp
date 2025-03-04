@@ -38,17 +38,17 @@
 
 #ifdef __APPLE__
 extern "C" {
-#include <mach/thread_state.h>
+# include <mach/thread_state.h>
 }
 
-#include <mach-o/dyld.h>
-#include <mach-o/dyld_images.h>
+# include <mach-o/dyld.h>
+# include <mach-o/dyld_images.h>
 
-#include <objc/runtime.h>
-#include <CoreFoundation/CFDictionary.h>
+# include <objc/runtime.h>
+# include <CoreFoundation/CFDictionary.h>
 
-#define OBJC_SUPPORT_EXTRA 1
-#include "objcSupport.hpp"
+# define OBJC_SUPPORT_EXTRA 1
+# include "objcSupport.hpp"
 #endif
 
 namespace lsan {
