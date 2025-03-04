@@ -34,6 +34,7 @@
 #include "crashWarner/exceptionHandler.hpp"
 #include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
+#include "suppression/firstPartyLibrary.hpp"
 #include "trackers/TLSTracker.hpp"
 
 #ifdef __APPLE__
@@ -289,18 +290,8 @@ auto LSan::isInDyld(const MallocInfo& info) const -> bool {
     return info.imageName.first == dyldPath;
 }
 
-auto LSan::isInFirstParty(const MallocInfo& info) -> bool {
-    if (info.imageName.first == nullptr) {
-        return false;
-    } else if (isInDyld(info)) {
-        return true;
-    }
-    for (const auto& sysLib : getSystemLibraries()) {
-        if (std::regex_match(info.imageName.first, sysLib)) {
-            return true;
-        }
-    }
-    return false;
+auto LSan::isInFirstParty(const MallocInfo& info) const -> bool {
+    return isInDyld(info) || suppression::isFirstParty(info.imageName.first, true);
 }
 
 auto LSan::isSuppressed(const MallocInfo& info) -> bool {
