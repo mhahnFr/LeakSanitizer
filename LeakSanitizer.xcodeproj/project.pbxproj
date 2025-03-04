@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF017DC82D76F26900572D07 /* firstPartyLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */; };
+		BF017DC92D76F26900572D07 /* firstPartyLibrary.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */; };
 		BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */; };
 		BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */; };
 		BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */; };
@@ -80,6 +82,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = firstPartyLibrary.hpp; sourceTree = "<group>"; };
+		BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = firstPartyLibrary.cpp; sourceTree = "<group>"; };
 		BF04B4B328F86EEA00051090 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		BF0F131C29194652008F0FCD /* liblsan.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblsan.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsan_stats.cpp; sourceTree = "<group>"; };
@@ -200,6 +204,8 @@
 				BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */,
 				F13529B02D108324002534D0 /* defaultSuppression.hpp */,
 				F13529AE2D10779B002534D0 /* defaultSuppression.cpp */,
+				BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */,
+				BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */,
 			);
 			path = suppression;
 			sourceTree = "<group>";
@@ -401,6 +407,7 @@
 				F128723A2D36E0D200D5F0AF /* objcSupport.hpp in Headers */,
 				BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */,
 				F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */,
+				BF017DC92D76F26900572D07 /* firstPartyLibrary.hpp in Headers */,
 				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
 				BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */,
 				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
@@ -558,6 +565,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */,
+				BF017DC82D76F26900572D07 /* firstPartyLibrary.cpp in Sources */,
 				BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */,
 				BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */,
 				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
