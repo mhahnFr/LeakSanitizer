@@ -19,7 +19,6 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <map>
 #include <string>
 
 #include <lsan_internals.h>
@@ -33,92 +32,9 @@
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 
+#include "../suppression/firstPartyLibrary.hpp"
+
 namespace lsan::callstackHelper {
-/**
- * An enumeration containing the currently known classifications of a binary file path.
- */
-enum class Classification {
-    /** Indicates the file path is first party.    */
-    firstParty,
-    /** Indicates the file path is user-defined.   */
-    none
-};
-
-/** Caches the classifications of the file paths. */
-static std::map<const char*, Classification> cache;
-
-/**
- * Returns whether the given binary file name represents a first party
- * (system) binary.
- *
- * @param file the binary file name to be checked
- * @return whether the given binary file name is first party
- */
-static inline auto isFirstPartyCore(const char* file) -> bool {
-    auto toReturn = false;
-
-    for (const auto& regex : getSystemLibraries()) {
-        if (std::regex_match(file, regex)) {
-            return true;
-        }
-    }
-
-    return toReturn;
-}
-
-/**
- * Classifies the given binary file name.
- *
- * @param file the binary file name to be checked
- * @return the classification of the file name
- */
-static inline auto classify(const char* file) -> Classification {
-    if (isFirstPartyCore(file)) {
-        return Classification::firstParty;
-    }
-    return Classification::none;
-}
-
-/**
- * Classifies and caches the given binary file name.
- *
- * @param file the binary file name to be classified
- * @return the classification of the file name
- */
-static inline auto classifyAndCache(const char* file) -> Classification {
-    const auto& toReturn = classify(file);
-    cache.emplace(std::make_pair(file, toReturn));
-    return toReturn;
-}
-
-/**
- * @brief Returns whether the given binary file name is first party.
- *
- * Uses the cache.
- *
- * @param file the binary file name to be checked
- * @return whether the given binary file name is first party
- */
-static inline auto isFirstPartyCached(const char* file) -> bool {
-    const auto& it = cache.find(file);
-    if (it != cache.end()) {
-        return it->second == Classification::firstParty;
-    }
-    return classifyAndCache(file) == Classification::firstParty;
-}
-
-/**
- * @brief Returns whether the given binary file name is first party.
- *
- * Uses the cache if appropriate.
- *
- * @param file the binary file name to be checked
- * @return whether the given binary file name is first party
- */
-static inline auto isFirstParty(const char* file) -> bool {
-    return callstack_autoClearCaches ? isFirstPartyCore(file) : isFirstPartyCached(file);
-}
-
 /**
  * @brief Returns the name of the binary file of the given callstack frame.
  *
@@ -244,7 +160,7 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
 
         if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
-        } else if (firstHit && (isFirstParty(binaryFile) || frames[i].binaryFileIsSelf)) {
+        } else if (firstHit && (suppression::isFirstParty(binaryFile, !callstack_autoClearCaches) || frames[i].binaryFileIsSelf)) {
             const auto& number = std::to_string(printed + 1);
             stream << indent << formatter::get<Style::GREYED>
                    << formatter::format<Style::ITALIC>("# " + getIndent(maxCount - number.size()) + number + ": ");
@@ -275,7 +191,7 @@ static inline auto match(const suppression::Suppression::RangeOrRegexType& supp,
     }
     for (const auto& regex : std::get<suppression::Suppression::RegexType>(supp.second)) {
         if (frame->binaryFileIsSelf
-            || (std::regex_match("LSAN_SYSTEM_LIBRARIES", regex) && isFirstParty(frame->binaryFile))
+            || (std::regex_match("LSAN_SYSTEM_LIBRARIES", regex) && suppression::isFirstParty(frame->binaryFile, !callstack_autoClearCaches))
             || std::regex_match(frame->binaryFile, regex)) {
             return true;
         }
