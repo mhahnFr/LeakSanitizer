@@ -289,9 +289,27 @@ auto LSan::isInDyld(const MallocInfo& info) const -> bool {
     return info.imageName.first == dyldPath;
 }
 
+auto LSan::isInFirstParty(const MallocInfo& info) -> bool {
+    if (info.imageName.first == nullptr) {
+        return false;
+    } else if (isInDyld(info)) {
+        return true;
+    }
+    for (const auto& sysLib : getSystemLibraries()) {
+        if (std::regex_match(info.imageName.first, sysLib)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 auto LSan::isSuppressed(const MallocInfo& info) -> bool {
+    if (isInFirstParty(info)) {
+        return true;
+    }
+
     for (const auto& suppression : getSuppressions()) {
-        if (isInDyld(info) || suppression.match(info)) {
+        if (suppression.match(info)) {
             return true;
         }
     }
