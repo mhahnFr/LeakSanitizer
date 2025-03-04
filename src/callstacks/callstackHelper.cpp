@@ -38,7 +38,7 @@ namespace lsan::callstackHelper {
 /**
  * @brief Returns the name of the binary file of the given callstack frame.
  *
- * The file name is allowed to be a relative if `__lsan_relativePaths` is `true`.
+ * The file name is allowed to be a relative if relative paths are activated.
  *
  * @param frame the callstack frame
  * @return the name of the binary file of the given callstack frame
@@ -54,7 +54,7 @@ static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::
 /**
  * @brief Returns the name of the source file of the given callstack frame.
  *
- * The file name is allowed to be relative if `__lsan_relativePaths` is `true`.
+ * The file name is allowed to be relative if relative paths are activated.
  *
  * @param frame the callstack frame
  * @return the name of the source file name of the given callstack frame
