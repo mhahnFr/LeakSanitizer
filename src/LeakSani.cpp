@@ -903,6 +903,12 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         stream << format<Style::BOLD, Style::GREEN, Style::ITALIC>("No leaks detected.") << std::endl;
     }
 
+    if (!isATTY() && !has("LSAN_PRINT_FORMATTED")) {
+        stream << std::endl << "Hint: To re-enable colored output, set "
+               << format<Style::BOLD>("LSAN_PRINT_FORMATTED") << " to "
+               << format<Style::BOLD>("true") << "." << std::endl;
+    }
+
     stream << maybeShowDeprecationWarnings;
     if (stats.getTotal() > 0) {
         stream << std::endl << format<Style::BOLD>("Summary:") << std::endl << stats;
