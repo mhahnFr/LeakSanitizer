@@ -3,7 +3,7 @@
   "^/usr/lib/system/.*$",
   "^/usr/lib/swift/.*$",
   "/usr/lib/libobjc.A.dylib",
-  "/usr/lib/libc\\+\\+abi.dylib",
+  "^/usr/lib/libc\\+\\+.*.dylib$",
   "/usr/lib/dyld",
 
   "/usr/lib/libMobileGestalt.dylib",
