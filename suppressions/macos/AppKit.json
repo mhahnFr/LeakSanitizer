@@ -1,8 +1,10 @@
 [
   {
+    "name": "Created by NSApplication's class creation",
     "functions": [ "+[NSApplication initialize]" ]
   },
   {
+    "name": "Created by NSApp's initialization",
     "functions": [ "-[NSApplication init]" ]
   },
   {
@@ -13,18 +15,21 @@
     ]
   },
   {
+    "name": "Indirect activation policy allocations",
     "functions": [
       { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
       "-[NSApplication setActivationPolicy:]"
     ]
   },
   {
+    "name": "NSWindow initialization resources",
     "functions": [
       { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
       "-[NSWindow initWithContentRect:styleMask:backing:defer:]"
     ]
   },
   {
+    "name": "NSWindow front ordering indirect allocations",
     "functions": [
       { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
       "-[NSWindow makeKeyAndOrderFront:]"
