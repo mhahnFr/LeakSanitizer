@@ -24,6 +24,7 @@
 #include <stack>
 
 #include <callstack_internals.h>
+#include <functionInfo/functionInfo.h>
 
 #include "LeakSani.hpp"
 
@@ -346,6 +347,39 @@ auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>
     return threadDescriptions.emplace(std::make_pair(id, std::move(desc))).first->second;
 }
 
+static inline auto loadFunc(const char* name) -> void* {
+    auto result = functionInfo_load(name);
+    return result.found ? reinterpret_cast<void*>(result.begin) : nullptr;
+}
+
+#ifdef __APPLE__
+# define FUNC_NAME(name) "_" #name
+#else
+# define FUNC_NAME(name) #name
+#endif
+
+#define LOAD_FUNC(name) auto name = reinterpret_cast<decltype(::name)*>(loadFunc(FUNC_NAME(name)))
+
+void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
+    LOAD_FUNC(objc_getClassList);
+    LOAD_FUNC(object_getClass);
+
+    if (objc_getClassList == nullptr || object_getClass == nullptr) {
+        return;
+    }
+
+    const auto& classNumber = objc_getClassList(nullptr, 0);
+    auto classes = new Class[classNumber];
+    objc_getClassList(classes, classNumber);
+    for (int i = 0; i < classNumber; ++i) {
+        classifyClass(classes[i], records, LeakType::objcDirect, LeakType::objcIndirect);
+
+        const auto& meta = object_getClass(reinterpret_cast<id>(classes[i]));
+        classifyClass(meta, records, LeakType::objcDirect, LeakType::objcIndirect);
+    }
+    delete[] classes;
+}
+
 auto LSan::classifyLeaks() -> LeakKindStats {
     auto toReturn = LeakKindStats();
 
@@ -368,20 +402,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
     }
 
-#ifdef LSAN_HANDLE_OBJC
     out << clear << "Reachability analysis: Objective-C runtime...";
-    // Search in the Objective-C runtime
-    const auto& classNumber = objc_getClassList(nullptr, 0);
-    auto classes = new Class[classNumber];
-    objc_getClassList(classes, classNumber);
-    for (int i = 0; i < classNumber; ++i) {
-        classifyClass(classes[i], toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
-
-        const auto& meta = object_getClass(reinterpret_cast<id>(classes[i]));
-        classifyClass(meta, toReturn.recordsObjC, LeakType::objcDirect, LeakType::objcIndirect);
-    }
-    delete[] classes;
-#endif
+    classifyObjC(toReturn.recordsObjC);
 
     out << clear << "Reachability analysis: Stacks...";
     for (const auto& [_, info] : threads) {

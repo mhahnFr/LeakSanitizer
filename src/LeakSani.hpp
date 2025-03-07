@@ -86,6 +86,7 @@ class LSan final: public trackers::ATracker {
 
     auto classifyLeaks() -> LeakKindStats;
     void classifyRecord(MallocInfo& info, const LeakType& currentType, bool reclassify = false);
+    void classifyObjC(std::deque<MallocInfo::Ref>& records);
 
     /**
      * Creates a thread-safe copy of the thread-local tracker list.
