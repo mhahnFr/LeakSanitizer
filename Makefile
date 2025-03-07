@@ -95,12 +95,12 @@ uninstall:
 	- $(RM) $(INSTALL_PATH)/lib/$(NAME)
 	- $(RM) -r "$(INSTALL_PATH)/include/lsan"
 
-release: fclean
+release: clean
 	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" MACOS_ARCH_FLAGS="-arch x86_64 -arch arm64 -arch arm64e" $(NAME)
 	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(NAME)" $(NAME); fi
 
 update:
-	$(MAKE) fclean
+	$(MAKE) clean
 	git fetch --tags
 	git pull
 	git submodule update
@@ -129,15 +129,12 @@ $(LIBCALLSTACK_A):
 clean:
 	- $(RM) $(OBJS) $(DEPS)
 	- $(RM) $(SUPP_HS)
+	- $(RM) $(SHARED_L) $(DYLIB_NA)
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) clean
 
-fclean: clean
-	- $(RM) $(SHARED_L) $(DYLIB_NA)
-	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) fclean
-
-re: fclean
+re: clean
 	$(MAKE) default
 
-.PHONY: re fclean clean all install uninstall release default update bench
+.PHONY: re clean all install uninstall release default update bench
 
 -include $(DEPS)
