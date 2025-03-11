@@ -124,7 +124,7 @@
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
 		BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Suppression.hpp; sourceTree = "<group>"; };
 		BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Suppression.cpp; sourceTree = "<group>"; };
-		BFA95FAF2D43EE4E0043C836 /* misc.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = misc.json; sourceTree = "<group>"; };
+		BFA7AA972D8037A700F2525A /* systemLibraries.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = systemLibraries.json; sourceTree = "<group>"; };
 		BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ThreadInfo.hpp; sourceTree = "<group>"; };
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
@@ -380,7 +380,7 @@
 			children = (
 				F1E0904B2D68DE9500F79FA2 /* AppKit.json */,
 				F1ACE4162D148B0F00E779A7 /* core.json */,
-				BFA95FAF2D43EE4E0043C836 /* misc.json */,
+				BFA7AA972D8037A700F2525A /* systemLibraries.json */,
 			);
 			path = macos;
 			sourceTree = "<group>";
