@@ -90,7 +90,7 @@ void LSan::classifyLeaks(uintptr_t begin, uintptr_t end,
                          std::deque<MallocInfo::Ref>& directs, bool skipClassifieds,
                          const char* name, const char* nameRelative, bool reclassify) {
     for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
-        const auto& record = infos.find(*reinterpret_cast<void**>(it));
+        const auto& record = findWithSpecials(*reinterpret_cast<void**>(it));
         if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
             continue;
         }
