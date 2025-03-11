@@ -1,13 +1,5 @@
 [
   {
-    "name": "Everything created by the system library initialization",
-    "functions": [ "_libSystem_initializer" ]
-  },
-  {
-    "name": "Everything created by the CoreFoundation - TODO: Make this unnecessary",
-    "functions": [ "___CFInitialize" ]
-  },
-  {
     "name": "Everything entirely created by the system",
     "functions": [{ "libraryRegex": "LSAN_SYSTEM_LIBRARIES" }]
   }
