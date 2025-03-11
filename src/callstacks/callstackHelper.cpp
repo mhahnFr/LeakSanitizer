@@ -184,6 +184,14 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
     }
 }
 
+/**
+ * Returns whether the given range or regex matches the given callstack frame.
+ *
+ * @param supp the regex or range
+ * @param frame the callstack frame
+ * @param address the address of the represented function call
+ * @return whether the callstack frame was matched
+ */
 static inline auto match(const suppression::Suppression::RangeOrRegexType& supp, const callstack_frame* frame, uintptr_t address) -> bool {
     if (supp.first == suppression::Suppression::Type::range) {
         const auto& range = std::get<suppression::Suppression::RangeType>(supp.second);
