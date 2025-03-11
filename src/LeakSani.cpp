@@ -82,6 +82,9 @@ auto LSan::findWithSpecials(void* ptr) -> decltype(infos)::iterator {
     if (toReturn == infos.end()) {
         toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - sizeof(void*)));
     }
+    if (toReturn == infos.end()) {
+        toReturn = infos.find(reinterpret_cast<void*>(~uintptr_t(ptr)));
+    }
     return toReturn;
 }
 
