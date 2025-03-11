@@ -5,6 +5,7 @@
   "/usr/lib/libobjc.A.dylib",
   "^/usr/lib/libc\\+\\+.*.dylib$",
   "/usr/lib/dyld",
+  "^.*System.*$",
 
   "/usr/lib/libMobileGestalt.dylib",
   "/usr/lib/libicucore.A.dylib",
