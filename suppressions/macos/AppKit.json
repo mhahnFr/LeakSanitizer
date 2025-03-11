@@ -36,6 +36,13 @@
     ]
   },
   {
+    "name": "NSWindow closing behind the scenes allocations",
+    "functions": [
+      { "libraryRegex": "LSAN_SYSTEM_LIBRARIES" },
+      "-[NSWindow _close]"
+    ]
+  },
+  {
     "FIXME": "Belongs to Foundation",
     "functions": [ "-[NSProcessInfo arguments]" ]
   }
