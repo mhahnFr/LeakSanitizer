@@ -30,7 +30,7 @@ LIBCALLSTACK_DIR  = ./CallstackLibrary
 LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
 LIBCALLSTACK_FLAG = "CXX_FUNCTIONS=${LIBCALLSTACK_OPT}" 'USE_BUILTINS=false'
 
-SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*)
+SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*) SimpleJSON/src/parser.cpp
 OBJS  = $(patsubst %.cpp, %.o, $(SRC))
 DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 
@@ -42,7 +42,7 @@ DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 BENCHMARK = false
 
 LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include -I suppressions
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions
 
 ifeq ($(BENCHMARK),true)
 	CXXFLAGS += -DBENCHMARK

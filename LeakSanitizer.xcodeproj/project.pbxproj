@@ -65,6 +65,7 @@
 		F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
 		F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529B02D108324002534D0 /* defaultSuppression.hpp */; };
 		F13529B22D1083E0002534D0 /* defaultSuppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
+		F14B3CDD2D842C4A004768E9 /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F14B3CDC2D842C4A004768E9 /* parser.cpp */; };
 		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
 		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
@@ -152,6 +153,7 @@
 		F13529AE2D10779B002534D0 /* defaultSuppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = defaultSuppression.cpp; sourceTree = "<group>"; };
 		F13529B02D108324002534D0 /* defaultSuppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = defaultSuppression.hpp; sourceTree = "<group>"; };
 		F13529BB2D109F4C002534D0 /* schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
+		F14B3CDC2D842C4A004768E9 /* parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = parser.cpp; path = ../../SimpleJSON/src/parser.cpp; sourceTree = "<group>"; };
 		F16901512C403EF200EED0AE /* utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
@@ -564,6 +566,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F14B3CDD2D842C4A004768E9 /* parser.cpp in Sources */,
 				F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */,
 				BF017DC82D76F26900572D07 /* firstPartyLibrary.cpp in Sources */,
 				BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */,
@@ -619,6 +622,7 @@
 					CallstackLibrary/include,
 					include,
 					suppressions,
+					SimpleJSON/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -652,6 +656,7 @@
 					CallstackLibrary/include,
 					include,
 					suppressions,
+					SimpleJSON/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
