@@ -64,8 +64,9 @@ else
 endif
 
 VERSION = "clean build"
-ifneq ($(shell git describe --tags --abbrev=0),)
-	VERSION = $(shell git describe --tags --abbrev=0)
+GIT_VERSION = $(shell git describe --tags --abbrev=1)
+ifneq (GIT_VERSION,)
+	VERSION = $(GIT_VERSION)
 endif
 
 ifeq ($(shell ls $(LIBCALLSTACK_DIR)),)
