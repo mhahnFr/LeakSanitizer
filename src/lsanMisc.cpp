@@ -31,6 +31,7 @@
 
 #include <lsan_internals.h>
 #include <callstack.h>
+#include <SimpleJSON/SimpleJSON.hpp>
 
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
@@ -40,8 +41,6 @@
 #include "suppression/defaultSuppression.hpp"
 #include "suppression/FunctionNotFoundException.hpp"
 #include "suppression/Suppression.hpp"
-#include "suppression/json/Exception.hpp"
-#include "suppression/json/parser.hpp"
 
 #include "trackers/PseudoTracker.hpp"
 #include "trackers/TLSTracker.hpp"
@@ -190,11 +189,11 @@ static inline auto getFiles(const char* files) -> std::vector<std::filesystem::p
     return toReturn;
 }
 
-static inline void loadSuppressions(std::vector<suppression::Suppression>& content, const json::Value& object) {
-    if (object.is(json::ValueType::Array)) {
-        for (const auto& object : object.as<json::ValueType::Array>()) {
+static inline void loadSuppressions(std::vector<suppression::Suppression>& content, const simple_json::Value& object) {
+    if (object.is(simple_json::ValueType::Array)) {
+        for (const auto& object : object.as<simple_json::ValueType::Array>()) {
             try {
-                content.push_back(json::Object(object));
+                content.push_back(simple_json::Object(object));
             } catch (const suppression::FunctionNotFoundException& e) {
                 using namespace formatter;
 
@@ -206,7 +205,7 @@ static inline void loadSuppressions(std::vector<suppression::Suppression>& conte
             }
         }
     } else {
-        content.push_back(json::Object(object));
+        content.push_back(simple_json::Object(object));
     }
 }
 
@@ -214,7 +213,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
     auto toReturn = std::vector<suppression::Suppression>();
     for (const auto& file : suppression::getDefaultSuppression()) {
         try {
-            loadSuppressions(toReturn, json::parse(std::istringstream(file)));
+            loadSuppressions(toReturn, simple_json::parse(std::istringstream(file)));
         } catch (const std::exception& e) {
             using namespace formatter;
             using namespace std::string_literals;
@@ -229,7 +228,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
 
         try {
             stream.open(file);
-            loadSuppressions(toReturn, json::parse(stream));
+            loadSuppressions(toReturn, simple_json::parse(stream));
         } catch (const std::exception& e) {
             using namespace formatter;
 
@@ -244,8 +243,8 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
     return toReturn;
 }
 
-static inline void loadSystemLibraryFile(std::vector<std::regex>& content, const json::Value& object) {
-    using namespace json;
+static inline void loadSystemLibraryFile(std::vector<std::regex>& content, const simple_json::Value& object) {
+    using namespace simple_json;
     if (!object.is(ValueType::Array)) {
         throw std::runtime_error("System libraries should be defined as a top level string array");
     }
@@ -263,7 +262,7 @@ auto loadSystemLibraries() -> std::vector<std::regex> {
 
     for (const auto& file : suppression::getSystemLibraryFiles()) {
         try {
-            loadSystemLibraryFile(toReturn, json::parse(std::istringstream(file)));
+            loadSystemLibraryFile(toReturn, simple_json::parse(std::istringstream(file)));
         } catch (const std::exception& e) {
             using namespace formatter;
             using namespace std::string_literals;
@@ -278,7 +277,7 @@ auto loadSystemLibraries() -> std::vector<std::regex> {
 
         try {
             stream.open(file);
-            loadSystemLibraryFile(toReturn, json::parse(stream));
+            loadSystemLibraryFile(toReturn, simple_json::parse(stream));
         } catch (const std::exception& e) {
             using namespace formatter;
 

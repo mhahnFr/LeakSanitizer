@@ -25,12 +25,11 @@
 #include <cstdint>
 #include <optional>
 #include <regex>
-#include <string>
 #include <utility>
 #include <variant>
 #include <vector>
 
-#include "json/Object.hpp"
+#include <SimpleJSON/Object.hpp>
 
 #include "../LeakType.hpp"
 
@@ -69,7 +68,7 @@ struct Suppression {
 
     std::vector<RangeOrRegexType> topCallstack;
 
-    Suppression(const json::Object& object);
+    Suppression(const simple_json::Object& object);
 
     auto match(const MallocInfo& info) const -> bool;
 };

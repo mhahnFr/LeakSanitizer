@@ -27,7 +27,7 @@
 #include "../MallocInfo.hpp"
 
 namespace lsan::suppression {
-using namespace json;
+using namespace simple_json;
 
 static inline auto getFunctionPair(const std::string& name,
                                    const std::optional<long>& offset,
