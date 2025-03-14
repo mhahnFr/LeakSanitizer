@@ -30,14 +30,7 @@
 		BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */ = {isa = PBXBuildFile; fileRef = BF621FDC28A291DE00414EE4 /* lsan_internals.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF378FB52919496000A4DAA9 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
-		BF3E505A2CCFF91C00CB225E /* Value.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3E50592CCFF91C00CB225E /* Value.hpp */; };
-		BF3E505E2CCFF96700CB225E /* Object.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3E505B2CCFF96700CB225E /* Object.hpp */; };
-		BF3E50602CCFFED300CB225E /* parser.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3E505F2CCFFED300CB225E /* parser.hpp */; };
-		BF3E50622CCFFF2900CB225E /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3E50612CCFFF2900CB225E /* parser.cpp */; };
 		BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF4368F32AACF04700252E2A /* crashWarner.cpp */; };
-		BF6D854E2CD3C97700316BFB /* ValueType.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D854D2CD3C97700316BFB /* ValueType.hpp */; };
-		BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D854F2CD3C98000316BFB /* Trait.hpp */; };
-		BF6D85542CD3DA9500316BFB /* Exception.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF6D85532CD3DA9500316BFB /* Exception.hpp */; };
 		BF7ACDAD2D5619AE00629378 /* PseudoTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF7ACDAC2D5619AE00629378 /* PseudoTracker.hpp */; };
 		BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */; };
 		BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
@@ -97,10 +90,6 @@
 		BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = callstackHelper.hpp; sourceTree = "<group>"; };
 		BF34157C2A8405AD00DEEF10 /* deprecation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deprecation.h; sourceTree = "<group>"; };
 		BF378FB42919496000A4DAA9 /* libcallstack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcallstack.a; path = CallstackLibrary/libcallstack.a; sourceTree = "<group>"; };
-		BF3E50592CCFF91C00CB225E /* Value.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Value.hpp; sourceTree = "<group>"; };
-		BF3E505B2CCFF96700CB225E /* Object.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Object.hpp; sourceTree = "<group>"; };
-		BF3E505F2CCFFED300CB225E /* parser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = parser.hpp; sourceTree = "<group>"; };
-		BF3E50612CCFFF2900CB225E /* parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = parser.cpp; sourceTree = "<group>"; };
 		BF4368F32AACF04700252E2A /* crashWarner.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crashWarner.cpp; sourceTree = "<group>"; };
 		BF4368F62AACF06F00252E2A /* crash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = crash.hpp; sourceTree = "<group>"; };
 		BF4368F72AACF07700252E2A /* warn.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = warn.hpp; sourceTree = "<group>"; };
@@ -113,9 +102,6 @@
 		BF621FDC28A291DE00414EE4 /* lsan_internals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_internals.h; sourceTree = "<group>"; };
 		BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bytePrinter.cpp; sourceTree = "<group>"; };
 		BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bytePrinter.hpp; sourceTree = "<group>"; };
-		BF6D854D2CD3C97700316BFB /* ValueType.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ValueType.hpp; sourceTree = "<group>"; };
-		BF6D854F2CD3C98000316BFB /* Trait.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Trait.hpp; sourceTree = "<group>"; };
-		BF6D85532CD3DA9500316BFB /* Exception.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Exception.hpp; sourceTree = "<group>"; };
 		BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LeakSani.hpp; sourceTree = "<group>"; };
 		BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LeakSani.cpp; sourceTree = "<group>"; };
 		BF7592282BB1799500891A55 /* LeakType.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LeakType.hpp; sourceTree = "<group>"; };
@@ -200,7 +186,7 @@
 		BF3E50512CCFE7ED00CB225E /* suppression */ = {
 			isa = PBXGroup;
 			children = (
-				BF3E50562CCFF8E800CB225E /* json */,
+				F14B3CDC2D842C4A004768E9 /* parser.cpp */,
 				BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */,
 				BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */,
 				BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */,
@@ -210,20 +196,6 @@
 				BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */,
 			);
 			path = suppression;
-			sourceTree = "<group>";
-		};
-		BF3E50562CCFF8E800CB225E /* json */ = {
-			isa = PBXGroup;
-			children = (
-				BF3E50592CCFF91C00CB225E /* Value.hpp */,
-				BF3E505B2CCFF96700CB225E /* Object.hpp */,
-				BF3E505F2CCFFED300CB225E /* parser.hpp */,
-				BF3E50612CCFFF2900CB225E /* parser.cpp */,
-				BF6D854D2CD3C97700316BFB /* ValueType.hpp */,
-				BF6D854F2CD3C98000316BFB /* Trait.hpp */,
-				BF6D85532CD3DA9500316BFB /* Exception.hpp */,
-			);
-			path = json;
 			sourceTree = "<group>";
 		};
 		BF41CC5D2A813B4500EAA3A1 /* statistics */ = {
@@ -407,7 +379,6 @@
 			files = (
 				F16901522C403EF200EED0AE /* utils.hpp in Headers */,
 				F128723A2D36E0D200D5F0AF /* objcSupport.hpp in Headers */,
-				BF6D85502CD3C98000316BFB /* Trait.hpp in Headers */,
 				F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */,
 				BF017DC92D76F26900572D07 /* firstPartyLibrary.hpp in Headers */,
 				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
@@ -418,24 +389,19 @@
 				BF2C5CB42AEAB76A00DE2224 /* exceptionHandler.hpp in Headers */,
 				F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */,
 				BF7ACDAD2D5619AE00629378 /* PseudoTracker.hpp in Headers */,
-				BF3E505A2CCFF91C00CB225E /* Value.hpp in Headers */,
 				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
 				BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */,
-				BF6D85542CD3DA9500316BFB /* Exception.hpp in Headers */,
 				BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */,
 				BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */,
 				BFDD6DFF2CC6B5D2008B9CDC /* Region.hpp in Headers */,
 				BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */,
 				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
-				BF3E50602CCFFED300CB225E /* parser.hpp in Headers */,
-				BF6D854E2CD3C97700316BFB /* ValueType.hpp in Headers */,
 				BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */,
 				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
 				BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */,
 				BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */,
 				BFA95FB12D43FBDA0043C836 /* ThreadInfo.hpp in Headers */,
 				F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */,
-				BF3E505E2CCFF96700CB225E /* Object.hpp in Headers */,
 				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
 				BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */,
 				BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */,
@@ -573,7 +539,6 @@
 				BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */,
 				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
 				BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */,
-				BF3E50622CCFFF2900CB225E /* parser.cpp in Sources */,
 				BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */,
 				BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */,
 				BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */,
