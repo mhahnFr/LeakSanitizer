@@ -1,3 +1,6 @@
 [submodule "CallstackLibrary"]
 	path = CallstackLibrary
 	url = https://github.com/mhahnFr/CallstackLibrary.git/
+[submodule "SimpleJSON"]
+	path = SimpleJSON
+	url = git@github.com:mhahnFr/SimpleJSON.git
