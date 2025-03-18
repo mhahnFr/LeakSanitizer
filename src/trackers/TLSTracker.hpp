@@ -22,8 +22,6 @@
 #ifndef TLSTracker_hpp
 #define TLSTracker_hpp
 
-#include <atomic>
-
 #include "ATracker.hpp"
 
 namespace lsan::trackers {
@@ -33,7 +31,7 @@ namespace lsan::trackers {
 class TLSTracker: public ATracker {
 private:
     /** Indicates whether the tracking has finished. */
-    std::atomic_bool finished = false;
+    bool finished = false;
 
 public:
     TLSTracker();

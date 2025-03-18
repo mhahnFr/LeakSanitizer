@@ -29,11 +29,11 @@ TLSTracker::TLSTracker() {
 }
 
 TLSTracker::~TLSTracker() {
-    if (finished) return;
+    std::lock_guard lock { mutex };
 
+    if (finished) return;
     finished = true;
 
-    std::lock_guard lock { mutex };
     ignoreMalloc = true;
 
     pthread_setspecific(getInstance().saniKey, std::addressof(getInstance()));
@@ -53,15 +53,14 @@ TLSTracker::~TLSTracker() {
 }
 
 void TLSTracker::finish() {
+    std::lock_guard lock { mutex };
+
     if (finished) return;
-
     finished = true;
-
-    std::lock_guard lock  { mutex     };
-    std::lock_guard lock1 { infoMutex };
 
     ignoreMalloc = true;
 
+    std::lock_guard lock1 { infoMutex };
     if (getBehaviour().invalidFree()) {
         for (auto it = infos.cbegin(); it != infos.cend();) {
             if (it->second.deleted) {
