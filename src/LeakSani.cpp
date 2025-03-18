@@ -409,17 +409,16 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     classifyObjC(toReturn.recordsObjC);
 
     out << clear << "Reachability analysis: Stacks...";
+    auto failed = std::vector<ThreadInfo>();
     for (const auto& [_, info] : threads) {
         using namespace formatter;
 
         const auto& threadDesc = getThreadDescription(info.getNumber(), info.getThread());
 
         const auto& selfThread = std::this_thread::get_id() == info.getId();
-        const auto& nativeThread = pthread_mach_thread_np(info.getThread());
-        auto resume = true;
-        if (!selfThread && thread_suspend(nativeThread) != KERN_SUCCESS) {
-            resume = false;
+        if (!selfThread && thread_suspend(pthread_mach_thread_np(info.getThread())) != KERN_SUCCESS) {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
+            failed.push_back(info);
         }
         const auto& top = align(info.getStackTop());
         auto sp = uintptr_t(0);
@@ -431,9 +430,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             sp = uintptr_t(info.getStackTop()) - info.getStackSize();
         }
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, isThreaded ? threadDesc.c_str() : nullptr);
-        if (resume && !selfThread && thread_resume(nativeThread) != KERN_SUCCESS) {
-            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume " + threadDesc + ".") << std::endl;
-        }
     }
 
     out << clear << "Reachability analysis: Globals...";
@@ -462,6 +458,17 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
                       LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, name, relative, true);
         it->second.suppressed = true;
+    }
+
+    for (const auto& [_, info] : threads) {
+        if (info.getId() != std::this_thread::get_id() && std::find(failed.cbegin(), failed.cend(), info) == failed.end()
+            && thread_resume(pthread_mach_thread_np(info.getThread())) != KERN_SUCCESS) {
+            using namespace formatter;
+
+            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume "
+                                                     + getThreadDescription(info.getNumber(), info.getThread()) + ".")
+                << std::endl;
+        }
     }
 
 #ifdef LSAN_HANDLE_OBJC
