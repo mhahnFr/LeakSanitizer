@@ -65,6 +65,10 @@ public:
         return stackTop;
     }
 
+    inline auto operator==(const ThreadInfo& other) const -> bool {
+        return id == other.id;
+    }
+
     static inline auto createThreadId() -> unsigned long {
         return ++threadId;
     }
