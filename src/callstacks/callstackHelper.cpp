@@ -112,7 +112,7 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
  * @param indentChar the character to indent with
  * @return a suitable indentation string
  */
-static inline auto getIndent(std::string::size_type indent, char indentChar = ' ') -> std::string {
+static inline auto getIndent(std::string::difference_type indent, char indentChar = ' ') -> std::string {
     return indent > 0 ? std::string(indent, indentChar) : std::string();
 }
 
