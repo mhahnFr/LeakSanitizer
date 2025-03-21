@@ -64,12 +64,12 @@ struct Suppression {
 };
 
 template<>
-inline constexpr auto Suppression::getTopCallstack<Suppression::Type::regex>(unsigned long i) const -> const auto& {
+inline auto Suppression::getTopCallstack<Suppression::Type::regex>(unsigned long i) const -> const auto& {
     return std::get<RegexType>(topCallstack[i].second);
 }
 
 template<>
-inline constexpr auto Suppression::getTopCallstack<Suppression::Type::range>(unsigned long i) const -> const auto& {
+inline auto Suppression::getTopCallstack<Suppression::Type::range>(unsigned long i) const -> const auto& {
     return std::get<RangeType>(topCallstack[i].second);
 }
 }
