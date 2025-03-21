@@ -187,9 +187,13 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
 static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size_t {
     std::size_t toReturn;
 
-    // TODO: Linux version
 #ifdef __APPLE__
     toReturn = pthread_get_stacksize_np(thread);
+#elif defined(__linux__)
+    pthread_attr_t attr;
+    if (pthread_getattr_np(thread, &attr) != 0 || pthread_attr_getstacksize(&attr, &toReturn) != 0) {
+        throw std::runtime_error("Failed to gather stack size");
+    }
 #endif
 
     return toReturn;
