@@ -152,7 +152,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     return out;
 }
 
-static constexpr inline auto newLocalTracker(bool pseudo) -> trackers::ATracker* {
+static inline auto newLocalTracker(bool pseudo) -> trackers::ATracker* {
     if (pseudo) {
         return new trackers::PseudoTracker();
     }
