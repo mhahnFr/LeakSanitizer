@@ -56,22 +56,22 @@ struct Suppression {
     template<Type T>
     auto getTopCallstack(unsigned long i) const -> const auto&;
 
-    template<>
-    inline constexpr auto getTopCallstack<Type::regex>(unsigned long i) const -> const auto& {
-        return std::get<RegexType>(topCallstack[i].second);
-    }
-
-    template<>
-    inline constexpr auto getTopCallstack<Type::range>(unsigned long i) const -> const auto& {
-        return std::get<RangeType>(topCallstack[i].second);
-    }
-
     std::vector<RangeOrRegexType> topCallstack;
 
     Suppression(const simple_json::Object& object);
 
     auto match(const MallocInfo& info) const -> bool;
 };
+
+template<>
+inline constexpr auto Suppression::getTopCallstack<Suppression::Type::regex>(unsigned long i) const -> const auto& {
+    return std::get<RegexType>(topCallstack[i].second);
+}
+
+template<>
+inline constexpr auto Suppression::getTopCallstack<Suppression::Type::range>(unsigned long i) const -> const auto& {
+    return std::get<RangeType>(topCallstack[i].second);
+}
 }
 
 #endif /* Suppression_hpp */
