@@ -176,9 +176,15 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, bool re
 static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
     void* toReturn;
 
-    // TODO: Linux version
 #ifdef __APPLE__
     toReturn = pthread_get_stackaddr_np(thread);
+#elif defined(__linux__)
+    pthread_attr_t attr;
+    std::size_t ignored;
+    if (pthread_getattr_np(thread, &attr) != 0 || pthread_attr_getstack(&attr, &toReturn, &ignored) != 0) {
+        throw std::runtime_error("Failed to gather stack address");
+    }
+    pthread_attr_destroy(&attr);
 #endif
 
     return toReturn;
@@ -194,6 +200,7 @@ static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size
     if (pthread_getattr_np(thread, &attr) != 0 || pthread_attr_getstacksize(&attr, &toReturn) != 0) {
         throw std::runtime_error("Failed to gather stack size");
     }
+    pthread_attr_destroy(&attr);
 #endif
 
     return toReturn;
