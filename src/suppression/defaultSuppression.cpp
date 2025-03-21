@@ -36,6 +36,7 @@
 #elif defined(LSAN_LINUX)
 # include <linux/core.hpp>
 
+# include <linux/systemLibraries.hpp>
 #endif
 
 namespace lsan::suppression {
@@ -63,6 +64,7 @@ auto getSystemLibraryFiles() -> std::vector<std::string> {
 #ifdef LSAN_APPLE
         std::string(suppressions_macos_systemLibraries),
 #elif defined(LSAN_LINUX)
+        std::string(suppressions_linux_systemLibraries),
 #endif
     });
 
