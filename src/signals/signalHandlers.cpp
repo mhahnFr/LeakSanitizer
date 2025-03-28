@@ -30,7 +30,6 @@
 # undef _XOPEN_SOURCE
 #endif /* __APPLE__ */
 
-#include <lsan_internals.h>
 #include <lsan_stats.h>
 
 #include "signals.hpp"

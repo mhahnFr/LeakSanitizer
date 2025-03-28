@@ -29,8 +29,6 @@
 
 #include <pthread.h>
 
-#include <lsan_internals.h>
-
 #include "../MallocInfo.hpp"
 
 #include "../allocators/PoolAllocator.hpp"

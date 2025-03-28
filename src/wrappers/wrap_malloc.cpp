@@ -21,8 +21,6 @@
 
 #include <sstream>
 
-#include <lsan_internals.h>
-
 #include "interpose.hpp"
 #include "realAlloc.hpp"
 

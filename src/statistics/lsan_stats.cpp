@@ -23,7 +23,6 @@
 #include <iostream>
 #include <functional>
 
-#include <lsan_internals.h>
 #include <lsan_stats.h>
 
 #include "../formatter.hpp"

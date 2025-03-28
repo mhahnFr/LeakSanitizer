@@ -21,8 +21,6 @@
 
 #include <string>
 
-#include <lsan_internals.h>
-
 #define LCS_USE_UNSAFE_OPTIMIZATION 1
 #include <callstack.h>
 #include <callstack_internals.h>
