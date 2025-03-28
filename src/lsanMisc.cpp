@@ -29,7 +29,6 @@
  #define LSAN_HAS_UNISTD
 #endif
 
-#include <lsan_internals.h>
 #include <callstack.h>
 #include <SimpleJSON/SimpleJSON.hpp>
 
@@ -129,7 +128,7 @@ auto isATTY() -> bool {
 #ifdef LSAN_HAS_UNISTD
     return isatty(getBehaviour().printCout() ? STDOUT_FILENO : STDERR_FILENO);
 #else
-    return __lsan_printFormatted;
+    return getBehaviour().printFormatted();
 #endif
 }
 
