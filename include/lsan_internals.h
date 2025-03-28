@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr and contributors
+ * Copyright (C) 2022 - 2025  mhahnFr and contributors
  *
  * This file is part of the LeakSanitizer.
  *
@@ -36,6 +36,7 @@ extern "C" {
  *
  * Defaults to `true`.
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_humanPrint;
 
 /**
@@ -46,6 +47,7 @@ extern bool __lsan_humanPrint;
  *
  * @since 1.1
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_printCout;
 
 /**
@@ -56,6 +58,7 @@ extern bool __lsan_printCout;
  *
  * @since 1.1
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_printFormatted;
 
 /**
@@ -89,6 +92,7 @@ extern bool __lsan_printWebsite;
  *
  * Defaults to `true`.
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_invalidCrash;
 
 /**
@@ -100,6 +104,7 @@ extern bool __lsan_invalidCrash;
  * but by `__lsan_freeNull`.
  * Defaults to `true` since version 1.10.
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_invalidFree;
 
 /**
@@ -108,6 +113,7 @@ extern bool __lsan_invalidFree;
  * It does not cause a termination of the program, regardless of `__lsan_invalidCrash`.
  * Defaults to `false`.
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_freeNull;
 
 /**
@@ -118,6 +124,7 @@ extern bool __lsan_freeNull;
  *
  * @since 1.8
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_zeroAllocation;
 
 /**
@@ -141,6 +148,7 @@ extern bool __lsan_trackMemory;
  *
  * @since 1.5
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_statsActive;
 
 /**
@@ -151,6 +159,7 @@ extern bool __lsan_statsActive;
  *
  * @since 1.7
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_printExitPoint;
 
 /**
@@ -161,6 +170,7 @@ extern bool __lsan_printExitPoint;
  *
  * @since 1.8
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_printBinaries;
 
 /**
@@ -171,6 +181,7 @@ extern bool __lsan_printBinaries;
  *
  * @since 1.8
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_printFunctions;
 
 /**
@@ -181,6 +192,7 @@ extern bool __lsan_printFunctions;
  *
  * @since v1.8
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern bool __lsan_relativePaths;
 
 /**
@@ -192,6 +204,7 @@ extern bool __lsan_relativePaths;
  *
  * @since 1.3
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern size_t __lsan_leakCount;
 
 /**
@@ -203,6 +216,7 @@ extern size_t __lsan_leakCount;
  *
  * @since 1.3
  */
+_LSAN_DEPRECATED("The __lsan_* variables will be removed in version 2; use environment variables instead")
 extern size_t __lsan_callstackSize;
 
 /**
