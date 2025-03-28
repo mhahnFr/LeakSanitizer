@@ -595,7 +595,10 @@
 				);
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
+				OTHER_CFLAGS = (
+					"-DLSAN_HANDLE_OBJC",
+					"-D__LSAN_SILENCE_DEPRECATION",
+				);
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
@@ -629,7 +632,10 @@
 				);
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_CFLAGS = "-DLSAN_HANDLE_OBJC";
+				OTHER_CFLAGS = (
+					"-DLSAN_HANDLE_OBJC",
+					"-D__LSAN_SILENCE_DEPRECATION",
+				);
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;

@@ -42,7 +42,7 @@ DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 BENCHMARK = false
 
 LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -D__LSAN_SILENCE_DEPRECATION
 
 ifeq ($(BENCHMARK),true)
 	CXXFLAGS += -DBENCHMARK

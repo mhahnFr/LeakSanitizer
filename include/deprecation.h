@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,17 +19,23 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef deprecation_h
-#define deprecation_h
+#ifndef __lsan_deprecation_h
+#define __lsan_deprecation_h
 
 #if (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 202311L)
- #define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
+# define LSAN_DEPRECATED(message) [[ deprecated(message) ]]
 #elif defined(__GNUC__) || defined(__clang__)
- #define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
+# define LSAN_DEPRECATED(message) __attribute__((deprecated(message)))
 #else
- #define LSAN_DEPRECATED(message)
+# define LSAN_DEPRECATED(message)
+#endif
+
+#ifndef __LSAN_SILENCE_DEPRECATION
+# define _LSAN_DEPRECATED(message) LSAN_DEPRECATED(message)
+#else
+# define _LSAN_DEPRECATED(message)
 #endif
 
 #define LSAN_DEPRECATED_PLAIN LSAN_DEPRECATED("")
 
-#endif /* deprecation_h */
+#endif /* __lsan_deprecation_h */
