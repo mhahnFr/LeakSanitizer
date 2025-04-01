@@ -301,12 +301,8 @@ static inline void destroySaniKey(void* value) {
     }
 }
 
-auto LSan::isInDyld(const MallocInfo& info) const -> bool {
-    return info.imageName.first == dyldPath;
-}
-
 auto LSan::isInFirstParty(const MallocInfo& info) const -> bool {
-    return isInDyld(info) || suppression::isFirstParty(info.imageName.first, true);
+    return suppression::isFirstParty(info.imageName.first, true);
 }
 
 auto LSan::isSuppressed(const MallocInfo& info) -> bool {
