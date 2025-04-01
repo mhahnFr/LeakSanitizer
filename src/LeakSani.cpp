@@ -953,10 +953,6 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         stream << std::endl << format<Style::BOLD>("Summary:") << std::endl << stats;
     }
 
-    for (const auto& string : self.binaryFilenames) {
-        std::free(string.first);
-        std::free(string.second);
-    }
     callstack_clearCaches();
     callstack_autoClearCaches = true;
     

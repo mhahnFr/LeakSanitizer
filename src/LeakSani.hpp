@@ -40,7 +40,7 @@
 #include "ThreadInfo.hpp"
 
 #ifdef BENCHMARK
- #include "timing.hpp"
+# include "timing.hpp"
 #endif
 
 #include "behaviour/Behaviour.hpp"
@@ -67,7 +67,6 @@ class LSan final: public trackers::ATracker {
     bool callstackSizeExceeded = false;
     std::optional<std::vector<suppression::Suppression>> suppressions;
     std::optional<std::vector<std::regex>> systemLibraries;
-    std::vector<std::pair<char*, char*>> binaryFilenames;
     std::unordered_map<unsigned long, std::string> threadDescriptions;
     /** The registered thread-local allocation trackers.                                */
     std::set<ATracker*> tlsTrackers;
