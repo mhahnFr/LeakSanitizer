@@ -251,36 +251,6 @@ static inline void getGlobalRegionsAndTLVs(const mach_header* header, intptr_t v
 }
 #endif
 
-auto LSan::getGlobalRegionsAndTLVs(std::vector<std::pair<char*, char*>>& binaryFilenames) -> std::pair<std::vector<Region>, std::vector<std::tuple<const void*, const char*, const char*>>> {
-    auto regions = std::vector<Region>();
-    auto locals  = std::vector<std::tuple<const void*, const char*, const char*>>();
-
-#ifdef __APPLE__
-    const uint32_t count = _dyld_image_count();
-    for (uint32_t i = 0; i < count; ++i) {
-        const auto& filename = strdup(_dyld_get_image_name(i));
-        const auto& relative = getBehaviour().relativePaths() ? strdup(std::filesystem::relative(filename).string().c_str()) : nullptr;
-        binaryFilenames.push_back({ filename, relative });
-        ::lsan::getGlobalRegionsAndTLVs(_dyld_get_image_header(i), _dyld_get_image_vmaddr_slide(i), regions, locals, filename, relative);
-    }
-
-    struct task_dyld_info dyldInfo;
-    mach_msg_type_number_t infoCount = TASK_DYLD_INFO_COUNT;
-    if (task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t) &dyldInfo, &infoCount) == KERN_SUCCESS) {
-        auto infos = reinterpret_cast<struct dyld_all_image_infos*>(dyldInfo.all_image_info_addr);
-        const auto& filename = strdup(infos->dyldPath);
-        const auto& relative = getBehaviour().relativePaths() ? strdup(std::filesystem::relative(filename).string().c_str()) : nullptr;
-        binaryFilenames.push_back({ filename, relative });
-        dyldPath = filename;
-        ::lsan::getGlobalRegionsAndTLVs(infos->dyldImageLoadAddress, 0, regions, locals, filename, relative);
-    } else {
-        using namespace formatter;
-        getOutputStream() << format<Style::RED>("LSan: Error: Failed to load the DYLD. Leak classification may be incomplete.") << std::endl;
-    }
-#endif
-    return std::make_pair(regions, locals);
-}
-
 /**
  * If the given pointer is a TLSTracker, it is deleted and the thread-local
  * value is set to point to the global tracker instance.
@@ -459,16 +429,17 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
     }
 
-    out << clear << "Reachability analysis: Compile-time thread-local variables...";
-    // Search in compile-time thread locals - their wrapper will be suppressed
-    for (const auto& [ptr, name, relative] : locals) {
-        const auto& it = infos.find(ptr);
-        if (it == infos.end()) continue;
-
-        classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
-                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, name, relative, true);
-        it->second.suppressed = true;
-    }
+    // FIXME: Reactivate!
+//    out << clear << "Reachability analysis: Compile-time thread-local variables...";
+//    // Search in compile-time thread locals - their wrapper will be suppressed
+//    for (const auto& [ptr, name, relative] : locals) {
+//        const auto& it = infos.find(ptr);
+//        if (it == infos.end()) continue;
+//
+//        classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
+//                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, name, relative, true);
+//        it->second.suppressed = true;
+//    }
 
     for (const auto& [_, info] : threads) {
         if (info.getId() != std::this_thread::get_id() && std::find(failed.cbegin(), failed.cend(), info) == failed.end()
