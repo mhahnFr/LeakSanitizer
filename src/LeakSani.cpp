@@ -301,12 +301,8 @@ static inline void destroySaniKey(void* value) {
     }
 }
 
-auto LSan::isInFirstParty(const MallocInfo& info) const -> bool {
-    return suppression::isFirstParty(info.imageName.first, true);
-}
-
 auto LSan::isSuppressed(const MallocInfo& info) -> bool {
-    if (isInFirstParty(info)) {
+    if (suppression::isFirstParty(info.imageName.first, !callstack_autoClearCaches)) {
         return true;
     }
 
