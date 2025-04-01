@@ -25,6 +25,7 @@
 
 #include <callstack_internals.h>
 #include <functionInfo/functionInfo.h>
+#include <regions/regions.h>
 
 #include "LeakSani.hpp"
 
@@ -401,7 +402,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         return out << std::endl;
     };
     out << "Searching globals and compile time thread locals...";
-    const auto& [regions, locals] = getGlobalRegionsAndTLVs(binaryFilenames);
+    const auto& regions = regions_getLoadedRegions();
 
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
@@ -441,7 +442,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Reachability analysis: Globals...";
     // Search in global space
-    for (const auto& region : regions) {
+    for (std::size_t i = 0; i < regions.amount; ++i) {
+        const auto& region = regions.regions[i];
+
         classifyLeaks(align(region.begin), align(region.end, false),
                       LeakType::globalDirect, LeakType::globalIndirect,
                       toReturn.recordsGlobal, false, region.name, region.nameRelative);
