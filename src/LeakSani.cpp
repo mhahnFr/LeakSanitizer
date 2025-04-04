@@ -338,7 +338,11 @@ static inline auto loadFunc(const char* name) -> void* {
 #define LOAD_FUNC(name) auto name = reinterpret_cast<decltype(::name)*>(loadFunc(FUNC_NAME(name)))
 
 void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
-#ifdef LSAN_HANDLE_OBJC
+#ifndef __APPLE__
+    using id = void*;
+    using Class = void*;
+#endif
+
     LOAD_FUNC(objc_getClassList);
     LOAD_FUNC(object_getClass);
 
@@ -356,9 +360,6 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
         classifyClass(meta, records, LeakType::objcDirect, LeakType::objcIndirect);
     }
     delete[] classes;
-#else
-    (void) records;
-#endif
 }
 
 auto LSan::classifyLeaks() -> LeakKindStats {
