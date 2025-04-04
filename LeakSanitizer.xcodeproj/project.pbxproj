@@ -47,7 +47,6 @@
 		BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCF0B252BDD54A900EE259C /* misc.cpp */; };
 		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
 		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
-		BFDD6DFF2CC6B5D2008B9CDC /* Region.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */; };
 		BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */; };
 		BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */; };
 		BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
@@ -129,7 +128,6 @@
 		BFCF0B252BDD54A900EE259C /* misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
-		BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Region.hpp; sourceTree = "<group>"; };
 		BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LeakKindStats.hpp; sourceTree = "<group>"; };
 		BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AutoStats.cpp; sourceTree = "<group>"; };
 		BFE023F22CA874D100AEFD5A /* Behaviour.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Behaviour.hpp; sourceTree = "<group>"; };
@@ -325,7 +323,6 @@
 		BFDD6DFD2CC6B5A9008B9CDC /* helpers */ = {
 			isa = PBXGroup;
 			children = (
-				BFDD6DFE2CC6B5D2008B9CDC /* Region.hpp */,
 				BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */,
 			);
 			path = helpers;
@@ -393,7 +390,6 @@
 				BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */,
 				BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */,
 				BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */,
-				BFDD6DFF2CC6B5D2008B9CDC /* Region.hpp in Headers */,
 				BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */,
 				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
 				BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */,

@@ -45,7 +45,6 @@
 
 #include "behaviour/Behaviour.hpp"
 #include "helpers/LeakKindStats.hpp"
-#include "helpers/Region.hpp"
 #include "statistics/Stats.hpp"
 #include "suppression/Suppression.hpp"
 #include "trackers/ATracker.hpp"
