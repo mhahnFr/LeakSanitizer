@@ -24,6 +24,8 @@ CORE_NAME = liblsan
 SHARED_L = $(CORE_NAME).so
 DYLIB_NA = $(CORE_NAME).dylib
 
+SIMPLE_JSON_DIR = ./SimpleJSON
+
 LIBCALLSTACK_OPT  = true
 LIBCALLSTACK_NAME = libcallstack
 LIBCALLSTACK_DIR  = ./CallstackLibrary
@@ -69,11 +71,6 @@ ifneq (GIT_VERSION,)
 	VERSION = $(GIT_VERSION)
 endif
 
-ifeq ($(shell ls $(LIBCALLSTACK_DIR)),)
-	_  = $(shell git submodule init)
-	_ += $(shell git submodule update)
-endif
-
 INSTALL_PATH ?= /usr/local
 
 default: $(NAME)
@@ -114,7 +111,13 @@ $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
 $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
 
-%.o: %.cpp
+$(SIMPLE_JSON_DIR):
+	if [ "$(ls $(SIMPLE_JSON_DIR))" ]; then git submodule update --init $(SIMPLE_JSON_DIR); fi
+
+$(LIBCALLSTACK_DIR):
+	if [ "$(ls $(LIBCALLSTACK_DIR))" ]; then git submodule update --init $(LIBCALLSTACK_DIR); fi
+
+%.o: %.cpp $(SIMPLE_JSON_DIR) $(LIBCALLSTACK_DIR)
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 %.hpp: %.json
@@ -136,6 +139,6 @@ clean:
 re: clean
 	$(MAKE) default
 
-.PHONY: re clean all install uninstall release default update bench
+.PHONY: re clean all install uninstall release default update bench $(SIMPLE_JSON_DIR) $(LIBCALLSTACK_DIR)
 
 -include $(DEPS)
