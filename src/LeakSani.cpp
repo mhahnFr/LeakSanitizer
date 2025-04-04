@@ -335,7 +335,7 @@ static inline auto loadFunc(const char* name) -> void* {
 # define FUNC_NAME(name) #name
 #endif
 
-#define LOAD_FUNC(name) auto name = reinterpret_cast<decltype(::name)*>(loadFunc(FUNC_NAME(name)))
+#define LOAD_FUNC(type, name) auto name = reinterpret_cast<type>(loadFunc(FUNC_NAME(name)))
 
 void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
 #ifndef __APPLE__
@@ -343,8 +343,8 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
     using Class = void*;
 #endif
 
-    LOAD_FUNC(objc_getClassList);
-    LOAD_FUNC(object_getClass);
+    LOAD_FUNC(int (*)(Class*, int), objc_getClassList);
+    LOAD_FUNC(Class (*)(id), object_getClass);
 
     if (objc_getClassList == nullptr || object_getClass == nullptr) {
         return;
