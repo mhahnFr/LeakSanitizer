@@ -384,6 +384,18 @@ static inline auto resumeThread(const ThreadInfo& info) -> bool {
     return toReturn;
 }
 
+static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
+    uintptr_t toReturn;
+    // TODO: Linux version
+#ifdef __APPLE__
+    auto count = std::size_t(0);
+    if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
+                                           &toReturn, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE)
+#endif
+        toReturn = uintptr_t(info.getStackTop()) - info.getStackSize();
+    return toReturn;
+}
+
 auto LSan::classifyLeaks() -> LeakKindStats {
     auto toReturn = LeakKindStats();
 
@@ -422,15 +434,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             failed.push_back(info);
         }
         const auto& top = align(info.getStackTop());
-        auto sp = uintptr_t(0);
-        auto count = std::size_t(0);
-        if (selfThread) {
-            sp = uintptr_t(__builtin_frame_address(0));
-        } else if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
-                                                      &sp, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE) {
-            sp = uintptr_t(info.getStackTop()) - info.getStackSize();
-        }
-        classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect, toReturn.recordsStack, false, isThreaded ? threadDesc.c_str() : nullptr);
+        const auto& sp = selfThread ? uintptr_t(__builtin_frame_address(0)) : getStackPointer(info);
+        classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect,
+                      toReturn.recordsStack, false, isThreaded ? threadDesc.c_str() : nullptr);
     }
 
     out << clear << "Reachability analysis: Globals...";
