@@ -362,6 +362,28 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
     delete[] classes;
 }
 
+static inline auto suspendThread(const ThreadInfo& info) -> bool {
+    auto toReturn = false;
+#ifdef __APPLE__
+    toReturn = thread_suspend(pthread_mach_thread_np(info.getThread())) == KERN_SUCCESS;
+#else
+    (void) info;
+    toReturn = true;
+#endif
+    return toReturn;
+}
+
+static inline auto resumeThread(const ThreadInfo& info) -> bool {
+    auto toReturn = false;
+#ifdef __APPLE__
+    toReturn = thread_resume(pthread_mach_thread_np(info.getThread())) == KERN_SUCCESS;
+#else
+    (void) info;
+    toReturn = true;
+#endif
+    return toReturn;
+}
+
 auto LSan::classifyLeaks() -> LeakKindStats {
     auto toReturn = LeakKindStats();
 
@@ -395,7 +417,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& threadDesc = getThreadDescription(info.getNumber(), info.getThread());
 
         const auto& selfThread = std::this_thread::get_id() == info.getId();
-        if (!selfThread && thread_suspend(pthread_mach_thread_np(info.getThread())) != KERN_SUCCESS) {
+        if (!selfThread && !suspendThread(info)) {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
             failed.push_back(info);
         }
@@ -442,9 +464,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 //        it->second.suppressed = true;
 //    }
 
-    for (const auto& [_, info] : threads) {
-        if (info.getId() != std::this_thread::get_id() && std::find(failed.cbegin(), failed.cend(), info) == failed.end()
-            && thread_resume(pthread_mach_thread_np(info.getThread())) != KERN_SUCCESS) {
+    for (const auto& info : failed) {
+        if (info.getId() != std::this_thread::get_id() && !resumeThread(info)) {
             using namespace formatter;
 
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume "
