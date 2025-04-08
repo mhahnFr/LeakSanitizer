@@ -1,7 +1,7 @@
 #
 # LeakSanitizer - Small library showing information about lost memory.
 #
-# Copyright (C) 2022 - 2024  mhahnFr
+# Copyright (C) 2022 - 2025  mhahnFr
 #
 # This file is part of the LeakSanitizer.
 #
@@ -36,7 +36,7 @@ DEPS  = $(patsubst %.cpp, %.d, $(SRC))
 BENCHMARK = false
 
 LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include
 
 ifeq ($(BENCHMARK),true)
 	CXXFLAGS += -DBENCHMARK
@@ -47,12 +47,13 @@ MACOS_ARCH_FLAGS =
 
 ifeq ($(shell uname -s),Darwin)
 	LDFLAGS += -current_version 1.10 -compatibility_version 1 -install_name $(abspath $@) $(MACOS_ARCH_FLAGS)
-	CXXFLAGS += $(MACOS_ARCH_FLAGS)
+	CXXFLAGS += $(MACOS_ARCH_FLAGS) -O3 -ffast-math
 	LIBCALLSTACK_FLAG += "MACOS_ARCH_FLAGS=$(MACOS_ARCH_FLAGS)"
 
 	NAME = $(DYLIB_NA)
 else
 	LDFLAGS += $(LINUX_SONAME_FLAG)
+	CXXFLAGS += -Ofast
 
 	NAME = $(SHARED_L)
 endif
