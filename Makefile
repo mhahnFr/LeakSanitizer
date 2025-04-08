@@ -44,7 +44,7 @@ DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 BENCHMARK = false
 
 LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -Ofast -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -D__LSAN_SILENCE_DEPRECATION
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -D__LSAN_SILENCE_DEPRECATION
 
 ifeq ($(BENCHMARK),true)
 	CXXFLAGS += -DBENCHMARK
@@ -55,12 +55,13 @@ MACOS_ARCH_FLAGS =
 
 ifeq ($(shell uname -s),Darwin)
 	LDFLAGS += -current_version 1.10 -compatibility_version 1 -install_name $(abspath $@) $(MACOS_ARCH_FLAGS) -lobjc -framework CoreFoundation
-	CXXFLAGS += $(MACOS_ARCH_FLAGS) -DLSAN_HANDLE_OBJC
+	CXXFLAGS += $(MACOS_ARCH_FLAGS) -DLSAN_HANDLE_OBJC -O3 -ffast-math
 	LIBCALLSTACK_FLAG += "MACOS_ARCH_FLAGS=$(MACOS_ARCH_FLAGS)"
 
 	NAME = $(DYLIB_NA)
 else
 	LDFLAGS += $(LINUX_SONAME_FLAG) -ldl
+	CXXFLAGS += -Ofast
 
 	NAME = $(SHARED_L)
 endif
