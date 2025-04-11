@@ -151,6 +151,12 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     return out;
 }
 
+/**
+ * Creates a thread local tracker.
+ *
+ * @param pseudo whether to create a pseudo tracker
+ * @return the new and allocated thread local tracker
+ */
 static inline auto newLocalTracker(bool pseudo) -> trackers::ATracker* {
     if (pseudo) {
         return new trackers::PseudoTracker();
@@ -176,6 +182,14 @@ auto getTracker() -> trackers::ATracker& {
     return *static_cast<trackers::ATracker*>(tlv);
 }
 
+/**
+ * @brief Returns the file names found in the given string.
+ *
+ * The string is splitted by the character `:`.
+ *
+ * @param files the string with the file names
+ * @return the deducted file names
+ */
 static inline auto getFiles(const char* files) -> std::vector<std::filesystem::path> {
     auto toReturn = std::vector<std::filesystem::path>();
     if (files != nullptr) {
@@ -188,6 +202,12 @@ static inline auto getFiles(const char* files) -> std::vector<std::filesystem::p
     return toReturn;
 }
 
+/**
+ * Loads the suppressions found in the given JSON value into the given suppression vector.
+ *
+ * @param content the vector with the deducted suppressions
+ * @param object the JSON value to deduct suppressions from
+ */
 static inline void loadSuppressions(std::vector<suppression::Suppression>& content, const simple_json::Value& object) {
     if (object.is(simple_json::ValueType::Array)) {
         for (const auto& object : object.as<simple_json::ValueType::Array>()) {
@@ -242,6 +262,12 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
     return toReturn;
 }
 
+/**
+ * Loads the regexes found in the given JSON value into the given vector.
+ *
+ * @param content the vector to store the deducted regexes in
+ * @param object the JSON value to deduct the regexes from
+ */
 static inline void loadSystemLibraryFile(std::vector<std::regex>& content, const simple_json::Value& object) {
     using namespace simple_json;
     if (!object.is(ValueType::Array)) {
