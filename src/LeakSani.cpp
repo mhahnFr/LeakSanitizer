@@ -423,6 +423,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Reachability analysis: Stacks...";
     auto failed = std::vector<ThreadInfo>();
+#ifndef __linux__
     for (const auto& [_, info] : threads) {
         using namespace formatter;
 
@@ -438,6 +439,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect,
                       toReturn.recordsStack, false, isThreaded ? threadDesc.c_str() : nullptr);
     }
+#endif
 
     out << clear << "Reachability analysis: Globals...";
     // Search in global space
@@ -450,6 +452,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     }
 
     out << clear << "Reachability analysis: Thread-locals...";
+#ifndef __linux__
     for (const auto& [_, info] : threads) {
         const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
@@ -457,6 +460,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& end = align(begin + __PTHREAD_SIZE__, false);
         classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
     }
+#endif
 
     // FIXME: Reactivate!
 //    out << clear << "Reachability analysis: Compile-time thread-local variables...";
