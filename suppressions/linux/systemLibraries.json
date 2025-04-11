@@ -1,4 +1,4 @@
 [
   "^/usr/lib64/.*$",
-  "^/usr/lib/ld-linux.*$"
+  "^/usr/lib/.*$"
 ]
