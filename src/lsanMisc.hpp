@@ -103,7 +103,18 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream&;
  */
 auto getTracker() -> trackers::ATracker&;
 
+/**
+ * Loads the suppressions.
+ *
+ * @return the loaded suppressions
+ */
 auto loadSuppressions() -> std::vector<suppression::Suppression>;
+
+/**
+ * Loads the system library regexes.
+ *
+ * @return the loaded regexes
+ */
 auto loadSystemLibraries() -> std::vector<std::regex>;
 
 /**
@@ -153,10 +164,20 @@ static inline auto getOutputStream() -> std::ostream & {
     return getBehaviour().printCout() ? std::cout : std::clog;
 }
 
+/**
+ * Returns the suppressions.
+ *
+ * @return the suppressions
+ */
 static inline auto getSuppressions() -> const std::vector<suppression::Suppression>& {
     return getInstance().getSuppressions();
 }
 
+/**
+ * Returns the system library regexes.
+ *
+ * @return the system library regexes
+ */
 static inline auto getSystemLibraries() -> const std::vector<std::regex>& {
     return getInstance().getSystemLibraries();
 }
