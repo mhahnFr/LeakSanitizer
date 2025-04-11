@@ -92,6 +92,12 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     return stream;
 }
 
+/**
+ * Returns the best of the given paths.
+ *
+ * @param path the pair with the relative and absolute path
+ * @return the path to be used
+ */
 static inline auto maybeRelativate(const std::pair<const char*, const char*>& path) -> const char* {
     if (!getBehaviour().relativePaths()) return path.first;
 
