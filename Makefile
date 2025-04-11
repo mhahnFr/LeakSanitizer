@@ -102,8 +102,8 @@ update:
 	$(MAKE) clean
 	git fetch --tags
 	git pull
-	git submodule update
-	git -C $(LIBCALLSTACK_DIR) submodule update
+	git submodule update --init
+	git -C $(LIBCALLSTACK_DIR) submodule update --init
 	$(MAKE) re
 
 $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
@@ -112,13 +112,7 @@ $(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
 $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
 
-$(SIMPLE_JSON_DIR):
-	if [ "$(ls $(SIMPLE_JSON_DIR))" ]; then git submodule update --init $(SIMPLE_JSON_DIR); fi
-
-$(LIBCALLSTACK_DIR):
-	if [ "$(ls $(LIBCALLSTACK_DIR))" ]; then git submodule update --init $(LIBCALLSTACK_DIR); fi
-
-%.o: %.cpp $(SIMPLE_JSON_DIR) $(LIBCALLSTACK_DIR)
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 %.hpp: %.json
@@ -140,6 +134,6 @@ clean:
 re: clean
 	$(MAKE) default
 
-.PHONY: re clean all install uninstall release default update bench $(SIMPLE_JSON_DIR) $(LIBCALLSTACK_DIR)
+.PHONY: re clean all install uninstall release default update bench
 
 -include $(DEPS)
