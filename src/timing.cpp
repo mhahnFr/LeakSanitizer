@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -29,7 +29,12 @@
 #include "formatter.hpp"
 
 namespace lsan::timing {
-auto getTimingMap() -> std::map<AllocType, Timings>& {
+/**
+ * Returns the timing mapping.
+ *
+ * @return the mapping with the timings
+ */
+static inline auto getTimingMap() -> std::map<AllocType, Timings>& {
     return getInstance().getTimingMap();
 }
 
