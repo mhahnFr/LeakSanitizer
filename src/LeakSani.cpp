@@ -390,7 +390,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     signal(SIGUSR1, holdOn);
 #endif
     auto failed = std::vector<ThreadInfo>();
-#ifndef __linux__
     for (const auto& [_, info] : threads) {
 #ifdef __linux__
         if (info.isDead()) continue;
@@ -405,12 +404,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
             failed.push_back(info);
         }
-        const auto& top = align(info.getStackTop());
+        const auto& top = align(info.getStackTop(), false);
         const auto& sp = selfThread ? uintptr_t(__builtin_frame_address(0)) : getStackPointer(info);
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect,
                       toReturn.recordsStack, false, isThreaded ? threadDesc.c_str() : nullptr);
     }
-#endif
 
     out << clear << "Reachability analysis: Globals...";
     // Search in global space
