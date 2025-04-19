@@ -30,6 +30,9 @@
 # undef _XOPEN_SOURCE
 #endif /* __APPLE__ */
 
+#define LCS_ACTIVATE_SWIFT_DEMANGLER_CONTROL 1
+#include <callstack_internals.h>
+
 #include <lsan_stats.h>
 
 #include "signals.hpp"
@@ -344,6 +347,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 
     getTracker().ignoreMalloc = true;
     const auto& reason = getReason(signalCode, info->si_code);
+    activateSwiftDemangler = false;
     crashForce(formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
                + (hasAddress(signalCode) ? " on address " + formatString<Style::BOLD>(utils::toString(info->si_addr)) : ""),
@@ -359,7 +363,9 @@ void callstack(int, siginfo_t*, void* context) {
     getTracker().withIgnoration(true, [&context] {
         auto& out = getOutputStream();
         out << format<Style::ITALIC>("The current callstack:") << std::endl;
+        activateSwiftDemangler = false;
         callstackHelper::format(createCallstackFor(context), out);
+        activateSwiftDemangler = true;
         out << std::endl;
     });
 }
