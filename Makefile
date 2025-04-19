@@ -79,6 +79,9 @@ default: $(NAME)
 bench:
 	$(MAKE) 'BENCHMARK=true'
 
+debug: CXXFLAGS += -O0 -g
+debug: default
+
 all: $(SHARED_L) $(DYLIB_NA)
 
 install:
@@ -134,6 +137,6 @@ clean:
 re: clean
 	$(MAKE) default
 
-.PHONY: re clean all install uninstall release default update bench
+.PHONY: re clean all install uninstall release default update bench debug
 
 -include $(DEPS)
