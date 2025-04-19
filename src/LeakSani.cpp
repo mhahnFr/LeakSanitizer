@@ -423,7 +423,6 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     }
 
     out << clear << "Reachability analysis: Thread-locals...";
-#ifndef __linux__
     for (const auto& [_, info] : threads) {
 #ifdef __linux__
         if (info.isDead()) continue;
@@ -432,10 +431,16 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
         const auto& begin = align(uintptr_t(info.getThread()));
-        const auto& end = align(begin + __PTHREAD_SIZE__, false);
+        const auto& end = align(
+#ifdef __APPLE__
+            begin + __PTHREAD_SIZE__
+#elif defined(__linux__)
+            info.getNumber() == 0 ? begin : uintptr_t(info.getStackTop()) + info.getStackSize() // TODO: What is its size for the main thread?
+#endif
+            , false);
+
         classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
     }
-#endif
 
     // FIXME: Reactivate!
 //    out << clear << "Reachability analysis: Compile-time thread-local variables...";
