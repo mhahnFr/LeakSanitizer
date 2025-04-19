@@ -315,13 +315,24 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
     delete[] classes;
 }
 
+#ifdef __linux__
+static std::thread::id killId;
+volatile static bool holding = true;
+
+static void holdOn(int) {
+    if (std::this_thread::get_id() != killId) {
+        while (holding); // FIXME: Use a condition variable
+    }
+}
+#endif
+
 static inline auto suspendThread(const ThreadInfo& info) -> bool {
     auto toReturn = false;
 #ifdef __APPLE__
     toReturn = thread_suspend(pthread_mach_thread_np(info.getThread())) == KERN_SUCCESS;
 #else
-    (void) info;
-    toReturn = true;
+    killId = std::this_thread::get_id();
+    toReturn = pthread_kill(info.getThread(), SIGUSR1) == 0;
 #endif
     return toReturn;
 }
@@ -375,6 +386,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     classifyObjC(toReturn.recordsObjC);
 
     out << clear << "Reachability analysis: Stacks...";
+#ifdef __linux__
+    signal(SIGUSR1, holdOn);
+#endif
     auto failed = std::vector<ThreadInfo>();
 #ifndef __linux__
     for (const auto& [_, info] : threads) {
@@ -444,6 +458,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                 << std::endl;
         }
     }
+#ifdef __linux__
+    holding = false;
+#endif
 
 #ifdef LSAN_HANDLE_OBJC
     out << clear << "Reachability analysis: Cocoa thread-local variables...";
