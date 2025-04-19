@@ -78,7 +78,11 @@ public:
     }
 
     constexpr inline auto getStackTop() const -> void* {
+#ifdef __APPLE__
         return stackTop;
+#else
+        return reinterpret_cast<void*>(uintptr_t(stackTop) + stackSize);
+#endif
     }
 
 #ifdef __linux__

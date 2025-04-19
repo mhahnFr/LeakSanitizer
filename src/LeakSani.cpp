@@ -435,7 +435,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 #ifdef __APPLE__
             begin + __PTHREAD_SIZE__
 #elif defined(__linux__)
-            info.getNumber() == 0 ? begin : uintptr_t(info.getStackTop()) + info.getStackSize() // TODO: What is its size for the main thread?
+            info.getNumber() == 0 ? begin : uintptr_t(info.getStackTop()) // TODO: What is its size for the main thread?
 #endif
             , false);
 
