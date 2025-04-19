@@ -452,8 +452,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 //        it->second.suppressed = true;
 //    }
 
-    for (const auto& info : failed) {
-        if (info.getId() != std::this_thread::get_id() && !resumeThread(info)) {
+    for (const auto& [_, info] : threads) {
+        if (info.getId() != std::this_thread::get_id() && std::find(failed.cbegin(), failed.cend(), info) == failed.end() && !resumeThread(info)) {
             using namespace formatter;
 
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume "
