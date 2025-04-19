@@ -378,6 +378,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto failed = std::vector<ThreadInfo>();
 #ifndef __linux__
     for (const auto& [_, info] : threads) {
+#ifdef __linux__
+        if (info.isDead()) continue;
+#endif
+
         using namespace formatter;
 
         const auto& threadDesc = getThreadDescription(info.getNumber(), info.getThread());
@@ -407,6 +411,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << clear << "Reachability analysis: Thread-locals...";
 #ifndef __linux__
     for (const auto& [_, info] : threads) {
+#ifdef __linux__
+        if (info.isDead()) continue;
+#endif
+
         const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
         const auto& begin = align(uintptr_t(info.getThread()));
@@ -750,11 +758,20 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
 }
 
 void LSan::addThread(ThreadInfo&& info) {
+#ifdef __linux__
+    if (threads.find(info.getId()) != threads.end()) {
+        return;
+    }
+#endif
     threads.insert_or_assign(info.getId(), std::move(info));
 }
 
 void LSan::removeThread(const std::thread::id& id) {
+#ifdef __linux__
+    threads.at(id).kill();
+#else
     threads.erase(id);
+#endif
 }
 
 auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {

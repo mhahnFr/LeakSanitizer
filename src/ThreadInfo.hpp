@@ -42,6 +42,7 @@ class ThreadInfo {
     void* stackTop;
 #ifdef __linux__
     pid_t tid;
+    bool dead = false;
 #endif
 
 public:
@@ -83,6 +84,14 @@ public:
 #ifdef __linux__
     constexpr inline auto getTid() const -> pid_t {
         return tid;
+    }
+
+    constexpr inline auto isDead() const -> bool {
+        return dead;
+    }
+
+    constexpr inline void kill() {
+        dead = true;
     }
 #endif
 
