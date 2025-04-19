@@ -41,14 +41,8 @@ SUPP_HS  = $(patsubst %.json, %.hpp, $(SUPP_SRC))
 
 DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 
-BENCHMARK = false
-
 LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -D__LSAN_SILENCE_DEPRECATION
-
-ifeq ($(BENCHMARK),true)
-	CXXFLAGS += -DBENCHMARK
-endif
 
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
 MACOS_ARCH_FLAGS =
@@ -76,8 +70,8 @@ INSTALL_PATH ?= /usr/local
 
 default: $(NAME)
 
-bench:
-	$(MAKE) 'BENCHMARK=true'
+bench: CXXFLAGS += -DBENCHMARK
+bench: default
 
 debug: CXXFLAGS += -O0 -g
 debug: default
