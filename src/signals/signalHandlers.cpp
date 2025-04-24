@@ -347,7 +347,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 
     getTracker().ignoreMalloc = true;
     const auto& reason = getReason(signalCode, info->si_code);
-    activateSwiftDemangler = false;
+    lcs_activateSwiftDemangler = false;
     crashForce(formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
                + (hasAddress(signalCode) ? " on address " + formatString<Style::BOLD>(utils::toString(info->si_addr)) : ""),
@@ -363,9 +363,9 @@ void callstack(int, siginfo_t*, void* context) {
     getTracker().withIgnoration(true, [&context] {
         auto& out = getOutputStream();
         out << format<Style::ITALIC>("The current callstack:") << std::endl;
-        activateSwiftDemangler = false;
+        lcs_activateSwiftDemangler = false;
         callstackHelper::format(createCallstackFor(context), out);
-        activateSwiftDemangler = true;
+        lcs_activateSwiftDemangler = true;
         out << std::endl;
     });
 }
