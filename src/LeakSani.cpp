@@ -548,7 +548,7 @@ for (const auto& leak : (records)) {                              \
               toReturn.lostIndirect, toReturn.bytesLostIndirect)
 #undef ENUMERATE
 
-    out << clear << clear;
+    out << clear;
 
     return toReturn;
 }
