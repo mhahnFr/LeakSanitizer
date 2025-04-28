@@ -440,17 +440,19 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
     }
 
-    // FIXME: Reactivate!
-//    out << clear << "Reachability analysis: Compile-time thread-local variables...";
-//    // Search in compile-time thread locals - their wrapper will be suppressed
-//    for (const auto& [ptr, name, relative] : locals) {
-//        const auto& it = infos.find(ptr);
-//        if (it == infos.end()) continue;
-//
-//        classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
-//                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, name, relative, true);
-//        it->second.suppressed = true;
-//    }
+    // FIXME: Implement for all threads!
+    out << clear << "Reachability analysis: Compile-time thread-local variables...";
+    // Search in compile-time thread locals - their wrapper will be suppressed
+    const auto& thisTls = regions_getTLSRegions();
+    for (std::size_t i = 0; i < thisTls.amount; ++i) {
+        const auto& element = thisTls.regions[i];
+        const auto& it = infos.find(reinterpret_cast<void*>(element.begin));
+        if (it == infos.end()) continue;
+
+        classifyLeaks(align(it->second.pointer), align(reinterpret_cast<uintptr_t>(it->second.pointer) + it->second.size, false),
+                      LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, element.name, element.nameRelative, true);
+        it->second.suppressed = true;
+    }
 
     for (const auto& [_, info] : threads) {
         if (info.getId() != std::this_thread::get_id() && std::find(failed.cbegin(), failed.cend(), info) == failed.end() && !resumeThread(info)) {
