@@ -479,15 +479,15 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         const auto& keyIt = infos.find(keys[i]);
         if (keyIt != infos.end()) {
-            classifyRecord(keyIt->second, LeakType::tlvIndirect);
+            classifyRecord(keyIt->second, LeakType::tlvIndirect, true);
             keyIt->second.leakType = LeakType::tlvDirect;
             keyIt->second.imageName.first = threadDesc;
             toReturn.recordsTlv.push_back(keyIt->second);
         }
         const auto& valIt = infos.find(values[i]);
         if (valIt != infos.end()) {
-            classifyRecord(valIt->second, LeakType::tlvIndirect);
-            keyIt->second.leakType = LeakType::tlvDirect;
+            classifyRecord(valIt->second, LeakType::tlvIndirect, true);
+            valIt->second.leakType = LeakType::tlvDirect;
             valIt->second.imageName.first = threadDesc;
             toReturn.recordsTlv.push_back(valIt->second);
         }
