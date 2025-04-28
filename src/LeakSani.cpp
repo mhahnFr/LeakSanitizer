@@ -872,7 +872,7 @@ static inline void printRecord(std::ostream& out, const MallocInfo& info) {
 static inline void printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, bool printContent = false) {
     for (const auto& leak : records) {
         auto& record = leak.get();
-        if (!record.printedInRoot && !record.suppressed && !record.printedInRoot) {
+        if (!record.printedInRoot && !record.suppressed) {
             if (printContent) {
                 printRecord(out, record);
             }
