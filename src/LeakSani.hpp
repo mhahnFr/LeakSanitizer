@@ -114,7 +114,6 @@ class LSan final: public trackers::ATracker {
 
     void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect);
     auto isSuppressed(const MallocInfo& info) -> bool;
-    void applySuppressions(const std::deque<MallocInfo::Ref>& leaks);
 
 protected:
     virtual inline void maybeAddToStats(const MallocInfo& info) final override {

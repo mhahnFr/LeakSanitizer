@@ -246,14 +246,6 @@ auto LSan::isSuppressed(const MallocInfo& info) -> bool {
     return false;
 }
 
-void LSan::applySuppressions(const std::deque<MallocInfo::Ref>& leaks) {
-    for (const auto& leak : leaks) {
-        if (isSuppressed(leak.get()) && !leak.get().suppressed) {
-            leak.get().markSuppressed();
-        }
-    }
-}
-
 auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>& thread) -> const std::string& {
     using namespace std::string_literals;
 
@@ -522,10 +514,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             leak.get().markSuppressed();
         }
     }
-    applySuppressions(toReturn.recordsStack);
-    applySuppressions(toReturn.recordsTlv);
-    applySuppressions(toReturn.recordsGlobal);
-    applySuppressions(toReturn.recordsLost);
+    for (auto& [_, leak] : infos) {
+        if (isSuppressed(leak) && !leak.suppressed) {
+            leak.markSuppressed();
+        }
+    }
 
     out << clear << "Enumerating memory leaks...";
 #define ENUMERATE(records, count, bytes, indirect, indirectBytes) \
