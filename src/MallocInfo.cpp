@@ -61,12 +61,6 @@ constexpr inline void MallocInfo::forEachIndirect(bool mark, F func, Args... arg
 }
 
 void MallocInfo::markSuppressed() {
-    for (const auto& leak : viaMeRecords) {
-        auto& record = leak.get();
-        if (isIndirect(record.leakType) && isConsideredGreater(record.leakType, leakType) && !record.suppressed) {
-            record.suppressed = true;
-        }
-    }
     suppressed = true;
 }
 
