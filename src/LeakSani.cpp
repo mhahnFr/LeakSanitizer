@@ -871,10 +871,10 @@ static inline void printRecord(std::ostream& out, const MallocInfo& info) {
     out << std::endl << info.pointer << " ";
 }
 
-static inline void printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, bool printContent = false) {
+static inline void printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, LeakType allowed, bool printContent = false) {
     for (const auto& leak : records) {
         auto& record = leak.get();
-        if (!record.printedInRoot && !record.suppressed) {
+        if (!record.printedInRoot && !record.suppressed && record.leakType == allowed) {
             if (printContent) {
                 printRecord(out, record);
             }
@@ -911,19 +911,11 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         // TODO: Optionally collapse identical callstacks
         stream << stats << std::endl;
 
-        for (const auto& leak : stats.recordsLost) {
-            auto& record = leak.get();
-            if (record.leakType != LeakType::unreachableDirect || record.printedInRoot || record.suppressed) continue;
-
-//            printRecord(stream, *record);
-            stream << record << std::endl;
-            record.printedInRoot = true;
-        }
-
+        printRecords(stats.recordsLost, stream, LeakType::unreachableDirect);
         if (self.behaviour.showReachables()) {
-            printRecords(stats.recordsGlobal, stream);
-            printRecords(stats.recordsTlv, stream);
-            printRecords(stats.recordsStack, stream);
+            printRecords(stats.recordsGlobal, stream, LeakType::globalDirect);
+            printRecords(stats.recordsTlv, stream, LeakType::tlvDirect);
+            printRecords(stats.recordsStack, stream, LeakType::reachableDirect);
         } else if (stats.getTotalReachable() > 0) {
             stream << "Hint: Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
                    << format<Style::BOLD>("true") << " to display the reachable memory leaks."
