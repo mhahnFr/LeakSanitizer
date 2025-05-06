@@ -8,6 +8,10 @@
     "functions": [ "fgets" ]
   },
   {
+    "name": "Thread creation buffers",
+    "functions": [ "__pthread_create_2_1" ]
+  },
+  {
     "name": "Everything entirely created by the system",
     "functions": [{ "libraryRegex": "LSAN_SYSTEM_LIBRARIES" }]
   }
