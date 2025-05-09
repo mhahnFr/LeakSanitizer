@@ -33,6 +33,8 @@
 
 # include <macos/systemLibraries.hpp>
 
+# include <macos/tlv.hpp>
+
 #elif defined(LSAN_LINUX)
 # include <linux/core.hpp>
 
@@ -65,6 +67,18 @@ auto getSystemLibraryFiles() -> std::vector<std::string> {
         std::string(suppressions_macos_systemLibraries),
 #elif defined(LSAN_LINUX)
         std::string(suppressions_linux_systemLibraries),
+#endif
+    });
+
+    return toReturn;
+}
+
+auto getDefaultTLVSuppressions() -> std::vector<std::string> {
+    auto toReturn = std::vector<std::string>();
+
+    toReturn.insert(toReturn.cbegin(), {
+#ifdef LSAN_APPLE
+        std::string(suppressions_macos_tlv),
 #endif
     });
 

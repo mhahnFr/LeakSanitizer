@@ -28,6 +28,7 @@
 namespace lsan::suppression {
 auto getDefaultSuppression() -> std::vector<std::string>;
 auto getSystemLibraryFiles() -> std::vector<std::string>;
+auto getDefaultTLVSuppressions() -> std::vector<std::string>;
 }
 
 #endif /* defaultSuppression_hpp */
