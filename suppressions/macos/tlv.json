@@ -1,0 +1,8 @@
+[
+  {
+    "name": "macOS compile time TLV matching",
+    "imageName": "/usr/lib/dyld",
+    "type": 4,
+    "functions": [ "_tlv_get_addr" ]
+  }
+]
