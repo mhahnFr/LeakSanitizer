@@ -315,4 +315,21 @@ auto loadSystemLibraries() -> std::vector<std::regex> {
 
     return toReturn;
 }
+
+auto createTLVSuppression() -> std::vector<suppression::Suppression> {
+    auto toReturn = std::vector<suppression::Suppression>();
+
+    for (const auto& suppression : suppression::getDefaultTLVSuppressions()) {
+        try {
+            loadSuppressions(toReturn, simple_json::parse(std::istringstream(suppression)));
+        } catch (const std::exception& e) {
+            using namespace formatter;
+            using namespace std::string_literals;
+
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load TLV suppression: "s + e.what()) << std::endl << std::endl;
+        }
+    }
+
+    return toReturn;
+}
 }

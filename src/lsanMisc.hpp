@@ -117,6 +117,8 @@ auto loadSuppressions() -> std::vector<suppression::Suppression>;
  */
 auto loadSystemLibraries() -> std::vector<std::regex>;
 
+auto createTLVSuppression() -> std::vector<suppression::Suppression>;
+
 /**
  * Returns the current instance of the statistics object.
  *
