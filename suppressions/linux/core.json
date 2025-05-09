@@ -4,12 +4,20 @@
     "functions": [ "__printf" ]
   },
   {
+    "name": "Output buffer allocation, part II",
+    "functions": [ "_IO_printf" ]
+  },
+  {
     "name": "Input buffer allocation",
     "functions": [ "fgets" ]
   },
   {
     "name": "Thread creation buffers",
     "functions": [ "__pthread_create_2_1" ]
+  },
+  {
+    "name": "Thread creation buffers, part II",
+    "functions": [ "pthread_create" ]
   },
   {
     "name": "Everything entirely created by the system",
