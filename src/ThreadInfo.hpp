@@ -27,10 +27,6 @@
 
 #include <pthread.h>
 
-#ifdef __linux__
-# include <unistd.h>
-#endif
-
 namespace lsan {
 class ThreadInfo {
     static unsigned long threadId;
@@ -41,7 +37,6 @@ class ThreadInfo {
     pthread_t thread;
     void* stackTop;
 #ifdef __linux__
-    pid_t tid;
     bool dead = false;
 #endif
 
@@ -50,16 +45,8 @@ public:
                       void* stackTop = __builtin_frame_address(0),
                       unsigned long number = createThreadId(),
                       const std::thread::id& id = std::this_thread::get_id(),
-                      const pthread_t& thread = pthread_self()
-#ifdef __linux__
-                      , const pid_t tid = gettid()
-#endif
-                      ):
-        number(number), stackSize(stackSize), id(id), thread(thread), stackTop(stackTop)
-#ifdef __linux__
-        , tid(tid)
-#endif
-    {}
+                      const pthread_t& thread = pthread_self()):
+        number(number), stackSize(stackSize), id(id), thread(thread), stackTop(stackTop) {}
 
     constexpr inline auto getNumber() const -> unsigned long {
         return number;
@@ -86,10 +73,6 @@ public:
     }
 
 #ifdef __linux__
-    constexpr inline auto getTid() const -> pid_t {
-        return tid;
-    }
-
     constexpr inline auto isDead() const -> bool {
         return dead;
     }
