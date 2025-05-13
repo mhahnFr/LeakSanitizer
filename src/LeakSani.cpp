@@ -499,7 +499,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << clear << "Reachability analysis: Cocoa thread-local variables...";
     // Search in the Cocoa runtime thread-locals
     // TODO: Get dicts of all threads
-    const auto& dict = reinterpret_cast<CFDictionaryRef>(_2(_4(NSThread, currentThread), threadDictionary));
+    const auto& dict = CFDictionaryRef(_1(_2(NSThread, currentThread), threadDictionary));
     const auto& count = CFDictionaryGetCount(dict);
     auto keys = new const void*[count];
     auto values = new const void*[count];

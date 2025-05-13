@@ -28,21 +28,14 @@
 extern "C" id objc_msgSend(id, SEL, ...);
 
 #define CLASS(name) objc_getClass(#name)
-
 #define SELECTOR(name) sel_registerName(#name)
 
-#define CALL_ARGS(receiver, selName, ...) objc_msgSend((id) (receiver), SELECTOR(selName), __VA_ARGS__)
-#define CALL(receiver, selName)           objc_msgSend((id) (receiver), SELECTOR(selName))
-
-#define CALL_CLASS_ARGS(clsName, selName, ...) CALL_ARGS(CLASS(clsName), selName, __VA_ARGS__)
-#define CALL_CLASS(clsName, selName)           CALL(CLASS(clsName), selName)
+#define CALL(receiver, selName, ...) objc_msgSend((id) (receiver), SELECTOR(selName) __VA_OPT__(,) __VA_ARGS__)
+#define CALL_CLASS(clsName, selName, ...) CALL(CLASS(clsName), selName __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef OBJC_SUPPORT_EXTRA
-# define _1(receiver, selName, ...) CALL_ARGS(receiver, selName, __VA_ARGS__)
-# define _2(receiver, selName)      CALL(receiver, selName)
-
-# define _3(clsName, selName, ...) CALL_CLASS_ARGS(clsName, selName, __VA_ARGS__)
-# define _4(clsName, selName)      CALL_CLASS(clsName, selName)
+# define _1(receiver, selName, ...) CALL(receiver, selName __VA_OPT__(,) __VA_ARGS__)
+# define _2(clsName, selName, ...) CALL_CLASS(clsName, selName __VA_OPT__(,) __VA_ARGS__)
 #endif
 
 #endif
