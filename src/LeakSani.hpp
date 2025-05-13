@@ -114,6 +114,9 @@ class LSan final: public trackers::ATracker {
 
     void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect);
     auto isSuppressed(const MallocInfo& info) -> bool;
+#ifdef __linux__
+    auto gatherPthreadSize() -> std::size_t;
+#endif
 
 protected:
     virtual inline void maybeAddToStats(const MallocInfo& info) final override {

@@ -360,6 +360,29 @@ static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
     return toReturn;
 }
 
+#ifdef __linux__
+auto LSan::gatherPthreadSize() -> std::size_t {
+    std::optional<ThreadInfo> info;
+    for (const auto& [_, thread] : threads) {
+        if (thread.getId() != 0) {
+            info = thread;
+            break;
+        }
+    }
+    std::size_t toReturn;
+    if (info) {
+        toReturn = uintptr_t(info->getStackTop()) - uintptr_t(info->getThread());
+    } else {
+        std::thread([&toReturn]() {
+            const auto& stackSize = findStackSize();
+            const auto& stackBegin = findStackBegin();
+            toReturn = uintptr_t(stackBegin + stackSize) - uintptr_t(pthread_self());
+        }).join();
+    }
+    return toReturn;
+}
+#endif
+
 auto LSan::classifyLeaks() -> LeakKindStats {
     auto toReturn = LeakKindStats();
 
@@ -428,15 +451,16 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
-        const auto& begin = align(uintptr_t(info.getThread()));
-        const auto& end = align(
+        std::size_t pthreadSize =
 #ifdef __APPLE__
-            begin + __PTHREAD_SIZE__
+            __PTHREAD_SIZE__
 #elif defined(__linux__)
-            info.getNumber() == 0 ? begin : uintptr_t(info.getStackTop()) // TODO: What is its size for the main thread?
+            gatherPthreadSize()
 #endif
-            , false);
+        ;
 
+        const auto& begin = align(uintptr_t(info.getThread()));
+        const auto& end = align(begin + pthreadSize, false);
         classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
     }
 
