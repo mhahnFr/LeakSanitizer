@@ -364,7 +364,7 @@ static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
 auto LSan::gatherPthreadSize() -> std::size_t {
     std::optional<ThreadInfo> info;
     for (const auto& [_, thread] : threads) {
-        if (thread.getId() != 0) {
+        if (thread.getNumber() != 0 && !thread.isDead()) {
             info = thread;
             break;
         }
@@ -376,7 +376,7 @@ auto LSan::gatherPthreadSize() -> std::size_t {
         std::thread([&toReturn]() {
             const auto& stackSize = findStackSize();
             const auto& stackBegin = findStackBegin();
-            toReturn = uintptr_t(stackBegin + stackSize) - uintptr_t(pthread_self());
+            toReturn = uintptr_t(stackBegin) + stackSize - uintptr_t(pthread_self());
         }).join();
     }
     return toReturn;
