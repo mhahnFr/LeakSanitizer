@@ -69,16 +69,16 @@ static constexpr inline auto align(uintptr_t ptr, bool up = true) -> uintptr_t {
 }
 
 static inline auto align(const void* ptr, bool up = true) -> uintptr_t {
-    return align(reinterpret_cast<uintptr_t>(ptr), up);
+    return align(uintptr_t(ptr), up);
 }
 
 auto LSan::findWithSpecials(void* ptr) -> decltype(infos)::iterator {
     auto toReturn = infos.find(ptr);
     if (toReturn == infos.end()) {
-        toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - 2 * sizeof(void*)));
+        toReturn = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) - 2 * sizeof(void*)));
     }
     if (toReturn == infos.end()) {
-        toReturn = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) - sizeof(void*)));
+        toReturn = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) - sizeof(void*)));
     }
     if (toReturn == infos.end()) {
         toReturn = infos.find(reinterpret_cast<void*>(~uintptr_t(ptr)));
@@ -107,7 +107,7 @@ void LSan::classifyLeaks(uintptr_t begin, uintptr_t end,
 
 void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect) {
     auto classWords = reinterpret_cast<void**>(cls);
-    auto cachePtr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[2]) & (((uintptr_t) 1 << 48) - 1));
+    auto cachePtr = reinterpret_cast<void*>(uintptr_t(classWords[2]) & (((uintptr_t) 1 << 48) - 1));
     const auto& cacheIt = infos.find(cachePtr);
     if (cacheIt != infos.end() && cacheIt->second.leakType > direct) {
         cacheIt->second.leakType = direct;
@@ -115,7 +115,7 @@ void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakTy
         directs.push_back(cacheIt->second);
     }
 
-    auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(classWords[4]) & 0x0f007ffffffffff8UL);
+    auto ptr = reinterpret_cast<void*>(uintptr_t(classWords[4]) & 0x0f007ffffffffff8UL);
     const auto& it = infos.find(ptr);
     if (it != infos.end()) {
         if (it->second.leakType > direct) {
@@ -125,7 +125,7 @@ void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakTy
         }
 
         auto rwStuff = reinterpret_cast<void**>(it->second.pointer);
-        auto ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(rwStuff[1]) & ~1);
+        auto ptr = reinterpret_cast<void*>(uintptr_t(rwStuff[1]) & ~1);
         const auto& it = infos.find(ptr);
         if (it != infos.end()) {
             if (it->second.leakType > direct) {
@@ -309,7 +309,7 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
     for (int i = 0; i < classNumber; ++i) {
         classifyClass(classes[i], records, LeakType::objcDirect, LeakType::objcIndirect);
 
-        const auto& meta = object_getClass(reinterpret_cast<id>(classes[i]));
+        const auto& meta = object_getClass(id(classes[i]));
         classifyClass(meta, records, LeakType::objcDirect, LeakType::objcIndirect);
     }
     delete[] classes;

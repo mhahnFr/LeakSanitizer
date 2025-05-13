@@ -80,11 +80,11 @@ struct interpose {
     const void* oldFunc;
 };
 
-#define INTERPOSE(NEW, OLD)                                                        \
-static const struct interpose interpose_##OLD                                      \
-    __attribute__((used, section("__DATA, __interpose"))) = {                      \
-        reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(lsan::NEW))), \
-        reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(&(OLD)))        \
+#define INTERPOSE(NEW, OLD)                                     \
+static const struct interpose interpose_##OLD                   \
+    __attribute__((used, section("__DATA, __interpose"))) = {   \
+        reinterpret_cast<const void*>(uintptr_t(&(lsan::NEW))), \
+        reinterpret_cast<const void*>(uintptr_t(&(OLD)))        \
     }
 
 #define REPLACE(RET, NAME) \

@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -34,7 +34,7 @@ auto ObjectPool::allocate() -> void* {
             chunks->previous = toReturn->previous;
         }
         ++toReturn->block->allocCount;
-        return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(toReturn) + sizeof(MemoryBlock*));
+        return reinterpret_cast<void*>(uintptr_t(toReturn) + sizeof(MemoryBlock*));
     }
     auto buffer = std::malloc((objectSize + sizeof(MemoryBlock*)) * (blockSize * factor) + sizeof(MemoryBlock));
     if (buffer == nullptr) {
@@ -43,7 +43,7 @@ auto ObjectPool::allocate() -> void* {
     auto newBlock = new(buffer) MemoryBlock(blockSize * factor);
 
     for (std::size_t i = 0; i < newBlock->blockSize; ++i) {
-        auto newChunk = new(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(buffer) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)))) MemoryChunk;
+        auto newChunk = new(reinterpret_cast<void*>(uintptr_t(buffer) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)))) MemoryChunk;
         newChunk->next = chunks;
         if (chunks == nullptr) {
             newChunk->previous = newChunk;
@@ -61,7 +61,7 @@ auto ObjectPool::allocate() -> void* {
 }
 
 void ObjectPool::deallocate(void* pointer) {
-    auto chunk = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(pointer) - sizeof(MemoryBlock*));
+    auto chunk = reinterpret_cast<MemoryChunk*>(uintptr_t(pointer) - sizeof(MemoryBlock*));
     chunk->next = chunks;
     if (chunks == nullptr) {
         chunk->previous = chunk;
@@ -73,7 +73,7 @@ void ObjectPool::deallocate(void* pointer) {
     if (--chunk->block->allocCount == 0) {
         const auto& block = chunk->block;
         for (std::size_t i = 0; i < block->blockSize; ++i) {
-            const auto& element = reinterpret_cast<MemoryChunk*>(reinterpret_cast<uintptr_t>(block) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)));
+            const auto& element = reinterpret_cast<MemoryChunk*>(uintptr_t(block) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)));
             if (element != chunks) {
                 element->previous->next = element->next;
             }

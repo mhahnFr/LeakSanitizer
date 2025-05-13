@@ -228,7 +228,7 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
                 zone->introspect->enumerator(mach_task_self_,
                                              &tracker,
                                              MALLOC_PTR_IN_USE_RANGE_TYPE,
-                                             reinterpret_cast<vm_address_t>(zone),
+                                             vm_address_t(zone),
                                              nullptr, [](auto, auto context, auto, auto array, auto count) {
                     auto& tracker = *reinterpret_cast<trackers::ATracker*>(context);
                     for (unsigned i = 0; i < count; ++i) {

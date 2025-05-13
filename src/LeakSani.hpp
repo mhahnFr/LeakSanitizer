@@ -104,7 +104,7 @@ class LSan final: public trackers::ATracker {
                                                LeakType direct, LeakType indirect) {
         constexpr const auto order = Four ? 3 : 1;
 
-        const auto& it = infos.find(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(ptr) & ~order));
+        const auto& it = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) & ~order));
         if (it != infos.end() && it->second.leakType > direct) {
             it->second.leakType = direct;
             classifyRecord(it->second, indirect);
