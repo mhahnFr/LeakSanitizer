@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -25,7 +25,6 @@
 #include <cctype>
 #include <charconv>
 #include <chrono>
-#include <cstdlib>
 #include <cstring>
 #include <optional>
 
@@ -50,7 +49,7 @@ static inline auto getVariable(const char* name) -> std::optional<const char*> {
  * @tparam T the type of the value to be deducted
  */
 template<typename T>
-constexpr inline auto getFrom(const char* value) -> std::optional<T>;
+constexpr auto getFrom(const char* value) -> std::optional<T>;
 
 /**
  * Retrieves the value set in the environment variable of the given name.
@@ -60,15 +59,15 @@ constexpr inline auto getFrom(const char* value) -> std::optional<T>;
  * @tparam T the type of the value to be deducted
  */
 template<typename T>
-constexpr inline auto get(const char* name) -> std::optional<T> {
-    if (auto var = getVariable(name)) {
+constexpr auto get(const char* name) -> std::optional<T> {
+    if (const auto var = getVariable(name)) {
         return getFrom<T>(*var);
     }
     return std::nullopt;
 }
 
 template<>
-constexpr inline auto getFrom(const char* value) -> std::optional<std::size_t> {
+constexpr auto getFrom(const char* value) -> std::optional<std::size_t> {
     if (value == nullptr) {
         return std::nullopt;
     }
@@ -86,7 +85,7 @@ constexpr inline auto getFrom(const char* value) -> std::optional<std::size_t> {
  * @param string2 the second string
  * @return whether the two given strings are lowercased equal
  */
-static inline auto lowerCompare(const char * string1, const char * string2) -> bool {
+static auto lowerCompare(const char * string1, const char * string2) -> bool {
     const std::size_t len1 = strlen(string1),
                       len2 = strlen(string2);
 
@@ -102,7 +101,7 @@ static inline auto lowerCompare(const char * string1, const char * string2) -> b
 }
 
 template<>
-constexpr inline auto getFrom(const char* value) -> std::optional<bool> {
+constexpr auto getFrom(const char* value) -> std::optional<bool> {
     if (value == nullptr) {
         return std::nullopt;
     }
@@ -113,7 +112,7 @@ constexpr inline auto getFrom(const char* value) -> std::optional<bool> {
         return false;
     }
 
-    if (auto number = getFrom<std::size_t>(value)) {
+    if (const auto number = getFrom<std::size_t>(value)) {
         return number != 0;
     }
     return std::nullopt;
@@ -146,7 +145,7 @@ inline auto getFrom(const char* value) -> std::optional<std::chrono::nanoseconds
 }
 
 template<>
-constexpr inline auto getFrom(const char* value) -> std::optional<const char*> {
+constexpr auto getFrom(const char* value) -> std::optional<const char*> {
     return value == nullptr ? std::nullopt : std::optional(value);
 }
 }
