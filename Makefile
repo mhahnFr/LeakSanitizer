@@ -113,9 +113,9 @@ $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 %.hpp: %.json
-	echo 'constexpr const char*' `echo $(basename $<) | tr /. _` '= R"(' > $@
+	echo 'constexpr const char*' `echo $(basename $<) | tr /. _` '= R"lsanJsonLiteral(' > $@
 	cat $< >> $@
-	echo '\n)";' >> $@
+	echo '\n)lsanJsonLiteral";' >> $@
 
 $(DEFAULT_SUPP_CPP): $(SUPP_HS)
 
