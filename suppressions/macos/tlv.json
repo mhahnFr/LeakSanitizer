@@ -9,5 +9,9 @@
     "name": "macOS compile time TLV matching (TLV version)",
     "type": 6,
     "functions": [ "_tlv_get_addr" ]
+  },
+  {
+    "name": "macOS compile time TLV matching (fallback matcher)",
+    "functions": [ "_tlv_get_addr" ]
   }
 ]
