@@ -19,8 +19,9 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cstdint>
-#include <cstdlib>
+// The memory allocated here is managed by the object pool - thus, it is not leaked.
+// ReSharper disable CppDFAMemoryLeak
+
 #include <new>
 
 #include "ObjectPool.hpp"
@@ -40,10 +41,10 @@ auto ObjectPool::allocate() -> void* {
     if (buffer == nullptr) {
         return nullptr;
     }
-    auto newBlock = new(buffer) MemoryBlock(blockSize * factor);
+    const auto newBlock = new(buffer) MemoryBlock(blockSize * factor);
 
     for (std::size_t i = 0; i < newBlock->blockSize; ++i) {
-        auto newChunk = new(reinterpret_cast<void*>(uintptr_t(buffer) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)))) MemoryChunk;
+        const auto newChunk = new(reinterpret_cast<void*>(uintptr_t(buffer) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)))) MemoryChunk;
         newChunk->next = chunks;
         if (chunks == nullptr) {
             newChunk->previous = newChunk;
@@ -61,7 +62,7 @@ auto ObjectPool::allocate() -> void* {
 }
 
 void ObjectPool::deallocate(void* pointer) {
-    auto chunk = reinterpret_cast<MemoryChunk*>(uintptr_t(pointer) - sizeof(MemoryBlock*));
+    const auto chunk = reinterpret_cast<MemoryChunk*>(uintptr_t(pointer) - sizeof(MemoryBlock*));
     chunk->next = chunks;
     if (chunks == nullptr) {
         chunk->previous = chunk;
@@ -99,7 +100,7 @@ void ObjectPool::merge(ObjectPool& other) {
     if (chunks == nullptr) {
         chunks = other.chunks;
     } else if (other.chunks != nullptr) {
-        auto end = chunks->previous;
+        const auto end = chunks->previous;
         end->next = other.chunks;
         chunks->previous = other.chunks->previous;
         other.chunks->previous = end;

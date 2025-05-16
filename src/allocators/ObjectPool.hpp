@@ -43,7 +43,7 @@ class ObjectPool {
          *
          * @param blockSize the amount of objects this block can hold
          */
-        constexpr inline MemoryBlock(std::size_t blockSize): blockSize(blockSize) {}
+        explicit constexpr MemoryBlock(const std::size_t blockSize): blockSize(blockSize) {}
     };
 
     /**
@@ -80,7 +80,7 @@ public:
      * @param objectSize the size of one object in bytes
      * @param blockSize the amount of objects a block of memory should hold
      */
-    constexpr inline ObjectPool(std::size_t objectSize, std::size_t blockSize): objectSize(objectSize), blockSize(blockSize) {}
+    constexpr ObjectPool(const std::size_t objectSize, const std::size_t blockSize): objectSize(objectSize), blockSize(blockSize) {}
 
     /**
      * Allocates an object in the pool.
@@ -110,18 +110,18 @@ public:
      *
      * @return the size in bytes of one object
      */
-    constexpr inline auto getObjectSize() const -> std::size_t {
+    constexpr auto getObjectSize() const -> std::size_t {
         return objectSize;
     }
 
-    constexpr inline auto operator==(const ObjectPool& other) const noexcept -> bool {
+    constexpr auto operator==(const ObjectPool& other) const noexcept -> bool {
         return objectSize == other.objectSize
             && blockSize == other.blockSize
             && factor == other.factor
             && chunks == other.chunks;
     }
 
-    constexpr inline auto operator!=(const ObjectPool& other) const noexcept -> bool {
+    constexpr auto operator!=(const ObjectPool& other) const noexcept -> bool {
         return !(*this == other);
     }
 };
