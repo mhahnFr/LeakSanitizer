@@ -262,7 +262,7 @@ auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>
         std::optional<pthread_t> t = thread;
         if (!t) {
             const auto& it = std::find_if(threads.cbegin(), threads.cend(), [id](const auto& element) {
-                return element.second.getNumber() == id;
+                return !element.second.isDead() && element.second.getNumber() == id;
             });
             if (it != threads.end()) {
                 t = it->second.getThread();
