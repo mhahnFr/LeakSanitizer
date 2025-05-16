@@ -474,10 +474,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             }
             return false;
         };
-        for (const auto& [_, info] : infos) {
+        for (auto& [_, info] : infos) {
             if (matches(info)) {
                 classifyLeaks(align(info.pointer), align(uintptr_t(info.pointer) + info.size, false), LeakType::tlvDirect,
                               LeakType::tlvIndirect, toReturn.recordsTlv, false, nullptr, nullptr, true);
+                info.suppressed = true;
             }
         }
     }
