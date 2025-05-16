@@ -68,16 +68,16 @@ private:
     FROM_ENV_API(std::size_t, leakCount, LEAK_COUNT)
     FROM_ENV_API(std::size_t, callstackSize, CALLSTACK_SIZE)
 
-    /** The time interval between the automatically statistics printing.   */
+    /** The time interval between the automatic statistics printing.     */
     const std::optional<std::chrono::nanoseconds> _autoStats = get<std::chrono::nanoseconds>("LSAN_AUTO_STATS");
 
     /**
      * Returns whether the stats have been activated using an environment
-     * variable or by the the C API.
+     * variable or by the C API.
      *
      * @return whether the stats should be active
      */
-    inline auto statsActiveInternal() const -> bool {
+    auto statsActiveInternal() const -> bool {
         return _statsActive ? *_statsActive : __lsan_statsActive;
     }
 
@@ -85,9 +85,9 @@ public:
     /**
      * Returns whether the stats should be active.
      *
-     * @return whether to activate the statistical book-keeping.
+     * @return whether to activate the statistical bookkeeping.
      */
-    inline auto statsActive() const -> bool {
+    auto statsActive() const -> bool {
         return statsActiveInternal() || _autoStats;
     }
 
@@ -96,7 +96,7 @@ public:
      *
      * @return the optional time interval
      */
-    constexpr inline auto autoStats() const {
+    constexpr auto autoStats() const {
         return _autoStats;
     }
 
