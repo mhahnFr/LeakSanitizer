@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -51,22 +51,22 @@ struct PoolAllocator {
     /** The type used to store object pools.                                             */
     using Pools = std::vector<ObjectPool>;
 
-    inline PoolAllocator(): pools(std::allocate_shared<Pools>(RealAllocator<Pools>())) {}
+    PoolAllocator(): pools(std::allocate_shared<Pools>(RealAllocator<Pools>())) {}
 
     template<typename U>
-    constexpr inline PoolAllocator(const PoolAllocator<U>& other) noexcept: pools(other.getPools()) {}
+    explicit constexpr PoolAllocator(const PoolAllocator<U>& other) noexcept: pools(other.getPools()) {}
 
-    constexpr inline PoolAllocator(PoolAllocator&& other) noexcept: pools(other.pools) {}
+    constexpr PoolAllocator(PoolAllocator&& other) noexcept: pools(other.pools) {}
 
     template<typename U>
-    constexpr inline PoolAllocator(PoolAllocator<U>&& other) noexcept: pools(other.getPools()) {}
+    explicit constexpr PoolAllocator(PoolAllocator<U>&& other) noexcept: pools(other.getPools()) {}
 
-    constexpr inline auto operator=(const PoolAllocator& other) noexcept -> PoolAllocator& {
+    constexpr auto operator=(const PoolAllocator& other) noexcept -> PoolAllocator& {
         pools = other.pools;
         return *this;
     }
 
-    constexpr inline auto operator=(PoolAllocator&& other) noexcept -> PoolAllocator& {
+    constexpr auto operator=(PoolAllocator&& other) noexcept -> PoolAllocator& {
         pools = other.pools;
         return *this;
     }
@@ -78,9 +78,9 @@ struct PoolAllocator {
      *
      * @param count the amount of objects to allocate
      * @return the allocated block of memory
-     * @throws if too many objects are requested or if unable to allocate
+     * @throws std::bad_alloc if too many objects are requested or if unable to allocate
      */
-    [[ nodiscard ]] constexpr inline auto allocate(std::size_t count) -> T* {
+    [[ nodiscard ]] constexpr auto allocate(const std::size_t count) -> T* {
         if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
         }
@@ -105,7 +105,7 @@ struct PoolAllocator {
      * @param pointer the block of memory to be deallocated
      * @param count the amount of objects to be deallocated
      */
-    constexpr inline void deallocate(T* pointer, std::size_t count) noexcept {
+    constexpr void deallocate(T* pointer, const std::size_t count) noexcept {
         if (count > 1) {
             std::free(pointer);
         } else {
@@ -114,12 +114,12 @@ struct PoolAllocator {
     }
 
     template<typename U>
-    constexpr inline auto operator==(const PoolAllocator<U>& other) const noexcept -> bool {
+    constexpr auto operator==(const PoolAllocator<U>& other) const noexcept -> bool {
         return pools == other.getPools() || *pools == *other.pools;
     }
 
     template<typename U>
-    constexpr inline auto operator!=(const PoolAllocator<U>& other) const noexcept -> bool {
+    constexpr auto operator!=(const PoolAllocator<U>& other) const noexcept -> bool {
         return !(*this == other);
     }
 
@@ -128,7 +128,7 @@ struct PoolAllocator {
      *
      * @return the registered object pools
      */
-    inline auto getPools() const -> std::shared_ptr<Pools> {
+    auto getPools() const -> std::shared_ptr<Pools> {
         return pools;
     }
 
@@ -139,7 +139,7 @@ struct PoolAllocator {
      *
      * @param other the other allocator to merge with
      */
-    inline void merge(PoolAllocator&& other) {
+    void merge(PoolAllocator&& other) {
         for (auto& pool : *other.getPools()) {
             const auto& it = std::find_if(pools->begin(), pools->end(), [&pool](const auto& element) {
                 return element.getObjectSize() == pool.getObjectSize();
@@ -163,10 +163,10 @@ private:
      *
      * @param create whether to create a new object pool if no appropriate one has been found
      * @return an appropriate object pool
-     * @throws if no appropriate object pool was found and no pool should be created
+     * @throws std::runtime_error if no appropriate object pool was found and no pool should be created
      */
-    constexpr inline auto findPool(bool create = true) -> ObjectPool& {
-        constexpr const std::size_t size = sizeof(T);
+    constexpr auto findPool(const bool create = true) -> ObjectPool& {
+        constexpr std::size_t size = sizeof(T);
 
         const auto& it = std::find_if(pools->begin(), pools->end(), [&size](const auto& element) {
             return element.getObjectSize() == size;
