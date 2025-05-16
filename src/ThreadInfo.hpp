@@ -48,23 +48,23 @@ public:
                       const pthread_t& thread = pthread_self()):
         number(number), stackSize(stackSize), id(id), thread(thread), stackTop(stackTop) {}
 
-    constexpr inline auto getNumber() const -> unsigned long {
+    constexpr auto getNumber() const -> unsigned long {
         return number;
     }
 
-    constexpr inline auto getThread() const -> pthread_t {
+    constexpr auto getThread() const -> pthread_t {
         return thread;
     }
 
-    constexpr inline auto getId() const -> const std::thread::id& {
+    constexpr auto getId() const -> const std::thread::id& {
         return id;
     }
 
-    constexpr inline auto getStackSize() const -> std::size_t {
+    constexpr auto getStackSize() const -> std::size_t {
         return stackSize;
     }
 
-    constexpr inline auto getStackTop() const -> void* {
+    constexpr auto getStackTop() const -> void* {
 #ifdef __APPLE__
         return stackTop;
 #else
@@ -73,11 +73,11 @@ public:
     }
 
 #ifdef __linux__
-    constexpr inline auto isDead() const -> bool {
+    constexpr auto isDead() const -> bool {
         return dead;
     }
 
-    constexpr inline void kill() {
+    constexpr void kill() {
         dead = true;
     }
 #endif
