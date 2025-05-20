@@ -22,10 +22,8 @@
 #include "interpose.hpp"
 
 #include "../lsanMisc.hpp"
-#include "../crashWarner/crash.hpp"
-#include "../crashWarner/warn.hpp"
 
-REPLACE(void, exit)(int code) noexcept(noexcept(::exit(code))) {
+REPLACE(void, exit)(const int code) noexcept(noexcept(::exit(code))) {
     getTracker().withIgnoration(true, [] {
         if (getBehaviour().printExitPoint()) {
             getOutputStream() << maybePrintExitPoint;
