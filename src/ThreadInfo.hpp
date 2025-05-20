@@ -22,7 +22,6 @@
 #ifndef ThreadInfo_hpp
 #define ThreadInfo_hpp
 
-#include <optional>
 #include <thread>
 
 #include <pthread.h>
@@ -41,9 +40,9 @@ class ThreadInfo {
 #endif
 
 public:
-    inline ThreadInfo(std::size_t stackSize,
+    inline ThreadInfo(const std::size_t stackSize,
                       void* stackTop = __builtin_frame_address(0),
-                      unsigned long number = createThreadId(),
+                      const unsigned long number = createThreadId(),
                       const std::thread::id& id = std::this_thread::get_id(),
                       const pthread_t& thread = pthread_self()):
         number(number), stackSize(stackSize), id(id), thread(thread), stackTop(stackTop) {}
