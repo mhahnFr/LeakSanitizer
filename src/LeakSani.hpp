@@ -133,6 +133,7 @@ public:
     /** The thread-local storage key used for the thread-local allocation trackers. */
     const pthread_key_t saniKey;
     bool hasPrintedExit = false;
+    bool hadIndirects = false;
 
     LSan();
    ~LSan();

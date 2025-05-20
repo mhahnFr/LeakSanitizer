@@ -896,6 +896,14 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
+static inline auto printIndirectHint(std::ostream& out) -> std::ostream& {
+    using namespace formatter;
+
+    out << "Hint: Set " << format<Style::BOLD>("LSAN_INDIRECT_LEAKS") << " to "
+        << format<Style::BOLD>("true") << " to show indirect memory leaks." << std::endl << std::endl;
+    return out;
+}
+
 static inline void printRecord(std::ostream& out, const MallocInfo& info) {
     auto ptr = reinterpret_cast<void**>(info.pointer);
     for (std::size_t i = 0; i < info.size / 8; ++i) {
@@ -960,6 +968,9 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
         if (self.callstackSizeExceeded) {
             stream << printCallstackSizeExceeded;
             self.callstackSizeExceeded = false;
+        }
+        if (self.hadIndirects) {
+            stream << printIndirectHint;
         }
         if (self.behaviour.relativePaths()) {
             stream << printWorkingDirectory;
