@@ -31,7 +31,7 @@ static constexpr unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024
 /** An array of the byte entities, going from EiB to single bytes.           */
 static constexpr const char* sizes[] { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
 
-auto bytesToString(unsigned long long amount) -> std::string {
+auto bytesToString(const unsigned long long amount) -> std::string {
     std::stringstream s;
     if (!getBehaviour().humanPrint() || amount == 0) {
         s << amount << " B";
@@ -39,10 +39,10 @@ auto bytesToString(unsigned long long amount) -> std::string {
         unsigned long long multiplier = exabyte;
         for (std::size_t i = 0; i < std::size(sizes); ++i, multiplier /= 1024) {
             if (multiplier <= amount) {
-                const unsigned short preDot = static_cast<unsigned short>(amount / multiplier);
+                const auto preDot = static_cast<unsigned short>(amount / multiplier);
                 const unsigned char digitCount = preDot < 10 ? 1 :
-                                                (preDot < 100 ? 2 :
-                                                (preDot < 1000 ? 3 : 4));
+                                                 preDot < 100 ? 2 :
+                                                 preDot < 1000 ? 3 : 4;
 
                 getTracker().withIgnoration(false, [&] {
                     s << std::setprecision(digitCount + 2) << static_cast<double>(amount) / multiplier << " " << sizes[i];
