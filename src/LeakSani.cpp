@@ -912,7 +912,8 @@ static inline void printRecord(std::ostream& out, const MallocInfo& info) {
     out << std::endl << info.pointer << " ";
 }
 
-static inline void printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, LeakType allowed, bool printContent = false) {
+static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, LeakType allowed, bool printContent = false) -> bool {
+    auto toReturn = false;
     for (const auto& leak : records) {
         auto& record = leak.get();
         if (!record.printedInRoot && !record.suppressed && record.leakType == allowed) {
@@ -921,15 +922,18 @@ static inline void printRecords(const std::deque<MallocInfo::Ref>& records, std:
             }
             out << record << std::endl;
             record.printedInRoot = true;
+            toReturn = true;
         }
     }
+    return toReturn;
 }
 
 static inline auto operator<<(std::ostream& out, const LeakKindStats& stats) -> std::ostream& {
     using namespace formatter;
 
     // TODO: Maybe split between direct and indirect?
-    out << "Total: " << stats.getTotal() << " leak" << (stats.getTotal() == 1 ? "" : "s")
+    out << format<Style::BOLD>("Summary:") << std::endl
+        << "Total: " << stats.getTotal() << " leak" << (stats.getTotal() == 1 ? "" : "s")
                      << " (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
         << "       " << get<Style::BOLD> << stats.getTotalLost() << " leak" << (stats.getTotalLost() == 1 ? "" : "s")
                      << " (" << bytesToString(stats.getLostBytes()) << ") lost" << clear<Style::BOLD> << std::endl
@@ -950,15 +954,16 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     callstack_autoClearCaches = false;
 
     const auto& stats = self.classifyLeaks();
+    auto printedLeaks = false;
     if (stats.getTotal() > 0) {
         // TODO: Optionally collapse identical callstacks
         stream << stats << std::endl;
 
-        printRecords(stats.recordsLost, stream, LeakType::unreachableDirect);
+        printedLeaks |= printRecords(stats.recordsLost, stream, LeakType::unreachableDirect);
         if (self.behaviour.showReachables()) {
-            printRecords(stats.recordsGlobal, stream, LeakType::globalDirect);
-            printRecords(stats.recordsTlv, stream, LeakType::tlvDirect);
-            printRecords(stats.recordsStack, stream, LeakType::reachableDirect);
+            printedLeaks |= printRecords(stats.recordsGlobal, stream, LeakType::globalDirect);
+            printedLeaks |= printRecords(stats.recordsTlv, stream, LeakType::tlvDirect);
+            printedLeaks |= printRecords(stats.recordsStack, stream, LeakType::reachableDirect);
         } else if (stats.getTotalReachable() > 0) {
             stream << "Hint: Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
                    << format<Style::BOLD>("true") << " to display the reachable memory leaks."
@@ -969,10 +974,10 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
             stream << printCallstackSizeExceeded;
             self.callstackSizeExceeded = false;
         }
-        if (self.hadIndirects) {
+        if (!self.hadIndirects && printedLeaks) {
             stream << printIndirectHint;
         }
-        if (self.behaviour.relativePaths()) {
+        if (printedLeaks && self.behaviour.relativePaths()) {
             stream << printWorkingDirectory;
         }
     } else {
@@ -986,8 +991,8 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     }
 
     stream << maybeShowDeprecationWarnings;
-    if (stats.getTotal() > 0) {
-        stream << std::endl << format<Style::BOLD>("Summary:") << std::endl << stats;
+    if (stats.getTotal() > 0 && printedLeaks) {
+        stream << std::endl << stats;
     }
 
     callstack_clearCaches();
