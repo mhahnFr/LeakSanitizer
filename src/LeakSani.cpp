@@ -920,11 +920,13 @@ static inline void printRecords(const std::deque<MallocInfo::Ref>& records, std:
 static inline auto operator<<(std::ostream& out, const LeakKindStats& stats) -> std::ostream& {
     using namespace formatter;
 
-    // TODO: Further formatting
     // TODO: Maybe split between direct and indirect?
-    out << "Total: " << stats.getTotal() << " leaks (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
-        << "       " << get<Style::BOLD> << stats.getTotalLost() << " leaks (" << bytesToString(stats.getLostBytes()) << ") lost" << clear<Style::BOLD> << std::endl
-        << "       " << stats.getTotalReachable() << " leaks (" << bytesToString(stats.getReachableBytes()) << ") reachable";
+    out << "Total: " << stats.getTotal() << " leak" << (stats.getTotal() == 1 ? "" : "s")
+                     << " (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
+        << "       " << get<Style::BOLD> << stats.getTotalLost() << " leak" << (stats.getTotalLost() == 1 ? "" : "s")
+                     << " (" << bytesToString(stats.getLostBytes()) << ") lost" << clear<Style::BOLD> << std::endl
+        << "       " << stats.getTotalReachable() << " leak" << (stats.getTotalReachable() == 1 ? "" : "s")
+                     << " (" << bytesToString(stats.getReachableBytes()) << ") reachable";
     if (!getBehaviour().showReachables()) {
         out << format<Style::ITALIC>(" (not shown)");
     }
