@@ -26,10 +26,8 @@
 #include <map>
 #include <mutex>
 #include <optional>
-#include <ostream>
 #include <regex>
 #include <set>
-#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -101,11 +99,11 @@ class LSan final: public trackers::ATracker {
 
     template<bool Four = false>
     constexpr inline void classifyPointerUnion(void* ptr, std::deque<MallocInfo::Ref>& directs,
-                                               LeakType direct, LeakType indirect) {
-        constexpr const auto order = Four ? 3 : 1;
+                                               const LeakType direct, const LeakType indirect) {
+        constexpr auto order = Four ? 3 : 1;
 
-        const auto& it = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) & ~order));
-        if (it != infos.end() && it->second.leakType > direct) {
+        if (const auto& it = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) & ~order));
+            it != infos.end() && it->second.leakType > direct) {
             it->second.leakType = direct;
             classifyRecord(it->second, indirect);
             directs.push_back(it->second);
@@ -136,7 +134,7 @@ public:
     bool hadIndirects = false;
 
     LSan();
-   ~LSan();
+   ~LSan() override;
 
     LSan(const LSan&) = delete;
     LSan(LSan&&)      = delete;
@@ -144,7 +142,7 @@ public:
     auto operator=(const LSan&) -> LSan& = delete;
     auto operator=(LSan&&)      -> LSan& = delete;
 
-    inline static auto operator new(std::size_t count) -> void* {
+    inline static auto operator new(const std::size_t count) -> void* {
         return real::malloc(count);
     }
 
@@ -279,7 +277,7 @@ public:
      *
      * @param exceeded whether the maximum callstack size has been exceeded
      */
-    constexpr inline void setCallstackSizeExceeded(bool exceeded) {
+    constexpr inline void setCallstackSizeExceeded(const bool exceeded) {
         callstackSizeExceeded = exceeded;
     }
 
