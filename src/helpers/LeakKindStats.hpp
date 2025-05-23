@@ -22,7 +22,6 @@
 #ifndef LeakKindStats_hpp
 #define LeakKindStats_hpp
 
-#include <cstddef>
 #include <deque>
 
 #include "../MallocInfo.hpp"
