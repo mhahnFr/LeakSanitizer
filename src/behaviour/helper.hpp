@@ -25,6 +25,7 @@
 #include <cctype>
 #include <charconv>
 #include <chrono>
+#include <cstdlib>
 #include <cstring>
 #include <optional>
 

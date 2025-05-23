@@ -22,8 +22,6 @@
 #ifndef ObjectPool_hpp
 #define ObjectPool_hpp
 
-#include <cstddef>
-
 namespace lsan {
 /**
  * This class represents a pool of objects.
