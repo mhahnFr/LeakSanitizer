@@ -110,7 +110,7 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
  * @param indentChar the character to indent with
  * @return a suitable indentation string
  */
-static inline auto getIndent(std::string::difference_type indent, char indentChar = ' ') -> std::string {
+static inline auto getIndent(const std::string::size_type indent, const char indentChar = ' ') -> std::string {
     return indent > 0 ? std::string(indent, indentChar) : std::string();
 }
 
@@ -154,9 +154,7 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
     }
 
     for (i = printed = 0; i < size && printed < getBehaviour().callstackSize(); ++i) {
-        const auto& binaryFile = frames[i].binaryFile;
-
-        if (binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
+        if (const auto& binaryFile = frames[i].binaryFile; binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
         } else if (firstHit && (suppression::isFirstParty(binaryFile, !callstack_autoClearCaches) || frames[i].binaryFileIsSelf)) {
             const auto& number = std::to_string(printed + 1);
@@ -190,30 +188,28 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
  * @param address the address of the represented function call
  * @return whether the callstack frame was matched
  */
-static inline auto match(const suppression::Suppression::RangeOrRegexType& supp, const callstack_frame* frame, uintptr_t address) -> bool {
+static inline auto match(const suppression::Suppression::RangeOrRegexType& supp, const callstack_frame* frame, const uintptr_t address) -> bool {
     if (supp.first == suppression::Suppression::Type::range) {
-        const auto& range = std::get<suppression::Suppression::RangeType>(supp.second);
-        return address >= range.first && address <= range.first + range.second;
+        const auto& [begin, end] = std::get<suppression::Suppression::RangeType>(supp.second);
+        return address >= begin && address <= begin + end;
     }
-    for (const auto& regex : std::get<suppression::Suppression::RegexType>(supp.second)) {
-        if (frame->binaryFileIsSelf
+    const auto& suppressions = std::get<suppression::Suppression::RegexType>(supp.second);
+    return std::any_of(suppressions.begin(), suppressions.end(), [&](const std::regex& regex) {
+        return frame->binaryFileIsSelf
             || (std::regex_match("LSAN_SYSTEM_LIBRARIES", regex) && suppression::isFirstParty(frame->binaryFile, !callstack_autoClearCaches))
-            || std::regex_match(frame->binaryFile, regex)) {
-            return true;
-        }
-    }
-    return false;
+            || std::regex_match(frame->binaryFile, regex);
+    });
 }
 
 auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& callstack) -> bool {
-    callstack_frame* binaries = nullptr;
+    const callstack_frame* binaries = nullptr;
     if (suppression.hasRegexes) {
         binaries = callstack_autoClearCaches ? callstack_getBinaries(callstack) : callstack_getBinariesCached(callstack);
     }
     for (std::size_t i = 0; i + suppression.topCallstack.size() <= callstack->backtraceSize; ++i) {
         auto matched { false };
 
-        for (std::size_t j = 0, k = i; j < suppression.topCallstack.size() && k < callstack->backtraceSize; /*++k*/) {
+        for (std::size_t j = 0, k = i; j < suppression.topCallstack.size() && k < callstack->backtraceSize; ) {
             const auto& address = uintptr_t(callstack->backtrace[k]);
             const auto& hereMatch = match(suppression.topCallstack[j], binaries + k, address);
             if (suppression.topCallstack[j].first == suppression::Suppression::Type::regex) {
