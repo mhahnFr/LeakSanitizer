@@ -40,7 +40,6 @@
 
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
-#include "../MallocInfo.hpp"
 #include "../utils.hpp"
 #include "../callstacks/callstackHelper.hpp"
 #include "../crashWarner/crash.hpp"
@@ -64,7 +63,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
      *                                                          - mhahnFr
      */
 #if defined(__APPLE__) && (defined(__x86_64__) || defined(__i386__) || defined(__arm64__))
-    const ucontext_t* context = reinterpret_cast<ucontext_t*>(ptr);
+    const ucontext_t* context = static_cast<ucontext_t*>(ptr);
     
     uintptr_t ip, bp;
 #ifdef __APPLE__
@@ -87,18 +86,18 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     bp = context->uc_mcontext.gregs[REG_EBP];
  #endif
 #endif
-    
-    void* previousFrame = nullptr;
-    void* frame         = reinterpret_cast<void*>(bp);
-    void* returnAddress = reinterpret_cast<void*>(ip);
+
+    const void* previousFrame = nullptr;
+    auto frame         = reinterpret_cast<void*>(bp);
+    auto returnAddress = reinterpret_cast<void*>(ip);
 
     auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
     int i = 0;
     do {
         addresses[i++] = returnAddress;
-        returnAddress = reinterpret_cast<void**>(frame)[1];
+        returnAddress = static_cast<void**>(frame)[1];
         previousFrame = frame;
-        frame = *reinterpret_cast<void**>(frame);
+        frame = *static_cast<void**>(frame);
     } while (frame > previousFrame && i < CALLSTACK_BACKTRACE_SIZE);
     toReturn = lcs::callstack(addresses.data(), i);
 #else
@@ -114,12 +113,13 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
  * @param code the reason code
  * @return the optional explanation
  */
-static inline auto getReasonSEGV(int code) -> std::optional<std::string> {
+static inline auto getReasonSEGV(const int code) -> std::optional<std::string> {
     switch (code) {
         case SEGV_MAPERR: return "Address not existent";
         case SEGV_ACCERR: return "Access to address denied";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -128,7 +128,7 @@ static inline auto getReasonSEGV(int code) -> std::optional<std::string> {
  * @param code the reason code
  * @return the optional explanation
  */
-static inline auto getReasonILL(int code) -> std::optional<std::string> {
+static inline auto getReasonILL(const int code) -> std::optional<std::string> {
     switch (code) {
         case ILL_ILLOPC: return "Illegal opcode";
         case ILL_ILLTRP: return "Illegal trap";
@@ -138,8 +138,9 @@ static inline auto getReasonILL(int code) -> std::optional<std::string> {
         case ILL_PRVREG: return "Privileged register";
         case ILL_COPROC: return "Coprocessor error";
         case ILL_BADSTK: return "Internal stack error";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -148,7 +149,7 @@ static inline auto getReasonILL(int code) -> std::optional<std::string> {
  * @param code the reason code
  * @return the optional explanation
  */
-static inline auto getReasonFPE(int code) -> std::optional<std::string> {
+static inline auto getReasonFPE(const int code) -> std::optional<std::string> {
     switch (code) {
         case FPE_FLTDIV: return "Floating point divide by zero";
         case FPE_FLTOVF: return "Floating point overflow";
@@ -158,8 +159,9 @@ static inline auto getReasonFPE(int code) -> std::optional<std::string> {
         case FPE_FLTSUB: return "Subscript out of range";
         case FPE_INTDIV: return "Integer divide by zero";
         case FPE_INTOVF: return "Integer overflow";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -168,13 +170,14 @@ static inline auto getReasonFPE(int code) -> std::optional<std::string> {
  * @param code the reason code
  * @return the optional explanation
  */
-static inline auto getReasonBUS(int code) -> std::optional<std::string> {
+static inline auto getReasonBUS(const int code) -> std::optional<std::string> {
     switch (code) {
         case BUS_ADRALN: return "Invalid address alignment";
         case BUS_ADRERR: return "Physical address not existent";
         case BUS_OBJERR: return "Object-specific HW error";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -183,12 +186,13 @@ static inline auto getReasonBUS(int code) -> std::optional<std::string> {
  * @param code the reason code
  * @return the optional explanation
  */
-static inline auto getReasonTRAP(int code) -> std::optional<std::string> {
+static inline auto getReasonTRAP(const int code) -> std::optional<std::string> {
     switch (code) {
         case TRAP_BRKPT: return "Process breakpoint";
         case TRAP_TRACE: return "Process trace trap";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -198,7 +202,7 @@ static inline auto getReasonTRAP(int code) -> std::optional<std::string> {
  * @param code the reason code
  * @return the optional explanation
  */
-static inline auto getReason(int signalCode, int code) -> std::optional<std::string> {
+static inline auto getReason(const int signalCode, const int code) -> std::optional<std::string> {
     using namespace formatter;
 
     switch (signalCode) {
@@ -207,6 +211,8 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
         case SIGFPE:  return getReasonFPE(code);
         case SIGBUS:  return getReasonBUS(code);
         case SIGTRAP: return getReasonTRAP(code);
+
+        default: break;
     }
     
     switch (code) {
@@ -214,16 +220,16 @@ static inline auto getReason(int signalCode, int code) -> std::optional<std::str
         case SI_QUEUE: return "Sent by " + formatString<Style::BOLD>("sigqueue") + "(3)";
         case SI_TIMER: return "POSIX timer expired";
         case SI_MESGQ: return "POSIX message queue state changed";
-            
+
 #ifdef SI_TKILL
         case SI_TKILL: return formatString<Style::BOLD>("tkill") + "(2) or " + formatString<Style::BOLD>("tgkill") + "(2)";
 #endif
 #ifdef SI_KERNEL
         case SI_KERNEL: return "Sent by the kernel";
 #endif
+
+        default: return std::nullopt;
     }
-    
-    return std::nullopt;
 }
 
 /**
@@ -236,8 +242,9 @@ static inline auto stringifyReasonSEGV(const int code) -> std::optional<std::str
     switch (code) {
         case SEGV_ACCERR: return "ACCERR";
         case SEGV_MAPERR: return "MAPERR";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -256,8 +263,9 @@ static inline auto stringifyReasonILL(const int code) -> std::optional<std::stri
         case ILL_PRVREG: return "PRVREG";
         case ILL_COPROC: return "COPROC";
         case ILL_BADSTK: return "BADSTK";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -276,8 +284,9 @@ static inline auto stringifyReasonFPE(const int code) -> std::optional<std::stri
         case FPE_FLTSUB: return "FLTSUB";
         case FPE_INTDIV: return "INTDIV";
         case FPE_INTOVF: return "INTOVF";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -291,8 +300,9 @@ static inline auto stringifyReasonBUS(const int code) -> std::optional<std::stri
         case BUS_ADRALN: return "ADRALN";
         case BUS_ADRERR: return "ADRERR";
         case BUS_OBJERR: return "OBJERR";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -305,8 +315,9 @@ static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::str
     switch (code) {
         case TRAP_BRKPT: return "BRKPT";
         case TRAP_TRACE: return "TRACE";
+
+        default: return std::nullopt;
     }
-    return std::nullopt;
 }
 
 /**
@@ -323,6 +334,8 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
         case SIGFPE:  return stringifyReasonFPE(code);
         case SIGBUS:  return stringifyReasonBUS(code);
         case SIGTRAP: return stringifyReasonTRAP(code);
+
+        default: break;
     }
     
     switch (code) {
@@ -337,34 +350,34 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 #ifdef SI_KERNEL
         case SI_KERNEL: return "SI_KERNEL";
 #endif
+
+        default: return std::nullopt;
     }
-    
-    return std::nullopt;
 }
 
-[[ noreturn ]] void crashWithTrace(int signalCode, siginfo_t* info, void* ptr) {
+[[ noreturn ]] void crashWithTrace(const int signalCode, const siginfo_t* signalContext, void* executionContext) {
     using namespace formatter;
 
     getTracker().ignoreMalloc = true;
-    const auto& reason = getReason(signalCode, info->si_code);
+    const auto& reason = getReason(signalCode, signalContext->si_code);
     lcs_activateSwiftDemangler = false;
     crashForce(formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
                + " (" + stringify(signalCode) + ")"
-               + (hasAddress(signalCode) ? " on address " + formatString<Style::BOLD>(utils::toString(info->si_addr)) : ""),
+               + (hasAddress(signalCode) ? " on address " + formatString<Style::BOLD>(utils::toString(signalContext->si_addr)) : ""),
                reason.has_value()
-                ? std::optional(formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, info->si_code).value_or("Unknown reason") + ")")
+                ? std::optional(formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, signalContext->si_code).value_or("Unknown reason") + ")")
                 : std::nullopt,
-               createCallstackFor(ptr));
+               createCallstackFor(executionContext));
 }
 
-void callstack(int, siginfo_t*, void* context) {
+void callstack(int, siginfo_t*, void* executionContext) {
     using namespace formatter;
 
-    getTracker().withIgnoration(true, [&context] {
+    getTracker().withIgnoration(true, [&executionContext] {
         auto& out = getOutputStream();
         out << format<Style::ITALIC>("The current callstack:") << std::endl;
         lcs_activateSwiftDemangler = false;
-        callstackHelper::format(createCallstackFor(context), out);
+        callstackHelper::format(createCallstackFor(executionContext), out);
         lcs_activateSwiftDemangler = true;
         out << std::endl;
     });
