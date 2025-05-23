@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -78,13 +78,13 @@ static inline auto demangle(const char * string) noexcept -> std::string {
 [[ noreturn ]] void exceptionHandler() noexcept {
     getTracker().ignoreMalloc = true;
 
-    if (auto exception = std::current_exception()) {
+    if (const auto exception = std::current_exception()) {
         try {
             std::rethrow_exception(exception);
-        } catch (lcs::exception& exception) {
-            handleException(exception);
-        } catch (std::exception& exception) {
-            handleException(exception);
+        } catch (lcs::exception& e) {
+            handleException(e);
+        } catch (std::exception& e) {
+            handleException(e);
         } catch (...) {
             crashForce("Unknown uncaught exception");
         }
