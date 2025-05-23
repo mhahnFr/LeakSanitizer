@@ -24,7 +24,6 @@
 
 #include <ostream>
 #include <string>
-#include <vector>
 
 #include <callstack.h>
 
