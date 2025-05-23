@@ -44,7 +44,7 @@ constexpr static inline void printer(const std::string& message, lcs::callstack&
                                      const std::optional<std::string>& reason = std::nullopt) {
     using formatter::Style;
     
-    constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
+    constexpr auto colour = Warning ? Style::MAGENTA : Style::RED;
 
     std::cerr << formatter::clearAll() << std::endl
               << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
@@ -92,7 +92,7 @@ constexpr static inline void printer(const std::string&                     mess
 
     auto& instance = getInstance();
     if (info.has_value()) {
-        constexpr const auto colour = Warning ? Style::MAGENTA : Style::RED;
+        constexpr auto colour = Warning ? Style::MAGENTA : Style::RED;
         const auto& record = info.value().get();
         const auto& showThread = instance.getIsThreaded();
 
@@ -125,8 +125,8 @@ constexpr static inline void printer(const std::string&                     mess
 template<typename F>
 static inline void withCallstack(const F & function) {
     auto callstack = lcs::callstack();
-    const auto& suppressions = lsan::getSuppressions();
-    if (!callstackHelper::isSuppressed(suppressions.cbegin(), suppressions.cend(), callstack)) {
+    if (const auto& suppressions = getSuppressions();
+        !callstackHelper::isSuppressed(suppressions.cbegin(), suppressions.cend(), callstack)) {
         function(callstack);
     }
 }
