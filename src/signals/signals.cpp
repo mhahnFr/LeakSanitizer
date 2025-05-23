@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -24,11 +24,11 @@
 #include "signals.hpp"
 
 namespace lsan::signals {
-auto registerFunction(void (*function)(int), int signalCode) -> bool {
-    return signal(signalCode, function) != SIG_ERR;
+auto registerFunction(void (*function)(int), const int signal) -> bool {
+    return ::signal(signal, function) != SIG_ERR;
 }
 
-auto registerFunction(void* function, int signalCode, bool forCrash) -> bool {
+auto registerFunction(void* function, const int signal, const bool forCrash) -> bool {
     struct sigaction s{};
     s.sa_sigaction = reinterpret_cast<void (*)(int, siginfo_t*, void*)>(function);
     s.sa_flags = SA_SIGINFO;
@@ -37,10 +37,10 @@ auto registerFunction(void* function, int signalCode, bool forCrash) -> bool {
     } else {
         s.sa_flags |= SA_RESTART;
     }
-    return sigaction(signalCode, &s, nullptr);
+    return sigaction(signal, &s, nullptr);
 }
 
-auto getDescriptionFor(int signal) noexcept -> const char* {
+auto getDescriptionFor(const int signal) noexcept -> const char* {
     switch (signal) {
         case SIGHUP:    return "Terminal line hangup";
         case SIGINT:    return "Interrupt";
@@ -64,11 +64,12 @@ auto getDescriptionFor(int signal) noexcept -> const char* {
 #if defined(__APPLE__) || defined(SIGEMT)
         case SIGEMT:    return "Emulate instruction executed";
 #endif
+
+        default: return "Unknown signal";
     }
-    return "Unknown signal";
 }
 
-auto stringify(int signal) noexcept -> const char* {
+auto stringify(const int signal) noexcept -> const char* {
     switch (signal) {
         case SIGHUP:    return "SIGHUP";
         case SIGINT:    return "SIGINT";
@@ -92,17 +93,19 @@ auto stringify(int signal) noexcept -> const char* {
 #if defined(__APPLE__) || defined(SIGEMT)
         case SIGEMT:    return "SIGEMT";
 #endif
+
+        default: return "Unknown";
     }
-    return "Unknown";
 }
 
-auto hasAddress(int signal) noexcept -> bool {
+auto hasAddress(const int signal) noexcept -> bool {
     switch (signal) {
         case SIGBUS:
         case SIGFPE:
         case SIGILL:
         case SIGSEGV: return true;
+
+        default: return false;
     }
-    return false;
 }
 }
