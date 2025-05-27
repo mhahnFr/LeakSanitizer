@@ -216,7 +216,7 @@ static inline void printFragmentationByteBar(const std::size_t width, std::ostre
                 currentBlockEnd   = it->second.size,
                 b                 = 0;
     
-    auto total = 0zu;
+    auto total = std::size_t(0);
     for (const auto & [_, info] : infos) {
         total += info.size;
     }
