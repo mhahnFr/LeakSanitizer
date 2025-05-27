@@ -25,8 +25,8 @@
 #include "crash.hpp"
 #include "warn.hpp"
 
-#include "../lsanMisc.hpp"
 #include "../formatter.hpp"
+#include "../lsanMisc.hpp"
 #include "../callstacks/callstackHelper.hpp"
 
 namespace lsan {

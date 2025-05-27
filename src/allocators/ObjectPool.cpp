@@ -22,8 +22,8 @@
 // The memory allocated here is managed by the object pool - thus, it is not leaked.
 // ReSharper disable CppDFAMemoryLeak
 
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
 #include <new>
 
 #include "ObjectPool.hpp"

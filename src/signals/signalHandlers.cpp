@@ -35,8 +35,8 @@
 
 #include <lsan_stats.h>
 
-#include "signals.hpp"
 #include "signalHandlers.hpp"
+#include "signals.hpp"
 
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"

@@ -23,8 +23,8 @@
 
 #include "MallocInfo.hpp"
 
-#include "formatter.hpp"
 #include "bytePrinter.hpp"
+#include "formatter.hpp"
 
 namespace lsan {
 /**
