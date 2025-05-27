@@ -24,7 +24,6 @@
 #ifdef BENCHMARK
 
 #include <tuple>
-#include <optional>
 
 #include "formatter.hpp"
 
@@ -38,22 +37,22 @@ static inline auto getTimingMap() -> std::map<AllocType, Timings>& {
     return getInstance().getTimingMap();
 }
 
-void addSystemTime(std::chrono::nanoseconds duration, AllocType type) {
+void addSystemTime(const std::chrono::nanoseconds duration, const AllocType type) {
     std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].system.push_back(duration);
 }
 
-void addLockingTime(std::chrono::nanoseconds duration, AllocType type) {
+void addLockingTime(const std::chrono::nanoseconds duration, const AllocType type) {
     std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].locking.push_back(duration);
 }
 
-void addTrackingTime(std::chrono::nanoseconds duration, AllocType type) {
+void addTrackingTime(const std::chrono::nanoseconds duration, const AllocType type) {
     std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].tracking.push_back(duration);
 }
 
-void addTotalTime(std::chrono::nanoseconds duration, AllocType type) {
+void addTotalTime(const std::chrono::nanoseconds duration, const AllocType type) {
     std::lock_guard lock { getInstance().mutex };
     getTimingMap()[type].total.push_back(duration);
 }
@@ -102,15 +101,15 @@ static inline auto operator<<(std::ostream& out, const Timings& timings) -> std:
     const double totalMinD = static_cast<double>(totalMin.count()),
                  totalMaxD = static_cast<double>(totalMax.count());
 
-    const double sysPartMin   = (systemMin.count() / totalMinD) * 100,
-                 sysPartMax   = (systemMax.count() / totalMaxD) * 100,
-                 sysPartAvg   = (systemAvg / totalAvg) * 100,
-                 lockPartMin  = (lockingMin.count() / totalMinD) * 100,
-                 lockPartMax  = (lockingMax.count() / totalMaxD) * 100,
-                 lockPartAvg  = (lockingAvg / totalAvg) * 100,
-                 trackPartMin = (trackingMin.count() / totalMinD) * 100,
-                 trackPartMax = (trackingMax.count() / totalMaxD) * 100,
-                 trackPartAvg = (trackingAvg / totalAvg) * 100;
+    const double sysPartMin   = systemMin.count() / totalMinD * 100,
+                 sysPartMax   = systemMax.count() / totalMaxD * 100,
+                 sysPartAvg   = systemAvg / totalAvg * 100,
+                 lockPartMin  = lockingMin.count() / totalMinD * 100,
+                 lockPartMax  = lockingMax.count() / totalMaxD * 100,
+                 lockPartAvg  = lockingAvg / totalAvg * 100,
+                 trackPartMin = trackingMin.count() / totalMinD * 100,
+                 trackPartMax = trackingMax.count() / totalMaxD * 100,
+                 trackPartAvg = trackingAvg / totalAvg * 100;
 
     out << "  System time (" << format<Style::GREEN>("min") << ", " << format<Style::RED>("max") << ", "
         << format<Style::MAGENTA>("avg") << ", " << format<Style::BOLD>("med") << "): "

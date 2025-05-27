@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -25,7 +25,6 @@
 #ifdef BENCHMARK
 #include <chrono>
 #include <deque>
-#include <map>
 #include <ostream>
 
 namespace lsan::timing {
