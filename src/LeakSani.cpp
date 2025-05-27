@@ -447,16 +447,13 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
-        const std::size_t pthreadSize =
-#ifdef __APPLE__
-            __PTHREAD_SIZE__
-#elif defined(__linux__)
-            gatherPthreadSize()
-#endif
-        ;
-
+#ifdef __linux__
+        const auto& end   = align(uintptr_t(info.getThread()) + gatherPthreadSize(), false);
+        const auto& begin = align(end - 3744);
+#else
         const auto& begin = align(uintptr_t(info.getThread()));
-        const auto& end = align(begin + pthreadSize, false);
+        const auto& end   = align(begin + __PTHREAD_SIZE__, false);
+#endif
         classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
     }
 
