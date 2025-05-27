@@ -29,11 +29,11 @@
 # include <malloc/malloc.h>
 #endif
 
-#include "../LeakSani.hpp"
 #include "../formatter.hpp"
+#include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
-#include "../utils.hpp"
 #include "../timing.hpp"
+#include "../utils.hpp"
 #include "../crashWarner/crashOrWarn.hpp"
 
 /*
@@ -55,15 +55,15 @@ auto operator new(std::size_t size) -> void * {
 
 namespace lsan {
 extern "C" {
-auto __wrap_malloc(std::size_t size, const char*, int) -> void* {
+auto __wrap_malloc(const std::size_t size, const char*, int) -> void* {
     return malloc(size);
 }
 
-auto __wrap_calloc(std::size_t objectSize, std::size_t count, const char*, int) -> void* {
-    return calloc(objectSize, count);
+auto __wrap_calloc(const std::size_t count, const std::size_t objectSize, const char*, int) -> void* {
+    return calloc(count, objectSize);
 }
 
-auto __wrap_realloc(void* pointer, std::size_t size, const char*, int) -> void* {
+auto __wrap_realloc(void* pointer, const std::size_t size, const char*, int) -> void* {
     return realloc(pointer, size);
 }
 
@@ -71,7 +71,7 @@ void __wrap_free(void* pointer, const char*, int) {
     return free(pointer);
 }
 
-[[ noreturn ]] void __wrap_exit(int code, const char*, int) {
+[[ noreturn ]] void __wrap_exit(const int code, const char*, int) {
     exit(code);
 }
 }
@@ -103,7 +103,7 @@ inline void ifNotIgnored(F&& func, Args&& ...args) {
     BENCH(std::lock_guard lock { tracker.mutex };, std::chrono::nanoseconds, lockingTime);
     if (!tracker.ignoreMalloc) {
         tracker.ignoreMalloc = true;
-        std::invoke(std::move(func), tracker,
+        std::invoke(std::forward<F>(func), tracker,
 #ifdef BENCHMARK
                     std::move(lockingTime),
 #endif
@@ -134,12 +134,12 @@ inline void ifNotIgnored(F&& func, Args&& ...args) {
 #endif
 
 #ifdef __APPLE__
-auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
+auto malloc_zone_malloc(malloc_zone_t* zone, const std::size_t size) -> void* {
     if (zone == nullptr) {
         crashForce("Called with NULL as zone");
     }
 
-    BENCH(auto ptr = ::malloc_zone_malloc(zone, size);, std::chrono::nanoseconds, sysTime);
+    BENCH(const auto ptr = ::malloc_zone_malloc(zone, size);, std::chrono::nanoseconds, sysTime);
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
@@ -154,12 +154,12 @@ auto malloc_zone_malloc(malloc_zone_t* zone, std::size_t size) -> void* {
     return ptr;
 }
 
-auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size) -> void* {
+auto malloc_zone_calloc(malloc_zone_t* zone, const std::size_t count, const std::size_t size) -> void* {
     if (zone == nullptr) {
         crashForce("Called with NULL as zone");
     }
 
-    BENCH(auto ptr = ::malloc_zone_calloc(zone, count, size);, std::chrono::nanoseconds, sysTime);
+    BENCH(const auto ptr = ::malloc_zone_calloc(zone, count, size);, std::chrono::nanoseconds, sysTime);
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
@@ -174,12 +174,12 @@ auto malloc_zone_calloc(malloc_zone_t* zone, std::size_t count, std::size_t size
     return ptr;
 }
 
-auto malloc_zone_valloc(malloc_zone_t* zone, std::size_t size) -> void* {
+auto malloc_zone_valloc(malloc_zone_t* zone, const std::size_t size) -> void* {
     if (zone == nullptr) {
         crashForce("Called with NULL as zone");
     }
 
-    BENCH(auto ptr = ::malloc_zone_valloc(zone, size);, std::chrono::nanoseconds, sysTime);
+    BENCH(const auto ptr = ::malloc_zone_valloc(zone, size);, std::chrono::nanoseconds, sysTime);
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
@@ -194,12 +194,12 @@ auto malloc_zone_valloc(malloc_zone_t* zone, std::size_t size) -> void* {
     return ptr;
 }
 
-auto malloc_zone_memalign(malloc_zone_t* zone, std::size_t alignment, std::size_t size) -> void* {
+auto malloc_zone_memalign(malloc_zone_t* zone, const std::size_t alignment, const std::size_t size) -> void* {
     if (zone == nullptr) {
         crashForce("Called with NULL as zone");
     }
 
-    BENCH(auto ptr = ::malloc_zone_memalign(zone, alignment, size);, std::chrono::nanoseconds, sysTime);
+    BENCH(const auto ptr = ::malloc_zone_memalign(zone, alignment, size);, std::chrono::nanoseconds, sysTime);
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
@@ -230,9 +230,9 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
                                              MALLOC_PTR_IN_USE_RANGE_TYPE,
                                              vm_address_t(zone),
                                              nullptr, [](auto, auto context, auto, auto array, auto count) {
-                    auto& tracker = *reinterpret_cast<trackers::ATracker*>(context);
+                    auto& theTracker = *reinterpret_cast<trackers::ATracker*>(context);
                     for (unsigned i = 0; i < count; ++i) {
-                        tracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
+                        theTracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
                     }
                 });
             }, std::chrono::nanoseconds, trackingTime);
@@ -251,11 +251,11 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
     })
 }
 
-auto malloc_zone_batch_malloc(malloc_zone_t* zone, std::size_t size, void** results, unsigned num_requested) -> unsigned {
+auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void** results, const unsigned num_requested) -> unsigned {
     if (zone == nullptr) {
         crashForce("Batch allocating with NULL zone");
     }
-    BENCH(auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested);, std::chrono::nanoseconds, sysTime);
+    BENCH(const auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested);, std::chrono::nanoseconds, sysTime);
     if (!LSan::finished && batched > 0) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH(for (std::size_t i = 0; i < batched; ++i) {
@@ -267,7 +267,7 @@ auto malloc_zone_batch_malloc(malloc_zone_t* zone, std::size_t size, void** resu
     return batched;
 }
 
-void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, unsigned num) {
+void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, const unsigned num) {
     if (zone == nullptr) {
         crashForce("Batch free with NULL zone");
     }
@@ -338,7 +338,7 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
     })
 }
 
-auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, std::size_t size) -> void* {
+auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size) -> void* {
     if (zone == nullptr) {
         crashForce("Called with NULL as zone");
     }
@@ -348,11 +348,11 @@ auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, std::size_t size) -> vo
     }
     auto& tracker = getTracker();
     std::lock_guard lock { tracker.mutex };
-    auto ignored = tracker.ignoreMalloc;
+    const auto ignored = tracker.ignoreMalloc;
     if (!ignored) {
         tracker.ignoreMalloc = true;
     }
-    auto toReturn = ::malloc_zone_realloc(zone, ptr, size);
+    const auto toReturn = ::malloc_zone_realloc(zone, ptr, size);
     if (!ignored) {
         if (toReturn != nullptr) {
             if (toReturn != ptr) {
@@ -374,8 +374,8 @@ auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, std::size_t size) -> vo
 extern "C" {
 #endif /* __linux__ */
 
-auto __lsan_malloc(std::size_t size) -> void* {
-    BENCH(auto ptr = real::malloc(size);, std::chrono::nanoseconds, systemTime);
+auto __lsan_malloc(const std::size_t size) -> void* {
+    BENCH(const auto ptr = real::malloc(size);, std::chrono::nanoseconds, systemTime);
 
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
@@ -391,8 +391,8 @@ auto __lsan_malloc(std::size_t size) -> void* {
     return ptr;
 }
 
-auto __lsan_calloc(std::size_t objectSize, std::size_t count) -> void* {
-    BENCH(auto ptr = real::calloc(objectSize, count);, std::chrono::nanoseconds, sysTime);
+auto __lsan_calloc(const std::size_t count, const std::size_t objectSize) -> void* {
+    BENCH(const auto ptr = real::calloc(count, objectSize);, std::chrono::nanoseconds, sysTime);
 
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
@@ -408,8 +408,8 @@ auto __lsan_calloc(std::size_t objectSize, std::size_t count) -> void* {
     return ptr;
 }
 
-auto __lsan_valloc(std::size_t size) -> void* {
-    BENCH(auto ptr = real::valloc(size);, std::chrono::nanoseconds, sysTime);
+auto __lsan_valloc(const std::size_t size) -> void* {
+    BENCH(const auto ptr = real::valloc(size);, std::chrono::nanoseconds, sysTime);
 
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
@@ -425,8 +425,8 @@ auto __lsan_valloc(std::size_t size) -> void* {
     return ptr;
 }
 
-auto __lsan_aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
-    BENCH(auto ptr = real::aligned_alloc(alignment, size);, std::chrono::nanoseconds, sysTime);
+auto __lsan_aligned_alloc(const std::size_t alignment, const std::size_t size) -> void* {
+    BENCH(const auto ptr = real::aligned_alloc(alignment, size);, std::chrono::nanoseconds, sysTime);
 
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
@@ -442,13 +442,13 @@ auto __lsan_aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     return ptr;
 }
 
-auto __lsan_realloc(void* pointer, std::size_t size) -> void* {
+auto __lsan_realloc(void* pointer, const std::size_t size) -> void* {
     if (LSan::finished) return real::realloc(pointer, size);
 
     auto& tracker = getTracker();
     BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
 
-    auto ignored = tracker.ignoreMalloc;
+    const auto ignored = tracker.ignoreMalloc;
     if (!ignored) {
         tracker.ignoreMalloc = true;
     }
@@ -516,14 +516,13 @@ void __lsan_free(void* pointer) {
 } /* extern "C" */
 #endif /* __linux__ */
 
-REPLACE(auto, posix_memalign)(void** memPtr, std::size_t alignment, std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
-    void** checkPtr = memPtr;
-    if (checkPtr == nullptr) {
+REPLACE(auto, posix_memalign)(void** memPtr, const std::size_t alignment, const std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
+    if (void** checkPtr = memPtr; checkPtr == nullptr) {
         crashForce("posix_memalign of a NULL pointer");
     }
 
-    auto wasPtr = *memPtr;
-    BENCH(auto toReturn = real::posix_memalign(memPtr, alignment, size);, std::chrono::nanoseconds, sysTime);
+    const auto wasPtr = *memPtr;
+    BENCH(const auto toReturn = real::posix_memalign(memPtr, alignment, size);, std::chrono::nanoseconds, sysTime);
     if (!LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
