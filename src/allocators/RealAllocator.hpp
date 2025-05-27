@@ -52,7 +52,7 @@ struct RealAllocator
      * @return the allocated block
      * @throws std::bad_alloc if too many objects are requested or when the allocator failed to allocate
      */
-    [[ nodiscard ]] constexpr auto allocate(const std::size_t n) -> T* {
+    [[ nodiscard ]] static constexpr auto allocate(const std::size_t n) -> T* {
         if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
         }
@@ -71,7 +71,7 @@ struct RealAllocator
      *
      * @param p the pointer to be deallocated
      */
-    constexpr void deallocate(T* p, std::size_t) noexcept {
+    static constexpr void deallocate(T* p, std::size_t) noexcept {
         real::free(p);
     }
 
