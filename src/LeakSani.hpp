@@ -117,7 +117,7 @@ class LSan final: public trackers::ATracker {
 #endif
 
 protected:
-    virtual inline void maybeAddToStats(const MallocInfo& info) final override {
+    inline void maybeAddToStats(const MallocInfo& info) final override {
         if (behaviour.statsActive()) {
             stats += info;
         }
@@ -142,11 +142,11 @@ public:
     auto operator=(const LSan&) -> LSan& = delete;
     auto operator=(LSan&&)      -> LSan& = delete;
 
-    inline static auto operator new(const std::size_t count) -> void* {
+    inline auto operator new(const std::size_t count) -> void* {
         return real::malloc(count);
     }
 
-    inline static void operator delete(void* ptr) {
+    inline void operator delete(void* ptr) {
         real::free(ptr);
     }
 
@@ -160,7 +160,7 @@ public:
      * @param pointer the pointer to the allocation
      * @return whether a record was removed and the potentially existing record
      */
-    auto removeMalloc(ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
+    auto removeMalloc(const ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
 
     /**
      * @brief Replaces the allocation record with the given one.
@@ -171,7 +171,7 @@ public:
      * @param tracker the allocation tracker to not be searched
      * @param info the new allocation record
      */
-    void changeMalloc(ATracker* tracker, MallocInfo&& info);
+    void changeMalloc(const ATracker* tracker, MallocInfo&& info);
 
     /**
      * Registers the given allocation tracker.
@@ -192,7 +192,7 @@ public:
      */
     void absorbLeaks(PoolMap<const void* const, MallocInfo>&& leaks);
 
-    virtual void finish() final override;
+    void finish() override;
 
 #ifdef BENCHMARK
     /**
@@ -235,7 +235,7 @@ public:
         return infoMutex;
     }
 
-    virtual void changeMalloc(MallocInfo&& info) final override;
+    void changeMalloc(MallocInfo&& info) override;
 
     /**
      * Removes the allocation record associated with the given pointer.
@@ -243,7 +243,7 @@ public:
      * @param pointer the allocation pointer
      * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
      */
-    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
+    auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
 
     /**
      * @brief Attempts to remove the allocation record associated with the given pointer.
@@ -253,7 +253,7 @@ public:
      * @param pointer the allocation pointer
      * @return whether a record was removed and the potentially existing record
      */
-    virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
+    auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
 
     /**
      * Prints a hint about the exceeded callstack size if it was exceeded.

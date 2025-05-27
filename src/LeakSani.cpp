@@ -32,10 +32,9 @@
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
-#include "callstacks/callstackHelper.hpp"
 #include "crashWarner/exceptionHandler.hpp"
-#include "signals/signals.hpp"
 #include "signals/signalHandlers.hpp"
+#include "signals/signals.hpp"
 #include "suppression/firstPartyLibrary.hpp"
 #include "trackers/TLSTracker.hpp"
 
@@ -44,8 +43,8 @@ extern "C" {
 # include <mach/thread_state.h>
 }
 
-# include <objc/runtime.h>
 # include <CoreFoundation/CFDictionary.h>
+# include <objc/runtime.h>
 
 # define OBJC_SUPPORT_EXTRA 1
 # include "objcSupport.hpp"
@@ -55,9 +54,9 @@ namespace lsan {
 std::atomic_bool LSan::finished = false;
 std::atomic_bool LSan::preventDealloc = false;
 
-constexpr static const auto alignment = sizeof(void*);
+constexpr inline static auto alignment = sizeof(void*);
 
-static constexpr inline auto align(uintptr_t ptr, bool up = true) -> uintptr_t {
+static constexpr inline auto align(uintptr_t ptr, const bool up = true) -> uintptr_t {
     if (ptr % alignment != 0) {
         if (up) {
             ptr = ptr + alignment - ptr % alignment;
@@ -68,7 +67,7 @@ static constexpr inline auto align(uintptr_t ptr, bool up = true) -> uintptr_t {
     return ptr;
 }
 
-static inline auto align(const void* ptr, bool up = true) -> uintptr_t {
+static inline auto align(const void* ptr, const bool up = true) -> uintptr_t {
     return align(uintptr_t(ptr), up);
 }
 
@@ -86,10 +85,10 @@ auto LSan::findWithSpecials(void* ptr) -> decltype(infos)::iterator {
     return toReturn;
 }
 
-void LSan::classifyLeaks(uintptr_t begin, uintptr_t end,
-                         LeakType direct, LeakType indirect,
-                         std::deque<MallocInfo::Ref>& directs, bool skipClassifieds,
-                         const char* name, const char* nameRelative, bool reclassify) {
+void LSan::classifyLeaks(const uintptr_t begin, const uintptr_t end,
+                         const LeakType direct, const LeakType indirect,
+                         std::deque<MallocInfo::Ref>& directs, const bool skipClassifieds,
+                         const char* name, const char* nameRelative, const bool reclassify) {
     for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
         const auto& record = findWithSpecials(*reinterpret_cast<void**>(it));
         if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
@@ -99,42 +98,39 @@ void LSan::classifyLeaks(uintptr_t begin, uintptr_t end,
             record->second.leakType = direct;
             record->second.imageName.first = name;
             record->second.imageName.second = nameRelative;
-            directs.push_back(record->second);
+            directs.emplace_back(record->second);
         }
         classifyRecord(record->second, indirect, reclassify);
     }
 }
 
-void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect) {
-    auto classWords = reinterpret_cast<void**>(cls);
-    auto cachePtr = reinterpret_cast<void*>(uintptr_t(classWords[2]) & (((uintptr_t) 1 << 48) - 1));
-    const auto& cacheIt = infos.find(cachePtr);
-    if (cacheIt != infos.end() && cacheIt->second.leakType > direct) {
+void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, const LeakType direct, const LeakType indirect) {
+    const auto classWords = static_cast<void**>(cls);
+    const auto cachePtr = reinterpret_cast<void*>(uintptr_t(classWords[2]) & (uintptr_t(1) << 48) - 1);
+    if (const auto& cacheIt = infos.find(cachePtr); cacheIt != infos.end() && cacheIt->second.leakType > direct) {
         cacheIt->second.leakType = direct;
         classifyRecord(cacheIt->second, indirect);
-        directs.push_back(cacheIt->second);
+        directs.emplace_back(cacheIt->second);
     }
 
-    auto ptr = reinterpret_cast<void*>(uintptr_t(classWords[4]) & 0x0f007ffffffffff8UL);
-    const auto& it = infos.find(ptr);
-    if (it != infos.end()) {
+    const auto ptr = reinterpret_cast<void*>(uintptr_t(classWords[4]) & 0x0f007ffffffffff8UL);
+    if (const auto& it = infos.find(ptr); it != infos.end()) {
         if (it->second.leakType > direct) {
             it->second.leakType = direct;
             classifyRecord(it->second, indirect);
-            directs.push_back(it->second);
+            directs.emplace_back(it->second);
         }
 
-        auto rwStuff = reinterpret_cast<void**>(it->second.pointer);
-        auto ptr = reinterpret_cast<void*>(uintptr_t(rwStuff[1]) & ~1);
-        const auto& it = infos.find(ptr);
-        if (it != infos.end()) {
-            if (it->second.leakType > direct) {
-                it->second.leakType = direct;
-                classifyRecord(it->second, indirect);
-                directs.push_back(it->second);
+        const auto rwStuff = static_cast<void**>(it->second.pointer);
+        const auto rwPtr = reinterpret_cast<void*>(uintptr_t(rwStuff[1]) & ~1);
+        if (const auto& rwIt = infos.find(rwPtr); rwIt != infos.end()) {
+            if (rwIt->second.leakType > direct) {
+                rwIt->second.leakType = direct;
+                classifyRecord(rwIt->second, indirect);
+                directs.emplace_back(rwIt->second);
             }
-            if (it->second.size >= 4 * sizeof(void*)) {
-                const auto ptrArr = reinterpret_cast<void**>(it->second.pointer);
+            if (rwIt->second.size >= 4 * sizeof(void*)) {
+                const auto ptrArr = static_cast<void**>(rwIt->second.pointer);
                 for (unsigned char i = 1; i < 4; ++i) {
                     classifyPointerUnion<true>(ptrArr[i], directs, direct, indirect);
                 }
@@ -143,9 +139,9 @@ void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakTy
     }
 }
 
-void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, bool reclassify) {
+void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, const bool reclassify) {
     auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
-    stack.push(info);
+    stack.emplace(info);
     while (!stack.empty()) {
         auto& elem = stack.top();
         stack.pop();
@@ -164,9 +160,9 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, bool re
                 || record->second.pointer == elem.get().pointer) {
                 continue;
             }
-            info.viaMeRecords.push_back(record->second);
+            info.viaMeRecords.emplace_back(record->second);
             if (record->second.leakType > currentType || reclassify)
-                stack.push(record->second);
+                stack.emplace(record->second);
         }
     }
 }
@@ -219,11 +215,10 @@ static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size
  * @param value the thread-local value
  */
 static inline void destroySaniKey(void* value) {
-    auto& globalInstance = getInstance();
-    if (value != std::addressof(globalInstance)) {
+    if (auto& globalInstance = getInstance(); value != std::addressof(globalInstance)) {
         pthread_setspecific(globalInstance.saniKey, std::addressof(globalInstance));
         auto tracker = static_cast<trackers::ATracker*>(value);
-        if (!globalInstance.preventDealloc) {
+        if (!LSan::preventDealloc) {
             globalInstance.withIgnoration(true, [&tracker] {
                 delete tracker;
             });
@@ -238,19 +233,16 @@ auto LSan::isSuppressed(const MallocInfo& info) -> bool {
         return true;
     }
 
-    for (const auto& suppression : getSuppressions()) {
-        if (suppression.match(info)) {
-            return true;
-        }
-    }
-    return false;
+    const auto& suppressions = getSuppressions();
+    return std::any_of(suppressions.cbegin(), suppressions.cend(), [&info](const auto& suppression) {
+        return suppression.match(info);
+    });
 }
 
 auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>& thread) -> const std::string& {
     using namespace std::string_literals;
 
-    const auto& it = threadDescriptions.find(id);
-    if (it != threadDescriptions.end()) {
+    if (const auto& it = threadDescriptions.find(id); it != threadDescriptions.end()) {
         return it->second;
     }
     std::string desc;
@@ -272,17 +264,17 @@ auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>
                 t = it->second.getThread();
             }
         }
-        const constexpr auto BUFFER_SIZE = 1024u;
+        constexpr auto BUFFER_SIZE = 1024u;
         char buffer[BUFFER_SIZE];
         if (t && pthread_getname_np(*t, buffer, BUFFER_SIZE) == 0 && buffer[0] != '\0') {
             desc += " ("s + buffer + ")";
         }
     }
-    return threadDescriptions.emplace(std::make_pair(id, std::move(desc))).first->second;
+    return threadDescriptions.emplace(id, std::move(desc)).first->second;
 }
 
 static inline auto loadFunc(const char* name) -> void* {
-    auto result = functionInfo_load(name);
+    const auto result = functionInfo_load(name);
     return result.found ? reinterpret_cast<void*>(result.begin) : nullptr;
 }
 
@@ -292,7 +284,7 @@ static inline auto loadFunc(const char* name) -> void* {
 # define FUNC_NAME(name) #name
 #endif
 
-#define LOAD_FUNC(type, name) auto name = reinterpret_cast<type>(loadFunc(FUNC_NAME(name)))
+#define LOAD_FUNC(type, name) const auto name = reinterpret_cast<type>(loadFunc(FUNC_NAME(name)))
 
 void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
 #ifndef __APPLE__
@@ -308,7 +300,7 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
     }
 
     const auto& classNumber = objc_getClassList(nullptr, 0);
-    auto classes = new Class[classNumber];
+    const auto classes = new Class[classNumber];
     objc_getClassList(classes, classNumber);
     for (int i = 0; i < classNumber; ++i) {
         classifyClass(classes[i], records, LeakType::objcDirect, LeakType::objcIndirect);
@@ -391,14 +383,14 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     auto toReturn = LeakKindStats();
 
     auto& out = getOutputStream();
-    const auto& clear = [](std::ostream& out) -> std::ostream& {
+    const auto& clear = [](std::ostream& stream) -> std::ostream& {
         if (isATTY()) {
-            return out << "\r                                                             \r";
+            return stream << "\r                                                             \r";
         }
-        return out << std::endl;
+        return stream << std::endl;
     };
     out << "Searching globals and compile time thread locals...";
-    const auto& regions = regions_getLoadedRegions();
+    const auto& [regions, regionsAmount] = regions_getLoadedRegions();
 
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
@@ -439,12 +431,12 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Reachability analysis: Globals...";
     // Search in global space
-    for (std::size_t i = 0; i < regions.amount; ++i) {
-        const auto& region = regions.regions[i];
+    for (std::size_t i = 0; i < regionsAmount; ++i) {
+        const auto& [begin, end, name, nameRelative] = regions[i];
 
-        classifyLeaks(align(region.begin), align(region.end, false),
+        classifyLeaks(align(begin), align(end, false),
                       LeakType::globalDirect, LeakType::globalIndirect,
-                      toReturn.recordsGlobal, false, region.name, region.nameRelative);
+                      toReturn.recordsGlobal, false, name, nameRelative);
     }
 
     out << clear << "Reachability analysis: Thread-locals...";
@@ -455,7 +447,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
-        std::size_t pthreadSize =
+        const std::size_t pthreadSize =
 #ifdef __APPLE__
             __PTHREAD_SIZE__
 #elif defined(__linux__)
@@ -468,18 +460,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
     }
 
-    const auto& tlvSupp = createTLVSuppression();
-    if (!tlvSupp.empty()) {
-        auto matches = [&tlvSupp](const MallocInfo& info) {
-            for (const auto& supp : tlvSupp) {
-                if (supp.match(info)) {
-                    return true;
-                }
-            }
-            return false;
-        };
+    if (const auto& tlvSupp = createTLVSuppression(); !tlvSupp.empty()) {
         for (auto& [_, info] : infos) {
-            if (matches(info)) {
+            if (std::any_of(tlvSupp.cbegin(), tlvSupp.cend(), [&info](const auto& supp) {
+                return supp.match(info);
+            })) {
                 classifyLeaks(align(info.pointer), align(uintptr_t(info.pointer) + info.size, false), LeakType::tlvDirect,
                               LeakType::tlvIndirect, toReturn.recordsTlv, false, nullptr, nullptr, true);
                 info.suppressed = true;
@@ -506,25 +491,23 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     // TODO: Get dicts of all threads
     const auto& dict = CFDictionaryRef(_1(_2(NSThread, currentThread), threadDictionary));
     const auto& count = CFDictionaryGetCount(dict);
-    auto keys = new const void*[count];
-    auto values = new const void*[count];
+    const auto keys = new const void*[count];
+    const auto values = new const void*[count];
     CFDictionaryGetKeysAndValues(dict, keys, values);
     for (CFIndex i = 0; i < count; ++i) {
         const auto& threadDesc = isThreaded ? getThreadDescription(getThreadId()).c_str() : nullptr;
 
-        const auto& keyIt = infos.find(keys[i]);
-        if (keyIt != infos.end()) {
+        if (const auto& keyIt = infos.find(keys[i]); keyIt != infos.end()) {
             classifyRecord(keyIt->second, LeakType::tlvIndirect, true);
             keyIt->second.leakType = LeakType::tlvDirect;
             keyIt->second.imageName.first = threadDesc;
-            toReturn.recordsTlv.push_back(keyIt->second);
+            toReturn.recordsTlv.emplace_back(keyIt->second);
         }
-        const auto& valIt = infos.find(values[i]);
-        if (valIt != infos.end()) {
+        if (const auto& valIt = infos.find(values[i]); valIt != infos.end()) {
             classifyRecord(valIt->second, LeakType::tlvIndirect, true);
             valIt->second.leakType = LeakType::tlvDirect;
             valIt->second.imageName.first = threadDesc;
-            toReturn.recordsTlv.push_back(valIt->second);
+            toReturn.recordsTlv.emplace_back(valIt->second);
         }
     }
     delete[] keys;
@@ -540,7 +523,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         }
         record.leakType = LeakType::unreachableDirect;
         classifyRecord(record, LeakType::unreachableIndirect);
-        toReturn.recordsLost.push_back(record);
+        toReturn.recordsLost.emplace_back(record);
     }
 
     out << clear << "Filtering the memory leaks...";
@@ -631,7 +614,7 @@ LSan::LSan(): saniKey(createSaniKey()) {
 }
 
 LSan::~LSan() {
-    for (auto tracker : tlsTrackers) {
+    for (const auto tracker : tlsTrackers) {
         if (tracker->needsDealloc) {
             delete tracker;
         }
@@ -653,8 +636,8 @@ void LSan::finish() {
         ignoreMalloc = true;
     }
 
-    auto trackers = copyTrackerList();
-    for (auto tracker : trackers) {
+    const auto trackers = copyTrackerList();
+    for (const auto tracker : trackers) {
         tracker->finish();
     }
 }
@@ -711,20 +694,20 @@ void LSan::absorbLeaks(PoolMap<const void *const, MallocInfo>&& leaks) {
 }
 
 // FIXME: Though unlikely, the invalidly freed record ref can become invalid throughout this process
-auto LSan::removeMalloc(ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
+auto LSan::removeMalloc(const ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
     const auto& result = maybeRemoveMalloc(pointer);
     std::pair<bool, std::optional<MallocInfo::CRef>> tmp { false, std::nullopt };
     if (!result.first) {
         std::lock_guard lock { tlsTrackerMutex };
-        for (auto element : tlsTrackers) {
+        for (const auto element : tlsTrackers) {
             if (element == tracker) continue;
 
-            const auto& result = element->maybeRemoveMalloc(pointer);
-            if (result.first) {
-                return result;
+            auto trackerResult = element->maybeRemoveMalloc(pointer);
+            if (trackerResult.first) {
+                return trackerResult;
             }
-            if (!tmp.second || (tmp.second && result.second && result.second->get().isMoreRecent(tmp.second->get()))) {
-                tmp = std::move(result);
+            if (!tmp.second || (tmp.second && trackerResult.second && trackerResult.second->get().isMoreRecent(tmp.second->get()))) {
+                tmp = std::move(trackerResult);
             }
         }
     }
@@ -762,13 +745,13 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
     return std::make_pair(true, std::nullopt);
 }
 
-void LSan::changeMalloc(ATracker* tracker, MallocInfo&& info) {
+void LSan::changeMalloc(const ATracker* tracker, MallocInfo&& info) {
     std::lock_guard lock { infoMutex };
 
     const auto& it = infos.find(info.pointer);
     if (it == infos.end()) {
         std::lock_guard tlsLock { tlsTrackerMutex };
-        for (auto element : tlsTrackers) {
+        for (const auto element : tlsTrackers) {
             if (element == tracker) continue;
 
             if (element->maybeChangeMalloc(info)) {
@@ -819,7 +802,7 @@ void LSan::addThread(ThreadInfo&& info) {
         return;
     }
 #endif
-    threads.insert_or_assign(info.getId(), std::move(info));
+    threads.insert_or_assign(info.getId(), info);
 }
 
 void LSan::removeThread(const std::thread::id& id) {
@@ -905,18 +888,17 @@ static inline auto printIndirectHint(std::ostream& out) -> std::ostream& {
 }
 
 static inline void printRecord(std::ostream& out, const MallocInfo& info) {
-    auto ptr = reinterpret_cast<void**>(info.pointer);
+    const auto ptr = static_cast<void**>(info.pointer);
     for (std::size_t i = 0; i < info.size / 8; ++i) {
         out << ptr[i] << ", ";
     }
     out << std::endl << info.pointer << " ";
 }
 
-static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, LeakType allowed, bool printContent = false) -> bool {
+static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, const LeakType allowed, bool printContent = false) -> bool {
     auto toReturn = false;
     for (const auto& leak : records) {
-        auto& record = leak.get();
-        if (!record.printedInRoot && !record.suppressed && record.leakType == allowed) {
+        if (auto& record = leak.get(); !record.printedInRoot && !record.suppressed && record.leakType == allowed) {
             if (printContent) {
                 printRecord(out, record);
             }
