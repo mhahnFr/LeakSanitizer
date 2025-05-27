@@ -27,8 +27,6 @@
 #include <optional>
 #include <utility>
 
-#include <pthread.h>
-
 #include "../MallocInfo.hpp"
 
 #include "../allocators/PoolAllocator.hpp"
@@ -82,14 +80,14 @@ public:
     }
 
     template<typename F, typename ...Args>
-    inline auto withIgnorationResult(bool ignore, F&& func, Args&& ...args) -> typename std::invoke_result<F, Args...>::type {
+    inline auto withIgnorationResult(const bool ignore, F&& func, Args&& ...args) -> std::invoke_result_t<F, Args...> {
         static_assert(std::is_invocable_v<F, Args...>,
                       "Given function must be callable with the given arguments");
         static_assert(!std::is_same_v<std::remove_cv_t<std::invoke_result_t<F, Args...>>, void>,
                       "Given function must not return void");
 
         std::lock_guard lock { mutex };
-        auto ignored = ignoreMalloc;
+        const auto ignored = ignoreMalloc;
         ignoreMalloc = ignore;
         const auto& toReturn = std::invoke(std::move(func), std::move(args)...);
         ignoreMalloc = ignored;
@@ -97,12 +95,12 @@ public:
     }
 
     template<typename F, typename ...Args>
-    inline void withIgnoration(bool ignore, F&& func, Args&& ...args) {
+    inline void withIgnoration(const bool ignore, F&& func, Args&& ...args) {
         static_assert(std::is_invocable_v<F, Args...>,
                       "Given function must be callable with the given arguments");
 
         std::lock_guard lock { mutex };
-        auto ignored = ignoreMalloc;
+        const auto ignored = ignoreMalloc;
         ignoreMalloc = ignore;
         std::invoke(std::move(func), std::move(args)...);
         ignoreMalloc = ignored;
