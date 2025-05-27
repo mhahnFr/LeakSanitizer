@@ -462,8 +462,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     if (const auto& tlvSupp = createTLVSuppression(); !tlvSupp.empty()) {
         for (auto& [_, info] : infos) {
-            if (std::any_of(tlvSupp.cbegin(), tlvSupp.cend(), [&info](const auto& supp) {
-                return supp.match(info);
+            if (const auto& infoForCXX17 = info; std::any_of(tlvSupp.cbegin(), tlvSupp.cend(), [&infoForCXX17](const auto& supp) {
+                return supp.match(infoForCXX17);
             })) {
                 classifyLeaks(align(info.pointer), align(uintptr_t(info.pointer) + info.size, false), LeakType::tlvDirect,
                               LeakType::tlvIndirect, toReturn.recordsTlv, false, nullptr, nullptr, true);
