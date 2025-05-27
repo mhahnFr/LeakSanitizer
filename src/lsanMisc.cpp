@@ -32,8 +32,8 @@
 #include <callstack.h>
 #include <SimpleJSON/SimpleJSON.hpp>
 
-#include "formatter.hpp"
 #include "lsanMisc.hpp"
+#include "formatter.hpp"
 
 #include "callstacks/callstackHelper.hpp"
 
@@ -157,7 +157,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
  * @param pseudo whether to create a pseudo tracker
  * @return the new and allocated thread local tracker
  */
-static inline auto newLocalTracker(bool pseudo) -> trackers::ATracker* {
+static inline auto newLocalTracker(const bool pseudo) -> trackers::ATracker* {
     if (pseudo) {
         return new trackers::PseudoTracker();
     }
@@ -166,10 +166,10 @@ static inline auto newLocalTracker(bool pseudo) -> trackers::ATracker* {
 
 auto getTracker() -> trackers::ATracker& {
     auto& globalInstance = getInstance();
-    if (globalInstance.finished) return globalInstance;
+    if (LSan::finished) return globalInstance;
 
     const auto& key = globalInstance.saniKey;
-    auto tlv = pthread_getspecific(key);
+    const auto tlv = pthread_getspecific(key);
     if (tlv == nullptr) {
         pthread_setspecific(key, std::addressof(globalInstance));
         trackers::ATracker* tlsTracker;
@@ -185,7 +185,7 @@ auto getTracker() -> trackers::ATracker& {
 /**
  * @brief Returns the file names found in the given string.
  *
- * The string is splitted by the character `:`.
+ * The string is split by the character `:`.
  *
  * @param files the string with the file names
  * @return the deducted file names
@@ -196,7 +196,7 @@ static inline auto getFiles(const char* files) -> std::vector<std::filesystem::p
         auto stream = std::istringstream(files);
         std::string s;
         while (std::getline(stream, s, ':')) {
-            toReturn.push_back(s);
+            toReturn.emplace_back(s);
         }
     }
     return toReturn;
@@ -210,9 +210,9 @@ static inline auto getFiles(const char* files) -> std::vector<std::filesystem::p
  */
 static inline void loadSuppressions(std::vector<suppression::Suppression>& content, const simple_json::Value& object) {
     if (object.is(simple_json::ValueType::Array)) {
-        for (const auto& object : object.as<simple_json::ValueType::Array>()) {
+        for (const auto& obj : object.as<simple_json::ValueType::Array>()) {
             try {
-                content.push_back(simple_json::Object(object));
+                content.emplace_back(simple_json::Object(obj));
             } catch (const suppression::FunctionNotFoundException& e) {
                 using namespace formatter;
 
@@ -224,7 +224,7 @@ static inline void loadSuppressions(std::vector<suppression::Suppression>& conte
             }
         }
     } else {
-        content.push_back(simple_json::Object(object));
+        content.emplace_back(simple_json::Object(object));
     }
 }
 
@@ -278,7 +278,7 @@ static inline void loadSystemLibraryFile(std::vector<std::regex>& content, const
             throw std::runtime_error("System library regex was not a string");
         }
 
-        content.push_back(std::regex(value.as<ValueType::String>()));
+        content.emplace_back(value.as<ValueType::String>());
     }
 }
 
