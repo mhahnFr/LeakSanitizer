@@ -27,7 +27,6 @@
 #include <optional>
 #include <ostream>
 #include <string>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -39,7 +38,7 @@
 
 namespace lsan {
 /**
- * @brief This class acts as a allocation record: all information about the allocation process
+ * @brief This class acts as an allocation record: all information about the allocation process
  * that is available is stored.
  *
  * It features a callstack and the file name and the line number of the allocation. The size and the
@@ -70,7 +69,7 @@ struct MallocInfo {
     /** The callstack where the deallocation happened.            */
     mutable std::optional<lcs::callstack> deletedCallstack;
     std::pair<const char*, const char*> imageName = { nullptr, nullptr };
-    unsigned long threadId, deletedId;
+    unsigned long threadId, deletedId = 0;
 
     bool printedInRoot = false;
     bool suppressed = false;
@@ -82,7 +81,7 @@ struct MallocInfo {
      * @param pointer the pointer to the allocated piece of memory
      * @param size the size of the allocated piece of memory
      */
-    inline MallocInfo(void* const pointer, const std::size_t size, unsigned long id = getThreadId()):
+    inline MallocInfo(void* const pointer, const std::size_t size, const unsigned long id = getThreadId()):
         pointer(pointer), size(size), threadId(id) {}
 
     /**
