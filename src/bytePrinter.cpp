@@ -45,7 +45,7 @@ auto bytesToString(const unsigned long long amount) -> std::string {
                                                  preDot < 1000 ? 3 : 4;
 
                 getTracker().withIgnoration(false, [&] {
-                    s << std::setprecision(digitCount + 2) << static_cast<double>(amount) / multiplier << " " << sizes[i];
+                    s << std::setprecision(digitCount + 2) << double(amount) / double(multiplier) << " " << sizes[i];
                 });
                 break;
             }
