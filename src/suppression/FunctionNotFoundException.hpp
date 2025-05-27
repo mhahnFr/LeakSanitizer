@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -26,7 +26,7 @@
 #include <string>
 
 namespace lsan::suppression {
-class FunctionNotFoundException: public std::runtime_error {
+class FunctionNotFoundException final: public std::runtime_error {
     const std::string functionName;
     const std::string suppressionName;
 
