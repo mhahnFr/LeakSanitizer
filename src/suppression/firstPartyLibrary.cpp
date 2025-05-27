@@ -51,12 +51,10 @@ static inline auto isFirstPartyCore(const char* file) -> bool {
         return false;
     }
 
-    for (const auto& regex : getSystemLibraries()) {
-        if (std::regex_match(file, regex)) {
-            return true;
-        }
-    }
-    return false;
+    const auto& systemLibraries = getSystemLibraries();
+    return std::any_of(systemLibraries.cbegin(), systemLibraries.cend(), [file](const auto& regex) {
+        return std::regex_match(file, regex);
+    });
 }
 
 /**
@@ -80,7 +78,7 @@ static inline auto classify(const char* file) -> Classification {
  */
 static inline auto classifyAndCache(const char* file) -> Classification {
     const auto& toReturn = classify(file);
-    cache.emplace(std::make_pair(file, toReturn));
+    cache.emplace(file, toReturn);
     return toReturn;
 }
 
@@ -93,14 +91,13 @@ static inline auto classifyAndCache(const char* file) -> Classification {
  * @return whether the given binary file name is first party
  */
 static inline auto isFirstPartyCached(const char* file) -> bool {
-    const auto& it = cache.find(file);
-    if (it != cache.end()) {
+    if (const auto& it = cache.find(file); it != cache.end()) {
         return it->second == Classification::firstParty;
     }
     return classifyAndCache(file) == Classification::firstParty;
 }
 
-auto isFirstParty(const char* binaryName, bool useCache) -> bool {
+auto isFirstParty(const char* binaryName, const bool useCache) -> bool {
     return useCache ? isFirstPartyCached(binaryName) : isFirstPartyCore(binaryName);
 }
 }
