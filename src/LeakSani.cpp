@@ -106,7 +106,7 @@ void LSan::classifyLeaks(const uintptr_t begin, const uintptr_t end,
 
 void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, const LeakType direct, const LeakType indirect) {
     const auto classWords = static_cast<void**>(cls);
-    const auto cachePtr = reinterpret_cast<void*>(uintptr_t(classWords[2]) & (uintptr_t(1) << 48) - 1);
+    const auto cachePtr = reinterpret_cast<void*>(uintptr_t(classWords[2]) & ((uintptr_t(1) << 48) - 1));
     if (const auto& cacheIt = infos.find(cachePtr); cacheIt != infos.end() && cacheIt->second.leakType > direct) {
         cacheIt->second.leakType = direct;
         classifyRecord(cacheIt->second, indirect);
