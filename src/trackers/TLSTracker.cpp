@@ -111,8 +111,7 @@ auto TLSTracker::removeMalloc(void* pointer) -> std::pair<bool, std::optional<Ma
 void TLSTracker::changeMalloc(MallocInfo&& info) {
     std::lock_guard lock { infoMutex };
 
-    const auto& it = infos.find(info.pointer);
-    if (it == infos.end()) {
+    if (const auto& it = infos.find(info.pointer); it == infos.end()) {
         getInstance().changeMalloc(this, std::move(info));
         return;
     }
@@ -122,11 +121,10 @@ void TLSTracker::changeMalloc(MallocInfo&& info) {
 auto TLSTracker::maybeChangeMalloc(const MallocInfo& info) -> bool {
     std::lock_guard lock { infoMutex };
 
-    const auto& it = infos.find(info.pointer);
-    if (it == infos.end()) {
+    if (const auto& it = infos.find(info.pointer); it == infos.end()) {
         return false;
     }
-    infos.insert_or_assign(info.pointer, std::move(info));
+    infos.insert_or_assign(info.pointer, info);
     return true;
 }
 }

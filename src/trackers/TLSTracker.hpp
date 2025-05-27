@@ -28,19 +28,18 @@ namespace lsan::trackers {
 /**
  * This class represents a thread-local allocation tracker.
  */
-class TLSTracker: public ATracker {
-private:
+class TLSTracker final: public ATracker {
     /** Indicates whether the tracking has finished. */
     bool finished = false;
 
 public:
     TLSTracker();
-   ~TLSTracker();
+   ~TLSTracker() override;
 
-    virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
-    virtual void changeMalloc(MallocInfo&& info) final override;
+    auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
+    void changeMalloc(MallocInfo&& info) override;
 
-    virtual auto maybeChangeMalloc(const MallocInfo& info) -> bool final override;
+    auto maybeChangeMalloc(const MallocInfo& info) -> bool override;
 
     /**
      * @brief Attempts to remove the allocation record associated with the given pointer.
@@ -50,9 +49,9 @@ public:
      * @param pointer the allocation pointer
      * @return whether a record was removed and the potentially already existing record
      */
-    virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> final override;
+    auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
 
-    virtual void finish() final override;
+    void finish() override;
 };
 }
 
