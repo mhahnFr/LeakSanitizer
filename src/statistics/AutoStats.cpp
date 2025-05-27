@@ -37,7 +37,7 @@ class AutoStats {
     /** Whether the printing thread is allowed to run.             */
     bool run = true;
     /** The interval between the prints.                           */
-    std::chrono::nanoseconds interval;
+    std::chrono::nanoseconds interval = std::chrono::nanoseconds(0);
     /** The printing thread.                                       */
     std::thread statsThread;
     /** The mutex to synchronize with the printing thread.         */
@@ -72,7 +72,7 @@ public:
     inline AutoStats() {
         using namespace std::chrono_literals;
 
-        if (auto duration = getBehaviour().autoStats()) {
+        if (const auto duration = getBehaviour().autoStats()) {
             interval = *duration;
             statsThread = std::thread(&AutoStats::printer, this);
         }
@@ -91,6 +91,6 @@ public:
 };
 
 /** The hidden global variable of the auto stats printer. */
-static AutoStats autoStats;
+AutoStats autoStats;
 }
 }
