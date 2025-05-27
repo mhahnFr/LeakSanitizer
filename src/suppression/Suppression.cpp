@@ -21,8 +21,8 @@
 
 #include <functionInfo/functionInfo.h>
 
-#include "FunctionNotFoundException.hpp"
 #include "Suppression.hpp"
+#include "FunctionNotFoundException.hpp"
 
 #include "../MallocInfo.hpp"
 
@@ -33,14 +33,14 @@ static inline auto getFunctionPair(const std::string& name,
                                    const std::optional<long>& offset,
                                    const std::optional<std::string>& library,
                                    const std::string& suppName) -> std::pair<uintptr_t, std::size_t> {
-    const auto& result = functionInfo_loadHint(name.c_str(), library ? library->c_str() : nullptr);
-    if (!result.found) {
+    const auto& [begin, length, found] = functionInfo_loadHint(name.c_str(), library ? library->c_str() : nullptr);
+    if (!found) {
         throw FunctionNotFoundException(name, suppName);
     }
     if (offset) {
-        return std::make_pair(result.begin + *offset, 0);
+        return std::make_pair(begin + *offset, 0);
     }
-    return std::make_pair(result.begin, result.length);
+    return std::make_pair(begin, length);
 }
 
 static inline constexpr auto asLeakType(const std::optional<unsigned long>& number) -> std::optional<LeakType> {
@@ -71,12 +71,12 @@ static inline auto getCallstackObject(const Value& object, const std::string& su
             const auto& libraryRegex = theObject.content.at("libraryRegex");
             auto regexes = std::vector<std::regex>();
             if (libraryRegex.type == ValueType::String) {
-                regexes.push_back(std::regex(libraryRegex.as<ValueType::String>()));
+                regexes.emplace_back(libraryRegex.as<ValueType::String>());
             } else if (libraryRegex.type == ValueType::Array) {
                 const auto& array = libraryRegex.as<ValueType::Array>();
                 regexes.reserve(array.size());
                 for (const auto& regex : array) {
-                    regexes.push_back(std::regex(regex.as<ValueType::String>()));
+                    regexes.emplace_back(regex.as<ValueType::String>());
                 }
             } else {
                 throw std::runtime_error("Library regex value is neither an array nor a (regex) string");
@@ -98,7 +98,7 @@ Suppression::Suppression(const Object& object):
         throw std::runtime_error("Suppressions need either 'imageName' or 'functions'");
     }
     if (functionArray) {
-        if (functionArray->size() < 1) {
+        if (functionArray->empty()) {
             throw std::runtime_error("Function array empty");
         }
         topCallstack.reserve(functionArray->size());

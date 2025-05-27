@@ -58,18 +58,18 @@ struct Suppression {
 
     std::vector<RangeOrRegexType> topCallstack;
 
-    Suppression(const simple_json::Object& object);
+    explicit Suppression(const simple_json::Object& object);
 
     auto match(const MallocInfo& info) const -> bool;
 };
 
 template<>
-inline auto Suppression::getTopCallstack<Suppression::Type::regex>(unsigned long i) const -> const auto& {
+inline auto Suppression::getTopCallstack<Suppression::Type::regex>(const unsigned long i) const -> const auto& {
     return std::get<RegexType>(topCallstack[i].second);
 }
 
 template<>
-inline auto Suppression::getTopCallstack<Suppression::Type::range>(unsigned long i) const -> const auto& {
+inline auto Suppression::getTopCallstack<Suppression::Type::range>(const unsigned long i) const -> const auto& {
     return std::get<RangeType>(topCallstack[i].second);
 }
 }
