@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -22,7 +22,6 @@
 #ifndef Stats_hpp
 #define Stats_hpp
 
-#include <cstddef>
 #include <mutex>
 
 #include "../MallocInfo.hpp"
@@ -57,10 +56,10 @@ public:
    ~Stats() = default;
     
     Stats(const Stats& other);
-    Stats(Stats&& other);
+    Stats(Stats&& other) noexcept;
     
     auto operator=(const Stats& other) -> Stats&;
-    auto operator=(Stats&& other) -> Stats&;
+    auto operator=(Stats&& other) noexcept -> Stats&;
 
     /**
      * Returns the count of currently active allocations.
