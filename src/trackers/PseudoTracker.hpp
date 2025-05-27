@@ -31,7 +31,7 @@ class PseudoTracker final: public ATracker {
     LSan& main = getInstance();
 
 protected:
-    virtual inline void maybeAddToStats(const MallocInfo& info) override {
+    inline void maybeAddToStats(const MallocInfo& info) override {
         infos.erase(info.pointer);
         main.addMalloc(MallocInfo(info));
     }
@@ -41,25 +41,25 @@ public:
         main.registerTracker(this);
     }
 
-    virtual inline ~PseudoTracker() {
+    inline ~PseudoTracker() override {
         main.deregisterTracker(this);
     }
 
-    virtual inline auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override {
+    inline auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override {
         return main.removeMalloc(pointer);
     }
 
-    virtual inline void changeMalloc(MallocInfo&& info) override {
+    inline void changeMalloc(MallocInfo&& info) override {
         main.changeMalloc(std::move(info));
     }
 
-    virtual inline void finish() override {}
+    inline void finish() override {}
 
-    virtual inline auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override {
+    inline auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override {
         return main.maybeRemoveMalloc(pointer);
     }
 
-    virtual inline auto maybeChangeMalloc(const MallocInfo& info) -> bool override {
+    inline auto maybeChangeMalloc(const MallocInfo& info) -> bool override {
         return main.maybeChangeMalloc(info);
     }
 };
