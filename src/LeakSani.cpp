@@ -860,7 +860,7 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
                          "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
     if (const auto& str = oss.str(); !str.empty()) {
-        out << format<Style::RED>("Warnings:") << std::endl << str << std::endl;
+        out << std::endl << format<Style::RED>("Warnings:") << std::endl << str;
     }
     return out;
 }
@@ -945,11 +945,11 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
               << format<Style::BOLD>("true") << " to re-enable colored output." << std::endl;
     }
     if (const auto& str = hints.str(); !str.empty()) {
-        stream << "Hints:" << std::endl << str << std::endl;
+        stream << std::endl << "Hints:" << std::endl << str;
     }
     stream << maybeShowDeprecationWarnings;
     if (printedLeaks && self.behaviour.relativePaths()) {
-        stream << printWorkingDirectory;
+        stream << std::endl << printWorkingDirectory;
     }
 
     if (stats.getTotal() > 0 && printedLeaks) {
