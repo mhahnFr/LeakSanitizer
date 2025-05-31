@@ -40,7 +40,7 @@ namespace lsan {
  * @tparam SizeHint whether to print the size hint if Warning is false
  */
 template<bool Warning, bool SizeHint = true>
-constexpr static inline void printer(const std::string& message, lcs::callstack& callstack,
+static inline void printer(const std::string& message, lcs::callstack& callstack,
                                      const std::optional<std::string>& reason = std::nullopt) {
     using formatter::Style;
     
@@ -55,8 +55,12 @@ constexpr static inline void printer(const std::string& message, lcs::callstack&
     std::cerr << std::endl;
     
     if constexpr (!Warning && SizeHint) {
-        getInstance().maybeHintCallstackSize(std::cerr);
-        std::cerr << maybeHintRelativePaths;
+        std::ostringstream oss;
+        getInstance().maybeHintCallstackSize(oss);
+        if (const auto& str = oss.str(); !str.empty()) {
+            std::cerr << "Hints:" << std::endl << str;
+        }
+        std::cerr << std::endl << maybeHintRelativePaths;
     }
 }
 
