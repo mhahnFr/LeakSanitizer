@@ -99,8 +99,6 @@ auto printInformation(std::ostream & out) -> std::ostream & {
 }
 
 void exitHook() {
-    using formatter::Style;
-
     getInstance().finish();
     getTracker().ignoreMalloc = true;
     getOutputStream() << maybePrintExitPoint
@@ -117,11 +115,8 @@ auto maybeHintRelativePaths(std::ostream & out) -> std::ostream & {
     return out;
 }
 
-auto printWorkingDirectory(std::ostream & out) -> std::ostream & {
-    out << "Note: " << formatter::format<formatter::Style::GREYED>("Paths are relative to the") << " working directory: "
-        << std::filesystem::current_path() << std::endl;
-    
-    return out;
+auto printWorkingDirectory(std::ostream& out) -> std::ostream& {
+    return out << "Working directory: " << std::filesystem::current_path().string() << std::endl;
 }
 
 auto isATTY() -> bool {
