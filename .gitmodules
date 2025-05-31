@@ -3,4 +3,4 @@
 	url = https://github.com/mhahnFr/CallstackLibrary.git/
 [submodule "SimpleJSON"]
 	path = SimpleJSON
-	url = git@github.com:mhahnFr/SimpleJSON.git
+	url = https://github.com/mhahnFr/SimpleJSON.git
