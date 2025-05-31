@@ -767,25 +767,13 @@ void LSan::changeMalloc(MallocInfo&& info) {
     changeMalloc(nullptr, std::move(info));
 }
 
-/**
- * Prints the callstack size exceeded hint onto the given output stream.
- *
- * @param stream the output stream to print to
- * @return the given output stream
- */
-static inline auto printCallstackSizeExceeded(std::ostream& stream) -> std::ostream& {
+auto LSan::maybeHintCallstackSize(std::ostream& out) const -> std::ostream& {
     using namespace formatter;
 
-    stream << "Hint: Increase the value of " << format<Style::BOLD>("LSAN_CALLSTACK_SIZE")
-           << " (currently " << format<Style::BOLD>(std::to_string(getBehaviour().callstackSize()))
-           << ") to see longer callstacks." << std::endl << std::endl;
-
-    return stream;
-}
-
-auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
     if (callstackSizeExceeded) {
-        out << printCallstackSizeExceeded;
+        out << hintBegin << "Increase the value of " << format<Style::BOLD>("LSAN_CALLSTACK_SIZE")
+           << " (currently " << format<Style::BOLD>(getBehaviour().callstackSize())
+           << ") to see longer callstacks." << std::endl;;
     }
     return out;
 }
@@ -873,14 +861,6 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
-static inline auto printIndirectHint(std::ostream& out) -> std::ostream& {
-    using namespace formatter;
-
-    out << "Hint: Set " << format<Style::BOLD>("LSAN_INDIRECT_LEAKS") << " to "
-        << format<Style::BOLD>("true") << " to show indirect memory leaks." << std::endl << std::endl;
-    return out;
-}
-
 static inline void printRecord(std::ostream& out, const MallocInfo& info) {
     const auto ptr = static_cast<void**>(info.pointer);
     for (std::size_t i = 0; i < info.size / 8; ++i) {
@@ -940,30 +920,31 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
             printedLeaks |= printRecords(stats.recordsGlobal, stream, LeakType::globalDirect);
             printedLeaks |= printRecords(stats.recordsTlv, stream, LeakType::tlvDirect);
             printedLeaks |= printRecords(stats.recordsStack, stream, LeakType::reachableDirect);
-        } else if (stats.getTotalReachable() > 0) {
-            stream << "Hint: Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
-                   << format<Style::BOLD>("true") << " to display the reachable memory leaks."
-                   << std::endl << std::endl;
-        }
-
-        if (self.callstackSizeExceeded) {
-            stream << printCallstackSizeExceeded;
-            self.callstackSizeExceeded = false;
-        }
-        if (!self.hadIndirects && printedLeaks) {
-            stream << printIndirectHint;
-        }
-        if (printedLeaks && self.behaviour.relativePaths()) {
-            stream << printWorkingDirectory;
         }
     } else {
         stream << format<Style::BOLD, Style::GREEN, Style::ITALIC>("No leaks detected.") << std::endl;
     }
 
+    std::ostringstream hints;
+    self.maybeHintCallstackSize(hints);
+    if (printedLeaks && !self.hadIndirects) {
+        hints << hintBegin << "Set " << format<Style::BOLD>("LSAN_INDIRECT_LEAKS") << " to "
+              << format<Style::BOLD>("true") << " to show indirect memory leaks." << std::endl;
+    }
+    if (!self.behaviour.showReachables() && stats.getTotalReachable() > 0) {
+        hints << hintBegin << "Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
+              << format<Style::BOLD>("true") << " to display the reachable memory leaks."
+              << std::endl;
+    }
     if (!isATTY() && !has("LSAN_PRINT_FORMATTED")) {
-        stream << std::endl << "Hint: To re-enable colored output, set "
-               << format<Style::BOLD>("LSAN_PRINT_FORMATTED") << " to "
-               << format<Style::BOLD>("true") << "." << std::endl;
+        hints << hintBegin << "Set " << format<Style::BOLD>("LSAN_PRINT_FORMATTED") << " to "
+              << format<Style::BOLD>("true") << " to re-enable colored output." << std::endl;
+    }
+    if (const auto& str = hints.str(); !str.empty()) {
+        stream << "Hints:" << std::endl << str << std::endl;
+    }
+    if (printedLeaks && self.behaviour.relativePaths()) {
+        stream << printWorkingDirectory;
     }
 
     stream << maybeShowDeprecationWarnings;

@@ -183,6 +183,10 @@ static inline auto getSuppressions() -> const std::vector<suppression::Suppressi
 static inline auto getSystemLibraries() -> const std::vector<std::regex>& {
     return getInstance().getSystemLibraries();
 }
+
+static inline auto hintBegin(std::ostream& out) -> std::ostream& {
+    return out << "  --   ";
+}
 }
 
 #endif /* lsanMisc_hpp */
