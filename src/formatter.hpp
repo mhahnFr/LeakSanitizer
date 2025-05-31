@@ -218,15 +218,15 @@ inline auto get(std::ostream & out, const std::string & str) -> std::ostream & {
  */
 template<Style... S>
 struct format {
-    const std::string & str;
-    
-    format(const std::string & str): str(str) {}
+    const std::string str;
+
+    template<typename T>
+    constexpr inline explicit format(const T& value): str((std::stringstream() << value).str()) {}
 };
 
 template<Style... S>
-auto operator<<(std::ostream & out, const format<S...> & f) -> std::ostream & {
-    out << get<S...> << f.str << clear<S...>;
-    return out;
+constexpr inline auto operator<<(std::ostream& out, const format<S...>& f) -> std::ostream& {
+    return out << get<S...> << f.str << clear<S...>;
 }
 
 /**
