@@ -773,16 +773,13 @@ void LSan::changeMalloc(MallocInfo&& info) {
  * @param stream the output stream to print to
  * @return the given output stream
  */
-static inline auto printCallstackSizeExceeded(std::ostream & stream) -> std::ostream & {
-    using formatter::Style;
-    
-    stream << "Hint:" << formatter::get<Style::GREYED>
-           << formatter::format<Style::ITALIC>(" to see longer callstacks, increase the value of ")
-           << formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << formatter::get<Style::GREYED>
-           << " (__lsan_callstackSize)" << formatter::format<Style::ITALIC>(" (currently ")
-           << formatter::clear<Style::GREYED> << getBehaviour().callstackSize()
-           << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
-    
+static inline auto printCallstackSizeExceeded(std::ostream& stream) -> std::ostream& {
+    using namespace formatter;
+
+    stream << "Hint: Increase the value of " << format<Style::BOLD>("LSAN_CALLSTACK_SIZE")
+           << " (currently " << format<Style::BOLD>(std::to_string(getBehaviour().callstackSize()))
+           << ") to see longer callstacks." << std::endl << std::endl;
+
     return stream;
 }
 
