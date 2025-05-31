@@ -821,10 +821,10 @@ static inline void printDeprecation(      std::ostream & out,
                                     const std::string &  envName,
                                     const std::string &  apiName,
                                     const std::string &  message) {
-    using formatter::Style;
+    using namespace formatter;
     
-    out << std::endl << formatter::format<Style::RED>(formatter::formatString<Style::BOLD>(envName) + " ("
-                                                      + formatter::formatString<Style::ITALIC>(apiName) + ") " + message + "!")
+    out << format<Style::RED>("  --   " + formatString<Style::BOLD>(envName) + " ("
+                              + formatter::formatString<Style::ITALIC>(apiName) + ") " + message + "!")
         << std::endl;
 }
 
@@ -838,25 +838,29 @@ static inline void printDeprecation(      std::ostream & out,
 static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostream & {
     using namespace formatter;
 
+    std::ostringstream oss;
     if (has("LSAN_PRINT_STATS_ON_EXIT")) {
-        printDeprecation(out, "LSAN_PRINT_STATS_ON_EXIT", "__lsan_printStatsOnExit",
+        printDeprecation(oss, "LSAN_PRINT_STATS_ON_EXIT", "__lsan_printStatsOnExit",
                          "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.7"));
     }
     if (has("LSAN_PRINT_LICENSE")) {
-        printDeprecation(out, "LSAN_PRINT_LICENSE", "__lsan_printLicense",
+        printDeprecation(oss, "LSAN_PRINT_LICENSE", "__lsan_printLicense",
                          "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     if (has("LSAN_PRINT_WEBSITE")) {
-        printDeprecation(out, "LSAN_PRINT_WEBSITE", "__lsan_printWebsite",
+        printDeprecation(oss, "LSAN_PRINT_WEBSITE", "__lsan_printWebsite",
                          "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     if (has("LSAN_FIRST_PARTY_THRESHOLD")) {
-        printDeprecation(out, "LSAN_FIRST_PARTY_THRESHOLD", "__lsan_firstPartyThreshold",
+        printDeprecation(oss, "LSAN_FIRST_PARTY_THRESHOLD", "__lsan_firstPartyThreshold",
                          "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
     if (has("LSAN_FIRST_PARTY_REGEX")) {
-        printDeprecation(out, "LSAN_FIRST_PARTY_REGEX", "__lsan_firstPartyRegex",
+        printDeprecation(oss, "LSAN_FIRST_PARTY_REGEX", "__lsan_firstPartyRegex",
                          "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
+    }
+    if (const auto& str = oss.str(); !str.empty()) {
+        out << format<Style::RED>("Warnings:") << std::endl << str << std::endl;
     }
     return out;
 }
@@ -943,11 +947,11 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     if (const auto& str = hints.str(); !str.empty()) {
         stream << "Hints:" << std::endl << str << std::endl;
     }
+    stream << maybeShowDeprecationWarnings;
     if (printedLeaks && self.behaviour.relativePaths()) {
         stream << printWorkingDirectory;
     }
 
-    stream << maybeShowDeprecationWarnings;
     if (stats.getTotal() > 0 && printedLeaks) {
         stream << std::endl << stats;
     }
