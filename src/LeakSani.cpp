@@ -931,7 +931,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
 
     std::ostringstream hints;
     self.maybeHintCallstackSize(hints);
-    if (printedLeaks && !self.hadIndirects) {
+    if (printedLeaks && self.hadIndirects && !self.behaviour.showIndirects()) {
         hints << hintBegin << "Set " << format<Style::BOLD>("LSAN_INDIRECT_LEAKS") << " to "
               << format<Style::BOLD>("true") << " to show indirect memory leaks." << std::endl;
     }
