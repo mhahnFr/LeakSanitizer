@@ -19,8 +19,26 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifdef __linux__
+# include <mutex>
+#endif
+
 #include "ThreadInfo.hpp"
 
 namespace lsan {
 unsigned long ThreadInfo::threadId = 0;
+
+#ifdef __linux__
+static std::mutex mutex;
+
+void ThreadInfo::setSP(void* sp) {
+    std::lock_guard lock { mutex };
+    ThreadInfo::sp = sp;
+}
+
+auto ThreadInfo::getSP() const -> void* {
+    std::lock_guard lock { mutex };
+    return sp;
+}
+#endif
 }

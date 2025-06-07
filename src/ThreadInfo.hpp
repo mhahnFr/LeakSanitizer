@@ -37,6 +37,7 @@ class ThreadInfo {
     void* stackTop;
 #ifdef __linux__
     bool dead = false;
+    void* sp = nullptr;
 #endif
 
 public:
@@ -79,6 +80,9 @@ public:
     constexpr void kill() {
         dead = true;
     }
+
+    void setSP(void* sp);
+    auto getSP() const -> void*;
 #endif
 
     inline auto operator==(const ThreadInfo& other) const -> bool {

@@ -317,6 +317,7 @@ volatile static bool holding = true;
 
 static void holdOn(int) {
     if (std::this_thread::get_id() != killId) {
+        getInstance().setSP(__builtin_frame_address(0));
         while (holding); // FIXME: Use a condition variable
     }
 }
@@ -351,6 +352,10 @@ static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
     auto count = std::size_t(0);
     if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
                                            &toReturn, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE)
+#elif defined(__linux__)
+    void* sp;
+    while ((sp = info.getSP()) == nullptr);
+    return uintptr_t(sp);
 #endif
         toReturn = uintptr_t(info.getStackTop()) - info.getStackSize();
     return toReturn;
