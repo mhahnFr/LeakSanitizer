@@ -428,7 +428,11 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
             failed.push_back(info);
         }
-        const auto& top = align(info.getStackTop(), false);
+        const auto& top = align(info.getStackTop(), false)
+#ifdef __linux__
+                - (info.getNumber() == 0 ? 0 : 3744)
+#endif
+            ;
         const auto& sp = selfThread ? uintptr_t(__builtin_frame_address(0)) : getStackPointer(info);
         classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect,
                       toReturn.recordsStack, false, isThreaded ? threadDesc.c_str() : nullptr);
