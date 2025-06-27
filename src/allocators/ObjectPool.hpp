@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -22,6 +22,8 @@
 #ifndef ObjectPool_hpp
 #define ObjectPool_hpp
 
+#include <cstddef>
+
 namespace lsan {
 /**
  * This class represents a pool of objects.
@@ -41,7 +43,7 @@ class ObjectPool {
          *
          * @param blockSize the amount of objects this block can hold
          */
-        explicit constexpr MemoryBlock(const std::size_t blockSize): blockSize(blockSize) {}
+        explicit constexpr inline MemoryBlock(const std::size_t blockSize): blockSize(blockSize) {}
     };
 
     /**
@@ -78,14 +80,15 @@ public:
      * @param objectSize the size of one object in bytes
      * @param blockSize the amount of objects a block of memory should hold
      */
-    constexpr ObjectPool(const std::size_t objectSize, const std::size_t blockSize): objectSize(objectSize), blockSize(blockSize) {}
+    constexpr inline ObjectPool(const std::size_t objectSize, const std::size_t blockSize): objectSize(objectSize), blockSize(blockSize) {}
 
     /**
      * Allocates an object in the pool.
      *
-     * @return the object or `NULL` if unable to allocate
+     * @return the object or @c nullptr if unable to allocate
      */
     auto allocate() -> void*;
+
     /**
      * Deallocates the given object.
      *
@@ -108,18 +111,18 @@ public:
      *
      * @return the size in bytes of one object
      */
-    constexpr auto getObjectSize() const -> std::size_t {
+    constexpr inline auto getObjectSize() const -> std::size_t {
         return objectSize;
     }
 
-    constexpr auto operator==(const ObjectPool& other) const noexcept -> bool {
+    constexpr inline auto operator==(const ObjectPool& other) const noexcept -> bool {
         return objectSize == other.objectSize
             && blockSize == other.blockSize
             && factor == other.factor
             && chunks == other.chunks;
     }
 
-    constexpr auto operator!=(const ObjectPool& other) const noexcept -> bool {
+    constexpr inline auto operator!=(const ObjectPool& other) const noexcept -> bool {
         return !(*this == other);
     }
 };
