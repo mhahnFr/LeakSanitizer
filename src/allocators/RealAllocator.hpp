@@ -28,13 +28,12 @@
 
 namespace lsan {
 /**
- * This allocator uses the allocation functions of the namespace `real`.
+ * This allocator uses the allocation functions of the namespace @c real .
  *
  * @tparam T the type to be allocated by this allocator
  */
 template<typename T>
-struct RealAllocator
-{
+struct RealAllocator {
     /** The value type of this allocator.                   */
     using value_type = T;
     /** Indicates allocators of this type are always equal. */
@@ -43,7 +42,7 @@ struct RealAllocator
     RealAllocator() = default;
 
     template<typename U>
-    explicit constexpr RealAllocator(const RealAllocator<U>&) noexcept {}
+    explicit constexpr inline RealAllocator(const RealAllocator<U>&) noexcept {}
 
     /**
      * Allocates and returns a block of memory fitting for the given amount of objects.
@@ -52,7 +51,7 @@ struct RealAllocator
      * @return the allocated block
      * @throws std::bad_alloc if too many objects are requested or when the allocator failed to allocate
      */
-    [[ nodiscard ]] static constexpr auto allocate(const std::size_t n) -> T* {
+    [[ nodiscard ]] static constexpr inline auto allocate(const std::size_t n) -> T* {
         if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
         }
@@ -71,18 +70,18 @@ struct RealAllocator
      *
      * @param p the pointer to be deallocated
      */
-    static constexpr void deallocate(T* p, std::size_t) noexcept {
+    static constexpr inline void deallocate(T* p, std::size_t) noexcept {
         real::free(p);
     }
 
     template<typename U>
-    constexpr auto operator==(const RealAllocator<U>&) const noexcept -> bool {
+    constexpr inline auto operator==(const RealAllocator<U>&) const noexcept -> bool {
         return true;
     }
 
     template<typename U>
-    constexpr auto operator!=(const RealAllocator<U>&) const noexcept -> bool {
-        return true;
+    constexpr inline auto operator!=(const RealAllocator<U>&) const noexcept -> bool {
+        return false;
     }
 };
 }
