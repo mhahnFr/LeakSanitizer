@@ -19,16 +19,25 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "Suppression.hpp"
+
 #include <functionInfo/functionInfo.h>
 
-#include "Suppression.hpp"
 #include "FunctionNotFoundException.hpp"
-
 #include "../MallocInfo.hpp"
 
 namespace lsan::suppression {
 using namespace simple_json;
 
+/**
+ * Loads the requested function and returns its ranges.
+ *
+ * @param name     the name of the function
+ * @param offset   optional offset into the requested function
+ * @param library  runtime image name where the function is located in
+ * @param suppName name of the suppression
+ * @return the address and the size of the requested function
+ */
 static inline auto getFunctionPair(const std::string& name,
                                    const std::optional<long>& offset,
                                    const std::optional<std::string>& library,
@@ -43,6 +52,12 @@ static inline auto getFunctionPair(const std::string& name,
     return std::make_pair(begin, length);
 }
 
+/**
+ * Translates the given number to a leak type.
+ *
+ * @param number the number to be converted
+ * @return the leak type corresponding to the given number
+ */
 static inline constexpr auto asLeakType(const std::optional<unsigned long>& number) -> std::optional<LeakType> {
     if (number && *number > 10) {
         throw std::runtime_error("Not a leak type: " + std::to_string(*number));
@@ -50,6 +65,13 @@ static inline constexpr auto asLeakType(const std::optional<unsigned long>& numb
     return number ? std::optional(LeakType(*number)) : std::nullopt;
 }
 
+/**
+ * Loads an entry for the suppression callstack from the given JSON value.
+ *
+ * @param object the JSON value
+ * @param suppName name of the suppression
+ * @return an entry for the suppression callstack
+ */
 static inline auto getCallstackObject(const Value& object, const std::string& suppName) -> decltype(Suppression::topCallstack)::value_type {
     if (object.type == ValueType::String) {
         return {
