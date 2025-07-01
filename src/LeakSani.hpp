@@ -26,13 +26,11 @@
 #include <map>
 #include <mutex>
 #include <optional>
+#include <pthread.h>
 #include <regex>
 #include <set>
-#include <unordered_map>
 #include <utility>
 #include <vector>
-
-#include <pthread.h>
 
 #include "MallocInfo.hpp"
 #include "ThreadInfo.hpp"
@@ -64,13 +62,18 @@ class LSan final: public trackers::ATracker {
     bool callstackSizeExceeded = false;
     std::optional<std::vector<suppression::Suppression>> suppressions;
     std::optional<std::vector<std::regex>> systemLibraries;
-    std::unordered_map<unsigned long, std::string> threadDescriptions;
+    /** Maps the thread numbers to their description.                                   */
+    std::map<unsigned long, std::string> threadDescriptions;
     /** The registered thread-local allocation trackers.                                */
     std::set<ATracker*> tlsTrackers;
     /** The mutex to manage the access to the registered thread-local trackers.         */
     std::mutex tlsTrackerMutex;
-    const std::thread::id mainId = std::this_thread::get_id();
+    /** Indicates whether multithreading was used.                                      */
     bool isThreaded = false;
+    /** The thread identifier of the main thread.                                       */
+    const std::thread::id mainId = std::this_thread::get_id();
+    /** The thread-local storage key used for the thread-local allocation trackers.     */
+    const pthread_key_t saniKey;
 
 #ifdef BENCHMARK
     /** The registered timings of the allocations.                                      */
@@ -128,8 +131,7 @@ public:
     static std::atomic_bool finished;
     /** Indicates whether to ignore deallocations in the TLS deallocator.           */
     static std::atomic_bool preventDealloc;
-    /** The thread-local storage key used for the thread-local allocation trackers. */
-    const pthread_key_t saniKey;
+    /** Whether the exit has already been printed.                        */
     bool hasPrintedExit = false;
     bool hadIndirects = false;
 
@@ -142,11 +144,11 @@ public:
     auto operator=(const LSan&) -> LSan& = delete;
     auto operator=(LSan&&)      -> LSan& = delete;
 
-    inline auto operator new(const std::size_t count) -> void* {
+    constexpr inline auto operator new(const std::size_t count) -> void* {
         return real::malloc(count);
     }
 
-    inline void operator delete(void* ptr) {
+    constexpr inline void operator delete(void* ptr) {
         real::free(ptr);
     }
 
@@ -295,7 +297,7 @@ public:
     void removeThread(const std::thread::id& id = std::this_thread::get_id());
 
 #ifdef __linux__
-    inline void setSP(void* sp) {
+    constexpr inline void setSP(void* sp) {
         threads.at(std::this_thread::get_id()).setSP(sp);
     }
 #endif
@@ -314,6 +316,16 @@ public:
 
     constexpr inline auto getIsThreaded() const -> bool {
         return isThreaded;
+    }
+
+    /**
+     * Returns the thread-local key used to store the memory tracker for each
+     * thread.
+     *
+     * @return the thread-local key used by this sanitizer
+     */
+    constexpr inline auto getTlsKey() const {
+        return saniKey;
     }
 
     friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;

@@ -216,7 +216,7 @@ static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size
  */
 static inline void destroySaniKey(void* value) {
     if (auto& globalInstance = getInstance(); value != std::addressof(globalInstance)) {
-        pthread_setspecific(globalInstance.saniKey, std::addressof(globalInstance));
+        pthread_setspecific(globalInstance.getTlsKey(), std::addressof(globalInstance));
         auto tracker = static_cast<trackers::ATracker*>(value);
         if (!LSan::preventDealloc) {
             globalInstance.withIgnoration(true, [&tracker] {

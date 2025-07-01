@@ -36,7 +36,7 @@ TLSTracker::~TLSTracker() {
 
     ignoreMalloc = true;
 
-    pthread_setspecific(getInstance().saniKey, std::addressof(getInstance()));
+    pthread_setspecific(getInstance().getTlsKey(), std::addressof(getInstance()));
     getInstance().deregisterTracker(this);
 
     std::lock_guard lock1 { infoMutex };

@@ -161,7 +161,7 @@ auto getTracker() -> trackers::ATracker& {
     auto& globalInstance = getInstance();
     if (LSan::finished) return globalInstance;
 
-    const auto& key = globalInstance.saniKey;
+    const auto& key = globalInstance.getTlsKey();
     const auto tlv = pthread_getspecific(key);
     if (tlv == nullptr) {
         pthread_setspecific(key, std::addressof(globalInstance));
