@@ -101,7 +101,7 @@ struct MallocInfo {
      * @param out the output stream to print to
      * @param indent the indentation to use while printing this record
      */
-    constexpr inline void printCreatedCallstack(std::ostream& out, const std::string& indent = "") const {
+    inline void printCreatedCallstack(std::ostream& out, const std::string& indent = "") const {
         callstackHelper::format(createdCallstack, out, indent);
     }
 
@@ -110,7 +110,7 @@ struct MallocInfo {
      *
      * @param out the output stream to print to
      */
-    constexpr inline void printDeletedCallstack(std::ostream& out) const {
+    inline void printDeletedCallstack(std::ostream& out) const {
         if (!deletedCallstack) {
             throw std::runtime_error("MallocInfo: No deleted callstack! "
                                      "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");

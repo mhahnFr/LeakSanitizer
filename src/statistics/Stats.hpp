@@ -124,7 +124,7 @@ public:
      *
      * @param info the allocation record to append
      */
-    constexpr inline void addMalloc(const MallocInfo& info) {
+    inline void addMalloc(const MallocInfo& info) {
         addMalloc(info.getSize());
     }
     
@@ -150,7 +150,7 @@ public:
      *
      * @param info the allocation record that should be removed from the statistics
      */
-    constexpr inline void addFree(const MallocInfo& info) {
+    inline void addFree(const MallocInfo& info) {
         addFree(info.getSize());
     }
     
@@ -160,7 +160,7 @@ public:
      * @param info the allocation record to append
      * @return this instance
      */
-    constexpr inline auto operator+=(const MallocInfo & info) -> Stats & {
+    inline auto operator+=(const MallocInfo & info) -> Stats & {
         addMalloc(info);
         return *this;
     }
@@ -171,7 +171,7 @@ public:
      * @param info the allocation record to be subtracted
      * @return this instance
      */
-    constexpr inline auto operator-=(const MallocInfo & info) -> Stats & {
+    inline auto operator-=(const MallocInfo & info) -> Stats & {
         addFree(info);
         return *this;
     }

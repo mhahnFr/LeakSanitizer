@@ -22,8 +22,6 @@
 #ifndef realAlloc_hpp
 #define realAlloc_hpp
 
-#include <cstdlib>
-
 #ifdef __linux__
 extern "C" {
 void* __libc_malloc(std::size_t);

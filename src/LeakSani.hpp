@@ -223,11 +223,11 @@ public:
     auto operator=(const LSan&) -> LSan& = delete;
     auto operator=(LSan&&)      -> LSan& = delete;
 
-    constexpr inline auto operator new(const std::size_t count) -> void* {
+    inline auto operator new(const std::size_t count) -> void* {
         return real::malloc(count);
     }
 
-    constexpr inline void operator delete(void* ptr) {
+    inline void operator delete(void* ptr) {
         real::free(ptr);
     }
 
@@ -416,7 +416,7 @@ public:
      *
      * @param sp the stack pointer
      */
-    constexpr inline void setSP(void* sp) {
+    inline void setSP(void* sp) {
         threads.at(std::this_thread::get_id()).setSP(sp);
     }
 #endif
