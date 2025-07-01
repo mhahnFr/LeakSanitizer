@@ -22,9 +22,8 @@
 #ifndef ThreadInfo_hpp
 #define ThreadInfo_hpp
 
-#include <thread>
-
 #include <pthread.h>
+#include <thread>
 
 namespace lsan {
 class ThreadInfo {
@@ -41,30 +40,30 @@ class ThreadInfo {
 #endif
 
 public:
-    inline ThreadInfo(const std::size_t stackSize,
+    constexpr inline ThreadInfo(const std::size_t stackSize,
                       void* stackTop = __builtin_frame_address(0),
                       const unsigned long number = createThreadId(),
                       const std::thread::id& id = std::this_thread::get_id(),
                       const pthread_t& thread = pthread_self()):
         number(number), stackSize(stackSize), id(id), thread(thread), stackTop(stackTop) {}
 
-    constexpr auto getNumber() const -> unsigned long {
+    constexpr inline auto getNumber() const -> unsigned long {
         return number;
     }
 
-    constexpr auto getThread() const -> pthread_t {
+    constexpr inline auto getThread() const -> pthread_t {
         return thread;
     }
 
-    constexpr auto getId() const -> const std::thread::id& {
+    constexpr inline auto getId() const -> const std::thread::id& {
         return id;
     }
 
-    constexpr auto getStackSize() const -> std::size_t {
+    constexpr inline auto getStackSize() const -> std::size_t {
         return stackSize;
     }
 
-    constexpr auto getStackTop() const -> void* {
+    constexpr inline auto getStackTop() const -> void* {
 #ifdef __APPLE__
         return stackTop;
 #else
@@ -73,11 +72,11 @@ public:
     }
 
 #ifdef __linux__
-    constexpr auto isDead() const -> bool {
+    constexpr inline auto isDead() const -> bool {
         return dead;
     }
 
-    constexpr void kill() {
+    constexpr inline void kill() {
         dead = true;
     }
 
