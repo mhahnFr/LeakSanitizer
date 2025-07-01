@@ -83,13 +83,25 @@ void __wrap_free(void* pointer, const char*, int) {
  * @param doubleFree whether the pointer has previously been freed
  * @return a descriptive invalid free message
  */
-static inline auto createInvalidFreeMessage(const void* address, bool doubleFree) -> std::string {
+static inline auto createInvalidFreeMessage(const void* address, const bool doubleFree) -> std::string {
     using namespace formatter;
     
     return formatString<Style::BOLD, Style::RED>(doubleFree ? "Double free" : "Invalid free") 
         + " for address " + formatString<Style::BOLD>(utils::toString(address));
 }
 
+/**
+ * @brief If the allocations are not ignored the given function is called with
+ * the active tracker and the given arguments.
+ *
+ * If @c BENCHMARK is defined, the locking time is passed to the given
+ * function, too.
+ *
+ * @tparam F the signature of the function to be called
+ * @tparam Args the argument types
+ * @param func the function to be called
+ * @param args the arguments to be forwarded to the given function
+ */
 template<typename F, typename ...Args>
 inline void ifNotIgnored(F&& func, Args&& ...args) {
     static_assert(std::is_invocable_v<F, trackers::ATracker&,

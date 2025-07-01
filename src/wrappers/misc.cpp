@@ -20,7 +20,6 @@
  */
 
 #include "interpose.hpp"
-
 #include "../lsanMisc.hpp"
 
 REPLACE(void, exit)(const int code) noexcept(noexcept(::exit(code))) {
