@@ -167,7 +167,7 @@ public:
      * @param info the new allocation record
      * @return whether an allocation record was found and replaced
      */
-    virtual auto maybeChangeMalloc([[ maybe_unused ]] const MallocInfo& info) -> bool {
+    virtual inline auto maybeChangeMalloc([[ maybe_unused ]] const MallocInfo& info) -> bool {
         return false;
     }
 };

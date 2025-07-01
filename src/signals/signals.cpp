@@ -19,9 +19,9 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <csignal>
-
 #include "signals.hpp"
+
+#include <csignal>
 
 namespace lsan::signals {
 auto registerFunction(void (*function)(int), const int signal) -> bool {

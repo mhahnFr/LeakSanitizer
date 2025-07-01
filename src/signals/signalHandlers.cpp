@@ -31,13 +31,12 @@
 #endif /* __APPLE__ */
 
 #define LCS_ACTIVATE_SWIFT_DEMANGLER_CONTROL 1
-#include <callstack_internals.h>
+#include "signalHandlers.hpp"
 
+#include <callstack_internals.h>
 #include <lsan_stats.h>
 
-#include "signalHandlers.hpp"
 #include "signals.hpp"
-
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../utils.hpp"

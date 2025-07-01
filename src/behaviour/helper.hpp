@@ -60,7 +60,7 @@ constexpr auto getFrom(const char* value) -> std::optional<T>;
  * @tparam T the type of the value to be deducted
  */
 template<typename T>
-constexpr auto get(const char* name) -> std::optional<T> {
+constexpr inline auto get(const char* name) -> std::optional<T> {
     if (const auto var = getVariable(name)) {
         return getFrom<T>(*var);
     }
@@ -68,7 +68,7 @@ constexpr auto get(const char* name) -> std::optional<T> {
 }
 
 template<>
-constexpr auto getFrom(const char* value) -> std::optional<std::size_t> {
+constexpr inline auto getFrom(const char* value) -> std::optional<std::size_t> {
     if (value == nullptr) {
         return std::nullopt;
     }
@@ -86,7 +86,7 @@ constexpr auto getFrom(const char* value) -> std::optional<std::size_t> {
  * @param string2 the second string
  * @return whether the two given strings are lowercased equal
  */
-static auto lowerCompare(const char * string1, const char * string2) -> bool {
+static inline auto lowerCompare(const char * string1, const char * string2) -> bool {
     const std::size_t len1 = strlen(string1),
                       len2 = strlen(string2);
 
@@ -102,7 +102,7 @@ static auto lowerCompare(const char * string1, const char * string2) -> bool {
 }
 
 template<>
-constexpr auto getFrom(const char* value) -> std::optional<bool> {
+constexpr inline auto getFrom(const char* value) -> std::optional<bool> {
     if (value == nullptr) {
         return std::nullopt;
     }
@@ -146,7 +146,7 @@ inline auto getFrom(const char* value) -> std::optional<std::chrono::nanoseconds
 }
 
 template<>
-constexpr auto getFrom(const char* value) -> std::optional<const char*> {
+constexpr inline auto getFrom(const char* value) -> std::optional<const char*> {
     return value == nullptr ? std::nullopt : std::optional(value);
 }
 }

@@ -67,18 +67,20 @@ public:
      * @return the count of currently active allocations
      */
     auto getCurrentMallocCount() const -> std::size_t;
+
     /**
      * Returns the total count of tracked allocations.
      *
      * @return the total count of allocations
      */
-    auto getTotalMallocCount()   const -> std::size_t;
+    auto getTotalMallocCount() const -> std::size_t;
+
     /**
      * Returns the maximal count of allocations active at one time.
      *
      * @return the peek of allocations
      */
-    auto getMallocPeek()         const -> std::size_t;
+    auto getMallocPeek() const -> std::size_t;
     
     /**
      * Returns the count of currently allocated bytes.
@@ -86,18 +88,20 @@ public:
      * @return the amount of currently allocated bytes
      */
     auto getCurrentBytes() const -> std::size_t;
+
     /**
      * Returns the total count of allocated bytes tracked by this sanitizer.
      *
      * @return the total count of tracked allocated bytes
      */
-    auto getTotalBytes()   const -> std::size_t;
+    auto getTotalBytes() const -> std::size_t;
+
     /**
      * Returns the maximal count of allocated bytes active at one time.
      *
      * @return the peek of allocated bytes at one time
      */
-    auto getBytePeek()     const -> std::size_t;
+    auto getBytePeek() const -> std::size_t;
     
     /**
      * Returns the total count of deallocations tracked by this sanitizer.
@@ -114,12 +118,13 @@ public:
      * @param size the size of the allocated object
      */
     void addMalloc(std::size_t size);
+
     /**
      * Adds the given allocation record to the tracked allocations.
      *
      * @param info the allocation record to append
      */
-    inline void addMalloc(const MallocInfo& info) {
+    constexpr inline void addMalloc(const MallocInfo& info) {
         addMalloc(info.getSize());
     }
     
@@ -139,12 +144,13 @@ public:
      * @param size the size to of the deallocated object
      */
     void addFree(std::size_t size);
+
     /**
      * Adds a deallocation to the statistics.
      *
      * @param info the allocation record that should be removed from the statistics
      */
-    inline void addFree(const MallocInfo& info) {
+    constexpr inline void addFree(const MallocInfo& info) {
         addFree(info.getSize());
     }
     
@@ -154,17 +160,18 @@ public:
      * @param info the allocation record to append
      * @return this instance
      */
-    inline auto operator+=(const MallocInfo & info) -> Stats & {
+    constexpr inline auto operator+=(const MallocInfo & info) -> Stats & {
         addMalloc(info);
         return *this;
     }
+
     /**
      * Removes the given allocation record from this instance and returns itself.
      *
      * @param info the allocation record to be subtracted
      * @return this instance
      */
-    inline auto operator-=(const MallocInfo & info) -> Stats & {
+    constexpr inline auto operator-=(const MallocInfo & info) -> Stats & {
         addFree(info);
         return *this;
     }
