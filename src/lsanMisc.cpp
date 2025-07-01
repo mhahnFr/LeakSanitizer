@@ -29,18 +29,16 @@
  #define LSAN_HAS_UNISTD
 #endif
 
+#include "lsanMisc.hpp"
+
 #include <callstack.h>
 #include <SimpleJSON/SimpleJSON.hpp>
 
-#include "lsanMisc.hpp"
 #include "formatter.hpp"
-
 #include "callstacks/callstackHelper.hpp"
-
 #include "suppression/defaultSuppression.hpp"
 #include "suppression/FunctionNotFoundException.hpp"
 #include "suppression/Suppression.hpp"
-
 #include "trackers/PseudoTracker.hpp"
 #include "trackers/TLSTracker.hpp"
 
@@ -180,7 +178,7 @@ auto getTracker() -> trackers::ATracker& {
 /**
  * @brief Returns the file names found in the given string.
  *
- * The string is split by the character `:`.
+ * The string is split by the character @code :@endcode.
  *
  * @param files the string with the file names
  * @return the deducted file names
@@ -198,12 +196,14 @@ static inline auto getFiles(const char* files) -> std::vector<std::filesystem::p
 }
 
 /**
- * Loads the suppressions found in the given JSON value into the given suppression vector.
+ * Loads the suppressions found in the given JSON value into the given
+ * suppression vector.
  *
  * @param content the vector with the deducted suppressions
  * @param object the JSON value to deduct suppressions from
  */
-static inline void loadSuppressions(std::vector<suppression::Suppression>& content, const simple_json::Value& object) {
+static inline void loadSuppressions(std::vector<suppression::Suppression>& content,
+                                    const simple_json::Value& object) {
     if (object.is(simple_json::ValueType::Array)) {
         for (const auto& obj : object.as<simple_json::ValueType::Array>()) {
             try {

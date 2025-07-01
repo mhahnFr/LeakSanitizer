@@ -27,7 +27,6 @@
 #include <vector>
 
 #include "LeakSani.hpp"
-
 #include "suppression/Suppression.hpp"
 #include "trackers/ATracker.hpp"
 
@@ -50,13 +49,14 @@ auto printInformation(std::ostream & out) -> std::ostream &;
 /**
  * @brief The hook to be called on exit.
  *
- * It prints all information tracked by the sanitizer and performs internal cleaning.
+ * It prints all information tracked by the sanitizer and performs internal
+ * cleaning.
  */
 void exitHook();
 
 /**
- * Prints the note about the relative paths if relative paths are
- * allowed by `__lsan_relativePaths` on the given output stream.
+ * Prints the note about the relative paths if relative paths are allowed by
+ * @c Behaviour::relativePaths() on the given output stream.
  *
  * @param out the output stream to print to
  * @return the given output stream
@@ -64,7 +64,8 @@ void exitHook();
 auto maybeHintRelativePaths(std::ostream & out) -> std::ostream &;
 
 /**
- * Prints the hint about the relative paths, including the current working directory.
+ * Prints the hint about the relative paths, including the current working
+ * directory.
  *
  * @param out the output stream to print to
  * @return the given output stream
@@ -74,7 +75,8 @@ auto printWorkingDirectory(std::ostream & out) -> std::ostream &;
 /**
  * @brief Returns whether the output stream to print to is a TTY.
  *
- * If the POSIX function `isatty` is not available, `__lsan_printFormatted` is returned.
+ * If the POSIX function @c isatty is not available, @c Behaviour::printFormatted()
+ * is returned.
  *
  * @return whether the output stream to print to is an interactive terminal
  */
@@ -117,6 +119,11 @@ auto loadSuppressions() -> std::vector<suppression::Suppression>;
  */
 auto loadSystemLibraries() -> std::vector<std::regex>;
 
+/**
+ * Loads and returns the suppressions to match thread-local memory leaks.
+ *
+ * @return the suppressions
+ */
 auto createTLVSuppression() -> std::vector<suppression::Suppression>;
 
 /**
@@ -145,8 +152,10 @@ static inline auto getBehaviour() -> const behaviour::Behaviour& {
 }
 
 /**
- * Returns whether to print formatted, that is, whether `__lsan_printFormatted` is
- * `true` and the output stream is an interactive terminal.
+ * @brief Returns whether to print formatted.
+ *
+ * This condition is met when @c Behaviour::printFormatted() returns @c true
+ * and the output stream prints onto an interactive terminal.
  *
  * @return whether to print formatted
  */
@@ -184,6 +193,12 @@ static inline auto getSystemLibraries() -> const std::vector<std::regex>& {
     return getInstance().getSystemLibraries();
 }
 
+/**
+ * Prints an indicator for a hint.
+ *
+ * @param out the output stream to print onto
+ * @return the given output stream
+ */
 static inline auto hintBegin(std::ostream& out) -> std::ostream& {
     return out << "  --   ";
 }
