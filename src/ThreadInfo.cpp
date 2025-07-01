@@ -29,6 +29,7 @@ namespace lsan {
 unsigned long ThreadInfo::threadId = 0;
 
 #ifdef __linux__
+/** The mutex used to synchronize the access to the stack pointers. */
 static std::mutex mutex;
 
 void ThreadInfo::setSP(void* sp) {
