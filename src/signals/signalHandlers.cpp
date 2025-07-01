@@ -46,7 +46,7 @@
 
 namespace lsan::signals::handlers {
 /**
- * Creates a callstack using the pointer to the `ucontext`.
+ * Creates a callstack using the pointer to the @c ucontext .
  *
  * @param ptr the pointer to the context for which to create a callstack for
  * @return the callstack

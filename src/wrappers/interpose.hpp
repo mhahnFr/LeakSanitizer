@@ -71,7 +71,7 @@ RET lsan::__lsan_##NAME
 
 #else
 /**
- * This structure contains the data for the `__interpose` Mach-O section.
+ * This structure contains the data for the @c __interpose Mach-O section.
  */
 struct interpose {
     /** The new function. */

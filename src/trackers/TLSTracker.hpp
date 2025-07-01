@@ -42,12 +42,14 @@ public:
     auto maybeChangeMalloc(const MallocInfo& info) -> bool override;
 
     /**
-     * @brief Attempts to remove the allocation record associated with the given pointer.
+     * @brief Attempts to remove the allocation record associated with the
+     * given pointer.
      *
      * Does not search in other trackers.
      *
      * @param pointer the allocation pointer
-     * @return whether a record was removed and the potentially already existing record
+     * @return whether a record was removed and the potentially already
+     * existing record
      */
     auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
 

@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -47,8 +47,8 @@ void crash(const std::string & message);
 [[ noreturn ]] void crashForce(const std::string & message);
 
 /**
- * @brief Terminates the linked program and prints the given message, the optionally given
- * reason and the given callstack.
+ * @brief Terminates the linked program and prints the given message, the
+ * optionally given reason and the given callstack.
  *
  * This function performs the termination in any case.
  *
@@ -61,8 +61,8 @@ void crash(const std::string & message);
                                      lcs::callstack&&            callstack);
 
 /**
- * @brief Terminates the linked program and prints the given message, the information
- * provided by the optional allocation record and a callstack.
+ * @brief Terminates the linked program and prints the given message, the
+ * information provided by the optional allocation record and a callstack.
  *
  * This function does nothing if the generated callstack is not user relevant.
  *
@@ -73,7 +73,7 @@ void crash(const std::string& message,
            const std::optional<MallocInfo::CRef>& info);
 
 /**
- * This function resets the signal handler for `SIGABRT` and performs the abort.
+ * This function resets the signal handler for @c SIGABRT and performs the abort.
  */
 [[ noreturn ]] void abort();
 }

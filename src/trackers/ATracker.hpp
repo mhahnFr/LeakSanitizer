@@ -28,7 +28,6 @@
 #include <utility>
 
 #include "../MallocInfo.hpp"
-
 #include "../allocators/PoolAllocator.hpp"
 
 namespace lsan::trackers {
@@ -37,7 +36,7 @@ namespace lsan::trackers {
  */
 class ATracker {
 protected:
-    /** A `std::map` using the `PoolAllocator`.                       */
+    /** A @c std::map using the @c PoolAllocator.                     */
     template<
         typename Key,
         typename T,
@@ -129,7 +128,8 @@ public:
      * Attempts to remove the allocation record for the given pointer.
      *
      * @param pointer the pointer of the actual allocation
-     * @return whether the allocation record was removed and the potentially found existing record
+     * @return whether the allocation record was removed and the potentially
+     * found existing record
      */
     virtual auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> = 0;
 
@@ -141,18 +141,21 @@ public:
     virtual void changeMalloc(MallocInfo&& info) = 0;
 
     /**
-     * Marks this tracker instance as finished, that is, it will ignore all upcoming allocations
-     * and upload its registered allocation records to the main instance.
+     * Marks this tracker instance as finished, that is, it will ignore all
+     * upcoming allocations and upload its registered allocation records to the
+     * main instance.
      */
     virtual void finish() = 0;
 
     /**
-     * @brief Removes the allocation record associated with the given pointer in this instance if it was found.
+     * @brief Removes the allocation record associated with the given pointer
+     * in this instance if it was found.
      *
      * Does not call out to the global instance.
      *
      * @param pointer the pointer whose allocation record to be removed
-     * @return whether the record was removed and the potentially already as deleted marked record 
+     * @return whether the record was removed and the potentially already as
+     * deleted marked record
      */
     virtual auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> = 0;
 

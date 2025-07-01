@@ -52,10 +52,13 @@ static constexpr inline auto BAR_COLOR = formatter::Style::CYAN;
  * The given functions are responsible for printing the bar.
  *
  * @param statsName the name of the statistics, printed at the beginning
- * @param width the width in characters that the printed bar should have, passed to the bar printing functions
+ * @param width the width in characters that the printed bar should have, passed
+ * to the bar printing functions
  * @param out the stream to which to print
- * @param printBarBytes a function printing a bar for the byte part of the stats, it gets the width and the output stream as parameters.
- * @param printBarObjects a function printing a bar for the object part of the stats, it gets the width and the output stream as parameters
+ * @param printBarBytes a function printing a bar for the byte part of the stats,
+ * it gets the width and the output stream as parameters
+ * @param printBarObjects a function printing a bar for the object part of the
+ * stats, it gets the width and the output stream as parameters
  */
 static inline void printStatsCore(const std::string & statsName, const std::size_t width, std::ostream & out,
                                   const std::function<void (std::size_t, std::ostream &)>& printBarBytes,
