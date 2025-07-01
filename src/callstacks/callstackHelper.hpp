@@ -22,7 +22,6 @@
 #ifndef callstackHelper_hpp
 #define callstackHelper_hpp
 
-#include <ostream>
 #include <string>
 
 #include <callstack.h>
@@ -36,6 +35,7 @@ namespace lsan::callstackHelper {
  *
  * @param callstack the callstack
  * @param stream the stream to print to
+ * @param indent the leading indentation to be used
  */
 void format(lcs::callstack& callstack, std::ostream& stream, const std::string& indent = "");
 
@@ -44,6 +44,7 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
  *
  * @param callstack the callstack
  * @param out the stream to print to
+ * @param indent the leading indentation to be used
  */
 static inline void format(lcs::callstack&& callstack, std::ostream& out, const std::string& indent = "") {
     format(callstack, out, indent);

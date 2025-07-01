@@ -19,17 +19,17 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <string>
-
 #define LCS_USE_UNSAFE_OPTIMIZATION 1
-#include <callstack.h>
-#include <callstack_internals.h>
 
 #include "callstackHelper.hpp"
 
+#include <string>
+
+#include <callstack.h>
+#include <callstack_internals.h>
+
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
-
 #include "../suppression/firstPartyLibrary.hpp"
 
 namespace lsan::callstackHelper {
@@ -62,7 +62,8 @@ static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) ->
 }
 
 /**
- * Formats the given callstack frame onto the given output stream using the given style.
+ * Formats the given callstack frame onto the given output stream using the
+ * given style.
  *
  * @param frame the callstack frame to be formatted
  * @param out the output stream
