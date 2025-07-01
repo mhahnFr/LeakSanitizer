@@ -23,11 +23,15 @@
 #define PseudoTracker_hpp
 
 #include "ATracker.hpp"
-
 #include "../lsanMisc.hpp"
 
 namespace lsan::trackers {
+/**
+ * Represents a memory allocation tracker that forwards all allocations to the
+ * global instance.
+ */
 class PseudoTracker final: public ATracker {
+    /** The main global instance to forward all calls to. */
     LSan& main = getInstance();
 
 protected:

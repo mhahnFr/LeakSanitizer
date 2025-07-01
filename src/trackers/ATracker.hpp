@@ -79,6 +79,16 @@ public:
         infos.insert_or_assign(info.getPointer(), std::move(info));
     }
 
+    /**
+     * Calls the given function while ignoring allocations caused by that function.
+     *
+     * @tparam F function signature of the function to be called
+     * @tparam Args argument types passed to the given function
+     * @param ignore whether to ignore allocations while calling the given function
+     * @param func the function to be called
+     * @param args the arguments to be forwarded
+     * @return the result of the given function
+     */
     template<typename F, typename ...Args>
     inline auto withIgnorationResult(const bool ignore, F&& func, Args&& ...args) -> std::invoke_result_t<F, Args...> {
         static_assert(std::is_invocable_v<F, Args...>,
@@ -94,6 +104,15 @@ public:
         return toReturn;
     }
 
+    /**
+     * Calls the given function while ignoring allocations caused by that function.
+     *
+     * @tparam F function signature of the function to be called
+     * @tparam Args argument types passed to the given function
+     * @param ignore whether to ignore allocations while calling the given function
+     * @param func the function to be called
+     * @param args the arguments to be forwarded
+     */
     template<typename F, typename ...Args>
     inline void withIgnoration(const bool ignore, F&& func, Args&& ...args) {
         static_assert(std::is_invocable_v<F, Args...>,
