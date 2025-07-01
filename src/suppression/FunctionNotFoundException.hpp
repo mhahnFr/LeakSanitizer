@@ -26,20 +26,42 @@
 #include <string>
 
 namespace lsan::suppression {
+/**
+ * Represents an exception including information about the function that was
+ * not found.
+ */
 class FunctionNotFoundException final: public std::runtime_error {
+    /** The function name.    */
     const std::string functionName;
+    /** The suppression name. */
     const std::string suppressionName;
 
 public:
+    /**
+     * Constructs the exception using the given information.
+     *
+     * @param function the name of the function
+     * @param suppressionName the name of the suppression
+     */
     inline FunctionNotFoundException(const std::string& function, const std::string& suppressionName):
         std::runtime_error("Function '" + function + "' not found for suppression '" + suppressionName + "'"),
         functionName(function),
         suppressionName(suppressionName) {}
 
+    /**
+     * Returns the name of the function that was not found.
+     *
+     * @return the name of the function
+     */
     constexpr inline auto getFunctionName() const -> const std::string& {
         return functionName;
     }
 
+    /**
+     * Returns the name of the suppression which caused this exception.
+     *
+     * @return the name of the suppression
+     */
     constexpr inline auto getSuppressionName() const -> const std::string& {
         return suppressionName;
     }
