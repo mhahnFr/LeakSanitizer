@@ -19,6 +19,8 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "LeakSani.hpp"
+
 #include <algorithm>
 #include <filesystem>
 #include <stack>
@@ -26,8 +28,6 @@
 #include <callstack_internals.h>
 #include <functionInfo/functionInfo.h>
 #include <regions/regions.h>
-
-#include "LeakSani.hpp"
 
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
@@ -43,21 +43,30 @@ extern "C" {
 # include <mach/thread_state.h>
 }
 
-# include <CoreFoundation/CFDictionary.h>
 # include <objc/runtime.h>
 
-# define OBJC_SUPPORT_EXTRA 1
-# include "objcSupport.hpp"
+# ifdef LSAN_HANDLE_OBJC
+#  include <CoreFoundation/CFDictionary.h>
+
+#  define OBJC_SUPPORT_EXTRA 1
+#  include "objcSupport.hpp"
+# endif
+
 #endif
 
 namespace lsan {
 std::atomic_bool LSan::finished = false;
 std::atomic_bool LSan::preventDealloc = false;
 
-constexpr inline static auto alignment = sizeof(void*);
-
+/**
+ * Aligns the given pointer to the next machine word.
+ *
+ * @param ptr the pointer to be aligned
+ * @param up whether to round up
+ * @return the aligned pointer
+ */
 static constexpr inline auto align(uintptr_t ptr, const bool up = true) -> uintptr_t {
-    if (ptr % alignment != 0) {
+    if (constexpr auto alignment = sizeof(void*); ptr % alignment != 0) {
         if (up) {
             ptr = ptr + alignment - ptr % alignment;
         } else {
@@ -67,6 +76,13 @@ static constexpr inline auto align(uintptr_t ptr, const bool up = true) -> uintp
     return ptr;
 }
 
+/**
+ * Aligns the given pointer to the next machine word.
+ *
+ * @param ptr the pointer to be aligned
+ * @param up whether to round up
+ * @return the aligned pointer
+ */
 static inline auto align(const void* ptr, const bool up = true) -> uintptr_t {
     return align(uintptr_t(ptr), up);
 }
@@ -167,6 +183,12 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, const b
     }
 }
 
+/**
+ * Returns the stack begin of the given thread.
+ *
+ * @param thread the POSIX thread
+ * @return the stack begin
+ */
 static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
     void* toReturn;
 
@@ -188,6 +210,12 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
     return toReturn;
 }
 
+/**
+ * Returns the stack size of the given POSIX thread.
+ *
+ * @param thread the POSIX thread
+ * @return the stack size
+ */
 static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size_t {
     std::size_t toReturn;
 
@@ -273,6 +301,12 @@ auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>
     return threadDescriptions.emplace(id, std::move(desc)).first->second;
 }
 
+/**
+ * Loads the function of the given name.
+ *
+ * @param name the name of the function as used by the linker
+ * @return the function pointer or @c nullptr if the function is not loaded
+ */
 static inline auto loadFunc(const char* name) -> void* {
     const auto result = functionInfo_load(name);
     return result.found ? reinterpret_cast<void*>(result.begin) : nullptr;
@@ -284,6 +318,13 @@ static inline auto loadFunc(const char* name) -> void* {
 # define FUNC_NAME(name) #name
 #endif
 
+/**
+ * Creates a variable named as the requested function, whose value is the
+ * loaded function.
+ *
+ * @param type the signature of the function
+ * @param name the name of the function
+ */
 #define LOAD_FUNC(type, name) const auto name = reinterpret_cast<type>(loadFunc(FUNC_NAME(name)))
 
 void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
@@ -312,9 +353,15 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
 }
 
 #ifdef __linux__
+/** The @c std::thread::id of the thread that performed the kill. */
 static std::thread::id killId;
+/** Whether to keep the killed threads paused.                    */
 volatile static bool holding = true;
 
+/**
+ * If the calling thread has not performed the kill, it is paused and the stack
+ * pointer is registered.
+ */
 static void holdOn(int) {
     if (std::this_thread::get_id() != killId) {
         getInstance().setSP(__builtin_frame_address(0));
@@ -323,6 +370,12 @@ static void holdOn(int) {
 }
 #endif
 
+/**
+ * Attempts to suspend the referred thread.
+ *
+ * @param info the thread to be suspended
+ * @return whether the thread was suspended successfully
+ */
 static inline auto suspendThread(const ThreadInfo& info) -> bool {
     auto toReturn = false;
 #ifdef __APPLE__
@@ -334,6 +387,12 @@ static inline auto suspendThread(const ThreadInfo& info) -> bool {
     return toReturn;
 }
 
+/**
+ * Attempts to resume the referred thread.
+ *
+ * @param info the thread to be resumed
+ * @return whether the thread was resumed successfully
+ */
 static inline auto resumeThread(const ThreadInfo& info) -> bool {
     auto toReturn = false;
 #ifdef __APPLE__
@@ -345,9 +404,14 @@ static inline auto resumeThread(const ThreadInfo& info) -> bool {
     return toReturn;
 }
 
+/**
+ * Returns the current stack pointer of the referred thread.
+ *
+ * @param info the thread
+ * @return the current stack pointer
+ */
 static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
     uintptr_t toReturn;
-    // TODO: Linux version
 #ifdef __APPLE__
     auto count = std::size_t(0);
     if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
@@ -572,11 +636,10 @@ for (const auto& leak : (records)) {                              \
 
 /**
  * @brief Creates and returns a thread-local storage key with the function
- * `destroySaniKey` as destructor.
- *
- * Throws an exception if no key could be created.
+ * @c destroySaniKey as destructor.
  *
  * @return the thread-local storage key
+ * @throws std::runtime_error if the key could not be created
  */
 static inline auto createSaniKey() -> pthread_key_t {
     pthread_key_t key;
@@ -874,6 +937,12 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
     return out;
 }
 
+/**
+ * Prints the content of the given allocation record.
+ *
+ * @param out the output stream to print onto
+ * @param info the allocation record
+ */
 static inline void printRecord(std::ostream& out, const MallocInfo& info) {
     const auto ptr = static_cast<void**>(info.getPointer());
     for (std::size_t i = 0; i < info.getSize() / 8; ++i) {
@@ -882,7 +951,20 @@ static inline void printRecord(std::ostream& out, const MallocInfo& info) {
     out << std::endl << info.getPointer() << " ";
 }
 
-static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, const LeakType allowed, bool printContent = false) -> bool {
+/**
+ * @brief Prints the given allocation records.
+ *
+ * Only those records matching the given leak type are printed. No record is
+ * printed more than once.
+ *
+ * @param records      the records to be printed
+ * @param out          the output stream to print onto
+ * @param allowed      which leak type to be printed
+ * @param printContent whether to print the content of the represented memory
+ * @return whether at least one record was printed
+ */
+static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out,
+                                const LeakType allowed, bool printContent = false) -> bool {
     auto toReturn = false;
     for (const auto& leak : records) {
         if (auto& record = leak.get(); !record.printedInRoot && !record.suppressed && record.leakType == allowed) {
