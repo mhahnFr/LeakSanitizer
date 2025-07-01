@@ -19,9 +19,9 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <limits>
-
 #include "MallocInfo.hpp"
+
+#include <limits>
 
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
