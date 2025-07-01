@@ -53,6 +53,7 @@ namespace lsan {
  * It acts as an allocation tracker.
  */
 class LSan final: public trackers::ATracker {
+    /** Maps the known thread identifiers to their information structure.               */
     std::map<std::thread::id, ThreadInfo> threads;
     /** An object holding all statistics.                                               */
     Stats stats;
@@ -60,7 +61,9 @@ class LSan final: public trackers::ATracker {
     behaviour::Behaviour behaviour;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
     bool callstackSizeExceeded = false;
+    /** The general suppressions.                                                       */
     std::optional<std::vector<suppression::Suppression>> suppressions;
+    /** The system library regular expressions.                                         */
     std::optional<std::vector<std::regex>> systemLibraries;
     /** Maps the thread numbers to their description.                                   */
     std::map<unsigned long, std::string> threadDescriptions;
@@ -82,8 +85,28 @@ class LSan final: public trackers::ATracker {
     std::mutex timingMutex;
 #endif
 
+    /**
+     * Classifies all memory leaks.
+     *
+     * @return the aggregated leak information
+     */
     auto classifyLeaks() -> LeakKindStats;
+
+    /**
+     * Classifies the given allocation record.
+     *
+     * @param info        the allocation record to be classified
+     * @param currentType the leak type to be used
+     * @param reclassify  whether to reclassify classified records
+     */
     void classifyRecord(MallocInfo& info, const LeakType& currentType, bool reclassify = false);
+
+    /**
+     * Searches the Objective-C runtime for memory leaks and places their
+     * allocation records into the given list.
+     *
+     * @param records the place to store related allocation records in
+     */
     void classifyObjC(std::deque<MallocInfo::Ref>& records);
 
     /**
@@ -93,13 +116,42 @@ class LSan final: public trackers::ATracker {
      */
     auto copyTrackerList() -> decltype(tlsTrackers);
 
+    /**
+     * Searches for the allocation record referred to by the given pointer,
+     * applying pointer demasking if necessary.
+     *
+     * @param ptr the pointer
+     * @return the iterator to the found allocation record
+     */
     auto findWithSpecials(void* ptr) -> decltype(infos)::iterator;
 
+    /**
+     * Classifies the memory leaks found in the given memory range.
+     *
+     * @param begin           the pointer to the beginning of the memory
+     * @param end             the pointer to the end of the memory
+     * @param direct          the leak type of leaks found in the given memory range
+     * @param indirect        the type of leaks found via direct leaks
+     * @param directs         the list to place direct memory leaks in
+     * @param skipClassifieds whether to skip already classified records
+     * @param name            the absolute name of the memory range
+     * @param nameRelative    the relative name of the memory range
+     * @param reclassify      whether to reclassify already classified records
+     */
     void classifyLeaks(uintptr_t begin, uintptr_t end,
                        LeakType direct, LeakType indirect,
                        std::deque<MallocInfo::Ref>& directs, bool skipClassifieds = false,
                        const char* name = nullptr, const char* nameRelative = nullptr, bool reclassify = false);
 
+    /**
+     * Classifies a pointer used as union of multiple pointers.
+     *
+     * @tparam Four whether the pointer union can hold four pointers
+     * @param ptr      the pointer union
+     * @param directs  the list to place direct memory leaks in
+     * @param direct   the direct leak type
+     * @param indirect the indirect leak type
+     */
     template<bool Four = false>
     constexpr inline void classifyPointerUnion(void* ptr, std::deque<MallocInfo::Ref>& directs,
                                                const LeakType direct, const LeakType indirect) {
@@ -113,26 +165,53 @@ class LSan final: public trackers::ATracker {
         }
     }
 
+    /**
+     * Classifies the given Objective-C class.
+     *
+     * @param cls      the pointer to the Objective-C class
+     * @param directs  the list to place direct memory leaks in
+     * @param direct   the direct leak type
+     * @param indirect the indirect leak type
+     */
     void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect);
+
+    /**
+     * Returns whether the given allocation record should be suppressed.
+     *
+     * @param info the allocation record in question
+     * @return whether the allocation record should be suppressed
+     */
     auto isSuppressed(const MallocInfo& info) -> bool;
+
 #ifdef __linux__
+    /**
+     * Gathers and returns the size of the memory referred to by @c pthread_t .
+     *
+     * @return the size of the POSIX thread structure
+     */
     auto gatherPthreadSize() -> std::size_t;
 #endif
 
 protected:
-    inline void maybeAddToStats(const MallocInfo& info) final override {
+    /**
+     * Adds the given allocation record to the statistics if they are active.
+     *
+     * @param info the allocation record
+     */
+    inline void maybeAddToStats(const MallocInfo& info) override {
         if (behaviour.statsActive()) {
             stats += info;
         }
     }
 
 public:
-    /** Indicates whether the allocation tracking has finished.                     */
+    /** Indicates whether the allocation tracking has finished.           */
     static std::atomic_bool finished;
-    /** Indicates whether to ignore deallocations in the TLS deallocator.           */
+    /** Indicates whether to ignore deallocations in the TLS deallocator. */
     static std::atomic_bool preventDealloc;
     /** Whether the exit has already been printed.                        */
     bool hasPrintedExit = false;
+    /** Whether indirect memory leaks have been found.                    */
     bool hadIndirects = false;
 
     LSan();
@@ -153,7 +232,8 @@ public:
     }
 
     /**
-     * @brief Attempts to remove the allocation record associated with the given pointer.
+     * @brief Attempts to remove the allocation record associated with the
+     * given pointer.
      *
      * If no record is found in this instance, all registered trackers except
      * the given one are searched for the record.
@@ -191,6 +271,8 @@ public:
 
     /**
      * Absorbs the given allocation records.
+     *
+     * @param leaks the memory leaks to absorb
      */
     void absorbLeaks(PoolMap<const void* const, MallocInfo>&& leaks);
 
@@ -216,7 +298,22 @@ public:
     }
 #endif
 
+    /**
+     * @brief Returns the global suppressions.
+     *
+     * They are loaded if necessary.
+     *
+     * @return the global suppressions
+     */
     auto getSuppressions() -> const std::vector<suppression::Suppression>&;
+
+    /**
+     * @brief Returns the system library regular expressions.
+     *
+     * They are loaded if necessary.
+     *
+     * @return the system library regular expressions
+     */
     auto getSystemLibraries() -> const std::vector<std::regex>&;
 
     /**
@@ -243,12 +340,14 @@ public:
      * Removes the allocation record associated with the given pointer.
      *
      * @param pointer the allocation pointer
-     * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
+     * @return a pair with a boolean indicating the success and optionally the
+     * already deleted allocation record
      */
     auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
 
     /**
-     * @brief Attempts to remove the allocation record associated with the given pointer.
+     * @brief Attempts to remove the allocation record associated with the
+     * given pointer.
      *
      * Does not search in the thread-local trackers.
      *
@@ -292,18 +391,53 @@ public:
         return stats;
     }
 
+    /**
+     * Registers the given thread information.
+     *
+     * @param info the thread information to be registered
+     */
     void addThread(ThreadInfo&& info);
+
+    /**
+     * Adds the calling thread.
+     */
     void addThread();
+
+    /**
+     * Removes the thread with the given thread identifier.
+     *
+     * @param id the identifier of the thread to be removed
+     */
     void removeThread(const std::thread::id& id = std::this_thread::get_id());
 
 #ifdef __linux__
+    /**
+     * Sets the stack pointer for the calling thread.
+     *
+     * @param sp the stack pointer
+     */
     constexpr inline void setSP(void* sp) {
         threads.at(std::this_thread::get_id()).setSP(sp);
     }
 #endif
 
+    /**
+     * Returns the number of the given thread.
+     *
+     * @param id the @c std::thread::id
+     * @return the number of the thread
+     */
     auto getThreadId(const std::thread::id& id = std::this_thread::get_id()) -> unsigned long;
-    auto getThreadDescription(unsigned long id, const std::optional<pthread_t>& thread = std::nullopt) -> const std::string&;
+
+    /**
+     * Returns the description for the given thread.
+     *
+     * @param id the thread number
+     * @param thread the POSIX thread identifier
+     * @return the thread description for the requested thread number
+     */
+    auto getThreadDescription(unsigned long id,
+                              const std::optional<pthread_t>& thread = std::nullopt) -> const std::string&;
 
     /**
      * Returns the behaviour object associated with this instance.
@@ -314,6 +448,12 @@ public:
         return behaviour;
     }
 
+    /**
+     * Returns whether at any time in the lifetime of the program multiple threads
+     * have been used.
+     *
+     * @return whether multithreading was used
+     */
     constexpr inline auto getIsThreaded() const -> bool {
         return isThreaded;
     }
