@@ -76,7 +76,7 @@ public:
         std::lock_guard lock { infoMutex };
         
         maybeAddToStats(info);
-        infos.insert_or_assign(info.pointer, std::move(info));
+        infos.insert_or_assign(info.getPointer(), std::move(info));
     }
 
     template<typename F, typename ...Args>

@@ -111,13 +111,13 @@ Suppression::Suppression(const Object& object):
 }
 
 auto Suppression::match(const MallocInfo& info) const -> bool {
-    if (size && info.size != *size) return false;
+    if (size && info.getSize() != *size) return false;
     if (leakType && info.leakType != *leakType) return false;
 
     if (imageName && info.imageName.first != nullptr && !std::regex_match(info.imageName.first, *imageName)) return false;
 
     if (topCallstack.empty() && info.imageName.first == nullptr) return false;
 
-    return topCallstack.empty() ? true : callstackHelper::isSuppressed(*this, info.createdCallstack);
+    return topCallstack.empty() ? true : callstackHelper::isSuppressed(*this, info.getAllocationCallstack());
 }
 }

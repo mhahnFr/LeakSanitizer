@@ -91,7 +91,7 @@ void LSan::classifyLeaks(const uintptr_t begin, const uintptr_t end,
                          const char* name, const char* nameRelative, const bool reclassify) {
     for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
         const auto& record = findWithSpecials(*reinterpret_cast<void**>(it));
-        if (record == infos.end() || record->second.deleted || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
+        if (record == infos.end() || record->second.isDeleted() || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
             continue;
         }
         if (record->second.leakType > direct || reclassify) {
@@ -121,7 +121,7 @@ void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, const 
             directs.emplace_back(it->second);
         }
 
-        const auto rwStuff = static_cast<void**>(it->second.pointer);
+        const auto rwStuff = static_cast<void**>(it->second.getPointer());
         const auto rwPtr = reinterpret_cast<void*>(uintptr_t(rwStuff[1]) & ~1);
         if (const auto& rwIt = infos.find(rwPtr); rwIt != infos.end()) {
             if (rwIt->second.leakType > direct) {
@@ -129,8 +129,8 @@ void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, const 
                 classifyRecord(rwIt->second, indirect);
                 directs.emplace_back(rwIt->second);
             }
-            if (rwIt->second.size >= 4 * sizeof(void*)) {
-                const auto ptrArr = static_cast<void**>(rwIt->second.pointer);
+            if (rwIt->second.getSize() >= 4 * sizeof(void*)) {
+                const auto ptrArr = static_cast<void**>(rwIt->second.getPointer());
                 for (unsigned char i = 1; i < 4; ++i) {
                     classifyPointerUnion<true>(ptrArr[i], directs, direct, indirect);
                 }
@@ -145,19 +145,19 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, const b
     while (!stack.empty()) {
         auto& elem = stack.top();
         stack.pop();
-        if ((elem.get().leakType > currentType || reclassify) && elem.get().pointer != info.pointer) {
+        if ((elem.get().leakType > currentType || reclassify) && elem.get().getPointer() != info.getPointer()) {
             elem.get().leakType = currentType;
         }
 
-        const auto beginPtr = align(elem.get().pointer);
-        const auto   endPtr = align(beginPtr + elem.get().size, false);
+        const auto beginPtr = align(elem.get().getPointer());
+        const auto   endPtr = align(beginPtr + elem.get().getSize(), false);
 
         for (uintptr_t it = beginPtr; it < endPtr; it += sizeof(uintptr_t)) {
             const auto& record = findWithSpecials(*reinterpret_cast<void**>(it));
             if (record == infos.end()
-                || record->second.deleted
-                || record->second.pointer == info.pointer
-                || record->second.pointer == elem.get().pointer) {
+                || record->second.isDeleted()
+                || record->second.getPointer() == info.getPointer()
+                || record->second.getPointer() == elem.get().getPointer()) {
                 continue;
             }
             info.viaMeRecords.emplace_back(record->second);
@@ -399,7 +399,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Collecting the leaks...";
     for (auto it = infos.begin(); it != infos.end();) {
-        if (it->second.deleted) {
+        if (it->second.isDeleted()) {
             it = infos.erase(it);
         } else {
             ++it;
@@ -471,7 +471,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             if (const auto& infoForCXX17 = info; std::any_of(tlvSupp.cbegin(), tlvSupp.cend(), [&infoForCXX17](const auto& supp) {
                 return supp.match(infoForCXX17);
             })) {
-                classifyLeaks(align(info.pointer), align(uintptr_t(info.pointer) + info.size, false), LeakType::tlvDirect,
+                classifyLeaks(align(info.getPointer()), align(uintptr_t(info.getPointer()) + info.getSize(), false), LeakType::tlvDirect,
                               LeakType::tlvIndirect, toReturn.recordsTlv, false, nullptr, nullptr, true);
                 info.suppressed = true;
             }
@@ -524,7 +524,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     out << clear << "Reachability analysis: Lost memory...";
     // All leaks still unclassified are unreachable, search for reachability inside them
     for (auto& [pointer, record] : infos) {
-        if (record.leakType != LeakType::unclassified || record.deleted) {
+        if (record.leakType != LeakType::unclassified || record.isDeleted()) {
             continue;
         }
         record.leakType = LeakType::unreachableDirect;
@@ -550,7 +550,7 @@ for (const auto& leak : (records)) {                              \
     if (leak.get().suppressed || leak.get().enumerated) continue; \
                                                                   \
     ++(count);                                                    \
-    (bytes) += leak.get().size;                                   \
+    (bytes) += leak.get().getSize();                              \
     const auto& [a, b] = leak.get().enumerate();                  \
     (indirect) += a;                                              \
     (indirectBytes) += b;                                         \
@@ -737,7 +737,7 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
     if (it == infos.end()) {
         return std::make_pair(false, std::nullopt);
     }
-    if (it->second.deleted) {
+    if (it->second.isDeleted()) {
         return std::make_pair(false, std::ref(it->second));
     }
     if (behaviour.statsActive()) {
@@ -754,7 +754,7 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
 void LSan::changeMalloc(const ATracker* tracker, MallocInfo&& info) {
     std::lock_guard lock { infoMutex };
 
-    const auto& it = infos.find(info.pointer);
+    const auto& it = infos.find(info.getPointer());
     if (it == infos.end()) {
         std::lock_guard tlsLock { tlsTrackerMutex };
         for (const auto element : tlsTrackers) {
@@ -767,9 +767,9 @@ void LSan::changeMalloc(const ATracker* tracker, MallocInfo&& info) {
         return;
     }
     if (behaviour.statsActive()) {
-        stats.replaceMalloc(it->second.size, info.size);
+        stats.replaceMalloc(it->second.getSize(), info.getSize());
     }
-    infos.insert_or_assign(info.pointer, info);
+    infos.insert_or_assign(info.getPointer(), info);
 }
 
 void LSan::changeMalloc(MallocInfo&& info) {
@@ -875,11 +875,11 @@ static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostr
 }
 
 static inline void printRecord(std::ostream& out, const MallocInfo& info) {
-    const auto ptr = static_cast<void**>(info.pointer);
-    for (std::size_t i = 0; i < info.size / 8; ++i) {
+    const auto ptr = static_cast<void**>(info.getPointer());
+    for (std::size_t i = 0; i < info.getSize() / 8; ++i) {
         out << ptr[i] << ", ";
     }
-    out << std::endl << info.pointer << " ";
+    out << std::endl << info.getPointer() << " ";
 }
 
 static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out, const LeakType allowed, bool printContent = false) -> bool {

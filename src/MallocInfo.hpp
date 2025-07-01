@@ -25,7 +25,6 @@
 #include <chrono>
 #include <functional>
 #include <optional>
-#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -33,7 +32,6 @@
 #include <callstack.h>
 
 #include "LeakType.hpp"
-
 #include "callstacks/callstackHelper.hpp"
 
 namespace lsan {
@@ -50,30 +48,17 @@ struct MallocInfo {
     /** The preferred constant reference type of this class. */
     using CRef = std::reference_wrapper<const MallocInfo>;
 
-    /** The pointer to the allocated piece of memory.             */
-    void* pointer;
-    /** The size of the allocated piece of memory.                */
-    std::size_t size;
-    
-    /** The type of leak this record has been classified as.      */
+    /** The type of leak this record has been classified as.                */
     LeakType leakType = LeakType::unclassified;
     /** The allocation records reachable via this record.         */
     std::vector<Ref> viaMeRecords;
 
-    /** Indicating whether this allocation has been deallocated.  */
-    bool deleted = false;
-    /** The timestamp when this record was freed.                 */
-    std::optional<std::chrono::system_clock::time_point> freeTimestamp;
-    /** The callstack where this allocation happened.             */
-    mutable lcs::callstack createdCallstack;
-    /** The callstack where the deallocation happened.            */
-    mutable std::optional<lcs::callstack> deletedCallstack;
-    std::pair<const char*, const char*> imageName = { nullptr, nullptr };
-    unsigned long threadId, deletedId = 0;
-
+    /** Indicates whether this record has been printed as root leak.        */
     bool printedInRoot = false;
     bool suppressed = false;
     bool enumerated = false;
+    /** The absolute and relative image name this record has been found in. */
+    std::pair<const char*, const char*> imageName = { nullptr, nullptr };
 
     /**
      * Initializes this allocation record using the given information.
@@ -114,15 +99,16 @@ struct MallocInfo {
      *
      * @param out the output stream to print to
      */
-    inline void printCreatedCallstack(std::ostream& out, const std::string& indent = "") const {
+    constexpr inline void printCreatedCallstack(std::ostream& out, const std::string& indent = "") const {
         callstackHelper::format(createdCallstack, out, indent);
     }
+
     /**
      * Prints the callstack where this allocation was deallocated.
      *
      * @param out the output stream to print to
      */
-    inline void printDeletedCallstack(std::ostream& out) const {
+    constexpr inline void printDeletedCallstack(std::ostream& out) const {
         if (!deletedCallstack) {
             throw std::runtime_error("MallocInfo: No deleted callstack! "
                                      "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");
@@ -131,6 +117,41 @@ struct MallocInfo {
         callstackHelper::format(*deletedCallstack, out);
     }
 
+    constexpr inline auto getPointer() const {
+        return pointer;
+    }
+
+    constexpr inline auto getSize() const {
+        return size;
+    }
+
+    constexpr inline auto isDeleted() const {
+        return deleted;
+    }
+
+    constexpr inline auto getFreeTimestamp() const -> const auto& {
+        return freeTimestamp;
+    }
+
+    constexpr inline auto getAllocationThread() const {
+        return threadId;
+    }
+
+    constexpr inline auto getDeallocationThread() const {
+        return deletedId;
+    }
+
+    constexpr inline auto getDeallocationCallstack() const -> const auto& {
+        return deletedCallstack;
+    }
+
+    constexpr inline auto getAllocationCallstack() const -> auto& {
+        return createdCallstack;
+    }
+
+    /**
+     * Marks this allocation record as suppressed.
+     */
     void markSuppressed();
     auto enumerate() -> std::pair<std::size_t, std::size_t>;
 
@@ -138,6 +159,22 @@ struct MallocInfo {
 
 private:
     bool flag = false;
+    /** The pointer to the allocated piece of memory.           */
+    void* pointer;
+    /** The size of the allocated piece of memory.              */
+    std::size_t size;
+    /** Indicates whether this allocation has been deallocated. */
+    bool deleted = false;
+    /** The timestamp when this record was freed.               */
+    std::optional<std::chrono::system_clock::time_point> freeTimestamp;
+    /** The thread number that created this record.             */
+    unsigned long threadId,
+    /** The thread number that performed the deallocation.      */
+                  deletedId = 0;
+    /** The callstack where the allocation happened.            */
+    mutable lcs::callstack createdCallstack;
+    /** The callstack where the deallocation happened.          */
+    mutable std::optional<lcs::callstack> deletedCallstack;
 
     void print(std::ostream& stream, unsigned long indent = 0, unsigned long number = 0, unsigned long indent2 = 0) const;
 

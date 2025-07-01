@@ -120,7 +120,7 @@ public:
      * @param info the allocation record to append
      */
     inline void addMalloc(const MallocInfo& info) {
-        addMalloc(info.size);
+        addMalloc(info.getSize());
     }
     
     /**
@@ -145,7 +145,7 @@ public:
      * @param info the allocation record that should be removed from the statistics
      */
     inline void addFree(const MallocInfo& info) {
-        addFree(info.size);
+        addFree(info.getSize());
     }
     
     /**

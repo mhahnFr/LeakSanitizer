@@ -101,13 +101,13 @@ constexpr static inline void printer(const std::string&                     mess
         const auto& showThread = instance.getIsThreaded();
 
         std::cerr << format<Style::ITALIC, colour>("Previously allocated"s
-                                                   + (showThread ? " by " + instance.getThreadDescription(record.threadId) : "")
+                                                   + (showThread ? " by " + instance.getThreadDescription(record.getAllocationThread()) : "")
                                                    + " here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
-        if (record.deletedCallstack.has_value()) {
+        if (record.getDeallocationCallstack().has_value()) {
             std::cerr << format<Style::ITALIC, colour>("Previously freed"s
-                                                       + (showThread ? " by " + instance.getThreadDescription(record.deletedId) : "")
+                                                       + (showThread ? " by " + instance.getThreadDescription(record.getDeallocationThread()) : "")
                                                        + " here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;

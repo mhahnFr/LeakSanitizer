@@ -42,7 +42,7 @@ TLSTracker::~TLSTracker() {
     std::lock_guard lock1 { infoMutex };
     if (getBehaviour().invalidFree()) {
         for (auto it = infos.cbegin(); it != infos.cend();) {
-            if (it->second.deleted) {
+            if (it->second.isDeleted()) {
                 it = infos.erase(it);
             } else {
                 ++it;
@@ -63,7 +63,7 @@ void TLSTracker::finish() {
     std::lock_guard lock1 { infoMutex };
     if (getBehaviour().invalidFree()) {
         for (auto it = infos.cbegin(); it != infos.cend();) {
-            if (it->second.deleted) {
+            if (it->second.isDeleted()) {
                 it = infos.erase(it);
             } else {
                 ++it;
@@ -81,7 +81,7 @@ auto TLSTracker::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::option
     if (it == infos.end()) {
         return std::make_pair(false, std::nullopt);
     }
-    if (it->second.deleted) {
+    if (it->second.isDeleted()) {
         return std::make_pair(false, std::ref(it->second));
     }
     if (getBehaviour().invalidFree()) {
@@ -111,20 +111,20 @@ auto TLSTracker::removeMalloc(void* pointer) -> std::pair<bool, std::optional<Ma
 void TLSTracker::changeMalloc(MallocInfo&& info) {
     std::lock_guard lock { infoMutex };
 
-    if (const auto& it = infos.find(info.pointer); it == infos.end()) {
+    if (const auto& it = infos.find(info.getPointer()); it == infos.end()) {
         getInstance().changeMalloc(this, std::move(info));
         return;
     }
-    infos.insert_or_assign(info.pointer, std::move(info));
+    infos.insert_or_assign(info.getPointer(), std::move(info));
 }
 
 auto TLSTracker::maybeChangeMalloc(const MallocInfo& info) -> bool {
     std::lock_guard lock { infoMutex };
 
-    if (const auto& it = infos.find(info.pointer); it == infos.end()) {
+    if (const auto& it = infos.find(info.getPointer()); it == infos.end()) {
         return false;
     }
-    infos.insert_or_assign(info.pointer, info);
+    infos.insert_or_assign(info.getPointer(), info);
     return true;
 }
 }

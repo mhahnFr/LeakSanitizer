@@ -130,8 +130,8 @@ static inline void printFragmentationObjectBar(const std::size_t width, std::ost
                      loss = fmod(step, double(int(step)));
         double tmpLoss = 0.0f;
         for (; it != infos.cend(); ++it) {
-            const std::string& fill = it->second.deleted ? formatter::get<Style::BAR_EMPTY>()
-                                                         : formatter::get<Style::BAR_FILLED>();
+            const std::string& fill = it->second.isDeleted() ? formatter::get<Style::BAR_EMPTY>()
+                                                             : formatter::get<Style::BAR_FILLED>();
             tmpLoss += loss;
             if (tmpLoss >= 1.0f) {
                 out << fill;
@@ -161,7 +161,7 @@ static inline void printFragmentationObjectBar(const std::size_t width, std::ost
             }
             std::size_t fs = 0;
             for (; it != e; ++it) {
-                if (it->second.deleted) {
+                if (it->second.isDeleted()) {
                     ++fs;
                 }
             }
@@ -213,12 +213,12 @@ static inline void printFragmentationByteBar(const std::size_t width, std::ostre
     const auto & infos = getInstance().getFragmentationInfos();
     auto it = infos.cbegin();
     std::size_t currentBlockBegin = 0,
-                currentBlockEnd   = it->second.size,
+                currentBlockEnd   = it->second.getSize(),
                 b                 = 0;
     
     auto total = std::size_t(0);
     for (const auto & [_, info] : infos) {
-        total += info.size;
+        total += info.getSize();
     }
     
     if (total < width) {
@@ -227,10 +227,10 @@ static inline void printFragmentationByteBar(const std::size_t width, std::ostre
             if (b >= currentBlockEnd) {
                 ++it;
                 currentBlockBegin = b;
-                currentBlockEnd   = currentBlockBegin + it->second.size;
+                currentBlockEnd   = currentBlockBegin + it->second.getSize();
             }
-            const std::string& fill = it->second.deleted ? formatter::get<Style::BAR_EMPTY>()
-                                                         : formatter::get<Style::BAR_FILLED>();
+            const std::string& fill = it->second.isDeleted() ? formatter::get<Style::BAR_EMPTY>()
+                                                             : formatter::get<Style::BAR_FILLED>();
             for (std::size_t i = 0; i < step; ++i) {
                 out << fill;
             }
@@ -258,9 +258,9 @@ static inline void printFragmentationByteBar(const std::size_t width, std::ostre
                 if (b >= currentBlockEnd) {
                     ++it;
                     currentBlockBegin = b;
-                    currentBlockEnd   = currentBlockBegin + it->second.size;
+                    currentBlockEnd   = currentBlockBegin + it->second.getSize();
                 }
-                if (it->second.deleted) {
+                if (it->second.isDeleted()) {
                     ++fs;
                 }
             }

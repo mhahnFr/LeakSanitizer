@@ -32,7 +32,7 @@ class PseudoTracker final: public ATracker {
 
 protected:
     inline void maybeAddToStats(const MallocInfo& info) override {
-        infos.erase(info.pointer);
+        infos.erase(info.getPointer());
         main.addMalloc(MallocInfo(info));
     }
 
