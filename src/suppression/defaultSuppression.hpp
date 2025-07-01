@@ -26,8 +26,25 @@
 #include <vector>
 
 namespace lsan::suppression {
+/**
+ * Loads and returns the contents of the default suppression files.
+ *
+ * @return the contents of the default suppression files
+ */
 auto getDefaultSuppression() -> std::vector<std::string>;
+
+/**
+ * Loads and returns the contents of the default system library expression files.
+ *
+ * @return the contents of the system library regular expression files
+ */
 auto getSystemLibraryFiles() -> std::vector<std::string>;
+
+/**
+ * Loads and returns the contents of the default thread-local value suppression files.
+ *
+ * @return the contents of the default thread-local value suppression files
+ */
 auto getDefaultTLVSuppressions() -> std::vector<std::string>;
 }
 

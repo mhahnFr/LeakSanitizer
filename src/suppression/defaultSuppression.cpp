@@ -30,14 +30,11 @@
 #ifdef LSAN_APPLE
 # include <macos/AppKit.hpp>
 # include <macos/core.hpp>
-
 # include <macos/systemLibraries.hpp>
-
 # include <macos/tlv.hpp>
 
 #elif defined(LSAN_LINUX)
 # include <linux/core.hpp>
-
 # include <linux/systemLibraries.hpp>
 #endif
 
