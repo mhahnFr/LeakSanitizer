@@ -19,17 +19,18 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "bytePrinter.hpp"
+
 #include <iomanip>
 #include <sstream>
 
-#include "bytePrinter.hpp"
 #include "lsanMisc.hpp"
 
 namespace lsan {
 /** Represents exactly 1 EiB. Needed for the calculations as starting point. */
-static constexpr unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL;
+static constexpr inline unsigned long long exabyte = 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL * 1024ULL;
 /** An array of the byte entities, going from EiB to single bytes.           */
-static constexpr const char* sizes[] { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
+static constexpr inline const char* sizes[] { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
 
 auto bytesToString(const unsigned long long amount) -> std::string {
     std::stringstream s;

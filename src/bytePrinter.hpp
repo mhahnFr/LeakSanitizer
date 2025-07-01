@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -26,10 +26,10 @@
 
 namespace lsan {
 /**
- * @brief Returns a human readable representation of the given byte amount.
+ * @brief Returns a human-readable representation of the given byte amount.
  *
- * Depending on `__lsan_humanPrint`, the amount may be represented in
- * a higher entity.
+ * Depending on @c Behaviour::humanPrint() the amount may be represented in a
+ * higher entity.
  *
  * @param amount the amount to create a string representation of
  * @return a string representation of the given byte amount
