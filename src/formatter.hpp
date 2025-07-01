@@ -66,8 +66,8 @@ enum class Style {
 /**
  * @brief Returns an ANSI escape code for the requested style.
  *
- * The returned string might be empty if `__lsan_printFormatted` is
- * set to `false`.
+ * The returned string might be empty if @c Behaviour::printFormatted() returns
+ * @c false .
  *
  * @return the corresponding escape code
  * @tparam S the requested style
@@ -103,8 +103,8 @@ constexpr inline auto get() -> const char * {
 /**
  * @brief Returns an ANSI escape code to clear the given style.
  *
- * The returned string might be empty if `__lsan_printFormatted` is
- * set to `false`.
+ * The returned string might be empty if @c Behaviour::printFormatted() returns
+ * @c false .
  *
  * @return the corresponding escape code
  * @tparam S the style to clear
