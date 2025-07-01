@@ -19,15 +19,16 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <map>
-
 #include "firstPartyLibrary.hpp"
+
+#include <map>
 
 #include "../lsanMisc.hpp"
 
 namespace lsan::suppression {
 /**
- * An enumeration containing the currently known classifications of a binary file path.
+ * An enumeration containing the currently known classifications of a binary
+ * file path.
  */
 enum class Classification {
     /** Indicates the file path is first party.    */

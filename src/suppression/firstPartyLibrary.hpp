@@ -23,6 +23,13 @@
 #define firstPartyLibrary_hpp
 
 namespace lsan::suppression {
+/**
+ * Returns whether the given binary file name is considered first party.
+ *
+ * @param binaryName the binary file name in question
+ * @param useCache whether to use the cache
+ * @return whether the given binary file is considered first party
+ */
 auto isFirstParty(const char* binaryName, bool useCache) -> bool;
 }
 
