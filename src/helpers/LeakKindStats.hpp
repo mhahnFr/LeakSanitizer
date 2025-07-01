@@ -31,48 +31,49 @@ namespace lsan {
  * This structure represents the statistics for the different kind of leaks.
  */
 struct LeakKindStats {
-    /** The amount of leaks on the stack.                     */
+    /** The amount of leaks on the stack.                                */
     std::size_t stack          = 0,
-    /** The amount of leaks found via leaks on the stack.     */
+    /** The amount of leaks found via leaks on the stack.                */
                 stackIndirect  = 0,
-    /** The amount of leaks in global space.                  */
+    /** The amount of leaks in global space.                             */
                 global         = 0,
-    /** The amount of leaks found via global leaks.           */
+    /** The amount of leaks found via global leaks.                      */
                 globalIndirect = 0,
-    /** The amount of thread-local leaks.                     */
+    /** The amount of thread-local leaks.                                */
                 tlv            = 0,
-    /** The amount of leaks found via thread-local leaks.     */
+    /** The amount of leaks found via thread-local leaks.                */
                 tlvIndirect    = 0,
-    /** The amount of root leaks.                             */
+    /** The amount of root leaks.                                        */
                 lost           = 0,
-    /** The amount of leaks found via lost leaks.             */
+    /** The amount of leaks found via lost leaks.                        */
                 lostIndirect   = 0;
 
-    /** The count of bytes found on the stack.                */
+    /** The count of bytes found on the stack.                           */
     std::size_t bytesStack          = 0,
-    /** The count of bytes found via the stack.               */
+    /** The count of bytes found via the stack.                          */
                 bytesStackIndirect  = 0,
-    /** The count of bytes found in global space.             */
+    /** The count of bytes found in global space.                        */
                 bytesGlobal         = 0,
-    /** The count of bytes found via the global space.        */
+    /** The count of bytes found via the global space.                   */
                 bytesGlobalIndirect = 0,
-    /** The count of bytes found in thread-local values.      */
+    /** The count of bytes found in thread-local values.                 */
                 bytesTlv            = 0,
-    /** The count of bytes found via thread-local values.     */
+    /** The count of bytes found via thread-local values.                */
                 bytesTlvIndirect    = 0,
-    /** The count of bytes lost.                              */
+    /** The count of bytes lost.                                         */
                 bytesLost           = 0,
-    /** The count of bytes found via lost leaks.              */
+    /** The count of bytes found via lost leaks.                         */
                 bytesLostIndirect   = 0;
 
-    /** The allocation records found on the stack.            */
+    /** The allocation records found on the stack.                       */
     std::deque<MallocInfo::Ref> recordsStack;
+    /** The allocation records found in the Objective-C runtime library. */
     std::deque<MallocInfo::Ref> recordsObjC;
-    /** The allocation records found in global space.         */
+    /** The allocation records found in global space.                    */
     std::deque<MallocInfo::Ref> recordsGlobal;
-    /** The allocation records found in thread-local storage. */
+    /** The allocation records found in thread-local storage.            */
     std::deque<MallocInfo::Ref> recordsTlv;
-    /** The allocation records directly lost.                 */
+    /** The allocation records directly lost.                            */
     std::deque<MallocInfo::Ref> recordsLost;
 
     /**
