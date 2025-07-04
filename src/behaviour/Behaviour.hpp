@@ -33,13 +33,13 @@ namespace lsan::behaviour {
  * Represents the settings of the behaviours this sanitizer supports.
  */
 class Behaviour {
-#define FROM_ENV(type, name, envName, def) \
-private:\
-    const std::optional<type> _##name = get<type>("LSAN_" #envName);\
-public:\
-    constexpr inline auto name() const {\
-        return _##name.value_or(def);\
-    }\
+#define FROM_ENV(type, name, envName, def)                           \
+private:                                                             \
+    const std::optional<type> _##name = get<type>("LSAN_" #envName); \
+public:                                                              \
+    constexpr inline auto name() const {                             \
+        return _##name.value_or(def);                                \
+    }                                                                \
 private:
 
 #define FROM_ENV_API(type, name, envName) FROM_ENV(type, name, envName, __lsan_##name)
