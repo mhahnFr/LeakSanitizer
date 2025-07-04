@@ -63,6 +63,10 @@ The name of the function as used by the linker.
 ##### `libraryRegex`
 At least one callstack frame with a runtime image whose name matches these regular expressions.
 
+> [!TIP]
+> The special value `LSAN_SYSTEM_LIBRARIES` can be used in order to match any runtime image known to be provided by
+> the system.
+
 **Type**: Regular expression *(String)* or array of regular expressions  
 **Necessity**: Either this or `name`
 
