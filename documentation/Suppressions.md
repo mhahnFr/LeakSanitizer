@@ -1,7 +1,7 @@
 # Suppressions
 Since version **1.11**, the LeakSanitizer provides a sophisticated system for suppressing irrelevant memory leaks.
 
-This system is based on JSON files containing suppression objects as defined below. A JSON schema is also available.
+This system is based on JSON files containing suppression objects as defined below. A [JSON schema][1] is also available.
 
 ## Suppression object
 A suppression object is designed to match memory leaks. This can be achieved by defining one or multiple of the
@@ -23,7 +23,7 @@ The size of the memory block.
 A regular expression to match the runtime image in which the leak is to be found.
 
 **Type**: Regular expression *(String)*  
-**Necessity**: Either this or `functions`
+**Necessity**: Either this or [`functions`][2]
 
 ### `type`
 The type of the memory leak.
@@ -46,7 +46,7 @@ The type of the memory leak.
 
 ### `functions`
 **Type**: Array  
-**Necessity**: Either this or `imageName`
+**Necessity**: Either this or [`imageName`][3]
 
 This array describes an abstracted stacktrace of memory leaks to match.
 
@@ -58,7 +58,7 @@ At least one entry needs to be defined.
 The name of the function as used by the linker.
 
 **Type**: String  
-**Necessity**: Either this or `libraryRegex`
+**Necessity**: Either this or [`libraryRegex`][4]
 
 ##### `libraryRegex`
 At least one callstack frame with a runtime image whose name matches these regular expressions.
@@ -68,12 +68,12 @@ At least one callstack frame with a runtime image whose name matches these regul
 > the system.
 
 **Type**: Regular expression *(String)* or array of regular expressions  
-**Necessity**: Either this or `name`
+**Necessity**: Either this or [`name`][5]
 
 ##### `offset`
 The byte offset into the function.
 
-Only used when the property `name` is defined.
+Only used when the property [`name`][5] is defined.
 
 **Type**: Non-negative integral number  
 **Necessity**: Optional
@@ -81,7 +81,7 @@ Only used when the property `name` is defined.
 ##### `library`
 Hint in which runtime image to search for the function.
 
-Only used when the property `name` is defined.
+Only used when the property [`name`][5] is defined.
 
 **Type**: String  
 **Necessity**: Optional
@@ -112,3 +112,9 @@ Consider the following example suppression stacktrace:
 | `# 6: (fdf) onApplicationFinishedLaunching (delegate/app_delegate.c:36:2)`                        | *No further matching performed*         |
 | `# 7: (fdf) main (main.c:26:10)`                                                                  | *No further matching performed*         |
 | `# 8: (/usr/lib/dyld) start + 3056`                                                               | *No further matching performed*         |
+
+[1]: ../suppressions/schema.json
+[2]: #functions
+[3]: #imagename
+[4]: #libraryregex
+[5]: #name-1
