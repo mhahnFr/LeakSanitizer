@@ -45,9 +45,39 @@ The type of the memory leak.
 **Necessity**: Optional
 
 ### `functions`
-This array describes an abstracted stacktrace of memory leaks to match.
-
-You can use the name of the function (as used by the linker) directly or use the stacktrace entry object described below.
-
 **Type**: Array  
 **Necessity**: Either this or `imageName`
+
+This array describes an abstracted stacktrace of memory leaks to match.
+
+You can use the name of the function (as used by the linker) directly or use the stacktrace entry object described below. At least one entry
+needs to be defined.
+
+#### Stacktrace entry object
+##### `name`
+The name of the function as used by the linker.
+
+**Type**: String  
+**Necessity**: Either this or `libraryRegex`
+
+##### `libraryRegex`
+At least one callstack frame with a runtime image whose name matches these regular expressions.
+
+**Type**: Regular expression *(String)* or array of regular expressions  
+**Necessity**: Either this or `name`
+
+##### `offset`
+The byte offset into the function.
+
+Only used when the property `name` is defined.
+
+**Type**: Non-negative integral number  
+**Necessity**: Optional
+
+##### `library`
+Hint in which runtime image to search for the function.
+
+Only used when the property `name` is defined.
+
+**Type**: String  
+**Necessity**: Optional
