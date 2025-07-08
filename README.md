@@ -142,28 +142,12 @@ Compiled and linked on macOS with `cc test.c -g -L<path/to/lsan> -llsan` creates
     <img src="documentation/images/dark/leak-example.png" alt="">
 </picture>
 
-Summary: 2 leaks, 1.01 KiB lost.
-```
-Compiled and linked on Debian with `gcc main.c -g -L<path/to/library> -llsan` creates the following output:
-```
-Exiting
-
-Leak of size 1023 B                 
-In: (a.out) main (main.c:7:16)
-at: (/usr/lib/x86_64-linux-gnu/libc.so.6) << Unknown >>
-at: (/usr/lib/x86_64-linux-gnu/libc.so.6) __libc_start_main + 133
-at: (a.out) _start + 33
-
-Leak of size 13 B                   
-At: (/usr/lib/x86_64-linux-gnu/libc.so.6) __strdup + 26
-in: (a.out) main (main.c:8:9)
-at: (/usr/lib/x86_64-linux-gnu/libc.so.6) << Unknown >>
-at: (/usr/lib/x86_64-linux-gnu/libc.so.6) __libc_start_main + 133
-at: (a.out) _start + 33
-
-
-Summary: 2 leaks, 1.01 KiB lost.
-```
+Compiled and linked on Fedora with `gcc test.c -g -L<path/to/lsan> -llsan` creates the following output:
+<picture>
+    <source srcset="documentation/images/light/leak-example-fedora.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+    <source srcset="documentation/images/dark/leak-example-fedora.png" media="(prefers-color-scheme: dark)" />
+    <img src="documentation/images/dark/leak-example-fedora.png" alt="">
+</picture>
 
 #### Line numbers
 Simply compile your code with debug symbols to add line numbers to the output.
