@@ -4,17 +4,13 @@ The LeakSanitizer is a tool designed to debug memory leaks.
 It can be used with almost any programming language that compiles to native machine code.  
 Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
 
-> [!IMPORTANT]
-> **Objective-C** and **Swift** objects are never considered to become memory leaks - even in the case of strong
-> reference cycles.
-
 This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are detected on both platforms.
 
 ## Quickstart
 Use the LeakSanitizer to check for memory leaks as follows:
 1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
 2. Build it: `cd LeakSanitizer && make -j`
-3. Link your code with: `-L<path/to/library> -llsan`
+3. Link your code with: `-L<path/to/lsan> -llsan`
 
 > [!TIP]
 > **Update** the LeakSanitizer using:
@@ -85,17 +81,17 @@ Install it again as described [above][8].
 To use this sanitizer simply link your application against it (recommended) or preload its library.
 
 #### Linking (_recommended_)
-- Add `-L<path/to/library>` if this sanitizer has not been installed in one of the default directories.
+- Add `-L<path/to/lsan>` if this sanitizer has not been installed in one of the default directories.
 
 Link with: `-llsan`
 
 > [!TIP]
-> - Example: `-L<path/to/library> -llsan`
+> **Example**: `-L<path/to/lsan> -llsan`
 
 #### Preloading
 Add this sanitizer's library to the dynamic loader preload environment variable:
-- **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/library>`
-- **Linux**: `LD_PRELOAD=<path/to/library>`
+- **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/lsan>/liblsan.dylib`
+- **Linux**: `LD_PRELOAD=<path/to/lsan>/liblsan.so`
 
 > [!TIP]
 > - Example **macOS**:
@@ -220,7 +216,7 @@ This sanitizer comes with handlers for the following signals:
 | `SIGUSR2`     | Printing the current callstack.                                                       |
 | Deadly signal | Printing the callstack of the crash.                                                  |
 
-More on the signal handlers [here][3].
+More about the signal handlers [here][3].
 
 ### Statistics
 The statistics of the tracked memory can be queried at runtime. To do so activate the statistical bookkeeping by setting
