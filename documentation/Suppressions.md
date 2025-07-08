@@ -65,7 +65,7 @@ At least one callstack frame with a runtime image whose name matches these regul
 
 > [!TIP]
 > The special value `LSAN_SYSTEM_LIBRARIES` can be used in order to match any runtime image known to be provided by
-> the system. [Adapt the known system libraries by using its extension system.][]
+> the system. [Adapt the known system libraries by using its extension system.][6]
 
 **Type**: Regular expression *(String)* or array of regular expressions  
 **Necessity**: Either this or [`name`][5]
@@ -109,7 +109,8 @@ Consider the following example suppression stacktrace:
 | `(a.out) main + 9`             | Matched by `main`                       |
 | `(/usr/lib/dyld) start + 2345` | *No further matching performed*         |
 
-If another function was present between `foo` and `main`, the callstack would be considered to not have matched the suppression.
+If another function was present between `foo` and `main`, the callstack would be considered to not have matched the
+suppression.
 
 ##### Example with `LSAN_SYSTEM_LIBRARIES`
 Consider the following example suppression stacktrace:
@@ -134,8 +135,27 @@ Consider the following example suppression stacktrace:
 | `(fdf) main (main.c:26:10)`                                                  | *No further matching performed*         |
 | `(/usr/lib/dyld) start + 3056`                                               | *No further matching performed*         |
 
+## System library detection
+The system library detection available using the special regular expression value of `LSAN_SYSTEM_LIBRARIES` can be
+extended by providing a simple JSON file. This JSON file should include an array of regular expressions matching the
+binary file names of the runtime images to be treated as a system library.
+
+**Example**:
+```JSON
+[
+  "^/System/Library/.*$"
+]
+```
+
+In order to use your own JSON file(s), add them to the environment variable [`LSAN_SYSTEM_LIBRARY_FILES`][7]:
+```shell
+LSAN_SYSTEM_LIBRARY_FILES='libraryFoo.json:barLibrary.json' ./a.out
+```
+
 [1]: ../suppressions/schema.json
 [2]: #functions
 [3]: #imagename
 [4]: #libraryregex
 [5]: #name-1
+[6]: #system-library-detection
+[7]: Behaviour#lsan_system_library_files
