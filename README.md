@@ -107,32 +107,40 @@ Add this sanitizer's library to the dynamic loader preload environment variable:
 Once this sanitizer is bundled with your application the detected memory leaks are printed upon termination.
 
 ```C
-// main.c
+// test.c
 
 #include <string.h>
 #include <stdlib.h>
 
-int main(void) {
-    void * a = malloc(1023);
+char* global;
+
+void foo2(void) {
+    global = strdup("Global variable");
+}
+
+void bar2(void) {
+    void* a = malloc(1023);
     a = strdup("Hello World!");
     a = NULL;
     a = malloc(1000);
     free(a);
+    
+    foo2();
+}
+
+void foo(void) { bar2(); }
+void bar(void) { foo();  }
+
+int main(void) {
+    bar();
 }
 ```
-Compiled and linked on macOS with `cc main.c -g -L<path/to/library> -llsan` creates the following output:
-```
-Exiting
-
-Leak of size 13 B                   
-At: (/usr/lib/system/libsystem_c.dylib) strdup + 32
-in: (a.out) main (main.c:8:9)
-at: (/usr/lib/dyld) start + 1903
-
-Leak of size 1023 B                 
-In: (a.out) main (main.c:7:16)
-at: (/usr/lib/dyld) start + 1903
-
+Compiled and linked on macOS with `cc test.c -g -L<path/to/lsan> -llsan` creates the following output:
+<picture>
+    <source srcset="documentation/images/light/leak-example.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+    <source srcset="documentation/images/dark/leak-example.png" media="(prefers-color-scheme: dark)" />
+    <img src="documentation/images/dark/leak-example.png" alt="">
+</picture>
 
 Summary: 2 leaks, 1.01 KiB lost.
 ```
