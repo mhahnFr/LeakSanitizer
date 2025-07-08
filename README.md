@@ -162,31 +162,33 @@ Currently, debug symbols in the following formats are supported:
 The DWARF parser supports DWARF in version **2**, **3**, **4** and **5**.
 
 ### Behaviour
-Since version 1.6 the behaviour of this sanitizer can be adjusted by setting the following environment variables to
-their indicated values:
+Since version 1.6 the behaviour of this sanitizer can be adjusted by setting certain environment variables.  
+The following variables are currently supported:
 
-| Name                         | Description                                                                              | Values              | Default value |
-|------------------------------|------------------------------------------------------------------------------------------|---------------------|---------------|
-| `LSAN_HUMAN_PRINT`           | Print human-readably formatted                                                           | `true`, `false`     | `true`        |
-| `LSAN_PRINT_COUT`            | Print to the default output stream                                                       | `true`, `false`     | `false`       |
-| `LSAN_PRINT_FORMATTED`       | Print using ANSI escape codes                                                            | `true`, `false`     | `true`        |
-| `LSAN_INVALID_CRASH`         | Terminate if an invalid action is detected                                               | `true`, `false`     | `true`        |
-| `LSAN_INVALID_FREE`          | Detect invalid de-allocations                                                            | `true`, `false`     | `true`        |
-| `LSAN_FREE_NULL`             | Issue a warning if `NULL` is `free`d                                                     | `true`, `false`     | `false`       |
-| `LSAN_STATS_ACTIVE`          | Enable the statistical bookkeeping                                                       | `true`, `false`     | `false`       |
-| `LSAN_LEAK_COUNT`            | The amount of leaks to be printed in detail                                              | `0` to `SIZE_MAX`   | `100`         |
-| `LSAN_CALLSTACK_SIZE`        | The amount of frames to be printed in a callstack                                        | `0` to `SIZE_MAX`   | `20`          |
-| `LSAN_FIRST_PARTY_THRESHOLD` | **Since v1.7:** The amount of first party frames                                         | `0` to `SIZE_MAX`   | `3`           |
-| `LSAN_PRINT_EXIT_POINT`      | **Since v1.7:** Print the callstack of the exit point                                    | `true`, `false`     | `false`       |
-| `LSAN_PRINT_BINARIES`        | **Since v1.8:** Print the binary file names                                              | `true`, `false`     | `true`        |
-| `LSAN_PRINT_FUNCTIONS`       | **Since v1.8:** Always print the function names                                          | `true`, `false`     | `true`        |
-| `LSAN_RELATIVE_PATHS`        | **Since v1.8:** Allow relative paths to be printed                                       | `true`, `false`     | `true`        |
-| `LSAN_ZERO_ALLOCATION`       | **Since v1.8:** Issue a warning when `0` byte are allocated                              | `true`, `false`     | `false`       |
-| `LSAN_FIRST_PARTY_REGEX`     | **Since v1.8:** Binary files matching this regex are considered "first party".           | *Any regex*         | *None*        |
-| `LSAN_AUTO_STATS`            | **Since v1.11:** Time interval between the automatically statistics printing (when set). | *Any time interval* | *None*        |
+| Name                               | Description                                                 | Since | Type                | Default value |
+|------------------------------------|-------------------------------------------------------------|-------|---------------------|---------------|
+| [`LSAN_HUMAN_PRINT`][b1]           | Print human-readably formatted                              | v1.6  | [Boolean][15]       | `true`        |
+| [`LSAN_PRINT_COUT`][12]            | Print to the default output stream                          | v1.6  | [Boolean][15]       | `false`       |
+| [`LSAN_PRINT_FORMATTED`][b2]       | Print using ANSI escape codes                               | v1.6  | [Boolean][15]       | `true`        |
+| [`LSAN_INVALID_CRASH`][b3]         | Terminate if an invalid action is detected                  | v1.6  | [Boolean][15]       | `true`        |
+| [`LSAN_INVALID_FREE`][b4]          | Detect invalid de-allocations                               | v1.6  | [Boolean][15]       | `true`        |
+| [`LSAN_FREE_NULL`][b5]             | Issue a warning if `NULL` is `free`d                        | v1.6  | [Boolean][15]       | `false`       |
+| [`LSAN_STATS_ACTIVE`][13]          | Enable the statistical bookkeeping                          | v1.6  | [Boolean][15]       | `false`       |
+| [`LSAN_CALLSTACK_SIZE`][b6]        | The amount of frames to be printed in a callstack           | v1.6  | Number              | `20`          |
+| [`LSAN_PRINT_EXIT_POINT`][b7]      | Print the callstack of the exit point                       | v1.7  | [Boolean][15]       | `false`       |
+| [`LSAN_PRINT_BINARIES`][b8]        | Print the binary file names                                 | v1.8  | [Boolean][15]       | `true`        |
+| [`LSAN_PRINT_FUNCTIONS`][b9]       | Always print the function names                             | v1.8  | [Boolean][15]       | `true`        |
+| [`LSAN_RELATIVE_PATHS`][ba]        | Allow relative paths to be printed                          | v1.8  | [Boolean][15]       | `true`        |
+| [`LSAN_ZERO_ALLOCATION`][bb]       | Issue a warning when `0` byte are allocated                 | v1.8  | [Boolean][15]       | `false`       |
+| [`LSAN_AUTO_STATS`][14]            | Time interval between the automatically statistics printing | v1.11 | [Time interval][16] | *None*        |
+| [`LSAN_SUPPRESSION_DEVELOPER`][bc] | Activates more suppression developer output                 | v1.11 | [Boolean][15]       | `false`       |
+| [`LSAN_INDIRECT_LEAKS`][bd]        | Whether to print indirectly leaked allocations              | v1.11 | [Boolean][15]       | `false`       |
+| [`LSAN_REACHABLE_LEAKS`][be]       | Whether to print leaks to whose a pointer was found         | v1.11 | [Boolean][15]       | `true`        |
+| [`LSAN_SUPPRESSION_FILES`][bf]     | List of additional suppression files to be considered       | v1.11 | [File list][17]     | *None*        |
+| [`LSAN_SYSTEM_LIBRARY_FILES`][bf1] | List of additional system library files to be considered    | v1.11 | [File list][17]     | *None*        |
 
 > [!TIP]
-> `LSAN_AUTO_STATS` should be assigned a number with a time unit directly after the number.  
+> [`LSAN_AUTO_STATS`][14] should be assigned a number with a time unit directly after the number.  
 > The following time units are available:
 > - `ns`: nanoseconds
 > - `us`: microseconds
@@ -250,8 +252,8 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 © Copyright 2022 - 2025 [mhahnFr][6] and contributors
 
 [1]: https://github.com/mhahnFr/LeakSanitizer/releases/latest
-[2]: https://github.com/mhahnFr/LeakSanitizer/wiki/Behaviour
-[3]: https://github.com/mhahnFr/LeakSanitizer/wiki/Signal-handlers
+[2]: documentation/Behaviour
+[3]: documentation/Signal-handlers
 [4]: https://github.com/mhahnFr/LeakSanitizer/wiki/Home#Statistics
 [5]: https://github.com/mhahnFr/CallstackLibrary
 [6]: https://github.com/mhahnFr
@@ -263,3 +265,22 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 [12]: documentation/Behaviour#lsan_print_cout
 [13]: documentation/Behaviour#lsan_stats_active
 [14]: documentation/Behaviour#lsan_auto_stats
+[15]: documentation/Behaviour#boolean
+[16]: documentation/Behaviour#time-interval
+[17]: documentation/Behaviour#file-list
+[b1]: documentation/Behaviour#lsan_human_print
+[b2]: documentation/Behaviour#lsan_print_formatted
+[b3]: documentation/Behaviour#lsan_invalid_crash
+[b4]: documentation/Behaviour#lsan_invalid_free
+[b5]: documentation/Behaviour#lsan_free_null
+[b6]: documentation/Behaviour#lsan_callstack_size
+[b7]: documentation/Behaviour.md#lsan_print_exit_point
+[b8]: documentation/Behaviour.md#lsan_print_binaries
+[b9]: documentation/Behaviour.md#lsan_print_functions
+[ba]: documentation/Behaviour.md#lsan_relative_paths
+[bb]: documentation/Behaviour.md#lsan_zero_alloction
+[bc]: documentation/Behaviour.md#lsan_suppression_developer
+[bd]: documentation/Behaviour.md#lsan_indirect_leaks
+[be]: documentation/Behaviour.md#lsan_reachable_leaks
+[bf]: documentation/Behaviour.md#lsan_suppression_files
+[bf1]: documentation/Behaviour.md#lsan_system_library_files
