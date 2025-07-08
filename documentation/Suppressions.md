@@ -3,6 +3,18 @@ Since version **1.11**, the LeakSanitizer provides a sophisticated system for su
 
 This system is based on JSON files containing suppression objects as defined below. A [JSON schema][1] is also available.
 
+In order to use your own suppression file(s), add them to the environment variable [`LSAN_SUPPRESSION_FILES`][8]:
+```shell
+LSAN_SUPPRESSION_FILES='fooSuppressions.json:suppressionsBar.json' ./a.out
+```
+
+Activate more debug messages for the development of suppression files by setting the environment variable
+[`LSAN_SUPPRESSION_DEVELOPER`][9] to `true`:
+```shell
+LSAN_SUPPRESSION_DEVELOPER=true ./a.out
+```
+If this mode is active, function names are printed as they are used by the linker.
+
 ## Suppression object
 A suppression object is designed to match memory leaks. This can be achieved by defining one or multiple of the
 available metadata to be matched.
@@ -159,3 +171,5 @@ LSAN_SYSTEM_LIBRARY_FILES='libraryFoo.json:barLibrary.json' ./a.out
 [5]: #name-1
 [6]: #system-library-detection
 [7]: Behaviour#lsan_system_library_files
+[8]: Behaviour#lsan_suppression_files
+[9]: Behaviour#lsan_suppression_developer
