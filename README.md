@@ -210,30 +210,30 @@ More on the environment variables [here][2].
 ### Signals
 This sanitizer comes with handlers for the following signals:
 
-| Signal        | Action                                                                                |
-|---------------|---------------------------------------------------------------------------------------|
-| `SIGUSR1`     | Printing the statistics if enabled using `LSAN_STATS_ACTIVE` or `__lsan_statsActive`. |
-| `SIGUSR2`     | Printing the current callstack.                                                       |
-| Deadly signal | Printing the callstack of the crash.                                                  |
+| Signal            | Action                                                                                       |
+|-------------------|----------------------------------------------------------------------------------------------|
+| `SIGUSR1`         | Prints the statistics if enabled using [`LSAN_STATS_ACTIVE`][13] or [`LSAN_AUTO_STATS`][14]. |
+| `SIGUSR2`         | Prints the current callstack.                                                                |
+| Any deadly signal | is caught and the stacktrace of the cash is printed.                                         |
 
 More about the signal handlers [here][3].
 
 ### Statistics
-The statistics of the tracked memory can be queried at runtime. To do so activate the statistical bookkeeping by setting
-either the environment variable `LSAN_STATS_ACTIVE` or the variable `__lsan_statsActive` to `true`.  
+The statistics of the tracked memory can be queried at runtime. To do so activate the statistical bookkeeping by either
+setting the environment variable [`LSAN_STATS_ACTIVE`][13] to `true` or by using [`LSAN_AUTO_STATS`][14].  
 The statistics then can be queried using the following API:
 
-| Function                         | Description                                                                              |
-|----------------------------------|------------------------------------------------------------------------------------------|
-| `__lsan_getTotalMallocs()`       | Returns the total count of allocations registered.                                       |
-| `__lsan_getTotalBytes()`         | Returns the total count of allocated bytes.                                              |
-| `__lsan_getTotalFrees()`         | Returns the total count of registered and `free`d objects.                               |
-| `__lsan_getCurrentMallocCount()` | Returns the count of currently active allocations.                                       |
-| `__lsan_getCurrentByteCount()`   | Returns the amount of currently allocated bytes.                                         |
-| `__lsan_getMallocPeek()`         | Returns the highest amount of allocations at the same time.                              |
-| `__lsan_getBytePeek()`           | Returns the highest amount of bytes allocated at the same time.                          |
-| `__lsan_printStats()`            | Prints the statistics to the output stream specified by `LSAN_PRINT_COUT`.               |
-| `__lsan_printFStats()`           | Prints the fragmentation statistics to the output stream specified by `LSAN_PRINT_COUT`. |
+| Function                         | Description                                                                                    |
+|----------------------------------|------------------------------------------------------------------------------------------------|
+| `__lsan_getTotalMallocs()`       | Returns the total count of allocations registered.                                             |
+| `__lsan_getTotalBytes()`         | Returns the total count of allocated bytes.                                                    |
+| `__lsan_getTotalFrees()`         | Returns the total count of registered and `free`d objects.                                     |
+| `__lsan_getCurrentMallocCount()` | Returns the count of currently active allocations.                                             |
+| `__lsan_getCurrentByteCount()`   | Returns the amount of currently allocated bytes.                                               |
+| `__lsan_getMallocPeek()`         | Returns the highest amount of allocations at the same time.                                    |
+| `__lsan_getBytePeek()`           | Returns the highest amount of bytes allocated at the same time.                                |
+| `__lsan_printStats()`            | Prints the statistics to the output stream specified by [`LSAN_PRINT_COUT`][12].               |
+| `__lsan_printFStats()`           | Prints the fragmentation statistics to the output stream specified by [`LSAN_PRINT_COUT`][12]. |
 
 More on the statistics [here][4].
 
@@ -268,3 +268,6 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 [9]: https://github.com/mhahnFr/LeakSanitizer/issues/new
 [10]: https://github.com/mhahnFr/LeakSanitizer/pulls
 [11]: https://github.com/mhahnFr/CallstackLibrary/blob/main/README.md#build-dependencies
+[12]: documentation/Behaviour#lsan_print_cout
+[13]: documentation/Behaviour#lsan_stats_active
+[14]: documentation/Behaviour#lsan_auto_stats
