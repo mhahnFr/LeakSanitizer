@@ -65,7 +65,7 @@ At least one callstack frame with a runtime image whose name matches these regul
 
 > [!TIP]
 > The special value `LSAN_SYSTEM_LIBRARIES` can be used in order to match any runtime image known to be provided by
-> the system.
+> the system. [Adapt the known system libraries by using its extension system.][]
 
 **Type**: Regular expression *(String)* or array of regular expressions  
 **Necessity**: Either this or [`name`][5]
@@ -90,6 +90,27 @@ Only used when the property [`name`][5] is defined.
 Stacktraces are matched from the top. When using a library regular expression, multiple frames may be matched by the
 entry, however, at least one frame must be matched in order to match the entire stacktrace.
 
+##### Example without library regular expressions
+Consider the following example suppression stacktrace:
+```JSON
+{
+  "...": "...",
+  "functions": [
+    "foo",
+    "main"
+  ]
+}
+```
+
+| Actual stacktrace              | Matching performed by the example above |
+|--------------------------------|-----------------------------------------|
+| `(a.out) bar + 23`             | *Does not match, so it is skipped*      |
+| `(a.out) foo + 12`             | Matched by `foo`                        |
+| `(a.out) main + 9`             | Matched by `main`                       |
+| `(/usr/lib/dyld) start + 2345` | *No further matching performed*         |
+
+If another function was present between `foo` and `main`, the callstack would be considered to not have matched the suppression.
+
 ##### Example with `LSAN_SYSTEM_LIBRARIES`
 Consider the following example suppression stacktrace:
 ```JSON
@@ -102,16 +123,16 @@ Consider the following example suppression stacktrace:
 }
 ```
 
-| Actual stacktrace                                                                                 | Matching performed by the example above |
-|---------------------------------------------------------------------------------------------------|-----------------------------------------|
-| `# 1: (/usr/lib/system/libsystem_malloc.dylib) _malloc_type_calloc_outlined + 66`                 | Matched by `LSAN_SYSTEM_LIBRARIES`      |
-| `# 2: (/usr/lib/libobjc.A.dylib) _objc_rootAllocWithZone + 52`                                    | Matched by `LSAN_SYSTEM_LIBRARIES`      |                   
-| `# 3: (/usr/lib/libobjc.A.dylib) objc_alloc_init + 33`                                            | Matched by `LSAN_SYSTEM_LIBRARIES`      |
-| `# 4: (/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit) -[NSApplication run] + 610` | Matched by `-[NSApplication run]`       |
-| ` ->  (fdf) mlx_loop (minilibx_macos/mlx_init_loop.m:104:3)`                                      | *No further matching performed*         |
-| `# 6: (fdf) onApplicationFinishedLaunching (delegate/app_delegate.c:36:2)`                        | *No further matching performed*         |
-| `# 7: (fdf) main (main.c:26:10)`                                                                  | *No further matching performed*         |
-| `# 8: (/usr/lib/dyld) start + 3056`                                                               | *No further matching performed*         |
+| Actual stacktrace                                                            | Matching performed by the example above |
+|------------------------------------------------------------------------------|-----------------------------------------|
+| `(/usr/lib/system/libsystem_malloc.dylib) _malloc_type_calloc_outlined + 66` | Matched by `LSAN_SYSTEM_LIBRARIES`      |
+| `(/usr/lib/libobjc.A.dylib) _objc_rootAllocWithZone + 52`                    | Matched by `LSAN_SYSTEM_LIBRARIES`      |                   
+| `(/usr/lib/libobjc.A.dylib) objc_alloc_init + 33`                            | Matched by `LSAN_SYSTEM_LIBRARIES`      |
+| `(/System/Library/.../AppKit) -[NSApplication run] + 610`                    | Matched by `-[NSApplication run]`       |
+| `(fdf) mlx_loop (minilibx_macos/mlx_init_loop.m:104:3)`                      | *No further matching performed*         |
+| `(fdf) onApplicationFinishedLaunching (delegate/app_delegate.c:36:2)`        | *No further matching performed*         |
+| `(fdf) main (main.c:26:10)`                                                  | *No further matching performed*         |
+| `(/usr/lib/dyld) start + 3056`                                               | *No further matching performed*         |
 
 [1]: ../suppressions/schema.json
 [2]: #functions
