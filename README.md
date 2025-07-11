@@ -176,7 +176,17 @@ The following variables are currently supported:
 More on the environment variables [here][3].
 
 ### Leak suppression system
-_Description coming soon!_
+Use the memory leak suppression system introduced in version **1.11** to "remove" internal memory leaks created by the
+runtime libraries you additionally use.
+
+Add your additional suppression files to the environment variable [`LSAN_SUPPRESSION_FILES`][b13].
+> [!TIP]
+> **Example**:
+> ```shell
+> LSAN_SUPPRESSION_FILES='someLibrarySuppressions.json:otherIgnoredLeaks.json'
+> ```
+
+Follow the [full documentation of the suppression system][10] in order to write your own suppression files.
 
 ### Signals
 This sanitizer comes with handlers for the following signals:
@@ -228,15 +238,16 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 
 © Copyright 2022 - 2025 [mhahnFr][9] and contributors
 
-[1]: https://github.com/mhahnFr/LeakSanitizer/releases/latest
-[2]: https://github.com/mhahnFr/CallstackLibrary/blob/main/README.md#build-dependencies
-[3]: documentation/Behaviour.md
-[4]: documentation/Signal-handlers.md
-[5]: https://github.com/mhahnFr/LeakSanitizer/wiki/Home#Statistics
-[6]: https://github.com/mhahnFr/CallstackLibrary
-[7]: https://github.com/mhahnFr/LeakSanitizer/issues/new
-[8]: https://github.com/mhahnFr/LeakSanitizer/pulls
-[9]: https://github.com/mhahnFr
+ [1]: https://github.com/mhahnFr/LeakSanitizer/releases/latest
+ [2]: https://github.com/mhahnFr/CallstackLibrary/blob/main/README.md#build-dependencies
+ [3]: documentation/Behaviour.md
+ [4]: documentation/Signal-handlers.md
+ [5]: https://github.com/mhahnFr/LeakSanitizer/wiki/Home#Statistics
+ [6]: https://github.com/mhahnFr/CallstackLibrary
+ [7]: https://github.com/mhahnFr/LeakSanitizer/issues/new
+ [8]: https://github.com/mhahnFr/LeakSanitizer/pulls
+ [9]: https://github.com/mhahnFr
+[10]: documentation/Suppressions.md
 
  [b1]: documentation/Behaviour.md#lsan_human_print
  [b2]: documentation/Behaviour.md#lsan_print_cout
