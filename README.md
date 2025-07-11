@@ -222,17 +222,17 @@ The statistics of the tracked memory can be queried at runtime. To do so activat
 setting the environment variable [`LSAN_STATS_ACTIVE`][b7] to `true` or by using [`LSAN_AUTO_STATS`][be].  
 The statistics then can be queried using the following API:
 
-| Function                         | Description                                                                                    |
-|----------------------------------|------------------------------------------------------------------------------------------------|
-| `__lsan_getTotalMallocs()`       | Returns the total count of allocations registered.                                             |
-| `__lsan_getTotalBytes()`         | Returns the total count of allocated bytes.                                                    |
-| `__lsan_getTotalFrees()`         | Returns the total count of registered and `free`d objects.                                     |
-| `__lsan_getCurrentMallocCount()` | Returns the count of currently active allocations.                                             |
-| `__lsan_getCurrentByteCount()`   | Returns the amount of currently allocated bytes.                                               |
-| `__lsan_getMallocPeek()`         | Returns the highest amount of allocations at the same time.                                    |
-| `__lsan_getBytePeek()`           | Returns the highest amount of bytes allocated at the same time.                                |
-| `__lsan_printStats()`            | Prints the statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2].               |
-| `__lsan_printFStats()`           | Prints the fragmentation statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2]. |
+| Function                               | Description                                                                                    |
+|----------------------------------------|------------------------------------------------------------------------------------------------|
+| [`__lsan_getTotalMallocs()`][s1]       | Returns the total count of allocations registered.                                             |
+| [`__lsan_getTotalBytes()`][s2]         | Returns the total count of allocated bytes.                                                    |
+| [`__lsan_getTotalFrees()`][s3]         | Returns the total count of registered and `free`d objects.                                     |
+| [`__lsan_getCurrentMallocCount()`][s4] | Returns the count of currently active allocations.                                             |
+| [`__lsan_getCurrentByteCount()`][s5]   | Returns the amount of currently allocated bytes.                                               |
+| [`__lsan_getMallocPeek()`][s6]         | Returns the highest amount of allocations at the same time.                                    |
+| [`__lsan_getBytePeek()`][s7]           | Returns the highest amount of bytes allocated at the same time.                                |
+| [`__lsan_printStats()`][s8]            | Prints the statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2].               |
+| [`__lsan_printFStats()`][s9]           | Prints the fragmentation statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2]. |
 
 More on the statistics [here][5].
 
@@ -266,6 +266,16 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
  [8]: https://github.com/mhahnFr/LeakSanitizer/pulls
  [9]: https://github.com/mhahnFr
 [10]: documentation/Suppressions.md
+
+[s1]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_gettotalmallocs
+[s2]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_gettotalbytes
+[s3]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_gettotalfrees
+[s4]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_getcurrentmalloccount
+[s5]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_getcurrentbytecount
+[s6]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_getmallocpeek
+[s7]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_getbytepeek
+[s8]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#void-__lsan_printstats
+[s9]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#void-__lsan_printfstats
 
  [b1]: documentation/Behaviour.md#lsan_human_print
  [b2]: documentation/Behaviour.md#lsan_print_cout
