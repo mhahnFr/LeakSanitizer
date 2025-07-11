@@ -230,33 +230,33 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
 
 [1]: https://github.com/mhahnFr/LeakSanitizer/releases/latest
 [2]: https://github.com/mhahnFr/CallstackLibrary/blob/main/README.md#build-dependencies
-[3]: documentation/Behaviour
-[4]: documentation/Signal-handlers
+[3]: documentation/Behaviour.md
+[4]: documentation/Signal-handlers.md
 [5]: https://github.com/mhahnFr/LeakSanitizer/wiki/Home#Statistics
 [6]: https://github.com/mhahnFr/CallstackLibrary
 [7]: https://github.com/mhahnFr/LeakSanitizer/issues/new
 [8]: https://github.com/mhahnFr/LeakSanitizer/pulls
 [9]: https://github.com/mhahnFr
 
-[b1]: documentation/Behaviour#lsan_human_print
-[b2]: documentation/Behaviour#lsan_print_cout
-[b3]: documentation/Behaviour#lsan_print_formatted
-[b4]: documentation/Behaviour#lsan_invalid_crash
-[b5]: documentation/Behaviour#lsan_invalid_free
-[b6]: documentation/Behaviour#lsan_free_null
-[b7]: documentation/Behaviour#lsan_stats_active
-[b8]: documentation/Behaviour#lsan_callstack_size
-[b9]: documentation/Behaviour.md#lsan_print_exit_point
-[ba]: documentation/Behaviour.md#lsan_print_binaries
-[bb]: documentation/Behaviour.md#lsan_print_functions
-[bc]: documentation/Behaviour.md#lsan_relative_paths
-[bd]: documentation/Behaviour.md#lsan_zero_alloction
-[be]: documentation/Behaviour#lsan_auto_stats
-[bf]: documentation/Behaviour.md#lsan_suppression_developer
+ [b1]: documentation/Behaviour.md#lsan_human_print
+ [b2]: documentation/Behaviour.md#lsan_print_cout
+ [b3]: documentation/Behaviour.md#lsan_print_formatted
+ [b4]: documentation/Behaviour.md#lsan_invalid_crash
+ [b5]: documentation/Behaviour.md#lsan_invalid_free
+ [b6]: documentation/Behaviour.md#lsan_free_null
+ [b7]: documentation/Behaviour.md#lsan_stats_active
+ [b8]: documentation/Behaviour.md#lsan_callstack_size
+ [b9]: documentation/Behaviour.md#lsan_print_exit_point
+ [ba]: documentation/Behaviour.md#lsan_print_binaries
+ [bb]: documentation/Behaviour.md#lsan_print_functions
+ [bc]: documentation/Behaviour.md#lsan_relative_paths
+ [bd]: documentation/Behaviour.md#lsan_zero_alloction
+ [be]: documentation/Behaviour.md#lsan_auto_stats
+ [bf]: documentation/Behaviour.md#lsan_suppression_developer
 [b11]: documentation/Behaviour.md#lsan_indirect_leaks
 [b12]: documentation/Behaviour.md#lsan_reachable_leaks
 [b13]: documentation/Behaviour.md#lsan_suppression_files
 [b14]: documentation/Behaviour.md#lsan_system_library_files
-[b15]: documentation/Behaviour#boolean
-[b16]: documentation/Behaviour#time-interval
-[b17]: documentation/Behaviour#file-list
+[b15]: documentation/Behaviour.md#boolean
+[b16]: documentation/Behaviour.md#time-interval
+[b17]: documentation/Behaviour.md#file-list
