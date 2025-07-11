@@ -51,30 +51,118 @@ make INSTALL_PATH=/usr/local uninstall
 ```
 Adapt the value of the `INSTALL_PATH` argument to your needs.
 
-| Name                               | Description                                                 | Since | Type                | Default value |
-|------------------------------------|-------------------------------------------------------------|-------|---------------------|---------------|
-| [`LSAN_HUMAN_PRINT`][b1]           | Print human-readably formatted                              | v1.6  | [Boolean][15]       | `true`        |
-| [`LSAN_PRINT_COUT`][12]            | Print to the default output stream                          | v1.6  | [Boolean][15]       | `false`       |
-| [`LSAN_PRINT_FORMATTED`][b2]       | Print using ANSI escape codes                               | v1.6  | [Boolean][15]       | `true`        |
-| [`LSAN_INVALID_CRASH`][b3]         | Terminate if an invalid action is detected                  | v1.6  | [Boolean][15]       | `true`        |
-| [`LSAN_INVALID_FREE`][b4]          | Detect invalid de-allocations                               | v1.6  | [Boolean][15]       | `true`        |
-| [`LSAN_FREE_NULL`][b5]             | Issue a warning if `NULL` is `free`d                        | v1.6  | [Boolean][15]       | `false`       |
-| [`LSAN_STATS_ACTIVE`][13]          | Enable the statistical bookkeeping                          | v1.6  | [Boolean][15]       | `false`       |
-| [`LSAN_CALLSTACK_SIZE`][b6]        | The amount of frames to be printed in a callstack           | v1.6  | Number              | `20`          |
-| [`LSAN_PRINT_EXIT_POINT`][b7]      | Print the callstack of the exit point                       | v1.7  | [Boolean][15]       | `false`       |
-| [`LSAN_PRINT_BINARIES`][b8]        | Print the binary file names                                 | v1.8  | [Boolean][15]       | `true`        |
-| [`LSAN_PRINT_FUNCTIONS`][b9]       | Always print the function names                             | v1.8  | [Boolean][15]       | `true`        |
-| [`LSAN_RELATIVE_PATHS`][ba]        | Allow relative paths to be printed                          | v1.8  | [Boolean][15]       | `true`        |
-| [`LSAN_ZERO_ALLOCATION`][bb]       | Issue a warning when `0` byte are allocated                 | v1.8  | [Boolean][15]       | `false`       |
-| [`LSAN_AUTO_STATS`][14]            | Time interval between the automatically statistics printing | v1.11 | [Time interval][16] | *None*        |
-| [`LSAN_SUPPRESSION_DEVELOPER`][bc] | Activates more suppression developer output                 | v1.11 | [Boolean][15]       | `false`       |
-| [`LSAN_INDIRECT_LEAKS`][bd]        | Whether to print indirectly leaked allocations              | v1.11 | [Boolean][15]       | `false`       |
-| [`LSAN_REACHABLE_LEAKS`][be]       | Whether to print leaks to whose a pointer was found         | v1.11 | [Boolean][15]       | `true`        |
-| [`LSAN_SUPPRESSION_FILES`][bf]     | List of additional suppression files to be considered       | v1.11 | [File list][17]     | *None*        |
-| [`LSAN_SYSTEM_LIBRARY_FILES`][bf1] | List of additional system library files to be considered    | v1.11 | [File list][17]     | *None*        |
+### Hrm... Usage - again?
+Use this tool by preloading its runtime library or by linking against it *(recommended)*.
+
+#### Linking *(recommended)*
+Add the runtime library of the LeakSanitizer to your linking arguments.
 
 > [!TIP]
-> [`LSAN_AUTO_STATS`][14] should be assigned a number with a time unit directly after the number.  
+> **Example** for standard C/C++ compilers:
+> ```shell
+> -L<path/to/LeakSanitizer> -llsan
+> ```
+
+#### Preloading
+Add the runtime library to the preload environment variable of your dynamic linker:
+- **Linux**:
+```shell
+LD_PRELOAD=<path/to/LeakSanitizer>/liblsan.so
+```
+- **macOS**:
+```shell
+DYLD_INSERT_LIBRARIES=<path/to/LeakSanitizer>/liblsan.dylib
+```
+
+### Leak detection
+Once this sanitizer is bundled with your application the detected memory leaks are printed upon termination.
+
+**Example**:
+```C
+// test.c
+
+#include <string.h>
+#include <stdlib.h>
+
+char* global;
+
+void foo2(void) {
+    global = strdup("Global variable");
+}
+
+void bar2(void) {
+    void* a = malloc(1023);
+    a = strdup("Hello World!");
+    a = NULL;
+    a = malloc(1000);
+    free(a);
+    
+    foo2();
+}
+
+void foo(void) { bar2(); }
+void bar(void) { foo();  }
+
+int main(void) {
+    bar();
+}
+```
+Compiled and linked on macOS using `cc test.c -g -L<path/to/LeakSanitizer> -llsan` this example creates the following
+output:
+<picture>
+    <source srcset="documentation/images/light/leak-example.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+    <source srcset="documentation/images/dark/leak-example.png" media="(prefers-color-scheme: dark)" />
+    <img src="documentation/images/dark/leak-example.png" alt="">
+</picture>
+
+Compiled and linked on Fedora using `gcc test.c -g -L<path/to/LeakSanitizer> -llsan` the example above creates the
+following output:
+<picture>
+    <source srcset="documentation/images/light/leak-example-fedora.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+    <source srcset="documentation/images/dark/leak-example-fedora.png" media="(prefers-color-scheme: dark)" />
+    <img src="documentation/images/dark/leak-example-fedora.png" alt="">
+</picture>
+
+#### Source file line numbers
+To add source file line information to the output (as shown above), simply compile your target with debug symbols.
+> [!TIP]
+> Usually, the appropriate compilation option is `-g`.
+
+Currently, debug symbols in the following formats are supported:
+- DWARF in ELF binary files
+- DWARF in Mach-O debug maps (using Mach-O object files)
+- `.dSYM` Mach-O bundles
+
+The DWARF parser supports DWARF in version **2**, **3**, **4** and **5**.
+
+### Behaviour
+Since version 1.6 the behaviour of this sanitizer can be adjusted by setting certain environment variables.  
+The following variables are currently supported:
+
+| Name                               | Description                                                 | Since | Type                 | Default value |
+|------------------------------------|-------------------------------------------------------------|-------|----------------------|---------------|
+| [`LSAN_HUMAN_PRINT`][b1]           | Print human-readably formatted                              | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_PRINT_COUT`][b2]            | Print to the default output stream                          | v1.6  | [Boolean][b15]       | `false`       |
+| [`LSAN_PRINT_FORMATTED`][b3]       | Print using ANSI escape codes                               | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_INVALID_CRASH`][b4]         | Terminate if an invalid action is detected                  | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_INVALID_FREE`][b5]          | Detect invalid de-allocations                               | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_FREE_NULL`][b6]             | Issue a warning if `NULL` is `free`d                        | v1.6  | [Boolean][b15]       | `false`       |
+| [`LSAN_STATS_ACTIVE`][b7]          | Enable the statistical bookkeeping                          | v1.6  | [Boolean][b15]       | `false`       |
+| [`LSAN_CALLSTACK_SIZE`][b8]        | The amount of frames to be printed in a callstack           | v1.6  | Number               | `20`          |
+| [`LSAN_PRINT_EXIT_POINT`][b9]      | Print the callstack of the exit point                       | v1.7  | [Boolean][b15]       | `false`       |
+| [`LSAN_PRINT_BINARIES`][ba]        | Print the binary file names                                 | v1.8  | [Boolean][b15]       | `true`        |
+| [`LSAN_PRINT_FUNCTIONS`][bb]       | Always print the function names                             | v1.8  | [Boolean][b15]       | `true`        |
+| [`LSAN_RELATIVE_PATHS`][bc]        | Allow relative paths to be printed                          | v1.8  | [Boolean][b15]       | `true`        |
+| [`LSAN_ZERO_ALLOCATION`][bd]       | Issue a warning when `0` byte are allocated                 | v1.8  | [Boolean][b15]       | `false`       |
+| [`LSAN_AUTO_STATS`][be]            | Time interval between the automatically statistics printing | v1.11 | [Time interval][b16] | *None*        |
+| [`LSAN_SUPPRESSION_DEVELOPER`][bf] | Activates more suppression developer output                 | v1.11 | [Boolean][b15]       | `false`       |
+| [`LSAN_INDIRECT_LEAKS`][b11]       | Whether to print indirectly leaked allocations              | v1.11 | [Boolean][b15]       | `false`       |
+| [`LSAN_REACHABLE_LEAKS`][b12]      | Whether to print leaks to whose a pointer was found         | v1.11 | [Boolean][b15]       | `true`        |
+| [`LSAN_SUPPRESSION_FILES`][b13]    | List of additional suppression files to be considered       | v1.11 | [File list][b17]     | *None*        |
+| [`LSAN_SYSTEM_LIBRARY_FILES`][b14] | List of additional system library files to be considered    | v1.11 | [File list][b17]     | *None*        |
+
+> [!TIP]
+> [`LSAN_AUTO_STATS`][be] should be assigned a number with a time unit directly after the number.  
 > The following time units are available:
 > - `ns`: nanoseconds
 > - `us`: microseconds
@@ -85,7 +173,10 @@ Adapt the value of the `INSTALL_PATH` argument to your needs.
 >
 > The default unit when none is given is seconds.
 
-More on the environment variables [here][2].
+More on the environment variables [here][3].
+
+### Leak suppression system
+_Description coming soon!_
 
 ### Signals
 This sanitizer comes with handlers for the following signals:
