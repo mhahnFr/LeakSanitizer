@@ -1,25 +1,15 @@
-# Welcome to the LeakSanitizer!
-The LeakSanitizer is a tool designed to debug memory leaks.
+# LeakSanitizer
+Tool to track down memory leaks.
 
-It can be used with almost any programming language that compiles to native machine code.  
-Officially supported are currently: **C**, **C++**, **Objective-C**, **Swift**.
+It can be used in conjunction with code written in almost any programming language that compiles down to native machine
+code.  
+Officially supported languages are currently:
+- C
+- C++
+- Objective-C
+- Swift
 
-This sanitizer has been optimized for both **macOS** and **Linux** - all memory leaks are detected on both platforms.
-
-## Quickstart
-Use the LeakSanitizer to check for memory leaks as follows:
-1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
-2. Build it: `cd LeakSanitizer && make -j`
-3. Link your code with: `-L<path/to/lsan> -llsan`
-
-> [!TIP]
-> **Update** the LeakSanitizer using:
-> 
-> ```shell
-> make update
-> ```
-
-More explanation can be found in the [wiki][7]; the detailed explanation follows below.
+This tool is available for both **Linux** and **macOS**.
 
 ## Usage
 ### Installation
