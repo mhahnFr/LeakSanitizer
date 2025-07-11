@@ -13,147 +13,43 @@ This tool is available for both **Linux** and **macOS**.
 
 ## Usage
 ### Installation
-Get started by either downloading a prebuilt version of this sanitizer [here][1].
+Get started by [downloading a release][1].  
+Simply move the headers and the library anywhere you like.
 
-Alternatively you can also build it from source:
-1. Clone the repository: `git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git`
-2. go into the cloned repository: `cd LeakSanitizer`
-3. and build the library: `make -j`
-
-Or in one step:
+Alternatively, you can build the LeakSanitizer from source:
 ```shell
-git clone --recursive https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make -j
+git clone --recurse-submodules https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make
 ```
-
-The LeakSanitizer is automatically installed in the current directory.
-
-To install it in a specific directory you can use the following command:
+It is automatically installed in the directory where the LeakSanitizer was cloned in. To install it in a specific
+directory, use the following command:
 ```shell
 make INSTALL_PATH=/usr/local install
 ```
 Adapt the value of the `INSTALL_PATH` argument to your needs.
 
 > [!TIP]
-> To create a portable build use the following command:
+> To create a portable build (just like a downloaded release), use the following command:
 > ```shell
-> make -j release
+> make release
 > ```
 
-If you have downloaded a release or if you have created a portable build you can simply move the headers and the library
-anywhere you like.
-
 #### Build dependencies
-The LeakSanitizer adheres to the C++17 standard.
+The LeakSanitizer adheres to the standard of C++17.
 
-Additionally, the following command line tools are needed to successfully build the sanitizer:
+Additionally, the following command line tools are necessary to successfully build the LeakSanitizer:
 - GNU compatible `make` command line tool
 - The `uname` command line tool *(POSIX.2)*
 - The `cat` command line tool *(POSIX.2)*
 
-All dependencies introduced by the [CallstackLibrary][5] are necessary as well (find them [here][11]).
+All [dependencies introduced by the CallstackLibrary][2] are needed as well.
 
-#### Uninstallation
-Uninstall the sanitizer by simply removing its library and its header files from the installation directory.  
-This can be done using the following command:
+### Uninstallation
+To uninstall the LeakSanitizer, simply remove its headers and its library from the installation directory.  
+This can be done by the following command:
 ```shell
 make INSTALL_PATH=/usr/local uninstall
 ```
 Adapt the value of the `INSTALL_PATH` argument to your needs.
-
-### Updating
-Update the LeakSanitizer by either downloading the new release or, when cloned from the repository, using:
-```shell
-make update
-```
-Install it again as described [above][8].
-
-### How to use
-To use this sanitizer simply link your application against it (recommended) or preload its library.
-
-#### Linking (_recommended_)
-- Add `-L<path/to/lsan>` if this sanitizer has not been installed in one of the default directories.
-
-Link with: `-llsan`
-
-> [!TIP]
-> **Example**: `-L<path/to/lsan> -llsan`
-
-#### Preloading
-Add this sanitizer's library to the dynamic loader preload environment variable:
-- **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/lsan>/liblsan.dylib`
-- **Linux**: `LD_PRELOAD=<path/to/lsan>/liblsan.so`
-
-> [!TIP]
-> - Example **macOS**:
-> ```shell
-> DYLD_INSERT_LIBRARIES=/usr/local/lib/liblsan.dylib ./a.out
-> ```
-> - Example **Linux**:
-> ```shell
-> LD_PRELOAD=/usr/local/lib/liblsan.so ./a.out
-> ```
-
-### Leaks
-Once this sanitizer is bundled with your application the detected memory leaks are printed upon termination.
-
-```C
-// test.c
-
-#include <string.h>
-#include <stdlib.h>
-
-char* global;
-
-void foo2(void) {
-    global = strdup("Global variable");
-}
-
-void bar2(void) {
-    void* a = malloc(1023);
-    a = strdup("Hello World!");
-    a = NULL;
-    a = malloc(1000);
-    free(a);
-    
-    foo2();
-}
-
-void foo(void) { bar2(); }
-void bar(void) { foo();  }
-
-int main(void) {
-    bar();
-}
-```
-Compiled and linked on macOS with `cc test.c -g -L<path/to/lsan> -llsan` creates the following output:
-<picture>
-    <source srcset="documentation/images/light/leak-example.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
-    <source srcset="documentation/images/dark/leak-example.png" media="(prefers-color-scheme: dark)" />
-    <img src="documentation/images/dark/leak-example.png" alt="">
-</picture>
-
-Compiled and linked on Fedora with `gcc test.c -g -L<path/to/lsan> -llsan` creates the following output:
-<picture>
-    <source srcset="documentation/images/light/leak-example-fedora.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
-    <source srcset="documentation/images/dark/leak-example-fedora.png" media="(prefers-color-scheme: dark)" />
-    <img src="documentation/images/dark/leak-example-fedora.png" alt="">
-</picture>
-
-#### Line numbers
-Simply compile your code with debug symbols to add line numbers to the output.
-> [!TIP]
-> Usually, the appropriate flag is `-g`.
-
-Currently, debug symbols in the following formats are supported:
-- DWARF in ELF binary files
-- DWARF in Mach-O debug maps (using Mach-O object files)
-- `.dSYM` Mach-O bundles
-
-The DWARF parser supports DWARF in version **2**, **3**, **4** and **5**.
-
-### Behaviour
-Since version 1.6 the behaviour of this sanitizer can be adjusted by setting certain environment variables.  
-The following variables are currently supported:
 
 | Name                               | Description                                                 | Since | Type                | Default value |
 |------------------------------------|-------------------------------------------------------------|-------|---------------------|---------------|
