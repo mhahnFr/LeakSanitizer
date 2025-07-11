@@ -107,21 +107,39 @@ int main(void) {
     bar();
 }
 ```
-Compiled and linked on macOS using `cc test.c -g -L<path/to/LeakSanitizer> -llsan` this example creates the following
-output:
+Compiled and linked on **macOS** with the command
+```shell
+cc -g test.c -L<path/to/LeakSanitizer> -llsan
+```
+this example creates the following output:
 <picture>
     <source srcset="documentation/images/light/leak-example.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
     <source srcset="documentation/images/dark/leak-example.png" media="(prefers-color-scheme: dark)" />
     <img src="documentation/images/dark/leak-example.png" alt="">
 </picture>
 
-Compiled and linked on Fedora using `gcc test.c -g -L<path/to/LeakSanitizer> -llsan` the example above creates the
-following output:
+Compiled and linked on **Fedora** with the command
+```shell
+gcc -g test.c -L<path/to/LeakSanitizer> -llsan
+```
+the example above creates the following output:
 <picture>
     <source srcset="documentation/images/light/leak-example-fedora.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
     <source srcset="documentation/images/dark/leak-example-fedora.png" media="(prefers-color-scheme: dark)" />
     <img src="documentation/images/dark/leak-example-fedora.png" alt="">
 </picture>
+
+> [!TIP]
+> Indirect memory leaks can be displayed by setting [`LSAN_INDIRECT_LEAKS`][b11] to `true`:
+> ```shell
+> LSAN_INDIRECT_LEAKS=true
+> ```
+> 
+> Reachable memory leaks (those to which a pointer was found) can be hidden by setting [`LSAN_REACHABLE_LEAKS`][b12] to
+> `false`:
+> ```shell
+> LSAN_REACHABLE_LEAKS=false
+> ```
 
 #### Source file line numbers
 To add source file line information to the output (as shown above), simply compile your target with debug symbols.
