@@ -183,15 +183,15 @@ This sanitizer comes with handlers for the following signals:
 
 | Signal            | Action                                                                                       |
 |-------------------|----------------------------------------------------------------------------------------------|
-| `SIGUSR1`         | Prints the statistics if enabled using [`LSAN_STATS_ACTIVE`][13] or [`LSAN_AUTO_STATS`][14]. |
+| `SIGUSR1`         | Prints the statistics if enabled using [`LSAN_STATS_ACTIVE`][b7] or [`LSAN_AUTO_STATS`][be]. |
 | `SIGUSR2`         | Prints the current callstack.                                                                |
 | Any deadly signal | is caught and the stacktrace of the cash is printed.                                         |
 
-More about the signal handlers [here][3].
+More about the signal handlers [here][4].
 
 ### Statistics
 The statistics of the tracked memory can be queried at runtime. To do so activate the statistical bookkeeping by either
-setting the environment variable [`LSAN_STATS_ACTIVE`][13] to `true` or by using [`LSAN_AUTO_STATS`][14].  
+setting the environment variable [`LSAN_STATS_ACTIVE`][b7] to `true` or by using [`LSAN_AUTO_STATS`][be].  
 The statistics then can be queried using the following API:
 
 | Function                         | Description                                                                                    |
@@ -203,10 +203,10 @@ The statistics then can be queried using the following API:
 | `__lsan_getCurrentByteCount()`   | Returns the amount of currently allocated bytes.                                               |
 | `__lsan_getMallocPeek()`         | Returns the highest amount of allocations at the same time.                                    |
 | `__lsan_getBytePeek()`           | Returns the highest amount of bytes allocated at the same time.                                |
-| `__lsan_printStats()`            | Prints the statistics to the output stream specified by [`LSAN_PRINT_COUT`][12].               |
-| `__lsan_printFStats()`           | Prints the fragmentation statistics to the output stream specified by [`LSAN_PRINT_COUT`][12]. |
+| `__lsan_printStats()`            | Prints the statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2].               |
+| `__lsan_printFStats()`           | Prints the fragmentation statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2]. |
 
-More on the statistics [here][4].
+More on the statistics [here][5].
 
 ## Behind the scenes or: How does it work?
 In order to track the memory allocations this sanitizer replaces the common allocation management functions such as
@@ -218,46 +218,45 @@ The signal handlers and the wrapper functions are installed once the sanitizer h
 
 When the exit handler registered using `atexit` is invoked the allocated memory is examined and the detected memory
 leaks are printed.  
-The backtraces are translated using the [CallstackLibrary][5].
+The backtraces are translated using the [CallstackLibrary][6].
 
 ## Final notes
 If you experience any problems with the LeakSanitizer or if you have ideas to further improve it don't hesitate to
-[open an issue][9] or to [open a pull request][10].
+[open an issue][7] or to [open a pull request][8].
 
 This project is licensed under the terms of the GNU GPL in version 3 or later.
 
-© Copyright 2022 - 2025 [mhahnFr][6] and contributors
+© Copyright 2022 - 2025 [mhahnFr][9] and contributors
 
 [1]: https://github.com/mhahnFr/LeakSanitizer/releases/latest
-[2]: documentation/Behaviour
-[3]: documentation/Signal-handlers
-[4]: https://github.com/mhahnFr/LeakSanitizer/wiki/Home#Statistics
-[5]: https://github.com/mhahnFr/CallstackLibrary
-[6]: https://github.com/mhahnFr
-[7]: https://github.com/mhahnFr/LeakSanitizer/wiki
-[8]: #installation
-[9]: https://github.com/mhahnFr/LeakSanitizer/issues/new
-[10]: https://github.com/mhahnFr/LeakSanitizer/pulls
-[11]: https://github.com/mhahnFr/CallstackLibrary/blob/main/README.md#build-dependencies
-[12]: documentation/Behaviour#lsan_print_cout
-[13]: documentation/Behaviour#lsan_stats_active
-[14]: documentation/Behaviour#lsan_auto_stats
-[15]: documentation/Behaviour#boolean
-[16]: documentation/Behaviour#time-interval
-[17]: documentation/Behaviour#file-list
+[2]: https://github.com/mhahnFr/CallstackLibrary/blob/main/README.md#build-dependencies
+[3]: documentation/Behaviour
+[4]: documentation/Signal-handlers
+[5]: https://github.com/mhahnFr/LeakSanitizer/wiki/Home#Statistics
+[6]: https://github.com/mhahnFr/CallstackLibrary
+[7]: https://github.com/mhahnFr/LeakSanitizer/issues/new
+[8]: https://github.com/mhahnFr/LeakSanitizer/pulls
+[9]: https://github.com/mhahnFr
+
 [b1]: documentation/Behaviour#lsan_human_print
-[b2]: documentation/Behaviour#lsan_print_formatted
-[b3]: documentation/Behaviour#lsan_invalid_crash
-[b4]: documentation/Behaviour#lsan_invalid_free
-[b5]: documentation/Behaviour#lsan_free_null
-[b6]: documentation/Behaviour#lsan_callstack_size
-[b7]: documentation/Behaviour.md#lsan_print_exit_point
-[b8]: documentation/Behaviour.md#lsan_print_binaries
-[b9]: documentation/Behaviour.md#lsan_print_functions
-[ba]: documentation/Behaviour.md#lsan_relative_paths
-[bb]: documentation/Behaviour.md#lsan_zero_alloction
-[bc]: documentation/Behaviour.md#lsan_suppression_developer
-[bd]: documentation/Behaviour.md#lsan_indirect_leaks
-[be]: documentation/Behaviour.md#lsan_reachable_leaks
-[bf]: documentation/Behaviour.md#lsan_suppression_files
-[bf1]: documentation/Behaviour.md#lsan_system_library_files
+[b2]: documentation/Behaviour#lsan_print_cout
+[b3]: documentation/Behaviour#lsan_print_formatted
+[b4]: documentation/Behaviour#lsan_invalid_crash
+[b5]: documentation/Behaviour#lsan_invalid_free
+[b6]: documentation/Behaviour#lsan_free_null
+[b7]: documentation/Behaviour#lsan_stats_active
+[b8]: documentation/Behaviour#lsan_callstack_size
+[b9]: documentation/Behaviour.md#lsan_print_exit_point
+[ba]: documentation/Behaviour.md#lsan_print_binaries
+[bb]: documentation/Behaviour.md#lsan_print_functions
+[bc]: documentation/Behaviour.md#lsan_relative_paths
+[bd]: documentation/Behaviour.md#lsan_zero_alloction
+[be]: documentation/Behaviour#lsan_auto_stats
+[bf]: documentation/Behaviour.md#lsan_suppression_developer
+[b11]: documentation/Behaviour.md#lsan_indirect_leaks
+[b12]: documentation/Behaviour.md#lsan_reachable_leaks
+[b13]: documentation/Behaviour.md#lsan_suppression_files
+[b14]: documentation/Behaviour.md#lsan_system_library_files
+[b15]: documentation/Behaviour#boolean
+[b16]: documentation/Behaviour#time-interval
+[b17]: documentation/Behaviour#file-list
