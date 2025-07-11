@@ -51,7 +51,7 @@ make INSTALL_PATH=/usr/local uninstall
 ```
 Adapt the value of the `INSTALL_PATH` argument to your needs.
 
-### Hrm... Usage - again?
+### Usage, take II
 Use this tool by preloading its runtime library or by linking against it *(recommended)*.
 
 #### Linking *(recommended)*
@@ -163,7 +163,7 @@ The following variables are currently supported:
 | [`LSAN_PRINT_COUT`][b2]            | Print to the default output stream                          | v1.6  | [Boolean][b15]       | `false`       |
 | [`LSAN_PRINT_FORMATTED`][b3]       | Print using ANSI escape codes                               | v1.6  | [Boolean][b15]       | `true`        |
 | [`LSAN_INVALID_CRASH`][b4]         | Terminate if an invalid action is detected                  | v1.6  | [Boolean][b15]       | `true`        |
-| [`LSAN_INVALID_FREE`][b5]          | Detect invalid de-allocations                               | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_INVALID_FREE`][b5]          | Detect invalid deallocations                                | v1.6  | [Boolean][b15]       | `true`        |
 | [`LSAN_FREE_NULL`][b6]             | Issue a warning if `NULL` is `free`d                        | v1.6  | [Boolean][b15]       | `false`       |
 | [`LSAN_STATS_ACTIVE`][b7]          | Enable the statistical bookkeeping                          | v1.6  | [Boolean][b15]       | `false`       |
 | [`LSAN_CALLSTACK_SIZE`][b8]        | The amount of frames to be printed in a callstack           | v1.6  | Number               | `20`          |
@@ -226,7 +226,7 @@ The statistics then can be queried using the following API:
 |----------------------------------------|------------------------------------------------------------------------------------------------|
 | [`__lsan_getTotalMallocs()`][s1]       | Returns the total count of allocations registered.                                             |
 | [`__lsan_getTotalBytes()`][s2]         | Returns the total count of allocated bytes.                                                    |
-| [`__lsan_getTotalFrees()`][s3]         | Returns the total count of registered and `free`d objects.                                     |
+| [`__lsan_getTotalFrees()`][s3]         | Returns the total count of registered allocations that have been deallocated.                  |
 | [`__lsan_getCurrentMallocCount()`][s4] | Returns the count of currently active allocations.                                             |
 | [`__lsan_getCurrentByteCount()`][s5]   | Returns the amount of currently allocated bytes.                                               |
 | [`__lsan_getMallocPeek()`][s6]         | Returns the highest amount of allocations at the same time.                                    |
@@ -238,18 +238,18 @@ More on the statistics [here][5].
 
 ## Behind the scenes or: How does it work?
 In order to track the memory allocations this sanitizer replaces the common allocation management functions such as
-`malloc`, `calloc`, `realloc` and `free`. Every allocation and de-allocation is registered and a backtrace is stored
+`malloc`, `calloc`, `realloc` and `free`. Every allocation and deallocation is registered and a stacktrace is created
 for it.  
-Its own allocations are not tracked.
+The allocations created by the LeakSanitizer are ignored.
 
-The signal handlers and the wrapper functions are installed once the sanitizer has been loaded by the dynamic loader.
+The signal handlers and the wrapper functions are installed once the sanitizer has been loaded by the dynamic linker.
 
 When the exit handler registered using `atexit` is invoked the allocated memory is examined and the detected memory
 leaks are printed.  
-The backtraces are translated using the [CallstackLibrary][6].
+The stacktraces are managed using the [CallstackLibrary][6].
 
 ## Final notes
-If you experience any problems with the LeakSanitizer or if you have ideas to further improve it don't hesitate to
+If you experience any problems with the LeakSanitizer or if you have ideas to further improve it do not hesitate to
 [open an issue][7] or to [open a pull request][8].
 
 This project is licensed under the terms of the GNU GPL in version 3 or later.
