@@ -1,5 +1,9 @@
 [
   {
+    "name": "Output buffers",
+    "functions": [ "___smakebuf" ]
+  },
+  {
     "name": "Everything entirely created by the system",
     "functions": [{ "libraryRegex": "LSAN_SYSTEM_LIBRARIES" }]
   }
