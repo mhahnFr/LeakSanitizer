@@ -30,6 +30,7 @@
 #include "exceptionHandler.hpp"
 
 #include "../lsanMisc.hpp"
+#include "../utils.hpp"
 
 namespace lsan {
 /**
@@ -90,5 +91,17 @@ static inline auto demangle(const char * string) noexcept -> std::string {
         }
     }
     crashForce("Terminating without active exception");
+}
+
+[[ noreturn ]] void mhExceptionHandler() noexcept {
+    getTracker().ignoreMalloc = true;
+
+    if (LOAD_FUNC(void*(*)(), tryCatch_getException); tryCatch_getException != nullptr) {
+        if (const auto exception = tryCatch_getException(); exception != nullptr) {
+            const auto exceptionType = *reinterpret_cast<const char**>(uintptr_t(exception) - sizeof(char*));
+            crashForce("Uncaught exception of type " + std::string(exceptionType));
+        }
+    }
+    crashForce("Terminating with unknown exception");
 }
 }
