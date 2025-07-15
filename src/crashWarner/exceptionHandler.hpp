@@ -30,6 +30,11 @@ namespace lsan {
  */
 [[ noreturn ]] void exceptionHandler() noexcept;
 
+/**
+ * @brief Handles the terminating exception created by @c mh_tryCatch .
+ *
+ * Terminates the linked application.
+ */
 [[ noreturn ]] void mhExceptionHandler() noexcept;
 }
 
