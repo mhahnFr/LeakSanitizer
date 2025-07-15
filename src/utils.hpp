@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024  mhahnFr
+ * Copyright (C) 2024 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -24,6 +24,8 @@
 
 #include <sstream>
 
+#include <functionInfo/functionInfo.h>
+
 namespace lsan::utils {
 /**
  * Converts the given pointer to a string.
@@ -36,6 +38,32 @@ static inline auto toString(const void* pointer) -> std::string {
     stream << pointer;
     return stream.str();
 }
+
+/**
+ * Loads the function of the given name.
+ *
+ * @param name the name of the function as used by the linker
+ * @return the function pointer or @c nullptr if the function is not loaded
+ */
+static inline auto loadFunc(const char* name) -> void* {
+    const auto result = functionInfo_load(name);
+    return result.found ? reinterpret_cast<void*>(result.begin) : nullptr;
+}
+
+#ifdef __APPLE__
+# define FUNC_NAME(name) "_" #name
+#else
+# define FUNC_NAME(name) #name
+#endif
+
+/**
+ * Creates a variable named as the requested function, whose value is the
+ * loaded function.
+ *
+ * @param type the signature of the function
+ * @param name the name of the function
+ */
+#define LOAD_FUNC(type, name) const auto name = reinterpret_cast<type>(utils::loadFunc(FUNC_NAME(name)))
 }
 
 #endif /* utils_hpp */

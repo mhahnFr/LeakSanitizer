@@ -32,6 +32,8 @@
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
+#include "utils.hpp"
+
 #include "crashWarner/exceptionHandler.hpp"
 #include "signals/signalHandlers.hpp"
 #include "signals/signals.hpp"
@@ -300,32 +302,6 @@ auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>
     }
     return threadDescriptions.emplace(id, std::move(desc)).first->second;
 }
-
-/**
- * Loads the function of the given name.
- *
- * @param name the name of the function as used by the linker
- * @return the function pointer or @c nullptr if the function is not loaded
- */
-static inline auto loadFunc(const char* name) -> void* {
-    const auto result = functionInfo_load(name);
-    return result.found ? reinterpret_cast<void*>(result.begin) : nullptr;
-}
-
-#ifdef __APPLE__
-# define FUNC_NAME(name) "_" #name
-#else
-# define FUNC_NAME(name) #name
-#endif
-
-/**
- * Creates a variable named as the requested function, whose value is the
- * loaded function.
- *
- * @param type the signature of the function
- * @param name the name of the function
- */
-#define LOAD_FUNC(type, name) const auto name = reinterpret_cast<type>(loadFunc(FUNC_NAME(name)))
 
 void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
 #ifndef __APPLE__
