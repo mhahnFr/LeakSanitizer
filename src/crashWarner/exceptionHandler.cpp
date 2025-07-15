@@ -26,8 +26,8 @@
 
 #include <callstack_exception.hpp>
 
-#include "crash.hpp"
 #include "exceptionHandler.hpp"
+#include "crash.hpp"
 
 #include "../lsanMisc.hpp"
 #include "../utils.hpp"
