@@ -625,6 +625,18 @@ static inline auto createSaniKey() -> pthread_key_t {
     return key;
 }
 
+namespace {
+struct Initializer {
+    inline Initializer() noexcept {
+        if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
+            tryCatch_setTerminateHandler(mhExceptionHandler);
+        }
+    }
+};
+
+Initializer initializer;
+}
+
 LSan::LSan(): saniKey(createSaniKey()) {
     using namespace signals;
 
