@@ -57,5 +57,5 @@ or [`LSAN_STATS_ACTIVE`][2].
 >     <img src="images/dark/SIGUSR2.png" alt="Example stacktrace">
 > </picture>
 
-[1]: Behaviour#lsan_auto_stats
-[2]: Behaviour#lsan_stats_active
+[1]: Behaviour.md#lsan_auto_stats
+[2]: Behaviour.md#lsan_stats_active

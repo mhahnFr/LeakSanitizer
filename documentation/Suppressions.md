@@ -170,6 +170,6 @@ LSAN_SYSTEM_LIBRARY_FILES='libraryFoo.json:barLibrary.json' ./a.out
 [4]: #libraryregex
 [5]: #name-1
 [6]: #system-library-detection
-[7]: Behaviour#lsan_system_library_files
-[8]: Behaviour#lsan_suppression_files
-[9]: Behaviour#lsan_suppression_developer
+[7]: Behaviour.md#lsan_system_library_files
+[8]: Behaviour.md#lsan_suppression_files
+[9]: Behaviour.md#lsan_suppression_developer
