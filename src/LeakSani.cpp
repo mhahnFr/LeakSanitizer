@@ -626,6 +626,10 @@ static inline auto createSaniKey() -> pthread_key_t {
 }
 
 namespace {
+/**
+ * Wrapper class used to delay initialization to the point where global variables
+ * are constructed.
+ */
 struct Initializer {
     inline Initializer() noexcept {
         if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
@@ -634,6 +638,7 @@ struct Initializer {
     }
 };
 
+/** The hidden global variable delaying the initialization of some systems. */
 Initializer initializer;
 }
 
