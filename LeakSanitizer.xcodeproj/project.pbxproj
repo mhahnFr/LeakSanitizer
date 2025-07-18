@@ -52,7 +52,6 @@
 		BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
 		BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F62CA8765500AEFD5A /* helper.hpp */; };
 		F128723A2D36E0D200D5F0AF /* objcSupport.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F12872392D36E0D200D5F0AF /* objcSupport.hpp */; };
-		F12CA5DD2CB40E6A00C93A2C /* libobjc.A.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F12CA5DC2CB40E6A00C93A2C /* libobjc.A.tbd */; };
 		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
 		F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529B02D108324002534D0 /* defaultSuppression.hpp */; };
@@ -61,7 +60,6 @@
 		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
 		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
-		F1E0904D2D68DEC800F79FA2 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1E0904C2D68DEC800F79FA2 /* CoreFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -154,9 +152,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F12CA5DD2CB40E6A00C93A2C /* libobjc.A.tbd in Frameworks */,
 				BF378FB52919496000A4DAA9 /* libcallstack.a in Frameworks */,
-				F1E0904D2D68DEC800F79FA2 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -593,10 +589,7 @@
 				);
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_CFLAGS = (
-					"-DLSAN_HANDLE_OBJC",
-					"-D__LSAN_SILENCE_DEPRECATION",
-				);
+				OTHER_CFLAGS = "-D__LSAN_SILENCE_DEPRECATION";
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
@@ -630,10 +623,7 @@
 				);
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_CFLAGS = (
-					"-DLSAN_HANDLE_OBJC",
-					"-D__LSAN_SILENCE_DEPRECATION",
-				);
+				OTHER_CFLAGS = "-D__LSAN_SILENCE_DEPRECATION";
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = lsan;
 				SKIP_INSTALL = YES;
