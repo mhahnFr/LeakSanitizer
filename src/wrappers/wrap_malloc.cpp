@@ -19,6 +19,8 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "wrap_malloc.hpp"
+
 #include <sstream>
 
 #include "interpose.hpp"
@@ -26,7 +28,6 @@
 
 #ifdef __APPLE__
 # include <mach/mach_init.h>
-# include <malloc/malloc.h>
 #endif
 
 #include "../formatter.hpp"
@@ -54,7 +55,6 @@ auto operator new(std::size_t size) -> void * {
 #endif /* __linux__ */
 
 namespace lsan {
-extern "C" {
 auto __wrap_malloc(const std::size_t size, const char*, int) -> void* {
     return malloc(size);
 }
@@ -73,7 +73,6 @@ void __wrap_free(void* pointer, const char*, int) {
 
 [[ noreturn ]] void __wrap_exit(const int code, const char*, int) {
     exit(code);
-}
 }
 
 /**
@@ -382,10 +381,6 @@ auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size)
 }
 #endif
 
-#ifdef __linux__
-extern "C" {
-#endif /* __linux__ */
-
 auto __lsan_malloc(const std::size_t size) -> void* {
     BENCH(const auto ptr = real::malloc(size);, std::chrono::nanoseconds, systemTime);
 
@@ -523,10 +518,6 @@ void __lsan_free(void* pointer) {
         });
     })
 }
-
-#ifdef __linux__
-} /* extern "C" */
-#endif /* __linux__ */
 
 REPLACE(auto, posix_memalign)(void** memPtr, const std::size_t alignment, const std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
     if (void** checkPtr = memPtr; checkPtr == nullptr) {
