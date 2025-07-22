@@ -7,63 +7,67 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BF017DC82D76F26900572D07 /* firstPartyLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */; };
-		BF017DC92D76F26900572D07 /* firstPartyLibrary.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */; };
-		BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */; };
-		BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */; };
-		BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */; };
-		BF0F133B29194791008F0FCD /* LeakSani.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */; };
-		BF0F133E29194794008F0FCD /* Stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2E0289ED24200B17349 /* Stats.cpp */; };
-		BF0F134129194797008F0FCD /* MallocInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736328831FC200BC4208 /* MallocInfo.cpp */; };
-		BF0F1347291947A2008F0FCD /* wrap_malloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736728832C3300BC4208 /* wrap_malloc.cpp */; };
-		BF0F134D291947A8008F0FCD /* signalHandlers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF49A5D72899599300BC1FFD /* signalHandlers.cpp */; };
-		BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAFADC528B4FDA40060076C /* formatter.hpp */; };
-		BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */; };
-		BF2C5CB42AEAB76A00DE2224 /* exceptionHandler.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */; };
-		BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */; };
-		BF3204EF2AC5C614004EC77E /* callstackHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */; };
-		BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */; };
-		BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2E1289ED24200B17349 /* Stats.hpp */; };
-		BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */; };
-		BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
-		BF378F9F2919484100A4DAA9 /* signalHandlers.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF49A5D82899599300BC1FFD /* signalHandlers.hpp */; };
-		BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */ = {isa = PBXBuildFile; fileRef = BF621FDC28A291DE00414EE4 /* lsan_internals.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BF378FB52919496000A4DAA9 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
-		BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF4368F32AACF04700252E2A /* crashWarner.cpp */; };
-		BF7ACDAD2D5619AE00629378 /* PseudoTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF7ACDAC2D5619AE00629378 /* PseudoTracker.hpp */; };
-		BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */; };
-		BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
-		BFA6CD7C2CD3F3B800959363 /* Suppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */; };
-		BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */; };
-		BFA95FB12D43FBDA0043C836 /* ThreadInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */; };
-		BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
-		BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
-		BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */; };
-		BFBF26C82D4402CC0034C570 /* ThreadInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */; };
-		BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */; };
-		BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC817142BEFB36E00332937 /* TLSTracker.cpp */; };
-		BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817152BEFB36E00332937 /* TLSTracker.hpp */; };
-		BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCF0B252BDD54A900EE259C /* misc.cpp */; };
-		BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
-		BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
-		BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */; };
-		BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */; };
-		BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
-		BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F62CA8765500AEFD5A /* helper.hpp */; };
-		F128723A2D36E0D200D5F0AF /* objcSupport.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F12872392D36E0D200D5F0AF /* objcSupport.hpp */; };
-		F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF34157C2A8405AD00DEEF10 /* deprecation.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
-		F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529B02D108324002534D0 /* defaultSuppression.hpp */; };
-		F13529B22D1083E0002534D0 /* defaultSuppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
-		F14B3CDD2D842C4A004768E9 /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F14B3CDC2D842C4A004768E9 /* parser.cpp */; };
-		F16901522C403EF200EED0AE /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
-		F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
-		F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
+		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
+		BFCDA7F12E2F7CA10029AEC1 /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
+		BFCDA7F22E2F7CA10029AEC1 /* signalHandlers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF49A5D72899599300BC1FFD /* signalHandlers.cpp */; };
+		BFCDA7F32E2F7CA10029AEC1 /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
+		BFCDA7F42E2F7CA10029AEC1 /* wrap_malloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736728832C3300BC4208 /* wrap_malloc.cpp */; };
+		BFCDA7F52E2F7CA10029AEC1 /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCF0B252BDD54A900EE259C /* misc.cpp */; };
+		BFCDA7F62E2F7CA10029AEC1 /* callstackHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */; };
+		BFCDA7F72E2F7CA10029AEC1 /* crashWarner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF4368F32AACF04700252E2A /* crashWarner.cpp */; };
+		BFCDA7F82E2F7CA10029AEC1 /* exceptionHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */; };
+		BFCDA7F92E2F7CA10029AEC1 /* lsan_stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */; };
+		BFCDA7FA2E2F7CA10029AEC1 /* AutoStats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFE023EE2CA86E7400AEFD5A /* AutoStats.cpp */; };
+		BFCDA7FB2E2F7CA10029AEC1 /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F14B3CDC2D842C4A004768E9 /* parser.cpp */; };
+		BFCDA7FC2E2F7CA10029AEC1 /* Suppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */; };
+		BFCDA7FD2E2F7CA10029AEC1 /* defaultSuppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
+		BFCDA7FE2E2F7CA10029AEC1 /* firstPartyLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */; };
+		BFCDA7FF2E2F7CA10029AEC1 /* TLSTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFC817142BEFB36E00332937 /* TLSTracker.cpp */; };
+		BFCDA8002E2F7CA10029AEC1 /* bytePrinter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */; };
+		BFCDA8012E2F7CA10029AEC1 /* LeakSani.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */; };
+		BFCDA8022E2F7CA10029AEC1 /* MallocInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF736328831FC200BC4208 /* MallocInfo.cpp */; };
+		BFCDA8032E2F7CA10029AEC1 /* lsanMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */; };
+		BFCDA8042E2F7CA10029AEC1 /* ThreadInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */; };
+		BFCDA8052E2F7CA10029AEC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
+		BFCDA8062E2F7CA10029AEC1 /* lsan_internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */; };
+		BFCDA8072E2F7CDA0029AEC1 /* PoolAllocator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */; };
+		BFCDA8082E2F7CDA0029AEC1 /* RealAllocator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */; };
+		BFCDA8092E2F7CDA0029AEC1 /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
+		BFCDA80A2E2F7CDA0029AEC1 /* Behaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F22CA874D100AEFD5A /* Behaviour.hpp */; };
+		BFCDA80B2E2F7CDA0029AEC1 /* helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFE023F62CA8765500AEFD5A /* helper.hpp */; };
+		BFCDA80C2E2F7CDA0029AEC1 /* signalHandlers.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF49A5D82899599300BC1FFD /* signalHandlers.hpp */; };
+		BFCDA80D2E2F7CDA0029AEC1 /* signals.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAA94532B6C12FF007FC130 /* signals.hpp */; };
+		BFCDA80E2E2F7CDA0029AEC1 /* interpose.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF9623AC2AB36B86005FF2B7 /* interpose.hpp */; };
+		BFCDA80F2E2F7CDA0029AEC1 /* realAlloc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBCAD892ACF376600C6B69F /* realAlloc.hpp */; };
+		BFCDA8102E2F7CDA0029AEC1 /* callstackHelper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */; };
+		BFCDA8112E2F7CDA0029AEC1 /* crash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF4368F62AACF06F00252E2A /* crash.hpp */; };
+		BFCDA8122E2F7CDA0029AEC1 /* warn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF4368F72AACF07700252E2A /* warn.hpp */; };
+		BFCDA8132E2F7CDA0029AEC1 /* exceptionHandler.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */; };
+		BFCDA8142E2F7CDA0029AEC1 /* crashOrWarn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */; };
+		BFCDA8152E2F7CDA0029AEC1 /* Stats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2E1289ED24200B17349 /* Stats.hpp */; };
+		BFCDA8162E2F7CDA0029AEC1 /* Suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */; };
+		BFCDA8172E2F7CDA0029AEC1 /* FunctionNotFoundException.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */; };
+		BFCDA8182E2F7CDA0029AEC1 /* defaultSuppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F13529B02D108324002534D0 /* defaultSuppression.hpp */; };
+		BFCDA8192E2F7CDA0029AEC1 /* firstPartyLibrary.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */; };
+		BFCDA81A2E2F7CDA0029AEC1 /* LeakKindStats.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFDD6E002CC6B6EF008B9CDC /* LeakKindStats.hpp */; };
+		BFCDA81B2E2F7CDA0029AEC1 /* ATracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817182BEFB3C200332937 /* ATracker.hpp */; };
+		BFCDA81C2E2F7CDA0029AEC1 /* PseudoTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF7ACDAC2D5619AE00629378 /* PseudoTracker.hpp */; };
+		BFCDA81D2E2F7CDA0029AEC1 /* TLSTracker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFC817152BEFB36E00332937 /* TLSTracker.hpp */; };
+		BFCDA81E2E2F7CDA0029AEC1 /* bytePrinter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */; };
+		BFCDA81F2E2F7CDA0029AEC1 /* LeakSani.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */; };
+		BFCDA8202E2F7CDA0029AEC1 /* MallocInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFBF736428831FC200BC4208 /* MallocInfo.hpp */; };
+		BFCDA8212E2F7CDA0029AEC1 /* lsanMisc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */; };
+		BFCDA8222E2F7CDA0029AEC1 /* ThreadInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */; };
+		BFCDA8232E2F7CDA0029AEC1 /* timing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFD983A72B8A4729003B6CC1 /* timing.hpp */; };
+		BFCDA8242E2F7CDA0029AEC1 /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16901512C403EF200EED0AE /* utils.hpp */; };
+		BFCDA8252E2F7CDA0029AEC1 /* objcSupport.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F12872392D36E0D200D5F0AF /* objcSupport.hpp */; };
+		BFCDA8262E2F7CDA0029AEC1 /* LeakType.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF7592282BB1799500891A55 /* LeakType.hpp */; };
+		BFCDA8272E2F7CDA0029AEC1 /* formatter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAFADC528B4FDA40060076C /* formatter.hpp */; };
+		BFCDA8382E2F82F50029AEC1 /* Stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2E0289ED24200B17349 /* Stats.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		F13529B72D10842D002534D0 /* PBXContainerItemProxy */ = {
+		BFCDA7EE2E2F7C430029AEC1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BF97EB4E28831E5B00DAF1FE /* Project object */;
 			proxyType = 1;
@@ -76,7 +80,6 @@
 		BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = firstPartyLibrary.hpp; sourceTree = "<group>"; };
 		BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = firstPartyLibrary.cpp; sourceTree = "<group>"; };
 		BF04B4B328F86EEA00051090 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		BF0F131C29194652008F0FCD /* liblsan.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblsan.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsan_stats.cpp; sourceTree = "<group>"; };
 		BF23A2DD289ECE6A00B17349 /* lsan_stats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_stats.h; sourceTree = "<group>"; };
 		BF23A2E0289ED24200B17349 /* Stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Stats.cpp; sourceTree = "<group>"; };
@@ -123,6 +126,7 @@
 		BFC817142BEFB36E00332937 /* TLSTracker.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TLSTracker.cpp; sourceTree = "<group>"; };
 		BFC817152BEFB36E00332937 /* TLSTracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TLSTracker.hpp; sourceTree = "<group>"; };
 		BFC817182BEFB3C200332937 /* ATracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ATracker.hpp; sourceTree = "<group>"; };
+		BFCDA7E72E2F7C2C0029AEC1 /* LeakSanitizer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LeakSanitizer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFCF0B252BDD54A900EE259C /* misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
 		BFD983A72B8A4729003B6CC1 /* timing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = timing.hpp; sourceTree = "<group>"; };
@@ -148,11 +152,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		BF0F131A29194652008F0FCD /* Frameworks */ = {
+		BFCDA7E42E2F7C2C0029AEC1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF378FB52919496000A4DAA9 /* libcallstack.a in Frameworks */,
+				BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,7 +260,7 @@
 		BF97EB5728831E5B00DAF1FE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BF0F131C29194652008F0FCD /* liblsan.dylib */,
+				BFCDA7E72E2F7C2C0029AEC1 /* LeakSanitizer.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -368,39 +372,43 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		BF0F131829194652008F0FCD /* Headers */ = {
+		BFCDA7E22E2F7C2C0029AEC1 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F16901522C403EF200EED0AE /* utils.hpp in Headers */,
-				F128723A2D36E0D200D5F0AF /* objcSupport.hpp in Headers */,
-				F13529B12D108324002534D0 /* defaultSuppression.hpp in Headers */,
-				BF017DC92D76F26900572D07 /* firstPartyLibrary.hpp in Headers */,
-				BFAA94572B6C12FF007FC130 /* signals.hpp in Headers */,
-				BFBBC80D2CF0D00800F0785F /* FunctionNotFoundException.hpp in Headers */,
-				BF378FA82919484A00A4DAA9 /* lsan_stats.h in Headers */,
-				F133D0EE2C4049BB00A45493 /* deprecation.h in Headers */,
-				BF378FAE2919484E00A4DAA9 /* lsan_internals.h in Headers */,
-				BF2C5CB42AEAB76A00DE2224 /* exceptionHandler.hpp in Headers */,
-				F19C6EAA2C51496C00E7E4FA /* ObjectPool.hpp in Headers */,
-				BF7ACDAD2D5619AE00629378 /* PseudoTracker.hpp in Headers */,
-				BF0F1353291947C9008F0FCD /* bytePrinter.hpp in Headers */,
-				BFA6CD7D2CD3F3B800959363 /* Suppression.hpp in Headers */,
-				BFC817172BEFB36E00332937 /* TLSTracker.hpp in Headers */,
-				BFDD6E012CC6B6EF008B9CDC /* LeakKindStats.hpp in Headers */,
-				BFC6D0F82C9ED80C0056A3C3 /* crashOrWarn.hpp in Headers */,
-				BF0F1350291947C0008F0FCD /* formatter.hpp in Headers */,
-				BF8462602AD1B489003B05F5 /* lsanMisc.hpp in Headers */,
-				BF3204F12AC5C614004EC77E /* callstackHelper.hpp in Headers */,
-				BFE023F72CA8765500AEFD5A /* helper.hpp in Headers */,
-				BFD983AB2B8A4729003B6CC1 /* timing.hpp in Headers */,
-				BFA95FB12D43FBDA0043C836 /* ThreadInfo.hpp in Headers */,
-				F13529AF2D10779B002534D0 /* defaultSuppression.cpp in Headers */,
-				BF378F962919483900A4DAA9 /* LeakSani.hpp in Headers */,
-				BFE023F42CA874D100AEFD5A /* Behaviour.hpp in Headers */,
-				BF378F932919482E00A4DAA9 /* Stats.hpp in Headers */,
-				BF378F992919483B00A4DAA9 /* MallocInfo.hpp in Headers */,
-				BF378F9F2919484100A4DAA9 /* signalHandlers.hpp in Headers */,
+				BFCDA8072E2F7CDA0029AEC1 /* PoolAllocator.hpp in Headers */,
+				BFCDA8082E2F7CDA0029AEC1 /* RealAllocator.hpp in Headers */,
+				BFCDA8092E2F7CDA0029AEC1 /* ObjectPool.hpp in Headers */,
+				BFCDA80A2E2F7CDA0029AEC1 /* Behaviour.hpp in Headers */,
+				BFCDA80B2E2F7CDA0029AEC1 /* helper.hpp in Headers */,
+				BFCDA80C2E2F7CDA0029AEC1 /* signalHandlers.hpp in Headers */,
+				BFCDA80D2E2F7CDA0029AEC1 /* signals.hpp in Headers */,
+				BFCDA80E2E2F7CDA0029AEC1 /* interpose.hpp in Headers */,
+				BFCDA80F2E2F7CDA0029AEC1 /* realAlloc.hpp in Headers */,
+				BFCDA8102E2F7CDA0029AEC1 /* callstackHelper.hpp in Headers */,
+				BFCDA8112E2F7CDA0029AEC1 /* crash.hpp in Headers */,
+				BFCDA8122E2F7CDA0029AEC1 /* warn.hpp in Headers */,
+				BFCDA8132E2F7CDA0029AEC1 /* exceptionHandler.hpp in Headers */,
+				BFCDA8142E2F7CDA0029AEC1 /* crashOrWarn.hpp in Headers */,
+				BFCDA8152E2F7CDA0029AEC1 /* Stats.hpp in Headers */,
+				BFCDA8162E2F7CDA0029AEC1 /* Suppression.hpp in Headers */,
+				BFCDA8172E2F7CDA0029AEC1 /* FunctionNotFoundException.hpp in Headers */,
+				BFCDA8182E2F7CDA0029AEC1 /* defaultSuppression.hpp in Headers */,
+				BFCDA8192E2F7CDA0029AEC1 /* firstPartyLibrary.hpp in Headers */,
+				BFCDA81A2E2F7CDA0029AEC1 /* LeakKindStats.hpp in Headers */,
+				BFCDA81B2E2F7CDA0029AEC1 /* ATracker.hpp in Headers */,
+				BFCDA81C2E2F7CDA0029AEC1 /* PseudoTracker.hpp in Headers */,
+				BFCDA81D2E2F7CDA0029AEC1 /* TLSTracker.hpp in Headers */,
+				BFCDA81E2E2F7CDA0029AEC1 /* bytePrinter.hpp in Headers */,
+				BFCDA81F2E2F7CDA0029AEC1 /* LeakSani.hpp in Headers */,
+				BFCDA8202E2F7CDA0029AEC1 /* MallocInfo.hpp in Headers */,
+				BFCDA8212E2F7CDA0029AEC1 /* lsanMisc.hpp in Headers */,
+				BFCDA8222E2F7CDA0029AEC1 /* ThreadInfo.hpp in Headers */,
+				BFCDA8232E2F7CDA0029AEC1 /* timing.hpp in Headers */,
+				BFCDA8242E2F7CDA0029AEC1 /* utils.hpp in Headers */,
+				BFCDA8252E2F7CDA0029AEC1 /* objcSupport.hpp in Headers */,
+				BFCDA8262E2F7CDA0029AEC1 /* LeakType.hpp in Headers */,
+				BFCDA8272E2F7CDA0029AEC1 /* formatter.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,24 +448,27 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
-		BF0F131B29194652008F0FCD /* LeakSanitizer */ = {
+		BFCDA7E62E2F7C2C0029AEC1 /* LeakSanitizer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BF0F132629194652008F0FCD /* Build configuration list for PBXNativeTarget "LeakSanitizer" */;
+			buildConfigurationList = BFCDA7EB2E2F7C2C0029AEC1 /* Build configuration list for PBXNativeTarget "LeakSanitizer" */;
 			buildPhases = (
-				F13529B92D10848E002534D0 /* ShellScript */,
-				BF0F131829194652008F0FCD /* Headers */,
-				BF0F131929194652008F0FCD /* Sources */,
-				BF0F131A29194652008F0FCD /* Frameworks */,
+				BFCDA7E22E2F7C2C0029AEC1 /* Headers */,
+				BFCDA8392E2F885C0029AEC1 /* ShellScript */,
+				BFCDA7E32E2F7C2C0029AEC1 /* Sources */,
+				BFCDA7E42E2F7C2C0029AEC1 /* Frameworks */,
+				BFCDA7E52E2F7C2C0029AEC1 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				F13529B82D10842D002534D0 /* PBXTargetDependency */,
+				BFCDA7EF2E2F7C430029AEC1 /* PBXTargetDependency */,
 			);
 			name = LeakSanitizer;
-			productName = lsan;
-			productReference = BF0F131C29194652008F0FCD /* liblsan.dylib */;
-			productType = "com.apple.product-type.library.dynamic";
+			packageProductDependencies = (
+			);
+			productName = LeakSanitizer;
+			productReference = BFCDA7E72E2F7C2C0029AEC1 /* LeakSanitizer.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
@@ -466,14 +477,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = mhahnFr;
 				TargetAttributes = {
-					BF0F131B29194652008F0FCD = {
-						CreatedOnToolsVersion = 12.3;
-					};
 					BFB062292C397C1E0032E9C4 = {
 						CreatedOnToolsVersion = 15.2;
+					};
+					BFCDA7E62E2F7C2C0029AEC1 = {
+						CreatedOnToolsVersion = 16.4;
 					};
 					F13529B32D1083FD002534D0 = {
 						CreatedOnToolsVersion = 16.2;
@@ -493,17 +505,26 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BF0F131B29194652008F0FCD /* LeakSanitizer */,
 				BFB062292C397C1E0032E9C4 /* LeakSanitizer_make */,
 				F13529B32D1083FD002534D0 /* CallstackLibrary */,
+				BFCDA7E62E2F7C2C0029AEC1 /* LeakSanitizer */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		BFCDA7E52E2F7C2C0029AEC1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXShellScriptBuildPhase section */
-		F13529B92D10848E002534D0 /* ShellScript */ = {
+		BFCDA8392E2F885C0029AEC1 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -522,114 +543,47 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		BF0F131929194652008F0FCD /* Sources */ = {
+		BFCDA7E32E2F7C2C0029AEC1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F14B3CDD2D842C4A004768E9 /* parser.cpp in Sources */,
-				F19C6EA92C51496C00E7E4FA /* ObjectPool.cpp in Sources */,
-				BF017DC82D76F26900572D07 /* firstPartyLibrary.cpp in Sources */,
-				BF2C5CB52AEAB76F00DE2224 /* exceptionHandler.cpp in Sources */,
-				BFE023F02CA86E7400AEFD5A /* AutoStats.cpp in Sources */,
-				BF0F133229194786008F0FCD /* bytePrinter.cpp in Sources */,
-				BF0F13382919478E008F0FCD /* lsan_internals.cpp in Sources */,
-				BF0F13352919478B008F0FCD /* lsan_stats.cpp in Sources */,
-				BF84625E2AD1B489003B05F5 /* lsanMisc.cpp in Sources */,
-				BFCF0B272BDD54A900EE259C /* misc.cpp in Sources */,
-				BFA6CD7C2CD3F3B800959363 /* Suppression.cpp in Sources */,
-				BFAA94552B6C12FF007FC130 /* signals.cpp in Sources */,
-				BF0F133B29194791008F0FCD /* LeakSani.cpp in Sources */,
-				BF0F133E29194794008F0FCD /* Stats.cpp in Sources */,
-				BFBF26C82D4402CC0034C570 /* ThreadInfo.cpp in Sources */,
-				BF0F134129194797008F0FCD /* MallocInfo.cpp in Sources */,
-				BF0F1347291947A2008F0FCD /* wrap_malloc.cpp in Sources */,
-				BF4368F52AACF04700252E2A /* crashWarner.cpp in Sources */,
-				BF3204EF2AC5C614004EC77E /* callstackHelper.cpp in Sources */,
-				BFD983A92B8A4729003B6CC1 /* timing.cpp in Sources */,
-				BFC817162BEFB36E00332937 /* TLSTracker.cpp in Sources */,
-				BF0F134D291947A8008F0FCD /* signalHandlers.cpp in Sources */,
-				F13529B22D1083E0002534D0 /* defaultSuppression.cpp in Sources */,
+				BFCDA7F12E2F7CA10029AEC1 /* ObjectPool.cpp in Sources */,
+				BFCDA7F22E2F7CA10029AEC1 /* signalHandlers.cpp in Sources */,
+				BFCDA7F32E2F7CA10029AEC1 /* signals.cpp in Sources */,
+				BFCDA7F42E2F7CA10029AEC1 /* wrap_malloc.cpp in Sources */,
+				BFCDA7F52E2F7CA10029AEC1 /* misc.cpp in Sources */,
+				BFCDA7F62E2F7CA10029AEC1 /* callstackHelper.cpp in Sources */,
+				BFCDA7F72E2F7CA10029AEC1 /* crashWarner.cpp in Sources */,
+				BFCDA7F82E2F7CA10029AEC1 /* exceptionHandler.cpp in Sources */,
+				BFCDA7F92E2F7CA10029AEC1 /* lsan_stats.cpp in Sources */,
+				BFCDA7FA2E2F7CA10029AEC1 /* AutoStats.cpp in Sources */,
+				BFCDA7FB2E2F7CA10029AEC1 /* parser.cpp in Sources */,
+				BFCDA7FC2E2F7CA10029AEC1 /* Suppression.cpp in Sources */,
+				BFCDA7FD2E2F7CA10029AEC1 /* defaultSuppression.cpp in Sources */,
+				BFCDA7FE2E2F7CA10029AEC1 /* firstPartyLibrary.cpp in Sources */,
+				BFCDA7FF2E2F7CA10029AEC1 /* TLSTracker.cpp in Sources */,
+				BFCDA8002E2F7CA10029AEC1 /* bytePrinter.cpp in Sources */,
+				BFCDA8012E2F7CA10029AEC1 /* LeakSani.cpp in Sources */,
+				BFCDA8022E2F7CA10029AEC1 /* MallocInfo.cpp in Sources */,
+				BFCDA8032E2F7CA10029AEC1 /* lsanMisc.cpp in Sources */,
+				BFCDA8042E2F7CA10029AEC1 /* ThreadInfo.cpp in Sources */,
+				BFCDA8052E2F7CA10029AEC1 /* timing.cpp in Sources */,
+				BFCDA8062E2F7CA10029AEC1 /* lsan_internals.cpp in Sources */,
+				BFCDA8382E2F82F50029AEC1 /* Stats.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		F13529B82D10842D002534D0 /* PBXTargetDependency */ = {
+		BFCDA7EF2E2F7C430029AEC1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F13529B32D1083FD002534D0 /* CallstackLibrary */;
-			targetProxy = F13529B72D10842D002534D0 /* PBXContainerItemProxy */;
+			targetProxy = BFCDA7EE2E2F7C430029AEC1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		BF0F132429194652008F0FCD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEAD_CODE_STRIPPING = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_CPP_EXCEPTIONS = YES;
-				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					CallstackLibrary/include,
-					include,
-					suppressions,
-					SimpleJSON/include,
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/CallstackLibrary",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_CFLAGS = "-D__LSAN_SILENCE_DEPRECATION";
-				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
-				PRODUCT_NAME = lsan;
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		BF0F132529194652008F0FCD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEAD_CODE_STRIPPING = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_CPP_EXCEPTIONS = YES;
-				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					CallstackLibrary/include,
-					include,
-					suppressions,
-					SimpleJSON/include,
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/CallstackLibrary",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_CFLAGS = "-D__LSAN_SILENCE_DEPRECATION";
-				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
-				PRODUCT_NAME = lsan;
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 		BF97EB5828831E5B00DAF1FE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -784,6 +738,132 @@
 			};
 			name = Release;
 		};
+		BFCDA7EC2E2F7C2C0029AEC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/SimpleJSON/include",
+					"$(PROJECT_DIR)/CallstackLibrary/include",
+					"$(PROJECT_DIR)/suppressions",
+					"$(PROJECT_DIR)/include",
+				);
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 mhahnFr. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_DYLIB_INSTALL_NAME = "$(EXECUTABLE_PATH)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/CallstackLibrary",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_CFLAGS = "-D__LSAN_SILENCE_DEPRECATION";
+				PRODUCT_BUNDLE_IDENTIFIER = fr.mhahn.LeakSanitizer;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		BFCDA7ED2E2F7C2C0029AEC1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = fast;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/SimpleJSON/include",
+					"$(PROJECT_DIR)/CallstackLibrary/include",
+					"$(PROJECT_DIR)/suppressions",
+					"$(PROJECT_DIR)/include",
+				);
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 mhahnFr. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_DYLIB_INSTALL_NAME = "$(EXECUTABLE_PATH)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/CallstackLibrary",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_CFLAGS = "-D__LSAN_SILENCE_DEPRECATION";
+				PRODUCT_BUNDLE_IDENTIFIER = fr.mhahn.LeakSanitizer;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 		F13529B52D1083FD002534D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -820,15 +900,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BF0F132629194652008F0FCD /* Build configuration list for PBXNativeTarget "LeakSanitizer" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BF0F132429194652008F0FCD /* Debug */,
-				BF0F132529194652008F0FCD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		BF97EB5128831E5B00DAF1FE /* Build configuration list for PBXProject "LeakSanitizer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -843,6 +914,15 @@
 			buildConfigurations = (
 				BFB0622A2C397C1E0032E9C4 /* Debug */,
 				BFB0622B2C397C1E0032E9C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BFCDA7EB2E2F7C2C0029AEC1 /* Build configuration list for PBXNativeTarget "LeakSanitizer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BFCDA7EC2E2F7C2C0029AEC1 /* Debug */,
+				BFCDA7ED2E2F7C2C0029AEC1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
