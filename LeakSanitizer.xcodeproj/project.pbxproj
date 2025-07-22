@@ -434,8 +434,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BFCDA7EB2E2F7C2C0029AEC1 /* Build configuration list for PBXNativeTarget "LeakSanitizer" */;
 			buildPhases = (
-				BFCDA8392E2F885C0029AEC1 /* ShellScript */,
 				BFCDA7E22E2F7C2C0029AEC1 /* Headers */,
+				BFCDA8392E2F885C0029AEC1 /* ShellScript */,
 				BFCDA7E32E2F7C2C0029AEC1 /* Sources */,
 				BFCDA7E42E2F7C2C0029AEC1 /* Frameworks */,
 				BFCDA7E52E2F7C2C0029AEC1 /* Resources */,
@@ -460,7 +460,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 1640;
 				ORGANIZATIONNAME = mhahnFr;
 				TargetAttributes = {
 					BFCDA7E62E2F7C2C0029AEC1 = {
@@ -690,7 +690,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -754,7 +754,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
