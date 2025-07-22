@@ -155,7 +155,7 @@ class LSan final: public trackers::ATracker {
     template<bool Four = false>
     constexpr inline void classifyPointerUnion(void* ptr, std::deque<MallocInfo::Ref>& directs,
                                                const LeakType direct, const LeakType indirect) {
-        constexpr auto order = Four ? 3 : 1;
+        constexpr auto order = Four ? 3u : 1u;
 
         if (const auto& it = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) & ~order));
             it != infos.end() && it->second.leakType > direct) {

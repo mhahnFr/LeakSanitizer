@@ -91,14 +91,14 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     auto returnAddress = reinterpret_cast<void*>(ip);
 
     auto addresses = std::array<void*, CALLSTACK_BACKTRACE_SIZE>();
-    int i = 0;
+    auto i = 0u;
     do {
         addresses[i++] = returnAddress;
         returnAddress = static_cast<void**>(frame)[1];
         previousFrame = frame;
         frame = *static_cast<void**>(frame);
     } while (frame > previousFrame && i < CALLSTACK_BACKTRACE_SIZE);
-    toReturn = lcs::callstack(addresses.data(), i);
+    toReturn = lcs::callstack(addresses.data(), int(i));
 #else
     (void) ptr;
     toReturn = lcs::callstack();

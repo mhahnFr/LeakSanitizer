@@ -140,7 +140,7 @@ void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, const 
         }
 
         const auto rwStuff = static_cast<void**>(it->second.getPointer());
-        const auto rwPtr = reinterpret_cast<void*>(uintptr_t(rwStuff[1]) & ~1);
+        const auto rwPtr = reinterpret_cast<void*>(uintptr_t(rwStuff[1]) & ~1u);
         if (const auto& rwIt = infos.find(rwPtr); rwIt != infos.end()) {
             if (rwIt->second.leakType > direct) {
                 rwIt->second.leakType = direct;
@@ -263,8 +263,8 @@ auto LSan::isSuppressed(const MallocInfo& info) -> bool {
         return true;
     }
 
-    const auto& suppressions = getSuppressions();
-    return std::any_of(suppressions.cbegin(), suppressions.cend(), [&info](const auto& suppression) {
+    const auto& theSuppressions = getSuppressions();
+    return std::any_of(theSuppressions.cbegin(), theSuppressions.cend(), [&info](const auto& suppression) {
         return suppression.match(info);
     });
 }
@@ -317,7 +317,7 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
     }
 
     const auto& classNumber = objc_getClassList(nullptr, 0);
-    const auto classes = new Class[classNumber];
+    const auto classes = new Class[unsigned(classNumber)];
     objc_getClassList(classes, classNumber);
     for (int i = 0; i < classNumber; ++i) {
         classifyClass(classes[i], records, LeakType::objcDirect, LeakType::objcIndirect);

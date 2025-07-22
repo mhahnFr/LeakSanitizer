@@ -47,7 +47,7 @@ static inline auto getFunctionPair(const std::string& name,
         throw FunctionNotFoundException(name, suppName);
     }
     if (offset) {
-        return std::make_pair(begin + *offset, 0);
+        return std::make_pair(begin + uintptr_t(*offset), 0);
     }
     return std::make_pair(begin, length);
 }
