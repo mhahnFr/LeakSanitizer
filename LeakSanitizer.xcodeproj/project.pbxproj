@@ -411,20 +411,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
-		BFB062292C397C1E0032E9C4 /* LeakSanitizer_make */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "-j $(ACTION)";
-			buildConfigurationList = BFB0622C2C397C1E0032E9C4 /* Build configuration list for PBXLegacyTarget "LeakSanitizer_make" */;
-			buildPhases = (
-			);
-			buildToolPath = /usr/bin/make;
-			buildWorkingDirectory = "";
-			dependencies = (
-			);
-			name = LeakSanitizer_make;
-			passBuildSettingsInEnvironment = 1;
-			productName = LeakSanitizer_make;
-		};
 		F13529B32D1083FD002534D0 /* CallstackLibrary */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "-j libcallstack.a $(ACTION)";
@@ -477,9 +463,6 @@
 				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = mhahnFr;
 				TargetAttributes = {
-					BFB062292C397C1E0032E9C4 = {
-						CreatedOnToolsVersion = 15.2;
-					};
 					BFCDA7E62E2F7C2C0029AEC1 = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -501,7 +484,6 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BFB062292C397C1E0032E9C4 /* LeakSanitizer_make */,
 				F13529B32D1083FD002534D0 /* CallstackLibrary */,
 				BFCDA7E62E2F7C2C0029AEC1 /* LeakSanitizer */,
 			);
@@ -699,41 +681,6 @@
 			};
 			name = Release;
 		};
-		BFB0622A2C397C1E0032E9C4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_STYLE = Automatic;
-				DEBUGGING_SYMBOLS = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		BFB0622B2C397C1E0032E9C4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_STYLE = Automatic;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		BFCDA7EC2E2F7C2C0029AEC1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -903,15 +850,6 @@
 			buildConfigurations = (
 				BF97EB5828831E5B00DAF1FE /* Debug */,
 				BF97EB5928831E5B00DAF1FE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		BFB0622C2C397C1E0032E9C4 /* Build configuration list for PBXLegacyTarget "LeakSanitizer_make" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BFB0622A2C397C1E0032E9C4 /* Debug */,
-				BFB0622B2C397C1E0032E9C4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
