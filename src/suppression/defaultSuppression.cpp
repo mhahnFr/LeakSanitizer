@@ -28,8 +28,6 @@
 #endif
 
 #ifdef LSAN_APPLE
-# include <macos/AppKit.hpp>
-# include <macos/core.hpp>
 # include <macos/systemLibraries.hpp>
 # include <macos/tlv.hpp>
 
@@ -94,8 +92,8 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cbegin(), {
 #ifdef LSAN_APPLE
-        std::string(suppressions_macos_AppKit),
-        std::string(suppressions_macos_core),
+        // std::string(suppressions_macos_AppKit),
+        // std::string(suppressions_macos_core),
         // TODO: Swift, AppKit, ...
 
 #elif defined(LSAN_LINUX)
