@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF1775062E337EAE00D46975 /* AppKit.json in Resources */ = {isa = PBXBuildFile; fileRef = F1E0904B2D68DE9500F79FA2 /* AppKit.json */; };
+		BF1775072E337EB200D46975 /* core.json in Resources */ = {isa = PBXBuildFile; fileRef = F1ACE4162D148B0F00E779A7 /* core.json */; };
+		BF1775082E337EB800D46975 /* systemLibraries.json in Resources */ = {isa = PBXBuildFile; fileRef = BFA7AA972D8037A700F2525A /* systemLibraries.json */; };
+		BF1775092E337EBC00D46975 /* tlv.json in Resources */ = {isa = PBXBuildFile; fileRef = F18566A92DCDDA3C00D348F0 /* tlv.json */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
 		BFCDA7F12E2F7CA10029AEC1 /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		BFCDA7F22E2F7CA10029AEC1 /* signalHandlers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF49A5D72899599300BC1FFD /* signalHandlers.cpp */; };
@@ -495,6 +499,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF1775062E337EAE00D46975 /* AppKit.json in Resources */,
+				BF1775072E337EB200D46975 /* core.json in Resources */,
+				BF1775082E337EB800D46975 /* systemLibraries.json in Resources */,
+				BF1775092E337EBC00D46975 /* tlv.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
