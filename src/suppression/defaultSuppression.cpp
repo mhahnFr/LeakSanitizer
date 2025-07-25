@@ -38,8 +38,58 @@
 # include <linux/systemLibraries.hpp>
 #endif
 
+#include <fstream>
+#include <sstream>
+#include <CoreFoundation/CFBundle.h>
+
 namespace lsan::suppression {
+namespace v2 {
+static inline auto convertCFString(const CFStringRef str) -> std::string {
+    if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
+        return cStr;
+    }
+    auto toReturn = std::string();
+    toReturn.reserve(CFStringGetLength(str) + 1);
+    CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8);
+    // FIXME: Check for success
+    return toReturn;
+}
+
+static inline auto loadResource(CFURLRef url) -> std::string {
+    const auto path = CFURLCopyPath(url);
+    CFRelease(url);
+    const auto& pathStr = convertCFString(path);
+    CFRelease(path);
+    auto stream = std::ifstream();
+    auto strStr = std::ostringstream();
+    stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+    try {
+        stream.open(pathStr);
+        strStr << stream.rdbuf();
+        stream.close();
+    } catch (...) {
+        if (stream.is_open()) {
+            stream.close();
+        }
+    }
+    return strStr.str();
+}
+
 auto getDefaultSuppression() -> std::vector<std::string> {
+    const auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
+
+    const auto& toReturn = std::vector {
+        loadResource(CFBundleCopyResourceURL(bundle, CFSTR("AppKit"), CFSTR("json"), nullptr)),
+        loadResource(CFBundleCopyResourceURL(bundle, CFSTR("core"), CFSTR("json"), nullptr)),
+    };
+    CFRelease(bundle);
+    return toReturn;
+}
+}
+
+auto getDefaultSuppression() -> std::vector<std::string> {
+    return v2::getDefaultSuppression();
+
     auto toReturn = std::vector<std::string>();
 
     toReturn.insert(toReturn.cbegin(), {
