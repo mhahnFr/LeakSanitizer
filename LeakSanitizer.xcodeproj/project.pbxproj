@@ -11,6 +11,7 @@
 		BF1775072E337EB200D46975 /* core.json in Resources */ = {isa = PBXBuildFile; fileRef = F1ACE4162D148B0F00E779A7 /* core.json */; };
 		BF1775082E337EB800D46975 /* systemLibraries.json in Resources */ = {isa = PBXBuildFile; fileRef = BFA7AA972D8037A700F2525A /* systemLibraries.json */; };
 		BF1775092E337EBC00D46975 /* tlv.json in Resources */ = {isa = PBXBuildFile; fileRef = F18566A92DCDDA3C00D348F0 /* tlv.json */; };
+		BF17750B2E33892700D46975 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF17750A2E33892700D46975 /* CoreFoundation.framework */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
 		BFCDA7F12E2F7CA10029AEC1 /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		BFCDA7F22E2F7CA10029AEC1 /* signalHandlers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF49A5D72899599300BC1FFD /* signalHandlers.cpp */; };
@@ -84,6 +85,7 @@
 		BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = firstPartyLibrary.hpp; sourceTree = "<group>"; };
 		BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = firstPartyLibrary.cpp; sourceTree = "<group>"; };
 		BF04B4B328F86EEA00051090 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		BF17750A2E33892700D46975 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsan_stats.cpp; sourceTree = "<group>"; };
 		BF23A2DD289ECE6A00B17349 /* lsan_stats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_stats.h; sourceTree = "<group>"; };
 		BF23A2E0289ED24200B17349 /* Stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Stats.cpp; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF17750B2E33892700D46975 /* CoreFoundation.framework in Frameworks */,
 				BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -177,6 +180,7 @@
 		BF378FB32919496000A4DAA9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BF17750A2E33892700D46975 /* CoreFoundation.framework */,
 				BF378FB42919496000A4DAA9 /* libcallstack.a */,
 			);
 			name = Frameworks;
