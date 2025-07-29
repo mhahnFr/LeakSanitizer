@@ -41,7 +41,6 @@
 #include <CoreFoundation/CFBundle.h>
 
 namespace lsan::suppression {
-namespace v2 {
 static inline auto convertCFString(const CFStringRef str) -> std::string {
     if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
         return cStr;
@@ -73,33 +72,32 @@ static inline auto loadResource(CFURLRef url) -> std::string {
     return strStr.str();
 }
 
-auto getDefaultSuppression() -> std::vector<std::string> {
+template<typename F, typename... Args>
+constexpr static inline auto loadWithBundle(F&& f, Args&&... args) {
     const auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
-
-    const auto& toReturn = std::vector {
-        loadResource(CFBundleCopyResourceURL(bundle, CFSTR("AppKit"), CFSTR("json"), nullptr)),
-        loadResource(CFBundleCopyResourceURL(bundle, CFSTR("core"), CFSTR("json"), nullptr)),
-    };
-    CFRelease(bundle);
-    return toReturn;
-}
+    if constexpr (std::is_same_v<void, std::invoke_result_t<F, CFBundleRef, Args...>>) {
+        f(bundle, std::forward<Args&&>(args)...);
+        CFRelease(bundle);
+    } else {
+        const auto toReturn = f(bundle, std::forward<Args&&>(args)...);
+        CFRelease(bundle);
+        return toReturn;
+    }
 }
 
 auto getDefaultSuppression() -> std::vector<std::string> {
-    return v2::getDefaultSuppression();
-
     auto toReturn = std::vector<std::string>();
 
-    toReturn.insert(toReturn.cbegin(), {
 #ifdef LSAN_APPLE
-        // std::string(suppressions_macos_AppKit),
-        // std::string(suppressions_macos_core),
-        // TODO: Swift, AppKit, ...
-
-#elif defined(LSAN_LINUX)
-        std::string(suppressions_linux_core),
-#endif
+    loadWithBundle([&toReturn](const auto bundle) {
+        toReturn.insert(toReturn.cend(), {
+            loadResource(CFBundleCopyResourceURL(bundle, CFSTR("AppKit"), CFSTR("json"), nullptr)),
+            loadResource(CFBundleCopyResourceURL(bundle, CFSTR("core"), CFSTR("json"), nullptr)),
+        });
     });
+#elif defined(LSAN_LINUX)
+    toReturn.emplace_back(std::string(suppressions_linux_core));
+#endif
 
     return toReturn;
 }
