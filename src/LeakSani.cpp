@@ -22,10 +22,9 @@
 #include "LeakSani.hpp"
 
 #include <algorithm>
+#include <callstack_internals.h>
 #include <filesystem>
 #include <stack>
-
-#include <callstack_internals.h>
 #include <functionInfo/functionInfo.h>
 #include <regions/regions.h>
 
@@ -33,7 +32,6 @@
 #include "formatter.hpp"
 #include "lsanMisc.hpp"
 #include "utils.hpp"
-
 #include "crashWarner/exceptionHandler.hpp"
 #include "signals/signalHandlers.hpp"
 #include "signals/signals.hpp"
@@ -46,6 +44,8 @@ extern "C" {
 }
 
 # include <objc/runtime.h>
+
+# include "macos/bundle.hpp"
 
 # ifdef LSAN_HANDLE_OBJC
 #  include <CoreFoundation/CFDictionary.h>
@@ -676,6 +676,10 @@ LSan::LSan(): saniKey(createSaniKey()) {
 }
 
 LSan::~LSan() {
+#ifdef __APPLE__
+    macos::bundle::killBundle();
+#endif
+
     for (const auto tracker : tlsTrackers) {
         if (tracker->needsDealloc) {
             delete tracker;
