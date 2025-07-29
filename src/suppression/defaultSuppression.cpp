@@ -28,18 +28,18 @@
 #endif
 
 #ifdef LSAN_APPLE
-# include <macos/tlv.hpp>
+#include <fstream>
+#include <sstream>
+
+#include "../macos/bundle.hpp"
 
 #elif defined(LSAN_LINUX)
 # include <linux/core.hpp>
 # include <linux/systemLibraries.hpp>
 #endif
 
-#include <fstream>
-#include <sstream>
-#include <CoreFoundation/CFBundle.h>
-
 namespace lsan::suppression {
+#ifdef LSAN_APPLE
 static inline auto convertCFString(const CFStringRef str) -> std::string {
     if (str == nil) return {};
 
@@ -73,33 +73,19 @@ static inline auto loadResource(CFURLRef url) -> std::string {
     }
     return strStr.str();
 }
-
-template<typename F, typename... Args>
-constexpr static inline auto loadWithBundle(F&& f, Args&&... args) {
-    const auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
-    if constexpr (std::is_same_v<void, std::invoke_result_t<F, CFBundleRef, Args...>>) {
-        f(bundle, std::forward<Args&&>(args)...);
-        CFRelease(bundle);
-    } else {
-        const auto toReturn = f(bundle, std::forward<Args&&>(args)...);
-        CFRelease(bundle);
-        return toReturn;
-    }
-}
+#endif
 
 auto getDefaultSuppression() -> std::vector<std::string> {
     auto toReturn = std::vector<std::string>();
 
+    toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-    loadWithBundle([&toReturn](const auto bundle) {
-        toReturn.insert(toReturn.cend(), {
-            loadResource(CFBundleCopyResourceURL(bundle, CFSTR("AppKit"), CFSTR("json"), nullptr)),
-            loadResource(CFBundleCopyResourceURL(bundle, CFSTR("core"), CFSTR("json"), nullptr)),
-        });
-    });
+        loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("AppKit"), CFSTR("json"), nullptr)),
+        loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("core"), CFSTR("json"), nullptr)),
 #elif defined(LSAN_LINUX)
-    toReturn.emplace_back(std::string(suppressions_linux_core));
+        std::string(suppressions_linux_core),
 #endif
+    });
 
     return toReturn;
 }
@@ -107,13 +93,13 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 auto getSystemLibraryFiles() -> std::vector<std::string> {
     auto toReturn = std::vector<std::string>();
 
+    toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-    loadWithBundle([&toReturn](const auto bundle) {
-        toReturn.emplace_back(loadResource(CFBundleCopyResourceURL(bundle, CFSTR("systemLibraries"), CFSTR("json"), nullptr)));
-    });
+        loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("systemLibraries"), CFSTR("json"), nullptr)),
 #elif defined(LSAN_LINUX)
-    toReturn.emplace_back(std::string(suppressions_linux_systemLibraries));
+        std::string(suppressions_linux_systemLibraries)
 #endif
+    });
 
     return toReturn;
 }
@@ -121,9 +107,9 @@ auto getSystemLibraryFiles() -> std::vector<std::string> {
 auto getDefaultTLVSuppressions() -> std::vector<std::string> {
     auto toReturn = std::vector<std::string>();
 
-    toReturn.insert(toReturn.cbegin(), {
+    toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        std::string(suppressions_macos_tlv),
+        loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("tlv"), CFSTR("json"), nullptr)),
 #endif
     });
 
