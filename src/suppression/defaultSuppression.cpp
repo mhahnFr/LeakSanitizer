@@ -28,7 +28,6 @@
 #endif
 
 #ifdef LSAN_APPLE
-# include <macos/systemLibraries.hpp>
 # include <macos/tlv.hpp>
 
 #elif defined(LSAN_LINUX)
@@ -108,13 +107,13 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 auto getSystemLibraryFiles() -> std::vector<std::string> {
     auto toReturn = std::vector<std::string>();
 
-    toReturn.insert(toReturn.cbegin(), {
 #ifdef LSAN_APPLE
-        std::string(suppressions_macos_systemLibraries),
-#elif defined(LSAN_LINUX)
-        std::string(suppressions_linux_systemLibraries),
-#endif
+    loadWithBundle([&toReturn](const auto bundle) {
+        toReturn.emplace_back(loadResource(CFBundleCopyResourceURL(bundle, CFSTR("systemLibraries"), CFSTR("json"), nullptr)));
     });
+#elif defined(LSAN_LINUX)
+    toReturn.emplace_back(std::string(suppressions_linux_systemLibraries));
+#endif
 
     return toReturn;
 }
