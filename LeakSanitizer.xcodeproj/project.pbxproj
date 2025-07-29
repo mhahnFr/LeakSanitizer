@@ -12,6 +12,8 @@
 		BF1775082E337EB800D46975 /* systemLibraries.json in Resources */ = {isa = PBXBuildFile; fileRef = BFA7AA972D8037A700F2525A /* systemLibraries.json */; };
 		BF1775092E337EBC00D46975 /* tlv.json in Resources */ = {isa = PBXBuildFile; fileRef = F18566A92DCDDA3C00D348F0 /* tlv.json */; };
 		BF17750B2E33892700D46975 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF17750A2E33892700D46975 /* CoreFoundation.framework */; };
+		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
+		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
 		BFCDA7F12E2F7CA10029AEC1 /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		BFCDA7F22E2F7CA10029AEC1 /* signalHandlers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF49A5D72899599300BC1FFD /* signalHandlers.cpp */; };
@@ -122,6 +124,8 @@
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
+		BFB103D62E38CB7100ECECD5 /* bundle.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bundle.hpp; sourceTree = "<group>"; };
+		BFB103D72E38CB7100ECECD5 /* bundle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bundle.cpp; sourceTree = "<group>"; };
 		BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FunctionNotFoundException.hpp; sourceTree = "<group>"; };
 		BFBCAD892ACF376600C6B69F /* realAlloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = realAlloc.hpp; sourceTree = "<group>"; };
 		BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreadInfo.cpp; sourceTree = "<group>"; };
@@ -272,6 +276,7 @@
 		BF9DD3A428A6761400AEBC17 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BFB103D52E38CB5A00ECECD5 /* macos */,
 				F1B373972C67A0D700674C3C /* allocators */,
 				BFE023F12CA874AE00AEFD5A /* behaviour */,
 				BFAA94582B6C1E52007FC130 /* signals */,
@@ -312,6 +317,15 @@
 				BFAA94522B6C12FF007FC130 /* signals.cpp */,
 			);
 			path = signals;
+			sourceTree = "<group>";
+		};
+		BFB103D52E38CB5A00ECECD5 /* macos */ = {
+			isa = PBXGroup;
+			children = (
+				BFB103D62E38CB7100ECECD5 /* bundle.hpp */,
+				BFB103D72E38CB7100ECECD5 /* bundle.cpp */,
+			);
+			path = macos;
 			sourceTree = "<group>";
 		};
 		BFBCAD8A2ACF611A00C6B69F /* wrappers */ = {
@@ -382,6 +396,7 @@
 			files = (
 				BFCDA8072E2F7CDA0029AEC1 /* PoolAllocator.hpp in Headers */,
 				BFCDA8082E2F7CDA0029AEC1 /* RealAllocator.hpp in Headers */,
+				BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */,
 				BFCDA8092E2F7CDA0029AEC1 /* ObjectPool.hpp in Headers */,
 				BFCDA80A2E2F7CDA0029AEC1 /* Behaviour.hpp in Headers */,
 				BFCDA80B2E2F7CDA0029AEC1 /* helper.hpp in Headers */,
@@ -551,6 +566,7 @@
 				BFCDA7FB2E2F7CA10029AEC1 /* parser.cpp in Sources */,
 				BFCDA7FC2E2F7CA10029AEC1 /* Suppression.cpp in Sources */,
 				BFCDA7FD2E2F7CA10029AEC1 /* defaultSuppression.cpp in Sources */,
+				BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */,
 				BFCDA7FE2E2F7CA10029AEC1 /* firstPartyLibrary.cpp in Sources */,
 				BFCDA7FF2E2F7CA10029AEC1 /* TLSTracker.cpp in Sources */,
 				BFCDA8002E2F7CA10029AEC1 /* bytePrinter.cpp in Sources */,
