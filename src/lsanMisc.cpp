@@ -42,8 +42,8 @@
 #include "trackers/PseudoTracker.hpp"
 #include "trackers/TLSTracker.hpp"
 
-#ifndef VERSION
- #define VERSION "clean build"
+#ifdef __APPLE__
+# include "macos/bundle.hpp"
 #endif
 
 namespace lsan {
@@ -84,11 +84,21 @@ static inline auto printWebsite(std::ostream & out) -> std::ostream & {
     return out;
 }
 
+static inline auto getVersion() -> std::string {
+#ifdef __APPLE__
+    return macos::bundle::getVersion();
+#elif defined(LSAN_VERSION)
+    return LSAN_VERSION;
+#else
+    return "CLEAN BUILD";
+#endif
+}
+
 auto printInformation(std::ostream & out) -> std::ostream & {
     using formatter::Style;
     
     out << "Report by " << formatter::format<Style::BOLD>("LeakSanitizer ")
-        << formatter::format<Style::ITALIC>(VERSION)
+        << formatter::format<Style::ITALIC>(getVersion())
         << std::endl << std::endl
         << printLicense
         << printWebsite;

@@ -110,7 +110,7 @@ $(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -DLSAN_VERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 %.hpp: %.json
 	echo 'constexpr const char*' `echo $(basename $<) | tr /. _` '= R"lsanJsonLiteral(' > $@
