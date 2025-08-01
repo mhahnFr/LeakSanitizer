@@ -22,11 +22,15 @@
 #ifndef bundle_hpp
 #define bundle_hpp
 
+#include <string>
+
 #include <CoreFoundation/CFBundle.h>
 
 namespace lsan::macos::bundle {
 auto getBundle() -> CFBundleRef;
 void killBundle();
+
+auto convertCFString(const CFStringRef str) -> std::string;
 }
 
 #endif /* bundle_hpp */

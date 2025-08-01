@@ -28,10 +28,10 @@
 #endif
 
 #ifdef LSAN_APPLE
-#include <fstream>
-#include <sstream>
+# include <fstream>
+# include <sstream>
 
-#include "../macos/bundle.hpp"
+# include "../macos/bundle.hpp"
 
 #elif defined(LSAN_LINUX)
 # include <linux/core.hpp>
@@ -40,24 +40,10 @@
 
 namespace lsan::suppression {
 #ifdef LSAN_APPLE
-static inline auto convertCFString(const CFStringRef str) -> std::string {
-    if (str == nil) return {};
-
-    if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
-        return cStr;
-    }
-    auto toReturn = std::string();
-    toReturn.reserve(std::string::size_type(CFStringGetLength(str) + 1));
-    if (!CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8)) {
-        return {};
-    }
-    return toReturn;
-}
-
 static inline auto loadResource(CFURLRef url) -> std::string {
     const auto path = CFURLCopyPath(url);
     CFRelease(url);
-    const auto& pathStr = convertCFString(path);
+    const auto& pathStr = macos::bundle::convertCFString(path);
     CFRelease(path);
     auto stream = std::ifstream();
     auto strStr = std::ostringstream();

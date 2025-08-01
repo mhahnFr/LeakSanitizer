@@ -30,4 +30,18 @@ auto getBundle() -> CFBundleRef {
 void killBundle() {
     CFRelease(getBundle());
 }
+
+auto convertCFString(const CFStringRef str) -> std::string {
+    if (str == nil) return {};
+
+    if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
+        return cStr;
+    }
+    auto toReturn = std::string();
+    toReturn.resize(std::string::size_type(CFStringGetLength(str) + 1));
+    if (!CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8)) {
+        return {};
+    }
+    return toReturn;
+}
 }
