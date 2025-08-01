@@ -19,10 +19,7 @@
 # LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-CORE_NAME = liblsan
-
-SHARED_L = $(CORE_NAME).so
-DYLIB_NA = $(CORE_NAME).dylib
+NAME = liblsan.so
 
 SIMPLE_JSON_DIR = ./SimpleJSON
 
@@ -68,28 +65,13 @@ SUPP_SRCS = \
 	suppressions/macos/systemLibraries.json \
 	suppressions/macos/tlv.json
 
-SUPP_HS  = $(patsubst %.json, %.hpp, $(SUPP_SRCS))
-
+SUPP_HS = $(patsubst %.json, %.hpp, $(SUPP_SRCS))
 DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 
-LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -D__LSAN_SILENCE_DEPRECATION
+LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack -ldl
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -D__LSAN_SILENCE_DEPRECATION -Ofast
 
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
-MACOS_ARCH_FLAGS =
-
-ifeq ($(shell uname -s),Darwin)
-	LDFLAGS += -current_version 1.10 -compatibility_version 1 -install_name $(abspath $@) $(MACOS_ARCH_FLAGS)
-	CXXFLAGS += $(MACOS_ARCH_FLAGS) -O3 -ffast-math
-	LIBCALLSTACK_FLAG += "MACOS_ARCH_FLAGS=$(MACOS_ARCH_FLAGS)"
-
-	NAME = $(DYLIB_NA)
-else
-	LDFLAGS += $(LINUX_SONAME_FLAG) -ldl
-	CXXFLAGS += -Ofast
-
-	NAME = $(SHARED_L)
-endif
 
 VERSION = "clean build"
 GIT_VERSION = $(shell git describe --tags --abbrev=1)
@@ -99,20 +81,17 @@ endif
 
 INSTALL_PATH ?= /usr/local
 
-default: $(NAME)
+all: $(NAME)
 
 bench: CXXFLAGS += -DBENCHMARK
-bench: default
+bench: all
 
 debug: CXXFLAGS += -O0 -g
-debug: default
-
-all: $(SHARED_L) $(DYLIB_NA)
+debug: all
 
 install:
 	- $(RM) $(NAME)
 	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
-	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(INSTALL_PATH)/lib/$(NAME)" $(NAME); fi
 	mkdir -p $(INSTALL_PATH)/lib
 	mkdir -p "$(INSTALL_PATH)/include/lsan"
 	mv $(NAME) $(INSTALL_PATH)/lib
@@ -123,8 +102,7 @@ uninstall:
 	- $(RM) -r "$(INSTALL_PATH)/include/lsan"
 
 release: clean
-	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" MACOS_ARCH_FLAGS="-arch x86_64 -arch arm64 -arch arm64e" $(NAME)
-	if [ "$(shell uname -s)" = "Darwin" ]; then install_name_tool -id "$(NAME)" $(NAME); fi
+	$(MAKE) LINUX_SONAME_FLAG="-Wl,-soname,$(NAME)" $(NAME)
 
 update:
 	$(MAKE) clean
@@ -134,11 +112,8 @@ update:
 	git -C $(LIBCALLSTACK_DIR) submodule update --init
 	$(MAKE) re
 
-$(SHARED_L): $(OBJS) $(LIBCALLSTACK_A)
-	$(CXX) -shared -fPIC $(OBJS) $(LDFLAGS) -o $(SHARED_L)
-
-$(DYLIB_NA): $(OBJS) $(LIBCALLSTACK_A)
-	$(CXX) -dynamiclib $(LDFLAGS) -o $(DYLIB_NA) $(OBJS)
+$(NAME): $(OBJS) $(LIBCALLSTACK_A)
+	$(CXX) -shared -fPIC $(OBJS) $(LDFLAGS) -o $@
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DLSAN_VERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
@@ -160,7 +135,7 @@ clean:
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) clean
 
 re: clean
-	$(MAKE) default
+	$(MAKE) all
 
 .PHONY: re clean all install uninstall release default update bench debug
 
