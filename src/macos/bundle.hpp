@@ -30,6 +30,7 @@ namespace lsan::macos::bundle {
 auto getBundle() -> CFBundleRef;
 void killBundle();
 
+auto getVersion() -> std::string;
 auto convertCFString(const CFStringRef str) -> std::string;
 }
 

@@ -31,6 +31,16 @@ void killBundle() {
     CFRelease(getBundle());
 }
 
+constexpr inline auto DEFAULT_VERSION = "CLEAN BUILD";
+
+auto getVersion() -> std::string {
+    const auto value = CFBundleGetValueForInfoDictionaryKey(getBundle(), kCFBundleVersionKey);
+    if (value == nil) {
+        return DEFAULT_VERSION;
+    }
+    return convertCFString(CFStringRef(value));
+}
+
 auto convertCFString(const CFStringRef str) -> std::string {
     if (str == nil) return {};
 
