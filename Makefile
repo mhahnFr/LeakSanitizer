@@ -69,7 +69,7 @@ SUPP_HS = $(patsubst %.json, %.hpp, $(SUPP_SRCS))
 DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 
 LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack -ldl
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -D__LSAN_SILENCE_DEPRECATION -Ofast
+CXXFLAGS = -std=c++23 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -D__LSAN_SILENCE_DEPRECATION -Ofast
 
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
 
