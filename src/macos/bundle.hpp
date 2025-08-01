@@ -31,7 +31,7 @@ auto getBundle() -> CFBundleRef;
 void killBundle();
 
 auto getVersion() -> std::string;
-auto convertCFString(const CFStringRef str) -> std::string;
+auto convertCFString(CFStringRef str) -> std::string;
 }
 
 #endif /* bundle_hpp */
