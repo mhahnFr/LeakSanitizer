@@ -32,12 +32,43 @@ LIBCALLSTACK_DIR  = ./CallstackLibrary
 LIBCALLSTACK_A    = $(LIBCALLSTACK_DIR)/$(LIBCALLSTACK_NAME).a
 LIBCALLSTACK_FLAG = "CXX_FUNCTIONS=${LIBCALLSTACK_OPT}" 'USE_BUILTINS=false'
 
-SRC   = $(shell find src -name \*.cpp \! -path $(LIBCALLSTACK_DIR)\*) SimpleJSON/src/parser.cpp
-OBJS  = $(patsubst %.cpp, %.o, $(SRC))
-DEPS  = $(patsubst %.cpp, %.d, $(SRC))
+SRCS = \
+	$(SIMPLE_JSON_DIR)/src/parser.cpp \
+	src/timing.cpp \
+	src/ThreadInfo.cpp \
+	src/MallocInfo.cpp \
+	src/lsanMisc.cpp \
+	src/lsan_internals.cpp \
+	src/LeakSani.cpp \
+	src/bytePrinter.cpp \
+	src/wrappers/wrap_malloc.cpp \
+	src/wrappers/misc.cpp \
+	src/trackers/TLSTracker.cpp \
+	src/suppression/Suppression.cpp \
+	src/suppression/firstPartyLibrary.cpp \
+	src/suppression/defaultSuppression.cpp \
+	src/statistics/Stats.cpp \
+	src/statistics/lsan_stats.cpp \
+	src/statistics/AutoStats.cpp \
+	src/signals/signals.cpp \
+	src/signals/signalHandlers.cpp \
+	src/crashWarner/exceptionHandler.cpp \
+	src/crashWarner/crashWarner.cpp \
+	src/callstacks/callstackHelper.cpp \
+	src/allocators/ObjectPool.cpp
 
-SUPP_SRC = $(shell find suppressions -name \*.json)
-SUPP_HS  = $(patsubst %.json, %.hpp, $(SUPP_SRC))
+OBJS = $(patsubst %.cpp, %.o, $(SRCS))
+DEPS = $(patsubst %.cpp, %.d, $(SRCS))
+
+SUPP_SRCS = \
+	suppressions/linux/core.json \
+	suppressions/linux/systemLibraries.json \
+	suppressions/macos/AppKit.json \
+	suppressions/macos/core.json \
+	suppressions/macos/systemLibraries.json \
+	suppressions/macos/tlv.json
+
+SUPP_HS  = $(patsubst %.json, %.hpp, $(SUPP_SRCS))
 
 DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 
