@@ -12,6 +12,7 @@
 		BF1775082E337EB800D46975 /* systemLibraries.json in Resources */ = {isa = PBXBuildFile; fileRef = BFA7AA972D8037A700F2525A /* systemLibraries.json */; };
 		BF1775092E337EBC00D46975 /* tlv.json in Resources */ = {isa = PBXBuildFile; fileRef = F18566A92DCDDA3C00D348F0 /* tlv.json */; };
 		BF17750B2E33892700D46975 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF17750A2E33892700D46975 /* CoreFoundation.framework */; };
+		BF4AEC692E3CBAAB0078E35C /* LeakSanitizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BF4AEC682E3CBAA10078E35C /* LeakSanitizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
 		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
@@ -103,6 +104,7 @@
 		BF4368F72AACF07700252E2A /* warn.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = warn.hpp; sourceTree = "<group>"; };
 		BF49A5D72899599300BC1FFD /* signalHandlers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signalHandlers.cpp; sourceTree = "<group>"; };
 		BF49A5D82899599300BC1FFD /* signalHandlers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signalHandlers.hpp; sourceTree = "<group>"; };
+		BF4AEC682E3CBAA10078E35C /* LeakSanitizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LeakSanitizer.h; sourceTree = "<group>"; };
 		BF4C28E828B66033001EB53E /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		BF5F19FC28B3F00600DAEDE7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 				BF23A2DD289ECE6A00B17349 /* lsan_stats.h */,
 				BF621FDC28A291DE00414EE4 /* lsan_internals.h */,
 				BF34157C2A8405AD00DEEF10 /* deprecation.h */,
+				BF4AEC682E3CBAA10078E35C /* LeakSanitizer.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -394,6 +397,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF4AEC692E3CBAAB0078E35C /* LeakSanitizer.h in Headers */,
 				BFCDA8072E2F7CDA0029AEC1 /* PoolAllocator.hpp in Headers */,
 				BFCDA8082E2F7CDA0029AEC1 /* RealAllocator.hpp in Headers */,
 				BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */,
@@ -700,6 +704,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1.11;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1.11;
@@ -764,6 +769,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1.11;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1.11;
