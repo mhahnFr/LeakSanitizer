@@ -264,7 +264,7 @@ auto LSan::isSuppressed(const MallocInfo& info) -> bool {
     }
 
     const auto& theSuppressions = getSuppressions();
-    return std::any_of(theSuppressions.cbegin(), theSuppressions.cend(), [&info](const auto& suppression) {
+    return std::ranges::any_of(theSuppressions, [&info](const auto& suppression) {
         return suppression.match(info);
     });
 }
@@ -283,7 +283,7 @@ auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>
 
         std::optional<pthread_t> t = thread;
         if (!t) {
-            const auto& it = std::find_if(threads.cbegin(), threads.cend(), [id](const auto& element) {
+            const auto& it = std::ranges::find_if(std::as_const(threads), [id](const auto& element) {
                 return
 #ifdef __linux__
                     !element.second.isDead() &&
@@ -508,8 +508,8 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     if (const auto& tlvSupp = createTLVSuppression(); !tlvSupp.empty()) {
         for (auto& [_, info] : infos) {
-            if (const auto& infoForCXX17 = info; std::any_of(tlvSupp.cbegin(), tlvSupp.cend(), [&infoForCXX17](const auto& supp) {
-                return supp.match(infoForCXX17);
+            if (std::ranges::any_of(tlvSupp, [&info](const auto& supp) {
+                return supp.match(info);
             })) {
                 classifyLeaks(align(info.getPointer()), align(uintptr_t(info.getPointer()) + info.getSize(), false), LeakType::tlvDirect,
                               LeakType::tlvIndirect, toReturn.recordsTlv, false, nullptr, nullptr, true);
@@ -519,7 +519,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     }
 
     for (const auto& [_, info] : threads) {
-        if (info.getId() != std::this_thread::get_id() && std::find(failed.cbegin(), failed.cend(), info) == failed.end() && !resumeThread(info)) {
+        if (info.getId() != std::this_thread::get_id() && std::ranges::find(std::as_const(failed), info) == failed.end() && !resumeThread(info)) {
             using namespace formatter;
 
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume "
@@ -702,8 +702,7 @@ void LSan::finish() {
         ignoreMalloc = true;
     }
 
-    const auto trackers = copyTrackerList();
-    for (const auto tracker : trackers) {
+    for (const auto trackers = copyTrackerList(); const auto tracker : trackers) {
         tracker->finish();
     }
 }
@@ -842,7 +841,7 @@ auto LSan::maybeHintCallstackSize(std::ostream& out) const -> std::ostream& {
     if (callstackSizeExceeded) {
         out << hintBegin << "Increase the value of " << format<Style::BOLD>("LSAN_CALLSTACK_SIZE")
            << " (currently " << format<Style::BOLD>(getBehaviour().callstackSize())
-           << ") to see longer callstacks." << std::endl;;
+           << ") to see longer callstacks." << std::endl;
     }
     return out;
 }
