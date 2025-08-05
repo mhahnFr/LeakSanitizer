@@ -53,7 +53,7 @@ static inline auto isFirstPartyCore(const char* file) -> bool {
     }
 
     const auto& systemLibraries = getSystemLibraries();
-    return std::any_of(systemLibraries.cbegin(), systemLibraries.cend(), [file](const auto& regex) {
+    return std::ranges::any_of(systemLibraries, [file](const auto& regex) {
         return std::regex_match(file, regex);
     });
 }
