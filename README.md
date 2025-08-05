@@ -34,11 +34,10 @@ Adapt the value of the `INSTALL_PATH` argument to your needs.
 > ```
 
 #### Build dependencies
-The LeakSanitizer adheres to the standard of C++17.
+The LeakSanitizer adheres to the standard of C++23.
 
 Additionally, the following command line tools are necessary to successfully build the LeakSanitizer:
 - GNU compatible `make` command line tool
-- The `uname` command line tool *(POSIX.2)*
 - The `cat` command line tool *(POSIX.2)*
 
 All [dependencies introduced by the CallstackLibrary][2] are needed as well.
