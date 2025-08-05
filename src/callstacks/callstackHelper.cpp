@@ -195,7 +195,7 @@ static inline auto match(const suppression::Suppression::RangeOrRegexType& supp,
         return address >= begin && address <= begin + end;
     }
     const auto& suppressions = std::get<suppression::Suppression::RegexType>(supp.second);
-    return std::any_of(suppressions.begin(), suppressions.end(), [&](const std::regex& regex) {
+    return std::ranges::any_of(suppressions, [&](const std::regex& regex) {
         return frame->binaryFileIsSelf
             || (std::regex_match("LSAN_SYSTEM_LIBRARIES", regex) && suppression::isFirstParty(frame->binaryFile, !callstack_autoClearCaches))
             || std::regex_match(frame->binaryFile, regex);
