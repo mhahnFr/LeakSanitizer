@@ -21,7 +21,6 @@
 
 #include <cmath>
 #include <functional>
-#include <iostream>
 
 #include <lsan_stats.h>
 
@@ -330,12 +329,12 @@ void __lsan_printStatsWithWidth(const std::size_t width) {
         if (getBehaviour().statsActive()) {
             printStatsCore("memory usage", width, out,
                                   [count = __lsan_getCurrentByteCount(), peek = __lsan_getBytePeek(),
-                                      byteStr = bytesToString(__lsan_getBytePeek())] (auto&& theWidth, auto&& stream) {
-                                      printBar(count, peek, std::forward<decltype(theWidth)>(theWidth), byteStr, std::forward<decltype(stream)>(stream));
+                                      byteStr = bytesToString(__lsan_getBytePeek())] <typename W, typename S>(W&& theWidth, S&& stream) {
+                                      printBar(count, peek, std::forward<W>(theWidth), byteStr, std::forward<S>(stream));
                                   },
                                   [count = __lsan_getCurrentMallocCount(), peek = __lsan_getMallocPeek(),
-                                      objectsStr = std::to_string(__lsan_getMallocPeek()) + " objects"] (auto&& theWidth, auto&& stream) {
-                                      printBar(count, peek, std::forward<decltype(theWidth)>(theWidth), objectsStr, std::forward<decltype(stream)>(stream));
+                                      objectsStr = std::to_string(__lsan_getMallocPeek()) + " objects"] <typename W, typename S>(W&& theWidth, S&& stream) {
+                                      printBar(count, peek, std::forward<W>(theWidth), objectsStr, std::forward<S>(stream));
                                   });
         } else {
             out << get<Style::RED>
