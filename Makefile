@@ -59,11 +59,7 @@ DEPS = $(patsubst %.cpp, %.d, $(SRCS))
 
 SUPP_SRCS = \
 	suppressions/linux/core.json \
-	suppressions/linux/systemLibraries.json \
-	suppressions/macos/AppKit.json \
-	suppressions/macos/core.json \
-	suppressions/macos/systemLibraries.json \
-	suppressions/macos/tlv.json
+	suppressions/linux/systemLibraries.json
 
 SUPP_HS = $(patsubst %.json, %.hpp, $(SUPP_SRCS))
 DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
