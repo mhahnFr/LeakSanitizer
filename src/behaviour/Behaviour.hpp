@@ -24,8 +24,6 @@
 
 #include <chrono>
 
-#include <lsan_internals.h>
-
 #include "helper.hpp"
 
 namespace lsan::behaviour {
@@ -42,31 +40,26 @@ public:                                                              \
     }                                                                \
 private:
 
-#define FROM_ENV_API(type, name, envName) FROM_ENV(type, name, envName, __lsan_##name)
-
+    FROM_ENV(const char*, suppressionFiles, SUPPRESSION_FILES, nullptr)
+    FROM_ENV(const char*, systemLibraryFiles, SYSTEM_LIBRARY_FILES, nullptr)
+    FROM_ENV(std::size_t, callstackSize, CALLSTACK_SIZE, 20)
     FROM_ENV(bool, suppressionDevelopersMode, SUPPRESSION_DEVELOPER, false)
     FROM_ENV(bool, showIndirects, INDIRECT_LEAKS, false)
     FROM_ENV(bool, showReachables, REACHABLE_LEAKS, true)
-    FROM_ENV(const char*, suppressionFiles, SUPPRESSION_FILES, nullptr)
-    FROM_ENV(const char*, systemLibraryFiles, SYSTEM_LIBRARY_FILES, nullptr)
-
-    FROM_ENV_API(bool, humanPrint,     HUMAN_PRINT)
-    FROM_ENV_API(bool, printCout,      PRINT_COUT)
-    FROM_ENV_API(bool, printFormatted, PRINT_FORMATTED)
-    FROM_ENV_API(bool, invalidCrash,   INVALID_CRASH)
-    FROM_ENV_API(bool, invalidFree,    INVALID_FREE)
-    FROM_ENV_API(bool, freeNull,       FREE_NULL)
-    FROM_ENV_API(bool, zeroAllocation, ZERO_ALLOCATION)
-    FROM_ENV_API(bool, printExitPoint, PRINT_EXIT_POINT)
-    FROM_ENV_API(bool, printBinaries,  PRINT_BINARIES)
-    FROM_ENV_API(bool, printFunctions, PRINT_FUNCTIONS)
-    FROM_ENV_API(bool, relativePaths,  RELATIVE_PATHS)
+    FROM_ENV(bool, humanPrint, HUMAN_PRINT, true)
+    FROM_ENV(bool, printCout, PRINT_COUT, false)
+    FROM_ENV(bool, printFormatted, PRINT_FORMATTED, true)
+    FROM_ENV(bool, invalidCrash, INVALID_CRASH, true)
+    FROM_ENV(bool, invalidFree, INVALID_FREE, true)
+    FROM_ENV(bool, freeNull, FREE_NULL, false)
+    FROM_ENV(bool, zeroAllocation, ZERO_ALLOCATION, false)
+    FROM_ENV(bool, printExitPoint, PRINT_EXIT_POINT, false)
+    FROM_ENV(bool, printBinaries, PRINT_BINARIES, true)
+    FROM_ENV(bool, printFunctions, PRINT_FUNCTIONS, true)
+    FROM_ENV(bool, relativePaths, RELATIVE_PATHS, true)
 
     /** Whether to activate the statistical bookkeeping.                 */
     const std::optional<bool> _statsActive = get<bool>("LSAN_STATS_ACTIVE");
-
-    FROM_ENV_API(std::size_t, leakCount, LEAK_COUNT)
-    FROM_ENV_API(std::size_t, callstackSize, CALLSTACK_SIZE)
 
     /** The time interval between the automatic statistics printing.     */
     const std::optional<std::chrono::nanoseconds> _autoStats = get<std::chrono::nanoseconds>("LSAN_AUTO_STATS");
@@ -101,7 +94,6 @@ public:
     }
 
 #undef FROM_ENV
-#undef FROM_ENV_API
 };
 }
 

@@ -37,7 +37,6 @@
 		BFCDA8032E2F7CA10029AEC1 /* lsanMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */; };
 		BFCDA8042E2F7CA10029AEC1 /* ThreadInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */; };
 		BFCDA8052E2F7CA10029AEC1 /* timing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFD983A62B8A4729003B6CC1 /* timing.cpp */; };
-		BFCDA8062E2F7CA10029AEC1 /* lsan_internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */; };
 		BFCDA8072E2F7CDA0029AEC1 /* PoolAllocator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */; };
 		BFCDA8082E2F7CDA0029AEC1 /* RealAllocator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */; };
 		BFCDA8092E2F7CDA0029AEC1 /* ObjectPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */; };
@@ -108,8 +107,6 @@
 		BF4C28E828B66033001EB53E /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		BF5F19FC28B3F00600DAEDE7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsan_internals.cpp; sourceTree = "<group>"; };
-		BF621FDC28A291DE00414EE4 /* lsan_internals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_internals.h; sourceTree = "<group>"; };
 		BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bytePrinter.cpp; sourceTree = "<group>"; };
 		BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bytePrinter.hpp; sourceTree = "<group>"; };
 		BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LeakSani.hpp; sourceTree = "<group>"; };
@@ -235,7 +232,6 @@
 			isa = PBXGroup;
 			children = (
 				BF23A2DD289ECE6A00B17349 /* lsan_stats.h */,
-				BF621FDC28A291DE00414EE4 /* lsan_internals.h */,
 				BF34157C2A8405AD00DEEF10 /* deprecation.h */,
 				BF4AEC682E3CBAA10078E35C /* LeakSanitizer.h */,
 			);
@@ -306,7 +302,6 @@
 				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
 				BF7592282BB1799500891A55 /* LeakType.hpp */,
 				BFAFADC528B4FDA40060076C /* formatter.hpp */,
-				BF621FDB28A291DE00414EE4 /* lsan_internals.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -557,7 +552,6 @@
 				BFCDA8032E2F7CA10029AEC1 /* lsanMisc.cpp in Sources */,
 				BFCDA8042E2F7CA10029AEC1 /* ThreadInfo.cpp in Sources */,
 				BFCDA8052E2F7CA10029AEC1 /* timing.cpp in Sources */,
-				BFCDA8062E2F7CA10029AEC1 /* lsan_internals.cpp in Sources */,
 				BFCDA8382E2F82F50029AEC1 /* Stats.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
