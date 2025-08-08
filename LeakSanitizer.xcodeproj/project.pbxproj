@@ -96,7 +96,6 @@
 		BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = exceptionHandler.hpp; sourceTree = "<group>"; };
 		BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = callstackHelper.cpp; sourceTree = "<group>"; };
 		BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = callstackHelper.hpp; sourceTree = "<group>"; };
-		BF34157C2A8405AD00DEEF10 /* deprecation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deprecation.h; sourceTree = "<group>"; };
 		BF378FB42919496000A4DAA9 /* libcallstack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcallstack.a; path = CallstackLibrary/libcallstack.a; sourceTree = "<group>"; };
 		BF4368F32AACF04700252E2A /* crashWarner.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crashWarner.cpp; sourceTree = "<group>"; };
 		BF4368F62AACF06F00252E2A /* crash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = crash.hpp; sourceTree = "<group>"; };
@@ -232,7 +231,6 @@
 			isa = PBXGroup;
 			children = (
 				BF23A2DD289ECE6A00B17349 /* lsan_stats.h */,
-				BF34157C2A8405AD00DEEF10 /* deprecation.h */,
 				BF4AEC682E3CBAA10078E35C /* LeakSanitizer.h */,
 			);
 			path = include;
