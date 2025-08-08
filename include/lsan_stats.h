@@ -22,26 +22,12 @@
 #ifndef lsan_stats_h
 #define lsan_stats_h
 
-#include "deprecation.h"
-#include "lsan_internals.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stddef.h>
 #include <stdbool.h>
-
-/**
- * @deprecated Since v1.7 this option is no longer supported. Will be removed in v2.
- *
- * @brief Defaults to @c false .
- *
- * Setting it to @c true will cause this sanitizer to print the statistics upon
- * normal termination of the program.
- */
-LSAN_DEPRECATED("Since version 1.7 this is no longer supported.")
-extern bool __lsan_printStatsOnExit;
 
 /**
  * @brief Returns the total count of allocations ever registered by this
@@ -97,73 +83,6 @@ size_t __lsan_getMallocPeek();
 size_t __lsan_getBytePeek();
 
 /**
- * @deprecated Since 1.5, refer to @c __lsan_statsActive . Will be removed in v2.
- *
- * @brief Returns whether the memory statistics can safely be queried.
- *
- * If it returns @c false, but the memory statistics are queried regardless,
- * the library might crash!
- *
- * @return Whether the memory statistics can safely be queried.
- * @since 1.1
- */
-LSAN_DEPRECATED("Since v1.5, refer to __lsan_statsActive")
-static inline bool __lsan_statsAvailable() {
-    return __lsan_statsActive;
-}
-
-/**
- * @deprecated Since 1.5, replaced by @c __lsan_statsActive . Will be removed in v2.
- *
- * @brief Returns whether the memory fragmentation statistics can be queried
- * safely.
- *
- * If it returns @c false, the statistics can be queried regardless without
- * crash, but they might be wrong.
- *
- * @return Whether the memory fragmentation statistics are available.
- * @since 1.2
- */
-LSAN_DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
-static inline bool __lsan_fStatsAvailable() {
-    return __lsan_statsActive;
-}
-
-/**
- * @deprecated Since 1.5, replaced by @c __lsan_statsActive . Will be removed in v2.
- *
- * @brief Returns whether the memory fragmentation statistics can be queried
- * safely.
- *
- * If it returns @c false, the statistics can be queried regardless without
- * crash, but they might be wrong.
- *
- * @return Whether the memory fragmentation statistics are available.
- * @since 1.2
- */
-LSAN_DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
-static inline bool __lsan_fragStatsAvailable() {
-    return __lsan_statsActive;
-}
-
-/**
- * @deprecated Since 1.5 replaced by @c __lsan_statsActive . Will be removed in v2.
- *
- * @brief Returns whether the memory fragmentation statistics can be queried
- * safely.
- *
- * If it returns @c false, the statistics can be queried regardless without
- * crash, but they might be wrong.
- *
- * @return Whether the memory fragmentation statistics are available.
- * @since 1.2
- */
-LSAN_DEPRECATED("Since v1.5 replaced by __lsan_statsActive")
-static inline bool __lsan_fragmentationStatsAvailable() {
-    return __lsan_statsActive;
-}
-
-/**
  * @brief Prints the statistics of the memory fragmentation.
  *
  * The size of the bar is specified by the given argument. The output stream
@@ -213,27 +132,6 @@ static inline void __lsan_printFStats() {
 }
 
 /**
- * @deprecated Since version 1.9 replaced by @c __lsan_printFStats() and
- * @c __lsan_printFragmentationStats(). Will be removed in version 2.
- *
- * @brief Prints the statistics of the memory fragmentation.
- *
- * The bar has a size of @c 100 characters, it can be adjusted by using
- * @c __lsan_printFragStatsWithWidth(size_t) . The output stream defined by
- * @c __lsan_printCout is used for the printing. The byte amounts are printed
- * human-readable if @c __lsan_humanPrint is set to @c true .<br>
- * This function already checks for the availability of the memory statistics
- * using @c __lsan_statsActive and guarantees to not crash the program, even in
- * the case the memory fragmentation statistics are unavailable.
- *
- * @since 1.2
- */
-LSAN_DEPRECATED("Since v1.9 refer to __lsan_printFStats() or __lsan_printFragmentationStats()")
-static inline void __lsan_printFragStats() {
-    __lsan_printFragmentationStats();
-}
-
-/**
  * @brief Prints the statistics of the memory fragmentation.
  *
  * The size of the bar is specified by the given argument. The output stream
@@ -247,28 +145,6 @@ static inline void __lsan_printFragStats() {
  * @since 1.2
  */
 static inline void __lsan_printFStatsWithWidth(size_t width) {
-    __lsan_printFragmentationStatsWithWidth(width);
-}
-
-/**
- * @deprecated Since version 1.9 replaced by @c __lsan_printFStatsWithWidth(size_t)
- * and @c __lsan_printFragmentationStatsWithWidth(size_t) . Will be removed in
- * version 2.
- *
- * @brief Prints the statistics of the memory fragmentation.
- *
- * The size of the bar is specified by the given argument. The output stream
- * defined by @c __lsan_printCout is used for the printing. The byte amounts
- * are printed human-readable if @c __lsan_humanPrint is set to @c true .<br>
- * This function already checks for the availability of the memory fragmentation
- * statistics using @c __lsan_statsActive, and guarantees to not crash the
- * program, even in the case the memory fragmentation statistics are unavailable.
- *
- * @param width The width in characters the printed bar should have.
- * @since 1.2
- */
-LSAN_DEPRECATED("Since v1.9 refer to __lsan_printFStatsWithWidth(size_t) or __lsan_printFragmentationStatsWithWidth(size_t)")
-static inline void __lsan_printFragStatsWithWidth(size_t width) {
     __lsan_printFragmentationStatsWithWidth(width);
 }
 

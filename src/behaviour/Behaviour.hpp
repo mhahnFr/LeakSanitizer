@@ -78,7 +78,7 @@ private:
      * @return whether the stats should be active
      */
     auto statsActiveInternal() const -> bool {
-        return _statsActive ? *_statsActive : __lsan_statsActive;
+        return _statsActive ? *_statsActive : false;
     }
 
 public:
