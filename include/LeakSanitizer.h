@@ -36,4 +36,6 @@ extern const unsigned char LeakSanitizerVersionString[];
 } // extern "C"
 #endif
 
+#include <LeakSanitizer/lsan_stats.h>
+
 #endif /* LeakSanitizer_h */

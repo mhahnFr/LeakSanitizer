@@ -13,6 +13,7 @@
 		BF1775092E337EBC00D46975 /* tlv.json in Resources */ = {isa = PBXBuildFile; fileRef = F18566A92DCDDA3C00D348F0 /* tlv.json */; };
 		BF17750B2E33892700D46975 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF17750A2E33892700D46975 /* CoreFoundation.framework */; };
 		BF4AEC692E3CBAAB0078E35C /* LeakSanitizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BF4AEC682E3CBAA10078E35C /* LeakSanitizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BF4DBFE02E460C25000D4B26 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
 		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
@@ -391,6 +392,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF4AEC692E3CBAAB0078E35C /* LeakSanitizer.h in Headers */,
+				BF4DBFE02E460C25000D4B26 /* lsan_stats.h in Headers */,
 				BFCDA8072E2F7CDA0029AEC1 /* PoolAllocator.hpp in Headers */,
 				BFCDA8082E2F7CDA0029AEC1 /* RealAllocator.hpp in Headers */,
 				BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */,
