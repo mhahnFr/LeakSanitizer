@@ -21,37 +21,51 @@
 
 #include "bundle.hpp"
 
+#include "../lsanMisc.hpp"
+
 namespace lsan::macos::bundle {
+static inline auto getBundleWrapper() -> CFBundleRef {
+    return getTracker().withIgnorationResult(true, []() {
+        return CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
+    });
+}
+
 auto getBundle() -> CFBundleRef {
-    static CFBundleRef bundle = CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
+    static CFBundleRef bundle = getBundleWrapper();
     return bundle;
 }
 
 void killBundle() {
-    CFRelease(getBundle());
+    getTracker().withIgnoration(true, []() {
+        CFRelease(getBundle());
+    });
 }
 
 constexpr inline auto DEFAULT_VERSION = "CLEAN BUILD";
 
 auto getVersion() -> std::string {
-    const auto value = CFBundleGetValueForInfoDictionaryKey(getBundle(), kCFBundleVersionKey);
-    if (value == nil) {
-        return DEFAULT_VERSION;
-    }
-    return convertCFString(CFStringRef(value));
+    return getTracker().withIgnorationResult(true, []() -> std::string {
+        const auto value = CFBundleGetValueForInfoDictionaryKey(getBundle(), kCFBundleVersionKey);
+        if (value == nil) {
+            return DEFAULT_VERSION;
+        }
+        return convertCFString(CFStringRef(value));
+    });
 }
 
 auto convertCFString(const CFStringRef str) -> std::string {
-    if (str == nil) return {};
+    return getTracker().withIgnorationResult(true, [str]() -> std::string {
+        if (str == nil) return {};
 
-    if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
-        return cStr;
-    }
-    auto toReturn = std::string();
-    toReturn.resize(std::string::size_type(CFStringGetLength(str) + 1));
-    if (!CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8)) {
-        return {};
-    }
-    return toReturn;
+        if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
+            return cStr;
+        }
+        auto toReturn = std::string();
+        toReturn.resize(std::string::size_type(CFStringGetLength(str) + 1));
+        if (!CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8)) {
+            return {};
+        }
+        return toReturn;
+    });
 }
 }
