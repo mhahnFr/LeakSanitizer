@@ -882,18 +882,12 @@ auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
  *
  * @param out the output stream to print to
  * @param envName the name of the variable in the environment
- * @param apiName the name of the variable in the C API
  * @param message the deprecation message
  */
-static inline void printDeprecation(      std::ostream & out,
-                                    const std::string &  envName,
-                                    const std::string &  apiName,
-                                    const std::string &  message) {
+static inline void printDeprecation(std::ostream& out, const std::string& envName, const std::string&  message) {
     using namespace formatter;
     
-    out << format<Style::RED>("  --   " + formatString<Style::BOLD>(envName) + " ("
-                              + formatter::formatString<Style::ITALIC>(apiName) + ") " + message + "!")
-        << std::endl;
+    out << format<Style::RED>("  --   " + formatString<Style::BOLD>(envName) + message + "!") << std::endl;
 }
 
 /**
@@ -903,29 +897,29 @@ static inline void printDeprecation(      std::ostream & out,
  * @param out the output stream to print to
  * @return the given output stream
  */
-static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostream & {
+static inline auto maybeShowDeprecationWarnings(std::ostream& out) -> std::ostream& {
     using namespace formatter;
 
     std::ostringstream oss;
     if (has("LSAN_PRINT_STATS_ON_EXIT")) {
-        printDeprecation(oss, "LSAN_PRINT_STATS_ON_EXIT", "__lsan_printStatsOnExit",
-                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.7"));
+        printDeprecation(oss, "LSAN_PRINT_STATS_ON_EXIT", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.7"));
     }
     if (has("LSAN_PRINT_LICENSE")) {
-        printDeprecation(oss, "LSAN_PRINT_LICENSE", "__lsan_printLicense",
-                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.8"));
+        printDeprecation(oss, "LSAN_PRINT_LICENSE", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     if (has("LSAN_PRINT_WEBSITE")) {
-        printDeprecation(oss, "LSAN_PRINT_WEBSITE", "__lsan_printWebsite",
-                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.8"));
+        printDeprecation(oss, "LSAN_PRINT_WEBSITE", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     if (has("LSAN_FIRST_PARTY_THRESHOLD")) {
-        printDeprecation(oss, "LSAN_FIRST_PARTY_THRESHOLD", "__lsan_firstPartyThreshold",
-                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
+        printDeprecation(oss, "LSAN_FIRST_PARTY_THRESHOLD", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
     if (has("LSAN_FIRST_PARTY_REGEX")) {
-        printDeprecation(oss, "LSAN_FIRST_PARTY_REGEX", "__lsan_firstPartyRegex",
-                         "is no longer supported and " + formatString<Style::BOLD>("deprecated since version 1.11"));
+        printDeprecation(oss, "LSAN_FIRST_PARTY_REGEX", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
     if (const auto& str = oss.str(); !str.empty()) {
         out << std::endl << format<Style::RED>("Warnings:") << std::endl << str;
