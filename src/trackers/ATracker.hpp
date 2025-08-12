@@ -37,12 +37,14 @@ namespace lsan::trackers {
 class ATracker {
 protected:
     /** A @c std::map using the @c PoolAllocator.                     */
-    template<
-        typename Key,
-        typename T,
-        typename Compare = std::less<Key>,
-        typename Allocator = PoolAllocator<std::pair<const Key, T>>
-    > using PoolMap = std::map<Key, T, Compare, Allocator>;
+    // template<
+    //     typename Key,
+    //     typename T,
+    //     typename Compare = std::less<Key>,
+    //     typename Allocator = PoolAllocator<std::pair<const Key, T>>
+    // > using PoolMap = std::map<Key, T, Compare, Allocator>;
+    // FIXME: Fix the broken objectpool!!!
+    template<typename K, typename V> using PoolMap = std::map<K, V>;
     /** The registered allocations.                                   */
     PoolMap<const void* const, MallocInfo> infos;
     /** The mutex to manage the access to the registered allocations. */
