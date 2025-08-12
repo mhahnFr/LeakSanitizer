@@ -921,6 +921,10 @@ static inline auto maybeShowDeprecationWarnings(std::ostream& out) -> std::ostre
         printDeprecation(oss, "LSAN_FIRST_PARTY_REGEX", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
+    if (has("LSAN_LEAK_COUNT")) {
+        printDeprecation(oss, "LSAN_LEAK_COUNT", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.11"));
+    }
     if (const auto& str = oss.str(); !str.empty()) {
         out << std::endl << format<Style::RED>("Warnings:") << std::endl << str;
     }
