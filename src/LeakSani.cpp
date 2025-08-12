@@ -887,7 +887,7 @@ auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
 static inline void printDeprecation(std::ostream& out, const std::string& envName, const std::string&  message) {
     using namespace formatter;
     
-    out << format<Style::RED>("  --   " + formatString<Style::BOLD>(envName) + message + "!") << std::endl;
+    out << format<Style::RED>("  --   " + formatString<Style::BOLD>(envName) + " " + message + "!") << std::endl;
 }
 
 /**
