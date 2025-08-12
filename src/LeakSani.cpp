@@ -753,7 +753,7 @@ void LSan::absorbLeaks(PoolMap<const void *const, MallocInfo>&& leaks) {
     std::lock_guard lock1 { infoMutex };
 
     withIgnoration(true, [&] {
-        infos.get_allocator().merge(leaks.get_allocator());
+        // infos.get_allocator().merge(leaks.get_allocator()); // FIXME: Fix
         infos.merge(std::move(leaks));
     });
 }

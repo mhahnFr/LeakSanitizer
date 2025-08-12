@@ -77,16 +77,17 @@ void ObjectPool::deallocate(void* pointer) {
         const auto& block = chunk->block;
         for (std::size_t i = 0; i < block->blockSize; ++i) {
             const auto& element = reinterpret_cast<MemoryChunk*>(uintptr_t(block) + sizeof(MemoryBlock) + i * (objectSize + sizeof(MemoryBlock*)));
-            if (element != chunks) {
-                element->previous->next = element->next;
-            }
-            if (element->next != nullptr) {
-                element->next->previous = element->previous;
-            }
             if (element == chunks) {
-                chunks = element->next;
+                chunks = chunks->next;
                 if (chunks != nullptr) {
                     chunks->previous = element->previous;
+                }
+            } else {
+                element->previous->next = element->next;
+                if (element->next == nullptr) {
+                    chunks->previous = element->previous;
+                } else {
+                    element->next->previous = element->previous;
                 }
             }
             element->~MemoryChunk();
