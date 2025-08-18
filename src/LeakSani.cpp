@@ -745,13 +745,16 @@ auto LSan::getThreadId(const std::thread::id& id) -> unsigned long {
     return threadIt->second.getNumber();
 }
 
-void LSan::absorbLeaks(PoolMap<const void *const, MallocInfo>&& leaks) {
+void LSan::absorbLeaks(PoolMap<const void* const, MallocInfo>&& leaks) {
     std::lock_guard lock { mutex };
     std::lock_guard lock1 { infoMutex };
 
     withIgnoration(true, [&] {
-        // infos.get_allocator().merge(leaks.get_allocator()); // FIXME: Fix
-        infos.merge(std::move(leaks));
+        alwaysEqual = true;
+        infos.merge(leaks);
+        alwaysEqual = false;
+        leaks.clear();
+        infos.get_allocator().merge(leaks.get_allocator());
     });
 }
 
