@@ -73,6 +73,7 @@ class LSan final: public trackers::ATracker {
     std::mutex tlsTrackerMutex;
     /** Indicates whether multithreading was used.                                      */
     bool isThreaded = false;
+    bool alwaysEqual = false;
     /** The thread identifier of the main thread.                                       */
     const std::thread::id mainId = std::this_thread::get_id();
     /** The thread-local storage key used for the thread-local allocation trackers.     */
@@ -466,6 +467,10 @@ public:
      */
     constexpr inline auto getTlsKey() const {
         return saniKey;
+    }
+
+    constexpr inline auto isAlwaysEqual() const {
+        return alwaysEqual;
     }
 
     friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;
