@@ -680,7 +680,7 @@ LSan::~LSan() {
     macos::bundle::killBundle();
 #endif
 
-    for (const auto tracker : tlsTrackers) {
+    for (const auto& tracker : copyTrackerList()) {
         if (tracker->needsDealloc) {
             delete tracker;
         }
