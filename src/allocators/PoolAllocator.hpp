@@ -31,6 +31,12 @@
 #include "RealAllocator.hpp"
 
 namespace lsan {
+/**
+ * Returns whether @c PoolAllocator instances should bypass equality comparisons
+ * by always returning @c true .
+ *
+ * @return whether to bypass equality checks
+ */
 auto isAlwaysEqual() -> bool;
 
 /**
