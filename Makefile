@@ -52,7 +52,8 @@ SRCS = \
 	src/crashWarner/exceptionHandler.cpp \
 	src/crashWarner/crashWarner.cpp \
 	src/callstacks/callstackHelper.cpp \
-	src/allocators/ObjectPool.cpp
+	src/allocators/ObjectPool.cpp \
+	src/allocators/PoolAllocator.cpp
 
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 DEPS = $(patsubst %.cpp, %.d, $(SRCS))

@@ -31,6 +31,8 @@
 #include "RealAllocator.hpp"
 
 namespace lsan {
+auto isAlwaysEqual() -> bool;
+
 /**
  * This class is an allocator using the object pool class.
  *
@@ -115,7 +117,7 @@ struct PoolAllocator {
 
     template<typename U>
     constexpr auto operator==(const PoolAllocator<U>& other) const noexcept -> bool {
-        return pools == other.getPools() || *pools == *other.pools;
+        return isAlwaysEqual() || pools == other.getPools() || *pools == *other.pools;
     }
 
     template<typename U>
