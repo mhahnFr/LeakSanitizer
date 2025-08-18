@@ -140,7 +140,7 @@ struct PoolAllocator {
      * @param other the other allocator to merge with
      */
     void merge(PoolAllocator&& other) {
-        for (auto& pool : *other.getPools()) {
+        for (auto& pool : *other.pools) {
             const auto& it = std::find_if(pools->begin(), pools->end(), [&pool](const auto& element) {
                 return element.getObjectSize() == pool.getObjectSize();
             });
