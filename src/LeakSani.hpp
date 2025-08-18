@@ -73,6 +73,7 @@ class LSan final: public trackers::ATracker {
     std::mutex tlsTrackerMutex;
     /** Indicates whether multithreading was used.                                      */
     bool isThreaded = false;
+    /** Indicates whether @c PoolAllocator instances should bypass equality checks.     */
     bool alwaysEqual = false;
     /** The thread identifier of the main thread.                                       */
     const std::thread::id mainId = std::this_thread::get_id();
@@ -469,6 +470,12 @@ public:
         return saniKey;
     }
 
+    /**
+     * Returns whether @c PoolAllocator instances should bypass equality
+     * comparisons.
+     *
+     * @return whether to bypass equality comparisons
+     */
     constexpr inline auto isAlwaysEqual() const {
         return alwaysEqual;
     }
