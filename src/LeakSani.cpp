@@ -676,7 +676,7 @@ LSan::LSan(): saniKey(createSaniKey()) {
 }
 
 LSan::~LSan() {
-    for (const auto tracker : tlsTrackers) {
+    for (const auto& tracker : copyTrackerList()) {
         if (tracker->needsDealloc) {
             delete tracker;
         }
