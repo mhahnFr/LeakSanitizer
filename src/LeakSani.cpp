@@ -494,7 +494,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 #ifdef __linux__
         if (info.isDead()) continue;
 #endif
-        if (std::find(failed.cbegin(), failed.cend(), info) != failed.end()) {
+        if (std::ranges::find(std::as_const(failed), info) != failed.end()) {
             continue;
         }
 
