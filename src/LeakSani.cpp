@@ -689,7 +689,6 @@ LSan::~LSan() {
             delete tracker;
         }
     }
-    preventDealloc = false;
 }
 
 auto LSan::copyTrackerList() -> decltype(tlsTrackers) {
