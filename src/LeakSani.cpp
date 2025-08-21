@@ -467,6 +467,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         if (!selfThread && !suspendThread(info)) {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
             failed.push_back(info);
+            continue;
         }
         const auto& top = align(info.getStackTop(), false)
 #ifdef __linux__
@@ -493,6 +494,9 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 #ifdef __linux__
         if (info.isDead()) continue;
 #endif
+        if (std::find(failed.cbegin(), failed.cend(), info) != failed.end()) {
+            continue;
+        }
 
         const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
