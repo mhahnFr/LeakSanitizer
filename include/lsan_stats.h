@@ -27,7 +27,6 @@ extern "C" {
 #endif
 
 #include <stddef.h>
-#include <stdbool.h>
 
 /**
  * @brief Returns the total count of allocations ever registered by this
@@ -160,7 +159,7 @@ static inline void __lsan_printFStatsWithWidth(size_t width) {
  *
  * @param width The width in characters the printed bar should have.
  */
-void   __lsan_printStatsWithWidth(size_t width);
+void __lsan_printStatsWithWidth(size_t width);
 
 /**
  * @brief Prints the statistics of the allocations.
