@@ -636,9 +636,11 @@ namespace {
  */
 struct Initializer {
     inline Initializer() noexcept {
-        if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
-            tryCatch_setTerminateHandler(mhExceptionHandler);
-        }
+        getTracker().withIgnoration(true, [] {
+            if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
+                tryCatch_setTerminateHandler(mhExceptionHandler);
+            }
+        });
     }
 };
 
