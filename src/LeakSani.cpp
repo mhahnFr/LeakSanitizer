@@ -161,7 +161,7 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, const b
     auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
     stack.emplace(info);
     while (!stack.empty()) {
-        auto& elem = stack.top();
+        auto elem = stack.top();
         stack.pop();
         if ((elem.get().leakType > currentType || reclassify) && elem.get().getPointer() != info.getPointer()) {
             elem.get().leakType = currentType;
@@ -636,9 +636,11 @@ namespace {
  */
 struct Initializer {
     inline Initializer() noexcept {
-        if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
-            tryCatch_setTerminateHandler(mhExceptionHandler);
-        }
+        getTracker().withIgnoration(true, [] {
+            if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
+                tryCatch_setTerminateHandler(mhExceptionHandler);
+            }
+        });
     }
 };
 
