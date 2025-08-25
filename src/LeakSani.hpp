@@ -163,7 +163,7 @@ class LSan final: public trackers::ATracker {
             it != infos.end() && it->second.leakType > direct) {
             it->second.leakType = direct;
             classifyRecord(it->second, indirect);
-            directs.push_back(it->second);
+            directs.emplace_back(it->second);
         }
     }
 
