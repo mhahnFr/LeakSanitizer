@@ -72,7 +72,7 @@ public:
      *
      * @return the number of the thread
      */
-    constexpr inline auto getNumber() const -> unsigned long {
+    [[nodiscard]] constexpr inline auto getNumber() const -> unsigned long {
         return number;
     }
 
@@ -81,7 +81,7 @@ public:
      *
      * @return the POSIX thread id
      */
-    constexpr inline auto getThread() const -> pthread_t {
+    [[nodiscard]] constexpr inline auto getThread() const -> pthread_t {
         return thread;
     }
 
@@ -90,7 +90,7 @@ public:
      *
      * @return the C++ thread id
      */
-    constexpr inline auto getId() const -> const std::thread::id& {
+    [[nodiscard]] constexpr inline auto getId() const -> const std::thread::id& {
         return id;
     }
 
@@ -99,7 +99,7 @@ public:
      *
      * @return the stack size
      */
-    constexpr inline auto getStackSize() const -> std::size_t {
+    [[nodiscard]] constexpr inline auto getStackSize() const -> std::size_t {
         return stackSize;
     }
 
@@ -108,7 +108,7 @@ public:
      *
      * @return the top of the stack
      */
-    constexpr inline auto getStackTop() const -> void* {
+    [[nodiscard]] constexpr inline auto getStackTop() const -> void* {
 #ifdef __APPLE__
         return stackTop;
 #else

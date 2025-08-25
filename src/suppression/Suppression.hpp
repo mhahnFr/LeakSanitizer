@@ -96,7 +96,7 @@ struct Suppression {
      * @param info the allocation record to be checked
      * @return whether the given allocation record is matched by this suppression
      */
-    auto match(const MallocInfo& info) const -> bool;
+    [[nodiscard]] auto match(const MallocInfo& info) const -> bool;
 };
 
 template<>
