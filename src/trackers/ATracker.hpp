@@ -98,7 +98,7 @@ public:
         std::lock_guard lock { mutex };
         const auto ignored = ignoreMalloc;
         ignoreMalloc = ignore;
-        const auto& toReturn = std::invoke(std::move(func), std::move(args)...);
+        const auto& toReturn = std::invoke(std::forward<F&&>(func), std::forward<Args&&>(args)...);
         ignoreMalloc = ignored;
         return toReturn;
     }
@@ -120,7 +120,7 @@ public:
         std::lock_guard lock { mutex };
         const auto ignored = ignoreMalloc;
         ignoreMalloc = ignore;
-        std::invoke(std::move(func), std::move(args)...);
+        std::invoke(std::forward<F&&>(func), std::forward<Args&&>(args)...);
         ignoreMalloc = ignored;
     }
 

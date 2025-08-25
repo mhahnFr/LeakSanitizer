@@ -66,20 +66,13 @@ struct PoolAllocator {
     template<typename U>
     explicit constexpr PoolAllocator(const PoolAllocator<U>& other) noexcept: pools(other.getPools()) {}
 
-    constexpr PoolAllocator(PoolAllocator&& other) noexcept: pools(other.pools) {}
+    constexpr PoolAllocator(PoolAllocator&& other) noexcept: pools(std::move(other.pools)) {}
 
     template<typename U>
     explicit constexpr PoolAllocator(PoolAllocator<U>&& other) noexcept: pools(other.getPools()) {}
 
-    constexpr auto operator=(const PoolAllocator& other) noexcept -> PoolAllocator& {
-        pools = other.pools;
-        return *this;
-    }
-
-    constexpr auto operator=(PoolAllocator&& other) noexcept -> PoolAllocator& {
-        pools = other.pools;
-        return *this;
-    }
+    constexpr auto operator=(const PoolAllocator& other) noexcept -> PoolAllocator& = default;
+    constexpr auto operator=(PoolAllocator&& other) noexcept -> PoolAllocator& = default;
 
     /**
      * @brief Allocates the given amount of objects.
@@ -138,7 +131,7 @@ struct PoolAllocator {
      *
      * @return the registered object pools
      */
-    auto getPools() const -> std::shared_ptr<Pools> {
+    [[nodiscard]] inline auto getPools() const -> std::shared_ptr<Pools> {
         return pools;
     }
 

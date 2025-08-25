@@ -81,7 +81,7 @@ struct LeakKindStats {
      *
      * @return the total amount of lost leaks
      */
-    constexpr inline auto getTotalLost() const -> std::size_t {
+    [[nodiscard]] constexpr inline auto getTotalLost() const -> std::size_t {
         return lost + lostIndirect;
     }
 
@@ -90,7 +90,7 @@ struct LeakKindStats {
      *
      * @return the total amount of reachable leaks
      */
-    constexpr inline auto getTotalReachable() const -> std::size_t {
+    [[nodiscard]] constexpr inline auto getTotalReachable() const -> std::size_t {
         return stack + stackIndirect + global + globalIndirect + tlv + tlvIndirect;
     }
 
@@ -99,7 +99,7 @@ struct LeakKindStats {
      *
      * @return the total amount of leaks
      */
-    constexpr inline auto getTotal() const -> std::size_t {
+    [[nodiscard]] constexpr inline auto getTotal() const -> std::size_t {
         return getTotalLost() + getTotalReachable();
     }
 
@@ -108,7 +108,7 @@ struct LeakKindStats {
      *
      * @return the total amount of lost bytes
      */
-    constexpr inline auto getLostBytes() const -> std::size_t {
+    [[nodiscard]] constexpr inline auto getLostBytes() const -> std::size_t {
         return bytesLost + bytesLostIndirect;
     }
 
@@ -117,7 +117,7 @@ struct LeakKindStats {
      *
      * @return the total amount of reachable bytes
      */
-    constexpr inline auto getReachableBytes() const -> std::size_t {
+    [[nodiscard]] constexpr inline auto getReachableBytes() const -> std::size_t {
         return bytesStack  + bytesStackIndirect
              + bytesGlobal + bytesGlobalIndirect
              + bytesTlv    + bytesTlvIndirect;
@@ -128,7 +128,7 @@ struct LeakKindStats {
      *
      * @return the total amount of bytes
      */
-    constexpr inline auto getTotalBytes() const -> std::size_t {
+    [[nodiscard]] constexpr inline auto getTotalBytes() const -> std::size_t {
         return getLostBytes() + getReachableBytes();
     }
 };

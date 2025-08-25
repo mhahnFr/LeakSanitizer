@@ -35,7 +35,7 @@ class Behaviour {
 private:                                                             \
     const std::optional<type> _##name = get<type>("LSAN_" #envName); \
 public:                                                              \
-    constexpr inline auto name() const {                             \
+    [[nodiscard]] constexpr inline auto name() const {               \
         return _##name.value_or(def);                                \
     }                                                                \
 private:
@@ -70,7 +70,7 @@ private:
      *
      * @return whether the stats should be active
      */
-    auto statsActiveInternal() const -> bool {
+    [[nodiscard]] auto statsActiveInternal() const -> bool {
         return _statsActive ? *_statsActive : false;
     }
 
@@ -80,7 +80,7 @@ public:
      *
      * @return whether to activate the statistical bookkeeping.
      */
-    auto statsActive() const -> bool {
+    [[nodiscard]] auto statsActive() const -> bool {
         return statsActiveInternal() || _autoStats;
     }
 
@@ -89,7 +89,7 @@ public:
      *
      * @return the optional time interval
      */
-    constexpr auto autoStats() const {
+    [[nodiscard]] constexpr auto autoStats() const {
         return _autoStats;
     }
 

@@ -111,7 +111,7 @@ public:
      *
      * @return the size in bytes of one object
      */
-    constexpr inline auto getObjectSize() const -> std::size_t {
+    [[nodiscard]] constexpr inline auto getObjectSize() const -> std::size_t {
         return objectSize;
     }
 
