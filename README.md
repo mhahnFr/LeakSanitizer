@@ -221,17 +221,17 @@ The statistics of the tracked memory can be queried at runtime. To do so activat
 setting the environment variable [`LSAN_STATS_ACTIVE`][b7] to `true` or by using [`LSAN_AUTO_STATS`][be].  
 The statistics then can be queried using the following API:
 
-| Function                               | Description                                                                                    |
-|----------------------------------------|------------------------------------------------------------------------------------------------|
-| [`__lsan_getTotalMallocs()`][s1]       | Returns the total count of allocations registered.                                             |
-| [`__lsan_getTotalBytes()`][s2]         | Returns the total count of allocated bytes.                                                    |
-| [`__lsan_getTotalFrees()`][s3]         | Returns the total count of registered allocations that have been deallocated.                  |
-| [`__lsan_getCurrentMallocCount()`][s4] | Returns the count of currently active allocations.                                             |
-| [`__lsan_getCurrentByteCount()`][s5]   | Returns the amount of currently allocated bytes.                                               |
-| [`__lsan_getMallocPeek()`][s6]         | Returns the highest amount of allocations at the same time.                                    |
-| [`__lsan_getBytePeek()`][s7]           | Returns the highest amount of bytes allocated at the same time.                                |
-| [`__lsan_printStats()`][s8]            | Prints the statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2].               |
-| [`__lsan_printFStats()`][s9]           | Prints the fragmentation statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2]. |
+| Function                             | Description                                                                                    |
+|--------------------------------------|------------------------------------------------------------------------------------------------|
+| [`lsan_getTotalMallocs()`][s1]       | Returns the total count of allocations registered.                                             |
+| [`lsan_getTotalBytes()`][s2]         | Returns the total count of allocated bytes.                                                    |
+| [`lsan_getTotalFrees()`][s3]         | Returns the total count of registered allocations that have been deallocated.                  |
+| [`lsan_getCurrentMallocCount()`][s4] | Returns the count of currently active allocations.                                             |
+| [`lsan_getCurrentByteCount()`][s5]   | Returns the amount of currently allocated bytes.                                               |
+| [`lsan_getMallocPeek()`][s6]         | Returns the highest amount of allocations at the same time.                                    |
+| [`lsan_getBytePeek()`][s7]           | Returns the highest amount of bytes allocated at the same time.                                |
+| [`lsan_printStats()`][s8]            | Prints the statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2].               |
+| [`lsan_printFStats()`][s9]           | Prints the fragmentation statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2]. |
 
 More on the statistics [here][5].
 

@@ -100,7 +100,7 @@ void lsan_printFragmentationStatsWithWidth(size_t width);
  * @brief Prints the statistics of the memory fragmentation.
  *
  * The bar has a size of @c 100 characters, it can be adjusted by using
- * @c __lsan_printFragmentationStatsWithWidth(size_t) . The output stream
+ * @c lsan_printFragmentationStatsWithWidth(size_t) . The output stream
  * defined by @c LSAN_PRINT_COUT is used for the printing. The byte amounts
  * are printed human-readable if @c LSAN_HUMAN_PRINT is set to @c true .<br>
  * This function already checks for the availability of the memory statistics
@@ -117,7 +117,7 @@ static inline void lsan_printFragmentationStats() {
  * @brief Prints the statistics of the memory fragmentation.
  *
  * The bar has a size of @c 100 characters, it can be adjusted by using
- * @c __lsan_printFStatsWithWidth(size_t) . The output stream defined by
+ * @c lsan_printFStatsWithWidth(size_t) . The output stream defined by
  * @c LSAN_PRINT_COUT is used for the printing. The byte amounts are printed
  * human-readable if @c LSAN_HUMAN_PRINT is set to @c true .<br>
  * This function already checks for the availability of the memory statistics
@@ -165,7 +165,7 @@ void lsan_printStatsWithWidth(size_t width);
  * @brief Prints the statistics of the allocations.
  *
  * The bar has a size of @c 100 characters, it can be adjusted by using
- * @c __lsan_printStatsWithWidth(size_t) . The output stream defined by
+ * @c lsan_printStatsWithWidth(size_t) . The output stream defined by
  * @c LSAN_PRINT_COUT is used for the printing. The byte amounts are printed
  * human-readable if @c LSAN_HUMAN_PRINT is set to @c true .<br>
  * This function already checks for the availability of the memory statistics
