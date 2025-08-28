@@ -14,6 +14,8 @@
 		BF17750B2E33892700D46975 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF17750A2E33892700D46975 /* CoreFoundation.framework */; };
 		BF4AEC692E3CBAAB0078E35C /* LeakSanitizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BF4AEC682E3CBAA10078E35C /* LeakSanitizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF4DBFE02E460C25000D4B26 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BF5AAFE62E605492007C0329 /* PoolAllocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF5AAFE52E605492007C0329 /* PoolAllocator.cpp */; };
+		BF5AAFE82E6054E2007C0329 /* wrap_malloc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF5AAFE72E6054E2007C0329 /* wrap_malloc.hpp */; };
 		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
 		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
@@ -104,7 +106,22 @@
 		BF49A5D72899599300BC1FFD /* signalHandlers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signalHandlers.cpp; sourceTree = "<group>"; };
 		BF49A5D82899599300BC1FFD /* signalHandlers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signalHandlers.hpp; sourceTree = "<group>"; };
 		BF4AEC682E3CBAA10078E35C /* LeakSanitizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LeakSanitizer.h; sourceTree = "<group>"; };
-		BF4C28E828B66033001EB53E /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		BF5AAFD02E605420007C0329 /* leak-example.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "leak-example.png"; sourceTree = "<group>"; };
+		BF5AAFD12E605420007C0329 /* leak-example-fedora.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "leak-example-fedora.png"; sourceTree = "<group>"; };
+		BF5AAFD22E605420007C0329 /* segfault.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = segfault.png; sourceTree = "<group>"; };
+		BF5AAFD32E605420007C0329 /* SIGUSR1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SIGUSR1.png; sourceTree = "<group>"; };
+		BF5AAFD42E605420007C0329 /* SIGUSR2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SIGUSR2.png; sourceTree = "<group>"; };
+		BF5AAFD62E605420007C0329 /* leak-example.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "leak-example.png"; sourceTree = "<group>"; };
+		BF5AAFD72E605420007C0329 /* leak-example-fedora.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "leak-example-fedora.png"; sourceTree = "<group>"; };
+		BF5AAFD82E605420007C0329 /* segfault.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = segfault.png; sourceTree = "<group>"; };
+		BF5AAFD92E605420007C0329 /* SIGUSR1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SIGUSR1.png; sourceTree = "<group>"; };
+		BF5AAFDA2E605420007C0329 /* SIGUSR2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SIGUSR2.png; sourceTree = "<group>"; };
+		BF5AAFDD2E605420007C0329 /* Behaviour.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Behaviour.md; sourceTree = "<group>"; };
+		BF5AAFDE2E605420007C0329 /* Signal-handlers.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "Signal-handlers.md"; sourceTree = "<group>"; };
+		BF5AAFDF2E605420007C0329 /* Suppressions.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Suppressions.md; sourceTree = "<group>"; };
+		BF5AAFE12E605452007C0329 /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		BF5AAFE52E605492007C0329 /* PoolAllocator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PoolAllocator.cpp; sourceTree = "<group>"; };
+		BF5AAFE72E6054E2007C0329 /* wrap_malloc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = wrap_malloc.hpp; sourceTree = "<group>"; };
 		BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		BF5F19FC28B3F00600DAEDE7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bytePrinter.cpp; sourceTree = "<group>"; };
@@ -220,12 +237,64 @@
 			children = (
 				BF4368F62AACF06F00252E2A /* crash.hpp */,
 				BF4368F72AACF07700252E2A /* warn.hpp */,
-				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
-				BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */,
-				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
 				BFC6D0F72C9ED80C0056A3C3 /* crashOrWarn.hpp */,
+				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
+				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
+				BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */,
 			);
 			path = crashWarner;
+			sourceTree = "<group>";
+		};
+		BF5AAFD52E605420007C0329 /* dark */ = {
+			isa = PBXGroup;
+			children = (
+				BF5AAFD02E605420007C0329 /* leak-example.png */,
+				BF5AAFD12E605420007C0329 /* leak-example-fedora.png */,
+				BF5AAFD22E605420007C0329 /* segfault.png */,
+				BF5AAFD32E605420007C0329 /* SIGUSR1.png */,
+				BF5AAFD42E605420007C0329 /* SIGUSR2.png */,
+			);
+			path = dark;
+			sourceTree = "<group>";
+		};
+		BF5AAFDB2E605420007C0329 /* light */ = {
+			isa = PBXGroup;
+			children = (
+				BF5AAFD62E605420007C0329 /* leak-example.png */,
+				BF5AAFD72E605420007C0329 /* leak-example-fedora.png */,
+				BF5AAFD82E605420007C0329 /* segfault.png */,
+				BF5AAFD92E605420007C0329 /* SIGUSR1.png */,
+				BF5AAFDA2E605420007C0329 /* SIGUSR2.png */,
+			);
+			path = light;
+			sourceTree = "<group>";
+		};
+		BF5AAFDC2E605420007C0329 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				BF5AAFD52E605420007C0329 /* dark */,
+				BF5AAFDB2E605420007C0329 /* light */,
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
+		BF5AAFE02E605420007C0329 /* documentation */ = {
+			isa = PBXGroup;
+			children = (
+				BF5AAFDC2E605420007C0329 /* images */,
+				BF5AAFDD2E605420007C0329 /* Behaviour.md */,
+				BF5AAFDE2E605420007C0329 /* Signal-handlers.md */,
+				BF5AAFDF2E605420007C0329 /* Suppressions.md */,
+			);
+			path = documentation;
+			sourceTree = "<group>";
+		};
+		BF5AAFE22E605452007C0329 /* publishNotices */ = {
+			isa = PBXGroup;
+			children = (
+				BF5AAFE12E605452007C0329 /* README.txt */,
+			);
+			path = publishNotices;
 			sourceTree = "<group>";
 		};
 		BF643E5C28A40C970080DB21 /* include */ = {
@@ -251,13 +320,14 @@
 		BF97EB4D28831E5B00DAF1FE = {
 			isa = PBXGroup;
 			children = (
-				BF4C28E828B66033001EB53E /* Makefile */,
 				BF5F19FC28B3F00600DAEDE7 /* README.md */,
 				BF5F19FB28B3EFFB00DAEDE7 /* LICENSE */,
 				BF04B4B328F86EEA00051090 /* .gitignore */,
 				BF643E5C28A40C970080DB21 /* include */,
 				BF9DD3A428A6761400AEBC17 /* src */,
 				F13529AC2D10767E002534D0 /* suppressions */,
+				BF5AAFE02E605420007C0329 /* documentation */,
+				BF5AAFE22E605452007C0329 /* publishNotices */,
 				BF97EB5728831E5B00DAF1FE /* Products */,
 				BF378FB32919496000A4DAA9 /* Frameworks */,
 			);
@@ -328,6 +398,7 @@
 		BFBCAD8A2ACF611A00C6B69F /* wrappers */ = {
 			isa = PBXGroup;
 			children = (
+				BF5AAFE72E6054E2007C0329 /* wrap_malloc.hpp */,
 				BFBF736728832C3300BC4208 /* wrap_malloc.cpp */,
 				BF9623AC2AB36B86005FF2B7 /* interpose.hpp */,
 				BFBCAD892ACF376600C6B69F /* realAlloc.hpp */,
@@ -377,6 +448,7 @@
 			isa = PBXGroup;
 			children = (
 				F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */,
+				BF5AAFE52E605492007C0329 /* PoolAllocator.cpp */,
 				F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */,
 				F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */,
 				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
@@ -409,6 +481,7 @@
 				BFCDA8132E2F7CDA0029AEC1 /* exceptionHandler.hpp in Headers */,
 				BFCDA8142E2F7CDA0029AEC1 /* crashOrWarn.hpp in Headers */,
 				BFCDA8152E2F7CDA0029AEC1 /* Stats.hpp in Headers */,
+				BF5AAFE82E6054E2007C0329 /* wrap_malloc.hpp in Headers */,
 				BFCDA8162E2F7CDA0029AEC1 /* Suppression.hpp in Headers */,
 				BFCDA8172E2F7CDA0029AEC1 /* FunctionNotFoundException.hpp in Headers */,
 				BFCDA8182E2F7CDA0029AEC1 /* defaultSuppression.hpp in Headers */,
@@ -543,6 +616,7 @@
 				BFCDA7FB2E2F7CA10029AEC1 /* parser.cpp in Sources */,
 				BFCDA7FC2E2F7CA10029AEC1 /* Suppression.cpp in Sources */,
 				BFCDA7FD2E2F7CA10029AEC1 /* defaultSuppression.cpp in Sources */,
+				BF5AAFE62E605492007C0329 /* PoolAllocator.cpp in Sources */,
 				BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */,
 				BFCDA7FE2E2F7CA10029AEC1 /* firstPartyLibrary.cpp in Sources */,
 				BFCDA7FF2E2F7CA10029AEC1 /* TLSTracker.cpp in Sources */,
