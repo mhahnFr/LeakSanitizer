@@ -81,7 +81,7 @@ inline void ifNotIgnored(F&& func, Args&& ...args) {
 #ifdef BENCHMARK
                     std::move(lockingTime),
 #endif
-                    std::move(args)...);
+                    std::forward<Args&&>(args)...);
         tracker.ignoreMalloc = false;
     }
 }
