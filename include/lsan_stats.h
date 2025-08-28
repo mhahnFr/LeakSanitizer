@@ -143,7 +143,7 @@ static inline void lsan_printFStats() {
  * @param width The width in characters the printed bar should have.
  * @since 1.2
  */
-static inline void lsan_printFStatsWithWidth(size_t width) {
+static inline void lsan_printFStatsWithWidth(const size_t width) {
     lsan_printFragmentationStatsWithWidth(width);
 }
 
