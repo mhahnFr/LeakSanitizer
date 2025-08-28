@@ -27,14 +27,6 @@
 #endif
 
 namespace lsan {
-extern "C" {
-auto __wrap_malloc(std::size_t, const char*, int) -> void*;
-auto __wrap_calloc(std::size_t, std::size_t, const char*, int) -> void*;
-auto __wrap_realloc(void*, std::size_t, const char*, int) -> void*;
-void __wrap_free(void*, const char*, int);
-[[ noreturn ]] void __wrap_exit(int, const char*, int);
-}
-
 #ifdef __APPLE__
 auto malloc_zone_malloc(malloc_zone_t*, std::size_t) -> void*;
 auto malloc_zone_calloc(malloc_zone_t*, std::size_t, std::size_t) -> void*;
@@ -59,7 +51,7 @@ auto __lsan_realloc(void*, std::size_t) -> void*;
 void __lsan_free(void*);
 
 #ifdef __linux__
-}
+} /* extern "C" */
 #endif
 }
 

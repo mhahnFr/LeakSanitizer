@@ -37,44 +37,7 @@
 #include "../utils.hpp"
 #include "../crashWarner/crashOrWarn.hpp"
 
-/*
- * These wrapper functions still reside here to not break compatibility with
- * previously compiled programs.
- * They will be removed in one of the next version, at latest in version 2.
- *
- *                                                                  - mhahnFr
- */
-#ifdef __linux__
-auto operator new(std::size_t size) -> void * {
-    if (size == 0) {
-        size = 1;
-    }
-
-    return malloc(size);
-}
-#endif /* __linux__ */
-
 namespace lsan {
-auto __wrap_malloc(const std::size_t size, const char*, int) -> void* {
-    return malloc(size);
-}
-
-auto __wrap_calloc(const std::size_t count, const std::size_t objectSize, const char*, int) -> void* {
-    return calloc(count, objectSize);
-}
-
-auto __wrap_realloc(void* pointer, const std::size_t size, const char*, int) -> void* {
-    return realloc(pointer, size);
-}
-
-void __wrap_free(void* pointer, const char*, int) {
-    return free(pointer);
-}
-
-[[ noreturn ]] void __wrap_exit(const int code, const char*, int) {
-    exit(code);
-}
-
 /**
  * Creates an appropriate invalid free message for the given pointer.
  *
