@@ -34,7 +34,7 @@ extern "C" {
  *
  * @return The total allocation count.
  */
-size_t __lsan_getTotalMallocs();
+size_t lsan_getTotalMallocs();
 
 /**
  * @brief Returns the total count of allocated bytes ever registered by this
@@ -42,7 +42,7 @@ size_t __lsan_getTotalMallocs();
  *
  * @return The total amount of allocated bytes.
  */
-size_t __lsan_getTotalBytes();
+size_t lsan_getTotalBytes();
 
 /**
  * @brief Returns the total count of freed objects that were previously
@@ -50,14 +50,14 @@ size_t __lsan_getTotalBytes();
  *
  * @return The total count of freed objects.
  */
-size_t __lsan_getTotalFrees();
+size_t lsan_getTotalFrees();
 
 /**
  * Returns the count of the currently allocated objects registered by this sanitizer.
  *
  * @return The count of currently allocated objects.
  */
-size_t __lsan_getCurrentMallocCount();
+size_t lsan_getCurrentMallocCount();
 
 /**
  * @brief Returns the amount of the currently allocated bytes registered by
@@ -65,21 +65,21 @@ size_t __lsan_getCurrentMallocCount();
  *
  * @return The amount of currently allocated bytes.
  */
-size_t __lsan_getCurrentByteCount();
+size_t lsan_getCurrentByteCount();
 
 /**
  * @brief Returns the highest count of objects in the heap at the same time.
  *
  * @return The highest count of allocated objects.
  */
-size_t __lsan_getMallocPeek();
+size_t lsan_getMallocPeek();
 
 /**
  * @brief Returns the highest amount of bytes in the heap at the same time.
  *
  * @return The highest amount of allocated bytes.
  */
-size_t __lsan_getBytePeek();
+size_t lsan_getBytePeek();
 
 /**
  * @brief Prints the statistics of the memory fragmentation.
@@ -94,7 +94,7 @@ size_t __lsan_getBytePeek();
  * @param width The width in characters the printed bar should have.
  * @since 1.2
  */
-void __lsan_printFragmentationStatsWithWidth(size_t width);
+void lsan_printFragmentationStatsWithWidth(size_t width);
 
 /**
  * @brief Prints the statistics of the memory fragmentation.
@@ -109,8 +109,8 @@ void __lsan_printFragmentationStatsWithWidth(size_t width);
  *
  * @since 1.2
  */
-static inline void __lsan_printFragmentationStats() {
-    __lsan_printFragmentationStatsWithWidth(100);
+static inline void lsan_printFragmentationStats() {
+    lsan_printFragmentationStatsWithWidth(100);
 }
 
 /**
@@ -126,8 +126,8 @@ static inline void __lsan_printFragmentationStats() {
  *
  * @since 1.2
  */
-static inline void __lsan_printFStats() {
-    __lsan_printFragmentationStats();
+static inline void lsan_printFStats() {
+    lsan_printFragmentationStats();
 }
 
 /**
@@ -143,8 +143,8 @@ static inline void __lsan_printFStats() {
  * @param width The width in characters the printed bar should have.
  * @since 1.2
  */
-static inline void __lsan_printFStatsWithWidth(size_t width) {
-    __lsan_printFragmentationStatsWithWidth(width);
+static inline void lsan_printFStatsWithWidth(size_t width) {
+    lsan_printFragmentationStatsWithWidth(width);
 }
 
 /**
@@ -159,7 +159,7 @@ static inline void __lsan_printFStatsWithWidth(size_t width) {
  *
  * @param width The width in characters the printed bar should have.
  */
-void __lsan_printStatsWithWidth(size_t width);
+void lsan_printStatsWithWidth(size_t width);
 
 /**
  * @brief Prints the statistics of the allocations.
@@ -172,8 +172,8 @@ void __lsan_printStatsWithWidth(size_t width);
  * using @c LSAN_STATS_ACTIVE, and guarantees to not crash the program, even
  * in the case the memory statistics are unavailable.
  */
-static inline void __lsan_printStats() {
-    __lsan_printStatsWithWidth(100);
+static inline void lsan_printStats() {
+    lsan_printStatsWithWidth(100);
 }
 
 #ifdef __cplusplus

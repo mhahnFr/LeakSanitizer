@@ -61,8 +61,8 @@ class AutoStats {
                 }
             }
             const auto& begin = std::chrono::system_clock::now();
-            __lsan_printStats();
-            __lsan_printFStats();
+            lsan_printStats();
+            lsan_printFStats();
             const auto& elapsed = std::chrono::system_clock::now() - begin;
             sleepTime = elapsed < interval ? interval - elapsed : std::chrono::nanoseconds { 0 };
         }

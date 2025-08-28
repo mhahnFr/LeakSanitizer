@@ -383,6 +383,6 @@ void callstack(int, siginfo_t*, void* executionContext) {
 }
 
 void stats(int) {
-    __lsan_printStats();
+    lsan_printStats();
 }
 }

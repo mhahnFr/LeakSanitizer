@@ -31,15 +31,15 @@
 
 using namespace lsan;
 
-auto __lsan_getTotalMallocs() -> std::size_t { return getStats().getTotalMallocCount(); }
-auto __lsan_getTotalBytes()   -> std::size_t { return getStats().getTotalBytes();       }
-auto __lsan_getTotalFrees()   -> std::size_t { return getStats().getTotalFreeCount();   }
+auto lsan_getTotalMallocs() -> std::size_t { return getStats().getTotalMallocCount(); }
+auto lsan_getTotalBytes()   -> std::size_t { return getStats().getTotalBytes();       }
+auto lsan_getTotalFrees()   -> std::size_t { return getStats().getTotalFreeCount();   }
 
-auto __lsan_getCurrentMallocCount() -> std::size_t { return getStats().getCurrentMallocCount(); }
-auto __lsan_getCurrentByteCount()   -> std::size_t { return getStats().getCurrentBytes();       }
+auto lsan_getCurrentMallocCount() -> std::size_t { return getStats().getCurrentMallocCount(); }
+auto lsan_getCurrentByteCount()   -> std::size_t { return getStats().getCurrentBytes();       }
 
-auto __lsan_getMallocPeek() -> std::size_t { return getStats().getMallocPeek(); }
-auto __lsan_getBytePeek()   -> std::size_t { return getStats().getBytePeek();   }
+auto lsan_getMallocPeek() -> std::size_t { return getStats().getMallocPeek(); }
+auto lsan_getBytePeek()   -> std::size_t { return getStats().getBytePeek();   }
 
 namespace lsan {
 /** The color for the bar elements to be used. */
@@ -66,17 +66,17 @@ static inline void printStatsCore(const std::string & statsName, const std::size
     out << formatter::format<Style::ITALIC>("Stats of the " + statsName + " so far:") << std::endl;
     
     out << formatter::clearAll()
-        << __lsan_getCurrentMallocCount() << " objects in the heap, peek " << __lsan_getMallocPeek() << ", " << __lsan_getTotalFrees() << " deleted objects."
+        << lsan_getCurrentMallocCount() << " objects in the heap, peek " << lsan_getMallocPeek() << ", " << lsan_getTotalFrees() << " deleted objects."
         << std::endl << std::endl;
     
-    out << formatter::format<Style::BOLD>(bytesToString(__lsan_getCurrentByteCount()))
-        << " currently used, peek " << bytesToString(__lsan_getBytePeek()) << "." << std::endl;
+    out << formatter::format<Style::BOLD>(bytesToString(lsan_getCurrentByteCount()))
+        << " currently used, peek " << bytesToString(lsan_getBytePeek()) << "." << std::endl;
     printBarBytes(width, out);
     
     out << formatter::get<Style::BOLD>
-        << __lsan_getCurrentMallocCount() << " objects"
+        << lsan_getCurrentMallocCount() << " objects"
         << formatter::clear<Style::BOLD>
-        << " currently in the heap, peek " << __lsan_getMallocPeek() << " objects." << std::endl;
+        << " currently in the heap, peek " << lsan_getMallocPeek() << " objects." << std::endl;
     printBarObjects(width, out);
 }
 
@@ -298,7 +298,7 @@ static inline void printFragmentationByteBar(const std::size_t width, std::ostre
 }
 }
 
-void __lsan_printFragmentationStatsWithWidth(const std::size_t width) {
+void lsan_printFragmentationStatsWithWidth(const std::size_t width) {
     using namespace formatter;
 
     getTracker().withIgnoration(true, [=] {
@@ -321,19 +321,19 @@ void __lsan_printFragmentationStatsWithWidth(const std::size_t width) {
     });
 }
 
-void __lsan_printStatsWithWidth(const std::size_t width) {
+void lsan_printStatsWithWidth(const std::size_t width) {
     using namespace formatter;
 
     getTracker().withIgnoration(true, [=] {
         auto& out = getOutputStream();
         if (getBehaviour().statsActive()) {
             printStatsCore("memory usage", width, out,
-                                  [count = __lsan_getCurrentByteCount(), peek = __lsan_getBytePeek(),
-                                      byteStr = bytesToString(__lsan_getBytePeek())] <typename W, typename S>(W&& theWidth, S&& stream) {
+                                  [count = lsan_getCurrentByteCount(), peek = lsan_getBytePeek(),
+                                      byteStr = bytesToString(lsan_getBytePeek())] <typename W, typename S>(W&& theWidth, S&& stream) {
                                       printBar(count, peek, std::forward<W>(theWidth), byteStr, std::forward<S>(stream));
                                   },
-                                  [count = __lsan_getCurrentMallocCount(), peek = __lsan_getMallocPeek(),
-                                      objectsStr = std::to_string(__lsan_getMallocPeek()) + " objects"] <typename W, typename S>(W&& theWidth, S&& stream) {
+                                  [count = lsan_getCurrentMallocCount(), peek = lsan_getMallocPeek(),
+                                      objectsStr = std::to_string(lsan_getMallocPeek()) + " objects"] <typename W, typename S>(W&& theWidth, S&& stream) {
                                       printBar(count, peek, std::forward<W>(theWidth), objectsStr, std::forward<S>(stream));
                                   });
         } else {
