@@ -309,13 +309,9 @@ void lsan_printFragmentationStatsWithWidth(const std::size_t width) {
                                   printFragmentationObjectBar);
         } else {
             out << get<Style::RED>
-                << format<Style::BOLD>("No memory fragmentation stats available at the moment!")
-                << std::endl
-                << format<Style::ITALIC>("Hint: Did you set ")
-                << clear<Style::RED>
-                << "LSAN_STATS_ACTIVE (" << format<Style::GREYED>("__lsan_statsActive") << ")"
-                << format<Style::ITALIC, Style::RED>(" to ")
-                << "true" << format<Style::RED, Style::ITALIC>("?")
+                << format<Style::BOLD>("No memory fragmentation stats available at the moment!") << std::endl
+                << format<Style::ITALIC>("Hint: Did you set ") << clear<Style::RED> << "LSAN_STATS_ACTIVE"
+                << format<Style::ITALIC, Style::RED>(" to ") << "true" << format<Style::RED, Style::ITALIC>("?")
                 << std::endl << std::endl;
         }
     });
@@ -339,11 +335,8 @@ void lsan_printStatsWithWidth(const std::size_t width) {
         } else {
             out << get<Style::RED>
                 << format<Style::BOLD>("No memory statistics available at the moment!") << std::endl
-                << format<Style::ITALIC>("Hint: Did you set ")
-                << clear<Style::RED>
-                << "LSAN_STATS_ACTIVE (" << format<Style::GREYED>("__lsan_statsActive") << ")"
-                << format<Style::ITALIC, Style::RED>(" to ")
-                << "true" << format<Style::RED, Style::ITALIC>("?")
+                << format<Style::ITALIC>("Hint: Did you set ") << clear<Style::RED> << "LSAN_STATS_ACTIVE"
+                << format<Style::ITALIC, Style::RED>(" to ") << "true" << format<Style::RED, Style::ITALIC>("?")
                 << std::endl << std::endl;
         }
     });
