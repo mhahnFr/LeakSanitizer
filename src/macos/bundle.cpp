@@ -24,6 +24,13 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan::macos::bundle {
+/**
+ * @brief Loads the bundle associated with the LeakSanitizer.
+ *
+ * Allocations are not tracked.
+ *
+ * @return the @c CFBundleRef
+ */
 static inline auto getBundleWrapper() -> CFBundleRef {
     return getTracker().withIgnorationResult(true, []() {
         return CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
@@ -52,6 +59,7 @@ auto getCrashHandlerPath() -> std::string {
     });
 }
 
+/** The default version string in case loading fails. */
 constexpr inline auto DEFAULT_VERSION = "CLEAN BUILD";
 
 auto getVersion() -> std::string {
