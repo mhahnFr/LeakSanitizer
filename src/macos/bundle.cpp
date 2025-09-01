@@ -41,6 +41,17 @@ void killBundle() {
     });
 }
 
+auto getCrashHandlerPath() -> std::string {
+    return getTracker().withIgnorationResult(true, [] {
+        const auto result = CFBundleCopyResourceURL(getBundle(), CFSTR("CrashHandler"), nil, nil);
+        const auto path = CFURLCopyPath(result);
+        CFRelease(result);
+        const auto& toReturn = convertCFString(path);
+        CFRelease(path);
+        return toReturn;
+    });
+}
+
 constexpr inline auto DEFAULT_VERSION = "CLEAN BUILD";
 
 auto getVersion() -> std::string {

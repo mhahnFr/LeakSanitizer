@@ -30,6 +30,8 @@ namespace lsan::macos::bundle {
 auto getBundle() -> CFBundleRef;
 void killBundle();
 
+auto getCrashHandlerPath() -> std::string;
+
 auto getVersion() -> std::string;
 auto convertCFString(CFStringRef str) -> std::string;
 }
