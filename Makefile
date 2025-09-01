@@ -35,7 +35,6 @@ SRCS = \
 	src/ThreadInfo.cpp \
 	src/MallocInfo.cpp \
 	src/lsanMisc.cpp \
-	src/lsan_internals.cpp \
 	src/LeakSani.cpp \
 	src/bytePrinter.cpp \
 	src/wrappers/wrap_malloc.cpp \
