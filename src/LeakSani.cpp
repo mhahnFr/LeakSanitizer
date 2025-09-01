@@ -640,6 +640,9 @@ struct Initializer {
             if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
                 tryCatch_setTerminateHandler(mhExceptionHandler);
             }
+#ifdef __APPLE__
+            getInstance().crashHandlerPath = macos::bundle::getCrashHandlerPath();
+#endif
         });
     }
 };
