@@ -26,13 +26,46 @@
 
 #include <CoreFoundation/CFBundle.h>
 
+/**
+ * Groups everything related to the macOS bundle handling.
+ */
 namespace lsan::macos::bundle {
+/**
+ * @brief Returns the bundle associated with the LeakSanitizer.
+ *
+ * Needs to be paired with a call to @c killBundle() .
+ *
+ * @return the @c CFBundleRef
+ */
 auto getBundle() -> CFBundleRef;
+
+/**
+ * Deallocates the cached bundle information.
+ */
 void killBundle();
 
+/**
+ * Returns the path of the crash handler registered in the resources bundle.
+ *
+ * @return the path to the crash handler executable
+ */
 auto getCrashHandlerPath() -> std::string;
 
+/**
+ * Returns a version string.
+ *
+ * @return the version string
+ */
 auto getVersion() -> std::string;
+
+/**
+ * @brief Converts and returns the given CoreFoundation string reference to a C++ string.
+ *
+ * Returns an empty string if the convertion failed.
+ *
+ * @param str the @c CFStringRef to be converted
+ * @return the @c std::string representation
+ */
 auto convertCFString(CFStringRef str) -> std::string;
 }
 
