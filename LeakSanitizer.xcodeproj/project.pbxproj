@@ -74,6 +74,8 @@
 		BFCDA8262E2F7CDA0029AEC1 /* LeakType.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF7592282BB1799500891A55 /* LeakType.hpp */; };
 		BFCDA8272E2F7CDA0029AEC1 /* formatter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAFADC528B4FDA40060076C /* formatter.hpp */; };
 		BFCDA8382E2F82F50029AEC1 /* Stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2E0289ED24200B17349 /* Stats.cpp */; };
+		F1EDCE9F2E65879C007E260E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1EDCE9D2E65879C007E260E /* main.cpp */; };
+		F1EDCEA22E6587E1007E260E /* CrashHandler in Resources */ = {isa = PBXBuildFile; fileRef = F1EDCE962E65876D007E260E /* CrashHandler */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,7 +86,26 @@
 			remoteGlobalIDString = F13529B32D1083FD002534D0;
 			remoteInfo = CallstackLibrary;
 		};
+		F1EDCEA02E6587D2007E260E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF97EB4E28831E5B00DAF1FE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F1EDCE952E65876D007E260E;
+			remoteInfo = CrashHandler;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F1EDCE942E65876D007E260E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = firstPartyLibrary.hpp; sourceTree = "<group>"; };
@@ -173,6 +194,8 @@
 		F1ACE4162D148B0F00E779A7 /* core.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = core.json; sourceTree = "<group>"; };
 		F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealAllocator.hpp; sourceTree = "<group>"; };
 		F1E0904B2D68DE9500F79FA2 /* AppKit.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AppKit.json; sourceTree = "<group>"; };
+		F1EDCE962E65876D007E260E /* CrashHandler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CrashHandler; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1EDCE9D2E65879C007E260E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +205,13 @@
 			files = (
 				BF17750B2E33892700D46975 /* CoreFoundation.framework in Frameworks */,
 				BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1EDCE932E65876D007E260E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,6 +367,7 @@
 			isa = PBXGroup;
 			children = (
 				BFCDA7E72E2F7C2C0029AEC1 /* LeakSanitizer.framework */,
+				F1EDCE962E65876D007E260E /* CrashHandler */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -389,6 +420,7 @@
 		BFB103D52E38CB5A00ECECD5 /* macos */ = {
 			isa = PBXGroup;
 			children = (
+				F1EDCE912E658724007E260E /* crashHandler */,
 				BFB103D62E38CB7100ECECD5 /* bundle.hpp */,
 				BFB103D72E38CB7100ECECD5 /* bundle.cpp */,
 			);
@@ -454,6 +486,14 @@
 				F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */,
 			);
 			path = allocators;
+			sourceTree = "<group>";
+		};
+		F1EDCE912E658724007E260E /* crashHandler */ = {
+			isa = PBXGroup;
+			children = (
+				F1EDCE9D2E65879C007E260E /* main.cpp */,
+			);
+			path = crashHandler;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -537,6 +577,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F1EDCEA12E6587D2007E260E /* PBXTargetDependency */,
 				BFCDA7EF2E2F7C430029AEC1 /* PBXTargetDependency */,
 			);
 			name = LeakSanitizer;
@@ -545,6 +586,25 @@
 			productName = LeakSanitizer;
 			productReference = BFCDA7E72E2F7C2C0029AEC1 /* LeakSanitizer.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		F1EDCE952E65876D007E260E /* CrashHandler */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1EDCE9A2E65876D007E260E /* Build configuration list for PBXNativeTarget "CrashHandler" */;
+			buildPhases = (
+				F1EDCE922E65876D007E260E /* Sources */,
+				F1EDCE932E65876D007E260E /* Frameworks */,
+				F1EDCE942E65876D007E260E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CrashHandler;
+			packageProductDependencies = (
+			);
+			productName = CrashHandler;
+			productReference = F1EDCE962E65876D007E260E /* CrashHandler */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -563,6 +623,9 @@
 					F13529B32D1083FD002534D0 = {
 						CreatedOnToolsVersion = 16.2;
 					};
+					F1EDCE952E65876D007E260E = {
+						CreatedOnToolsVersion = 16.4;
+					};
 				};
 			};
 			buildConfigurationList = BF97EB5128831E5B00DAF1FE /* Build configuration list for PBXProject "LeakSanitizer" */;
@@ -580,6 +643,7 @@
 			targets = (
 				F13529B32D1083FD002534D0 /* CallstackLibrary */,
 				BFCDA7E62E2F7C2C0029AEC1 /* LeakSanitizer */,
+				F1EDCE952E65876D007E260E /* CrashHandler */,
 			);
 		};
 /* End PBXProject section */
@@ -589,6 +653,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1EDCEA22E6587E1007E260E /* CrashHandler in Resources */,
 				BF1775062E337EAE00D46975 /* AppKit.json in Resources */,
 				BF1775072E337EB200D46975 /* core.json in Resources */,
 				BF1775082E337EB800D46975 /* systemLibraries.json in Resources */,
@@ -630,6 +695,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F1EDCE922E65876D007E260E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1EDCE9F2E65879C007E260E /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -637,6 +710,11 @@
 			isa = PBXTargetDependency;
 			target = F13529B32D1083FD002534D0 /* CallstackLibrary */;
 			targetProxy = BFCDA7EE2E2F7C430029AEC1 /* PBXContainerItemProxy */;
+		};
+		F1EDCEA12E6587D2007E260E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F1EDCE952E65876D007E260E /* CrashHandler */;
+			targetProxy = F1EDCEA02E6587D2007E260E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -913,6 +991,32 @@
 			};
 			name = Release;
 		};
+		F1EDCE9B2E65876D007E260E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		F1EDCE9C2E65876D007E260E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -939,6 +1043,15 @@
 			buildConfigurations = (
 				F13529B52D1083FD002534D0 /* Debug */,
 				F13529B62D1083FD002534D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F1EDCE9A2E65876D007E260E /* Build configuration list for PBXNativeTarget "CrashHandler" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1EDCE9B2E65876D007E260E /* Debug */,
+				F1EDCE9C2E65876D007E260E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
