@@ -27,6 +27,8 @@
 # define _XOPEN_SOURCE
 # include <ucontext.h>
 # undef _XOPEN_SOURCE
+
+# include <unistd.h>
 #endif /* __APPLE__ */
 
 #define LCS_ACTIVATE_SWIFT_DEMANGLER_CONTROL 1
@@ -35,6 +37,7 @@
 #include <callstack_internals.h>
 #include <lsan_stats.h>
 
+#include "SignalInfo.hpp"
 #include "signals.hpp"
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
@@ -353,10 +356,9 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
     }
 }
 
-[[ noreturn ]] void crashWithTrace(const int signalCode, const siginfo_t* signalContext, void* executionContext) {
+[[ noreturn ]] static inline void crashWithTraceLocal(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
     using namespace formatter;
 
-    getTracker().ignoreMalloc = true;
     const auto& reason = getReason(signalCode, signalContext->si_code);
     lcs_activateSwiftDemangler = false;
     crashForce(formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
@@ -365,7 +367,50 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
                reason.has_value()
                 ? std::optional(formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, signalContext->si_code).value_or("Unknown reason") + ")")
                 : std::nullopt,
-               createCallstackFor(executionContext));
+               std::move(callstack));
+}
+
+#ifdef __APPLE__
+[[ noreturn ]] static inline void crashWithTraceRemote(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
+    const auto& path = getInstance().crashHandlerPath;
+    if (path.empty()) {
+        crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
+    }
+    if (const auto pid = fork(); pid < 0) {
+        crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
+    } else if (pid == 0) {
+        char buffer[sizeof(SignalInfo)];
+        char substitute[2] {};
+        auto info = SignalInfo {
+            .code = signalCode,
+            .faultAddress = signalContext->si_addr,
+            .callstack = std::move(callstack)
+        };
+        info.toBinary(buffer, sizeof buffer, substitute);
+        char* args[] = {
+            substitute,
+            buffer,
+            nullptr,
+        };
+
+        if (execv(path.c_str(), args) < 0) {
+            crashWithTraceLocal(signalCode, signalContext, std::move(info.callstack));
+        }
+    } else {
+        while (waitpid(pid, nullptr, WUNTRACED) != pid);
+    }
+    abort();
+}
+#endif
+
+[[ noreturn ]] void crashWithTrace(const int signalCode, const siginfo_t* signalContext, void* executionContext) {
+    getTracker().ignoreMalloc = true;
+    auto callstack = createCallstackFor(executionContext);
+#ifdef __APPLE__
+    crashWithTraceRemote(signalCode, signalContext, std::move(callstack));
+#else
+    crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
+#endif
 }
 
 void callstack(int, siginfo_t*, void* executionContext) {
