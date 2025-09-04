@@ -1,0 +1,267 @@
+#include "SignalInfo.hpp"
+
+#include "signals.hpp"
+#include "../formatter.hpp"
+#include "../utils.hpp"
+
+namespace lsan::signals {
+/**
+ * Returns an explanation for the given segmentation fault reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
+static inline auto getReasonSEGV(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case SEGV_MAPERR: return "Address not existent";
+        case SEGV_ACCERR: return "Access to address denied";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Returns an explanation for the given illegal instruction reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
+static inline auto getReasonILL(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case ILL_ILLOPC: return "Illegal opcode";
+        case ILL_ILLTRP: return "Illegal trap";
+        case ILL_PRVOPC: return "Privileged opcode";
+        case ILL_ILLOPN: return "Illegal operand";
+        case ILL_ILLADR: return "Illegal addressing mode";
+        case ILL_PRVREG: return "Privileged register";
+        case ILL_COPROC: return "Coprocessor error";
+        case ILL_BADSTK: return "Internal stack error";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Returns an explanation for the given floating point exception reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
+static inline auto getReasonFPE(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case FPE_FLTDIV: return "Floating point divide by zero";
+        case FPE_FLTOVF: return "Floating point overflow";
+        case FPE_FLTUND: return "Floating point underflow";
+        case FPE_FLTRES: return "Floating point inexact result";
+        case FPE_FLTINV: return "Invalid floating point operation";
+        case FPE_FLTSUB: return "Subscript out of range";
+        case FPE_INTDIV: return "Integer divide by zero";
+        case FPE_INTOVF: return "Integer overflow";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Returns an explanation for the given bus error reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
+static inline auto getReasonBUS(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case BUS_ADRALN: return "Invalid address alignment";
+        case BUS_ADRERR: return "Physical address not existent";
+        case BUS_OBJERR: return "Object-specific HW error";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Returns an explanation for the given trapping instruction reason code.
+ *
+ * @param code the reason code
+ * @return the optional explanation
+ */
+static inline auto getReasonTRAP(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case TRAP_BRKPT: return "Process breakpoint";
+        case TRAP_TRACE: return "Process trace trap";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Returns an explanation for the reason code of the given signal code.
+ *
+ * @param signalCode the signal's code
+ * @param code the reason code
+ * @return the optional explanation
+ */
+static inline auto getReason(const int signalCode, const int code) -> std::optional<std::string> {
+    using namespace formatter;
+
+    switch (signalCode) {
+        case SIGSEGV: return getReasonSEGV(code);
+        case SIGILL:  return getReasonILL(code);
+        case SIGFPE:  return getReasonFPE(code);
+        case SIGBUS:  return getReasonBUS(code);
+        case SIGTRAP: return getReasonTRAP(code);
+
+        default: break;
+    }
+
+    switch (code) {
+        case SI_USER:  return "Sent by " + formatString<Style::BOLD>("kill")     + "(2)";
+        case SI_QUEUE: return "Sent by " + formatString<Style::BOLD>("sigqueue") + "(3)";
+        case SI_TIMER: return "POSIX timer expired";
+        case SI_MESGQ: return "POSIX message queue state changed";
+
+#ifdef SI_TKILL
+        case SI_TKILL: return formatString<Style::BOLD>("tkill") + "(2) or " + formatString<Style::BOLD>("tgkill") + "(2)";
+#endif
+#ifdef SI_KERNEL
+        case SI_KERNEL: return "Sent by the kernel";
+#endif
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Stringifies the given segmentation fault reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
+static inline auto stringifyReasonSEGV(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case SEGV_ACCERR: return "ACCERR";
+        case SEGV_MAPERR: return "MAPERR";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Stringifies the given illegal instruction reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
+static inline auto stringifyReasonILL(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case ILL_ILLOPC: return "ILLOPC";
+        case ILL_ILLTRP: return "ILLTRP";
+        case ILL_PRVOPC: return "PRVOPC";
+        case ILL_ILLOPN: return "ILLOPN";
+        case ILL_ILLADR: return "ILLADR";
+        case ILL_PRVREG: return "PRVREG";
+        case ILL_COPROC: return "COPROC";
+        case ILL_BADSTK: return "BADSTK";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Stringifies the given floating point exception reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
+static inline auto stringifyReasonFPE(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case FPE_FLTDIV: return "FLTDIV";
+        case FPE_FLTOVF: return "FLTOVF";
+        case FPE_FLTUND: return "FLTUND";
+        case FPE_FLTRES: return "FLTRES";
+        case FPE_FLTINV: return "FLTINV";
+        case FPE_FLTSUB: return "FLTSUB";
+        case FPE_INTDIV: return "INTDIV";
+        case FPE_INTOVF: return "INTOVF";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Stringifies the given bus error reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
+static inline auto stringifyReasonBUS(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case BUS_ADRALN: return "ADRALN";
+        case BUS_ADRERR: return "ADRERR";
+        case BUS_OBJERR: return "OBJERR";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Stringifies the given trapping instruction reason code.
+ *
+ * @param code the reason code
+ * @return the optional string representation
+ */
+static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::string> {
+    switch (code) {
+        case TRAP_BRKPT: return "BRKPT";
+        case TRAP_TRACE: return "TRACE";
+
+        default: return std::nullopt;
+    }
+}
+
+/**
+ * Stringifies the given reason code for the given signal code.
+ *
+ * @param signalCode the signal's code
+ * @param code the reason code
+ * @return the optional string representation
+ */
+static inline auto stringifyReason(const int signalCode, const int code) -> std::optional<std::string> {
+    switch (signalCode) {
+        case SIGSEGV: return stringifyReasonSEGV(code);
+        case SIGILL:  return stringifyReasonILL(code);
+        case SIGFPE:  return stringifyReasonFPE(code);
+        case SIGBUS:  return stringifyReasonBUS(code);
+        case SIGTRAP: return stringifyReasonTRAP(code);
+
+        default: break;
+    }
+
+    switch (code) {
+        case SI_USER:  return "SI_USER";
+        case SI_QUEUE: return "SI_QUEUE";
+        case SI_TIMER: return "SI_TIMER";
+        case SI_MESGQ: return "SI_MESGQ";
+
+#ifdef SI_TKILL
+        case SI_TKILL: return "SI_TKILL";
+#endif
+#ifdef SI_KERNEL
+        case SI_KERNEL: return "SI_KERNEL";
+#endif
+
+        default: return std::nullopt;
+    }
+}
+
+auto createCrashMessage(const int signalCode, const int siCode, const void* siAddr) -> std::pair<std::string, std::optional<std::string>> {
+    using namespace formatter;
+
+    const auto& reason= getReason(signalCode, siCode);
+    return std::make_pair(formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
+                   + " (" + stringify(signalCode) + ")"
+                   + (hasAddress(signalCode) ? " on address " + formatString<Style::BOLD>(utils::toString(siAddr)) : ""),
+                   reason.has_value()
+                    ? std::optional(formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, siCode).value_or("Unknown reason") + ")")
+                         : std::nullopt);
+}
+}
