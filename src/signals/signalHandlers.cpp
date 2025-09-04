@@ -359,15 +359,9 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
 [[ noreturn ]] static inline void crashWithTraceLocal(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
     using namespace formatter;
 
-    const auto& reason = getReason(signalCode, signalContext->si_code);
     lcs_activateSwiftDemangler = false;
-    crashForce(formatString<Style::BOLD, Style::RED>(getDescriptionFor(signalCode))
-               + " (" + stringify(signalCode) + ")"
-               + (hasAddress(signalCode) ? " on address " + formatString<Style::BOLD>(utils::toString(signalContext->si_addr)) : ""),
-               reason.has_value()
-                ? std::optional(formatString<Style::RED>(*reason) + " (" + stringifyReason(signalCode, signalContext->si_code).value_or("Unknown reason") + ")")
-                : std::nullopt,
-               std::move(callstack));
+    const auto [message, reasonDescription] = createCrashMessage(signalCode, signalContext->si_code, signalContext->si_addr);
+    crashForce(message, reasonDescription, std::move(callstack));
 }
 
 #ifdef __APPLE__

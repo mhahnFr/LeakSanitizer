@@ -23,8 +23,14 @@
 
 #include "../../signals/SignalInfo.hpp"
 
+using namespace lsan;
+
 auto main(int argc, const char** argv) -> int {
     // TODO: Safety!!!
     auto info = lsan::signals::SignalInfo::fromBinary(argv[1], sizeof(lsan::signals::SignalInfo), argv[0][0]);
-    std::cout << "Signal " << info.code << ", fault address: " << info.faultAddress << std::endl;
+    auto [message, reason] = signals::createCrashMessage(info.code, info.siCode, info.faultAddress);
+    std::clog << message << std::endl;
+    if (reason) {
+        std::clog << *reason << std::endl;
+    }
 }

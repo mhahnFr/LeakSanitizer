@@ -61,6 +61,8 @@ struct SignalInfo {
         return toReturn;
     }
 };
+
+auto createCrashMessage(int signalCode, int siCode, const void* siAddr) -> std::pair<std::string, std::optional<std::string>>;
 }
 
 #endif /* SignalInfo_hpp */
