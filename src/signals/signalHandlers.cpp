@@ -383,6 +383,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
         char substitute[2] {};
         auto info = SignalInfo {
             .code = signalCode,
+            .siCode = signalContext->si_code,
             .faultAddress = signalContext->si_addr,
             .callstack = std::move(callstack)
         };

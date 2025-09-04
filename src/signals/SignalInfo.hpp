@@ -28,7 +28,7 @@
 
 namespace lsan::signals {
 struct SignalInfo {
-    int code = 0;
+    int code = 0, siCode = 0;
     void* faultAddress = nullptr;
     lcs::callstack callstack;
 
