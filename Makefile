@@ -48,6 +48,7 @@ SRCS = \
 	src/statistics/AutoStats.cpp \
 	src/signals/signals.cpp \
 	src/signals/signalHandlers.cpp \
+	src/signals/SignalInfo.cpp \
 	src/crashWarner/exceptionHandler.cpp \
 	src/crashWarner/crashWarner.cpp \
 	src/callstacks/callstackHelper.cpp \

@@ -76,6 +76,8 @@
 		BFCDA8382E2F82F50029AEC1 /* Stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2E0289ED24200B17349 /* Stats.cpp */; };
 		F1E6666C2E699572009909D1 /* SignalInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F1E6666B2E699572009909D1 /* SignalInfo.hpp */; };
 		F1E6666D2E69963B009909D1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
+		F1E6666F2E69A0E5009909D1 /* SignalInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1E6666E2E69A0E5009909D1 /* SignalInfo.cpp */; };
+		F1E666702E69A0E5009909D1 /* SignalInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1E6666E2E69A0E5009909D1 /* SignalInfo.cpp */; };
 		F1EDCE9F2E65879C007E260E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1EDCE9D2E65879C007E260E /* main.cpp */; };
 		F1EDCEA22E6587E1007E260E /* CrashHandler in Resources */ = {isa = PBXBuildFile; fileRef = F1EDCE962E65876D007E260E /* CrashHandler */; };
 /* End PBXBuildFile section */
@@ -197,6 +199,7 @@
 		F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealAllocator.hpp; sourceTree = "<group>"; };
 		F1E0904B2D68DE9500F79FA2 /* AppKit.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AppKit.json; sourceTree = "<group>"; };
 		F1E6666B2E699572009909D1 /* SignalInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SignalInfo.hpp; sourceTree = "<group>"; };
+		F1E6666E2E69A0E5009909D1 /* SignalInfo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SignalInfo.cpp; sourceTree = "<group>"; };
 		F1EDCE962E65876D007E260E /* CrashHandler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CrashHandler; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1EDCE9D2E65879C007E260E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -418,6 +421,7 @@
 				BFAA94532B6C12FF007FC130 /* signals.hpp */,
 				BFAA94522B6C12FF007FC130 /* signals.cpp */,
 				F1E6666B2E699572009909D1 /* SignalInfo.hpp */,
+				F1E6666E2E69A0E5009909D1 /* SignalInfo.cpp */,
 			);
 			path = signals;
 			sourceTree = "<group>";
@@ -689,6 +693,7 @@
 				BFCDA7FD2E2F7CA10029AEC1 /* defaultSuppression.cpp in Sources */,
 				BF5AAFE62E605492007C0329 /* PoolAllocator.cpp in Sources */,
 				BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */,
+				F1E6666F2E69A0E5009909D1 /* SignalInfo.cpp in Sources */,
 				BFCDA7FE2E2F7CA10029AEC1 /* firstPartyLibrary.cpp in Sources */,
 				BFCDA7FF2E2F7CA10029AEC1 /* TLSTracker.cpp in Sources */,
 				BFCDA8002E2F7CA10029AEC1 /* bytePrinter.cpp in Sources */,
@@ -706,6 +711,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1EDCE9F2E65879C007E260E /* main.cpp in Sources */,
+				F1E666702E69A0E5009909D1 /* SignalInfo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
