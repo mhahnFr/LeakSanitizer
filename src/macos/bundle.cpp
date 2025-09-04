@@ -32,7 +32,7 @@ namespace lsan::macos::bundle {
  * @return the @c CFBundleRef
  */
 static inline auto getBundleWrapper() -> CFBundleRef {
-    return getTracker().withIgnorationResult(true, []() {
+    return getTracker().withIgnorationResult(false, [] {
         return CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
     });
 }
@@ -43,13 +43,13 @@ auto getBundle() -> CFBundleRef {
 }
 
 void killBundle() {
-    getTracker().withIgnoration(true, []() {
+    getTracker().withIgnoration(false, [] {
         CFRelease(getBundle());
     });
 }
 
 auto getCrashHandlerPath() -> std::string {
-    return getTracker().withIgnorationResult(true, [] {
+    return getTracker().withIgnorationResult(false, [] {
         const auto result = CFBundleCopyResourceURL(getBundle(), CFSTR("CrashHandler"), nil, nil);
         const auto path = CFURLCopyPath(result);
         CFRelease(result);
@@ -63,7 +63,7 @@ auto getCrashHandlerPath() -> std::string {
 constexpr inline auto DEFAULT_VERSION = "CLEAN BUILD";
 
 auto getVersion() -> std::string {
-    return getTracker().withIgnorationResult(true, []() -> std::string {
+    return getTracker().withIgnorationResult(false, [] -> std::string {
         const auto value = CFBundleGetValueForInfoDictionaryKey(getBundle(), kCFBundleVersionKey);
         if (value == nil) {
             return DEFAULT_VERSION;
@@ -73,7 +73,7 @@ auto getVersion() -> std::string {
 }
 
 auto convertCFString(const CFStringRef str) -> std::string {
-    return getTracker().withIgnorationResult(true, [str]() -> std::string {
+    return getTracker().withIgnorationResult(false, [str] -> std::string {
         if (str == nil) return {};
 
         if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
