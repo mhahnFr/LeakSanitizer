@@ -21,6 +21,10 @@
 
 #include <iostream>
 
-auto main() -> int {
-    std::cout << "This will become the dedicated macOS crash handler." << std::endl;
+#include "../../signals/SignalInfo.hpp"
+
+auto main(int argc, const char** argv) -> int {
+    // TODO: Safety!!!
+    auto info = lsan::signals::SignalInfo::fromBinary(argv[1], sizeof(lsan::signals::SignalInfo), argv[0][0]);
+    std::cout << "Signal " << info.code << ", fault address: " << info.faultAddress << std::endl;
 }

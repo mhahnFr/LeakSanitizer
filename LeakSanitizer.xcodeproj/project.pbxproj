@@ -74,6 +74,8 @@
 		BFCDA8262E2F7CDA0029AEC1 /* LeakType.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF7592282BB1799500891A55 /* LeakType.hpp */; };
 		BFCDA8272E2F7CDA0029AEC1 /* formatter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFAFADC528B4FDA40060076C /* formatter.hpp */; };
 		BFCDA8382E2F82F50029AEC1 /* Stats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF23A2E0289ED24200B17349 /* Stats.cpp */; };
+		F1E6666C2E699572009909D1 /* SignalInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F1E6666B2E699572009909D1 /* SignalInfo.hpp */; };
+		F1E6666D2E69963B009909D1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
 		F1EDCE9F2E65879C007E260E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1EDCE9D2E65879C007E260E /* main.cpp */; };
 		F1EDCEA22E6587E1007E260E /* CrashHandler in Resources */ = {isa = PBXBuildFile; fileRef = F1EDCE962E65876D007E260E /* CrashHandler */; };
 /* End PBXBuildFile section */
@@ -194,6 +196,7 @@
 		F1ACE4162D148B0F00E779A7 /* core.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = core.json; sourceTree = "<group>"; };
 		F1DB86FA2C5E927A00D6B4F4 /* RealAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RealAllocator.hpp; sourceTree = "<group>"; };
 		F1E0904B2D68DE9500F79FA2 /* AppKit.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AppKit.json; sourceTree = "<group>"; };
+		F1E6666B2E699572009909D1 /* SignalInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SignalInfo.hpp; sourceTree = "<group>"; };
 		F1EDCE962E65876D007E260E /* CrashHandler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CrashHandler; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1EDCE9D2E65879C007E260E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -212,6 +215,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1E6666D2E69963B009909D1 /* libcallstack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +417,7 @@
 				BF49A5D72899599300BC1FFD /* signalHandlers.cpp */,
 				BFAA94532B6C12FF007FC130 /* signals.hpp */,
 				BFAA94522B6C12FF007FC130 /* signals.cpp */,
+				F1E6666B2E699572009909D1 /* SignalInfo.hpp */,
 			);
 			path = signals;
 			sourceTree = "<group>";
@@ -533,6 +538,7 @@
 				BFCDA81E2E2F7CDA0029AEC1 /* bytePrinter.hpp in Headers */,
 				BFCDA81F2E2F7CDA0029AEC1 /* LeakSani.hpp in Headers */,
 				BFCDA8202E2F7CDA0029AEC1 /* MallocInfo.hpp in Headers */,
+				F1E6666C2E699572009909D1 /* SignalInfo.hpp in Headers */,
 				BFCDA8212E2F7CDA0029AEC1 /* lsanMisc.hpp in Headers */,
 				BFCDA8222E2F7CDA0029AEC1 /* ThreadInfo.hpp in Headers */,
 				BFCDA8232E2F7CDA0029AEC1 /* timing.hpp in Headers */,
@@ -998,6 +1004,11 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/CallstackLibrary/include";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/CallstackLibrary",
+				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1011,6 +1022,11 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/CallstackLibrary/include";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/CallstackLibrary",
+				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
