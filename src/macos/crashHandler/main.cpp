@@ -21,16 +21,25 @@
 
 #include <iostream>
 
+#include "../../behaviour/getBehaviour.hpp"
 #include "../../signals/SignalInfo.hpp"
 
 using namespace lsan;
 
+auto behaviour::getBehaviour() -> const Behaviour& {
+    static Behaviour instance;
+    return instance;
+}
+
+
 auto main(int argc, const char** argv) -> int {
+    using namespace signals;
+
     // TODO: Safety!!!
-    auto info = lsan::signals::SignalInfo::fromBinary(argv[1], sizeof(lsan::signals::SignalInfo), argv[0][0]);
-    auto [message, reason] = signals::createCrashMessage(info.code, info.siCode, info.faultAddress);
-    std::clog << message << std::endl;
+    auto info = SignalInfo::fromBinary(argv[1], sizeof(SignalInfo), argv[0][0]);
+    auto [message, reason] = createCrashMessage(info.code, info.siCode, info.faultAddress);
+    std::clog << message << "!" << std::endl;
     if (reason) {
-        std::clog << *reason << std::endl;
+        std::clog << *reason << "." << std::endl;
     }
 }
