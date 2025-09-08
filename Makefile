@@ -35,6 +35,7 @@ SRCS = \
 	src/ThreadInfo.cpp \
 	src/MallocInfo.cpp \
 	src/lsanMisc.cpp \
+	src/lsanFormat.cpp \
 	src/LeakSani.cpp \
 	src/bytePrinter.cpp \
 	src/wrappers/wrap_malloc.cpp \
@@ -52,6 +53,7 @@ SRCS = \
 	src/crashWarner/exceptionHandler.cpp \
 	src/crashWarner/crashWarner.cpp \
 	src/callstacks/callstackHelper.cpp \
+	src/behaviour/getBehaviour.cpp \
 	src/allocators/ObjectPool.cpp \
 	src/allocators/PoolAllocator.cpp
 
