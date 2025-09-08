@@ -117,7 +117,7 @@ auto malloc_zone_malloc(malloc_zone_t* zone, const std::size_t size) -> void* {
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (getBehaviour().zeroAllocation() && size == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, size));
@@ -137,7 +137,7 @@ auto malloc_zone_calloc(malloc_zone_t* zone, const std::size_t count, const std:
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (getBehaviour().zeroAllocation() && size == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, count * size));
@@ -157,7 +157,7 @@ auto malloc_zone_valloc(malloc_zone_t* zone, const std::size_t size) -> void* {
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (getBehaviour().zeroAllocation() && size == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, size));
@@ -177,7 +177,7 @@ auto malloc_zone_memalign(malloc_zone_t* zone, const std::size_t alignment, cons
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (getBehaviour().zeroAllocation() && size == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, size));
@@ -252,11 +252,11 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, const unsig
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
                 for (unsigned i = 0; i < num; ++i) {
-                    if (to_be_freed[i] == nullptr && getBehaviour().freeNull()) {
+                    if (to_be_freed[i] == nullptr && behaviour::getBehaviour().freeNull()) {
                         warn("Free of NULL");
                     } else if (to_be_freed[i] != nullptr) {
                         const auto& it = tracker.removeMalloc(to_be_freed[i]);
-                        if (getBehaviour().invalidFree() && !it.first) {
+                        if (behaviour::getBehaviour().invalidFree() && !it.first) {
                             crashOrWarn(createInvalidFreeMessage(to_be_freed[i], bool(it.second)), it.second);
                         }
                     }
@@ -288,11 +288,11 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
     if (!LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (ptr == nullptr && getBehaviour().freeNull()) {
+                if (ptr == nullptr && behaviour::getBehaviour().freeNull()) {
                     warn("Free of NULL");
                 } else if (ptr != nullptr) {
                     const auto& it = tracker.removeMalloc(ptr);
-                    if (getBehaviour().invalidFree() && !it.first) {
+                    if (behaviour::getBehaviour().invalidFree() && !it.first) {
                         crashOrWarn(createInvalidFreeMessage(ptr, bool(it.second)), it.second);
                     }
                 }
@@ -350,7 +350,7 @@ auto __lsan_malloc(const std::size_t size) -> void* {
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (getBehaviour().zeroAllocation() && size == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, size));
@@ -367,7 +367,7 @@ auto __lsan_calloc(const std::size_t count, const std::size_t objectSize) -> voi
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (getBehaviour().zeroAllocation() && objectSize * count == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && objectSize * count == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, objectSize * count));
@@ -384,7 +384,7 @@ auto __lsan_valloc(const std::size_t size) -> void* {
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (getBehaviour().zeroAllocation() && size == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, size));
@@ -401,7 +401,7 @@ auto __lsan_aligned_alloc(const std::size_t alignment, const std::size_t size) -
     if (ptr != nullptr && !LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
-                if (getBehaviour().zeroAllocation() && size == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 tracker.addMalloc(MallocInfo(ptr, size));
@@ -459,11 +459,11 @@ void __lsan_free(void* pointer) {
                std::chrono::nanoseconds trackingTime;)
     ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
         BENCH({
-            if (pointer == nullptr && getBehaviour().freeNull()) {
+            if (pointer == nullptr && behaviour::getBehaviour().freeNull()) {
                 warn("Free of NULL");
             } else if (pointer != nullptr) {
                 const auto& it = tracker.removeMalloc(pointer);
-                if (getBehaviour().invalidFree() && !it.first) {
+                if (behaviour::getBehaviour().invalidFree() && !it.first) {
                     crashOrWarn(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
                 }
             }
@@ -495,7 +495,7 @@ REPLACE(auto, posix_memalign)(void** memPtr, const std::size_t alignment, const 
                 if (alignment == 0 || alignment % 2 != 0 || alignment % sizeof(void*) != 0) {
                     warn("posix_memalign with invalid alignment of " + std::to_string(alignment));
                 }
-                if (getBehaviour().zeroAllocation() && size == 0) {
+                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
                     warn("Implementation-defined allocation of size 0");
                 }
                 if (*memPtr != wasPtr) {

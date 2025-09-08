@@ -23,10 +23,9 @@
 
 #include "callstackHelper.hpp"
 
-#include <string>
-
 #include <callstack.h>
 #include <callstack_internals.h>
+#include <string>
 
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
@@ -46,7 +45,7 @@ static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::
         return "<< Unknown >>";
     }
     
-    return getBehaviour().relativePaths() ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
+    return behaviour::getBehaviour().relativePaths() ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
 }
 
 /**
@@ -58,7 +57,7 @@ static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::
  * @return the name of the source file name of the given callstack frame
  */
 static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) -> std::string {
-    return getBehaviour().relativePaths() ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
+    return behaviour::getBehaviour().relativePaths() ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
 }
 
 /**
@@ -73,7 +72,7 @@ template<formatter::Style S>
 static inline void formatShared(const callstack_frame& frame, std::ostream& out) {
     using namespace formatter;
 
-    if (getBehaviour().printBinaries()) {
+    if (behaviour::getBehaviour().printBinaries()) {
         bool reset = false;
         if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
@@ -81,7 +80,7 @@ static inline void formatShared(const callstack_frame& frame, std::ostream& out)
         out << formatter::format<Style::ITALIC>("(" + formatString<Style::BLUE>(getCallstackFrameName(frame)) + ")") << (reset ? get<S>() : "") << " ";
     }
     bool needsBrackets = false;
-    if (frame.sourceFile == nullptr || getBehaviour().printFunctions()) {
+    if (frame.sourceFile == nullptr || behaviour::getBehaviour().printFunctions()) {
         out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
         needsBrackets = true;
     }
@@ -140,7 +139,7 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
          firstPrint = true;
     std::size_t i, printed, maxCount = 1;
 
-    if (getBehaviour().callstackSize() > 9) {
+    if (behaviour::getBehaviour().callstackSize() > 9) {
         std::size_t toSkip = 0;
         if (size > 9) {
             for (; toSkip < size && (frames[toSkip].binaryFile == nullptr || frames[toSkip].binaryFileIsSelf); ++toSkip);
@@ -154,7 +153,7 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
         }
     }
 
-    for (i = printed = 0; i < size && printed < getBehaviour().callstackSize(); ++i) {
+    for (i = printed = 0; i < size && printed < behaviour::getBehaviour().callstackSize(); ++i) {
         if (const auto& binaryFile = frames[i].binaryFile; binaryFile == nullptr || (firstPrint && frames[i].binaryFileIsSelf)) {
             continue;
         } else if (firstHit && (suppression::isFirstParty(binaryFile, !callstack_autoClearCaches) || frames[i].binaryFileIsSelf)) {

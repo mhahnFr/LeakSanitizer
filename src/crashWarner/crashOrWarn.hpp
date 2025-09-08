@@ -25,8 +25,6 @@
 #include "crash.hpp"
 #include "warn.hpp"
 
-#include "../lsanMisc.hpp"
-
 namespace lsan {
 /**
  * Calls either @c crash or @c warn with the given arguments.
@@ -36,7 +34,7 @@ namespace lsan {
  */
 template<typename ...Args>
 constexpr static inline void crashOrWarn(Args&& ...args) {
-    if (getBehaviour().invalidCrash()) {
+    if (behaviour::getBehaviour().invalidCrash()) {
         crash(std::forward<Args>(args)...);
     } else {
         warn(std::forward<Args>(args)...);

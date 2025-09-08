@@ -25,6 +25,7 @@
 
 #include "bytePrinter.hpp"
 #include "formatter.hpp"
+#include "lsanMisc.hpp"
 
 namespace lsan {
 /**
@@ -91,7 +92,7 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
  * @return the path to be used
  */
 static inline auto maybeRelativate(const std::pair<const char*, const char*>& path) -> const char* {
-    if (!getBehaviour().relativePaths()) return path.first;
+    if (!behaviour::getBehaviour().relativePaths()) return path.first;
 
     const auto& s1 = path.first == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.first);
     const auto& s2 = path.second == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.second);
@@ -127,7 +128,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
 
     std::size_t count { 0 },
                 bytes { 0 };
-    forEachIndirect(!getBehaviour().showIndirects(), [&](const auto& record) {
+    forEachIndirect(!behaviour::getBehaviour().showIndirects(), [&](const auto& record) {
         ++count;
         bytes += record.size;
     });
@@ -138,7 +139,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
     stream << std::endl;
     printCreatedCallstack(stream, indentString);
 
-    if (getBehaviour().showIndirects() && count > 0) {
+    if (behaviour::getBehaviour().showIndirects() && count > 0) {
         stream << std::endl << indentString << get<Style::AMBER> << "Indirect leak" << (count > 1 ? "s" : "") << ":" << clear<Style::AMBER>;
         const auto& shouldPrint = count > 1;
         const auto& newIndent = indent + (shouldPrint ? std::to_string(count).size() : 0) + 3;

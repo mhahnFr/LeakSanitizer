@@ -25,6 +25,7 @@
 #include <sstream>
 
 #include "lsanMisc.hpp"
+#include "behaviour/getBehaviour.hpp"
 
 namespace lsan {
 /** Represents exactly 1 EiB. Needed for the calculations as starting point. */
@@ -34,7 +35,7 @@ static constexpr inline const char* sizes[] { "EiB", "PiB", "TiB", "GiB", "MiB",
 
 auto bytesToString(const unsigned long long amount) -> std::string {
     std::stringstream s;
-    if (!getBehaviour().humanPrint() || amount == 0) {
+    if (!behaviour::getBehaviour().humanPrint() || amount == 0) {
         s << amount << " B";
     } else {
         unsigned long long multiplier = exabyte;

@@ -26,7 +26,7 @@
 
 #include <lsan_stats.h>
 
-#include "../lsanMisc.hpp"
+#include "../behaviour/getBehaviour.hpp"
 
 namespace lsan {
 namespace {
@@ -72,7 +72,7 @@ public:
     inline AutoStats() {
         using namespace std::chrono_literals;
 
-        if (const auto duration = getBehaviour().autoStats()) {
+        if (const auto duration = behaviour::getBehaviour().autoStats()) {
             interval = *duration;
             statsThread = std::thread(&AutoStats::printer, this);
         }

@@ -36,7 +36,6 @@
 #include "signals/signalHandlers.hpp"
 #include "signals/signals.hpp"
 #include "suppression/firstPartyLibrary.hpp"
-#include "trackers/TLSTracker.hpp"
 
 #ifdef __APPLE__
 extern "C" {
@@ -995,7 +994,7 @@ static inline auto operator<<(std::ostream& out, const LeakKindStats& stats) -> 
                      << " (" << bytesToString(stats.getLostBytes()) << ") lost" << clear<Style::BOLD> << std::endl
         << "       " << stats.getTotalReachable() << " leak" << (stats.getTotalReachable() == 1 ? "" : "s")
                      << " (" << bytesToString(stats.getReachableBytes()) << ") reachable";
-    if (!getBehaviour().showReachables()) {
+    if (!behaviour::getBehaviour().showReachables()) {
         out << format<Style::ITALIC>(" (not shown)");
     }
     return out << std::endl;

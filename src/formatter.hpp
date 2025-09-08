@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include "lsanMisc.hpp"
+#include "lsanFormat.hpp"
 
 /**
  * A namespace containing helper functions and classes for formatting

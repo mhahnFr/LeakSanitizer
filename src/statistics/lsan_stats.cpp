@@ -28,6 +28,7 @@
 #include "../formatter.hpp"
 #include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
+#include "../behaviour/getBehaviour.hpp"
 
 using namespace lsan;
 
@@ -303,7 +304,7 @@ void lsan_printFragmentationStatsWithWidth(const std::size_t width) {
 
     getTracker().withIgnoration(true, [=] {
         auto& out = getOutputStream();
-        if (getBehaviour().statsActive()) {
+        if (behaviour::getBehaviour().statsActive()) {
             printStatsCore("memory fragmentation", width, out,
                                   printFragmentationByteBar,
                                   printFragmentationObjectBar);
@@ -322,7 +323,7 @@ void lsan_printStatsWithWidth(const std::size_t width) {
 
     getTracker().withIgnoration(true, [=] {
         auto& out = getOutputStream();
-        if (getBehaviour().statsActive()) {
+        if (behaviour::getBehaviour().statsActive()) {
             printStatsCore("memory usage", width, out,
                                   [count = lsan_getCurrentByteCount(), peek = lsan_getBytePeek(),
                                       byteStr = bytesToString(lsan_getBytePeek())] <typename W, typename S>(W&& theWidth, S&& stream) {

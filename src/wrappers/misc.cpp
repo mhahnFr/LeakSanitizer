@@ -20,11 +20,12 @@
  */
 
 #include "interpose.hpp"
+#include "../lsanFormat.hpp"
 #include "../lsanMisc.hpp"
 
 REPLACE(void, exit)(const int code) noexcept(noexcept(::exit(code))) {
     getTracker().withIgnoration(true, [] {
-        if (getBehaviour().printExitPoint()) {
+        if (behaviour::getBehaviour().printExitPoint()) {
             getOutputStream() << maybePrintExitPoint;
         }
     });
