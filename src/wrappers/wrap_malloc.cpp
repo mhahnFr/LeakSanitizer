@@ -36,6 +36,7 @@
 #include "../timing.hpp"
 #include "../utils.hpp"
 #include "../crashWarner/crashOrWarn.hpp"
+#include "../crashWarner/crashForce.hpp"
 
 namespace lsan {
 /**
@@ -110,7 +111,7 @@ inline void ifNotIgnored(F&& func, Args&& ...args) {
 #ifdef __APPLE__
 auto malloc_zone_malloc(malloc_zone_t* zone, const std::size_t size) -> void* {
     if (zone == nullptr) {
-        crashForce("Called with NULL as zone");
+        crashWarner::crashForce("Called with NULL as zone");
     }
 
     BENCH(const auto ptr = ::malloc_zone_malloc(zone, size);, std::chrono::nanoseconds, sysTime);
@@ -130,7 +131,7 @@ auto malloc_zone_malloc(malloc_zone_t* zone, const std::size_t size) -> void* {
 
 auto malloc_zone_calloc(malloc_zone_t* zone, const std::size_t count, const std::size_t size) -> void* {
     if (zone == nullptr) {
-        crashForce("Called with NULL as zone");
+        crashWarner::crashForce("Called with NULL as zone");
     }
 
     BENCH(const auto ptr = ::malloc_zone_calloc(zone, count, size);, std::chrono::nanoseconds, sysTime);
@@ -150,7 +151,7 @@ auto malloc_zone_calloc(malloc_zone_t* zone, const std::size_t count, const std:
 
 auto malloc_zone_valloc(malloc_zone_t* zone, const std::size_t size) -> void* {
     if (zone == nullptr) {
-        crashForce("Called with NULL as zone");
+        crashWarner::crashForce("Called with NULL as zone");
     }
 
     BENCH(const auto ptr = ::malloc_zone_valloc(zone, size);, std::chrono::nanoseconds, sysTime);
@@ -170,7 +171,7 @@ auto malloc_zone_valloc(malloc_zone_t* zone, const std::size_t size) -> void* {
 
 auto malloc_zone_memalign(malloc_zone_t* zone, const std::size_t alignment, const std::size_t size) -> void* {
     if (zone == nullptr) {
-        crashForce("Called with NULL as zone");
+        crashWarner::crashForce("Called with NULL as zone");
     }
 
     BENCH(const auto ptr = ::malloc_zone_memalign(zone, alignment, size);, std::chrono::nanoseconds, sysTime);
@@ -190,7 +191,7 @@ auto malloc_zone_memalign(malloc_zone_t* zone, const std::size_t alignment, cons
 
 void malloc_destroy_zone(malloc_zone_t* zone) {
     if (zone == nullptr) {
-        crashForce("Destroying NULL zone");
+        crashWarner::crashForce("Destroying NULL zone");
     }
 
     BENCH_ONLY(bool ignored = true;
@@ -227,7 +228,7 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
 
 auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void** results, const unsigned num_requested) -> unsigned {
     if (zone == nullptr) {
-        crashForce("Batch allocating with NULL zone");
+        crashWarner::crashForce("Batch allocating with NULL zone");
     }
     BENCH(const auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested);, std::chrono::nanoseconds, sysTime);
     if (!LSan::finished && batched > 0) {
@@ -243,7 +244,7 @@ auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void*
 
 void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, const unsigned num) {
     if (zone == nullptr) {
-        crashForce("Batch free with NULL zone");
+        crashWarner::crashForce("Batch free with NULL zone");
     }
     BENCH_ONLY(bool ignored = true;
                std::chrono::nanoseconds trackingTimeOut;
@@ -279,7 +280,7 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, const unsig
 
 void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
     if (zone == nullptr) {
-        crashForce("Called with NULL as zone");
+        crashWarner::crashForce("Called with NULL as zone");
     }
 
     BENCH_ONLY(bool ignored = true;
@@ -314,7 +315,7 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
 
 auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size) -> void* {
     if (zone == nullptr) {
-        crashForce("Called with NULL as zone");
+        crashWarner::crashForce("Called with NULL as zone");
     }
 
     if (LSan::finished) {
@@ -484,7 +485,7 @@ void __lsan_free(void* pointer) {
 
 REPLACE(auto, posix_memalign)(void** memPtr, const std::size_t alignment, const std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
     if (void** checkPtr = memPtr; checkPtr == nullptr) {
-        crashForce("posix_memalign of a NULL pointer");
+        crashWarner::crashForce("posix_memalign of a NULL pointer");
     }
 
     const auto wasPtr = *memPtr;

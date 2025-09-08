@@ -27,7 +27,7 @@
 #include <callstack_exception.hpp>
 
 #include "exceptionHandler.hpp"
-#include "crash.hpp"
+#include "crashForce.hpp"
 
 #include "../lsanMisc.hpp"
 #include "../utils.hpp"
@@ -59,7 +59,7 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     std::stringstream stream;
     stream << "Uncaught exception of type " << demangle(typeid(exception).name()) << ": \"" << exception.what() << "\"";
     
-    crashForce(stream.str());
+    crashWarner::crashForce(stream.str());
 }
 
 /**
@@ -73,7 +73,7 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     std::stringstream stream;
     stream << "Uncaught exception of type " << exception.what();
     
-    crashForce(stream.str());
+    crashWarner::crashForce(stream.str());
 }
 
 [[ noreturn ]] void exceptionHandler() noexcept {
@@ -87,10 +87,10 @@ static inline auto demangle(const char * string) noexcept -> std::string {
         } catch (std::exception& e) {
             handleException(e);
         } catch (...) {
-            crashForce("Unknown uncaught exception");
+            crashWarner::crashForce("Unknown uncaught exception");
         }
     }
-    crashForce("Terminating without active exception");
+    crashWarner::crashForce("Terminating without active exception");
 }
 
 [[ noreturn ]] void mhExceptionHandler() noexcept {
@@ -99,9 +99,9 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     if (LOAD_FUNC(void*(*)(), tryCatch_getException); tryCatch_getException != nullptr) {
         if (const auto exception = tryCatch_getException(); exception != nullptr) {
             const auto exceptionType = *reinterpret_cast<const char**>(uintptr_t(exception) - sizeof(char*));
-            crashForce("Uncaught exception of type " + std::string(exceptionType));
+            crashWarner::crashForce("Uncaught exception of type " + std::string(exceptionType));
         }
     }
-    crashForce("Terminating with unknown exception");
+    crashWarner::crashForce("Terminating with unknown exception");
 }
 }

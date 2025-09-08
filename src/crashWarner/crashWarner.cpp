@@ -155,16 +155,6 @@ void crash(const std::string & message) {
     });
 }
 
-void crashForce(const std::string & message) {
-    printer<false>(message, lcs::callstack());
-    abort();
-}
-
-void crashForce(const std::string& message, const std::optional<std::string>& reason, lcs::callstack&& callstack) {
-    printer<false>(message, callstack, reason);
-    abort();
-}
-
 void crash(const std::string& message,
            const std::optional<MallocInfo::CRef>& info) {
     withCallstack([&] (auto& callstack) {

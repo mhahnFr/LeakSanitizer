@@ -19,25 +19,17 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
+#include "crashForce.hpp"
+#include "core.hpp"
 
-#include "../../behaviour/getBehaviour.hpp"
-#include "../../crashWarner/crashForce.hpp"
-#include "../../signals/SignalInfo.hpp"
-
-using namespace lsan;
-
-auto behaviour::getBehaviour() -> const Behaviour& {
-    static Behaviour instance;
-    return instance;
+namespace lsan::crashWarner {
+void crashForce(const std::string& message) {
+    printer<false>(message, lcs::callstack());
+    abort();
 }
 
-
-auto main(int argc, const char** argv) -> int {
-    using namespace signals;
-
-    // TODO: Safety!!!
-    auto info = SignalInfo::fromBinary(argv[1], sizeof(SignalInfo), argv[0][0]);
-    const auto& [message, reason] = createCrashMessage(info.code, info.siCode, info.faultAddress);
-    crashWarner::crashForce(message, reason, std::move(info.callstack));
+void crashForce(const std::string& message, const std::optional<std::string>& reason, lcs::callstack&& callstack) {
+    printer<false>(message, callstack, reason);
+    abort();
+}
 }

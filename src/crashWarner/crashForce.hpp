@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2025  mhahnFr
+ * Copyright (C) 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,40 +19,37 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef crash_hpp
-#define crash_hpp
+#ifndef crashForce_hpp
+#define crashForce_hpp
 
 #include <optional>
 #include <string>
 
-#include "../MallocInfo.hpp"
+#include <callstack.h>
 
-namespace lsan {
+namespace lsan::crashWarner {
 /**
  * @brief Terminates the linked program and prints the given message and a callstack.
  *
- * This function does nothing if the generated callstack is not user relevant.
+ * This function performs the termination in any case.
  *
  * @param message the message to be printed
  */
-void crash(const std::string & message);
+[[ noreturn ]] void crashForce(const std::string& message);
 
 /**
  * @brief Terminates the linked program and prints the given message, the
- * information provided by the optional allocation record and a callstack.
+ * optionally given reason and the given callstack.
  *
- * This function does nothing if the generated callstack is not user relevant.
+ * This function performs the termination in any case.
  *
  * @param message the message to be printed
- * @param info the optional allocation record
+ * @param reason the optional reason
+ * @param callstack the callstack
  */
-void crash(const std::string& message,
-           const std::optional<MallocInfo::CRef>& info);
-
-/**
- * This function resets the signal handler for @c SIGABRT and performs the abort.
- */
-[[ noreturn ]] void abort();
+[[ noreturn ]] void crashForce(const std::string&                message,
+                               const std::optional<std::string>& reason,
+                                     lcs::callstack&&            callstack);
 }
 
-#endif /* crash_hpp */
+#endif /* crashForce_hpp */

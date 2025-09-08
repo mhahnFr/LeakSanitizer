@@ -38,12 +38,12 @@
 #include <lsan_stats.h>
 
 #include "SignalInfo.hpp"
-#include "signals.hpp"
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../utils.hpp"
 #include "../callstacks/callstackHelper.hpp"
-#include "../crashWarner/crash.hpp"
+#include "../crashWarner/core.hpp"
+#include "../crashWarner/crashForce.hpp"
 
 namespace lsan::signals::handlers {
 /**
@@ -113,7 +113,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 
     lcs_activateSwiftDemangler = false;
     const auto [message, reasonDescription] = createCrashMessage(signalCode, signalContext->si_code, signalContext->si_addr);
-    crashForce(message, reasonDescription, std::move(callstack));
+    crashWarner::crashForce(message, reasonDescription, std::move(callstack));
 }
 
 #ifdef __APPLE__
