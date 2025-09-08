@@ -27,7 +27,7 @@
 #include <optional>
 #include <string>
 
-#include "../formatter.hpp"
+#include "../formatter/formatter.hpp"
 
 namespace lsan {
 namespace crashWarner {
@@ -52,12 +52,12 @@ static inline void printer(const std::string& message, lcs::callstack& callstack
     if (reason.has_value()) {
         std::cerr << *reason << "." << std::endl;
     }
-    callstackHelper::format(callstack, std::cerr);
+    // callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
 
     if constexpr (!Warning && SizeHint) {
         std::ostringstream oss;
-        getInstance().maybeHintCallstackSize(oss);
+        // getInstance().maybeHintCallstackSize(oss);
         if (const auto& str = oss.str(); !str.empty()) {
             std::cerr << "Hints:" << std::endl << str;
         }

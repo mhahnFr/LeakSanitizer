@@ -1,5 +1,5 @@
 /*
-* LeakSanitizer - Small library showing information about lost memory.
+ * LeakSanitizer - Small library showing information about lost memory.
  *
  * Copyright (C) 2025  mhahnFr
  *
@@ -25,7 +25,7 @@
 #include <iostream>
 #include <string>
 
-#include "behaviour/getBehaviour.hpp"
+#include "../behaviour/getBehaviour.hpp"
 
 namespace lsan {
 /**

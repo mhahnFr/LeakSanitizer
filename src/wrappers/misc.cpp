@@ -20,8 +20,8 @@
  */
 
 #include "interpose.hpp"
-#include "../lsanFormat.hpp"
 #include "../lsanMisc.hpp"
+#include "../formatter/lsanFormat.hpp"
 
 REPLACE(void, exit)(const int code) noexcept(noexcept(::exit(code))) {
     getTracker().withIgnoration(true, [] {

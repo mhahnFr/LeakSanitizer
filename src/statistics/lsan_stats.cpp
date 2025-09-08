@@ -25,10 +25,10 @@
 #include <lsan_stats.h>
 
 #include "../bytePrinter.hpp"
-#include "../formatter.hpp"
 #include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
 #include "../behaviour/getBehaviour.hpp"
+#include "../formatter/formatter.hpp"
 
 using namespace lsan;
 

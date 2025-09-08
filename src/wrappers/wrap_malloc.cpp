@@ -30,13 +30,13 @@
 # include <mach/mach_init.h>
 #endif
 
-#include "../formatter.hpp"
 #include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
 #include "../timing.hpp"
 #include "../utils.hpp"
-#include "../crashWarner/crashOrWarn.hpp"
 #include "../crashWarner/crashForce.hpp"
+#include "../crashWarner/crashOrWarn.hpp"
+#include "../formatter/formatter.hpp"
 
 namespace lsan {
 /**

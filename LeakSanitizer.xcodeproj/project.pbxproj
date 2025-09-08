@@ -176,7 +176,7 @@
 		BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ThreadInfo.hpp; sourceTree = "<group>"; };
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
-		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter.hpp; sourceTree = SOURCE_ROOT; };
+		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter/formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFB103D62E38CB7100ECECD5 /* bundle.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bundle.hpp; sourceTree = "<group>"; };
 		BFB103D72E38CB7100ECECD5 /* bundle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bundle.cpp; sourceTree = "<group>"; };
 		BFBBC80C2CF0D00800F0785F /* FunctionNotFoundException.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FunctionNotFoundException.hpp; sourceTree = "<group>"; };
@@ -406,35 +406,33 @@
 		BF9DD3A428A6761400AEBC17 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				BFB103D52E38CB5A00ECECD5 /* macos */,
 				F1B373972C67A0D700674C3C /* allocators */,
 				BFE023F12CA874AE00AEFD5A /* behaviour */,
-				BFAA94582B6C1E52007FC130 /* signals */,
-				BFBCAD8A2ACF611A00C6B69F /* wrappers */,
 				BF3204F22AC5C625004EC77E /* callstacks */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
+				F16F67462E6ED93A00F7798C /* formatter */,
+				BFDD6DFD2CC6B5A9008B9CDC /* helpers */,
+				BFB103D52E38CB5A00ECECD5 /* macos */,
+				BFAA94582B6C1E52007FC130 /* signals */,
 				BF41CC5D2A813B4500EAA3A1 /* statistics */,
 				BF3E50512CCFE7ED00CB225E /* suppression */,
-				BFDD6DFD2CC6B5A9008B9CDC /* helpers */,
 				BF7ACDAE2D561DAC00629378 /* trackers */,
+				BFBCAD8A2ACF611A00C6B69F /* wrappers */,
 				BF621FE128A2B61E00414EE4 /* bytePrinter.hpp */,
 				BF621FE028A2B61E00414EE4 /* bytePrinter.cpp */,
 				BF72C3C92885CB9E00C7AE5C /* LeakSani.hpp */,
 				BF72C3CA2885CB9E00C7AE5C /* LeakSani.cpp */,
-				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
-				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
+				BF7592282BB1799500891A55 /* LeakType.hpp */,
 				BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */,
 				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
+				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
+				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
+				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
 				BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */,
 				BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
 				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
-				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
-				BF7592282BB1799500891A55 /* LeakType.hpp */,
-				BFAFADC528B4FDA40060076C /* formatter.hpp */,
-				F16F672F2E6EAF7E00F7798C /* lsanFormat.hpp */,
-				F16F67302E6EAF7E00F7798C /* lsanFormat.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -511,6 +509,16 @@
 				F18566A92DCDDA3C00D348F0 /* tlv.json */,
 			);
 			path = macos;
+			sourceTree = "<group>";
+		};
+		F16F67462E6ED93A00F7798C /* formatter */ = {
+			isa = PBXGroup;
+			children = (
+				BFAFADC528B4FDA40060076C /* formatter.hpp */,
+				F16F672F2E6EAF7E00F7798C /* lsanFormat.hpp */,
+				F16F67302E6EAF7E00F7798C /* lsanFormat.cpp */,
+			);
+			path = formatter;
 			sourceTree = "<group>";
 		};
 		F1B373972C67A0D700674C3C /* allocators */ = {

@@ -38,12 +38,12 @@
 #include <lsan_stats.h>
 
 #include "SignalInfo.hpp"
-#include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../utils.hpp"
 #include "../callstacks/callstackHelper.hpp"
 #include "../crashWarner/core.hpp"
 #include "../crashWarner/crashForce.hpp"
+#include "../formatter/formatter.hpp"
 
 namespace lsan::signals::handlers {
 /**

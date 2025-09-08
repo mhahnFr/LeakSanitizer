@@ -22,8 +22,8 @@
 #include "SignalInfo.hpp"
 
 #include "signals.hpp"
-#include "../formatter.hpp"
 #include "../utils.hpp"
+#include "../formatter/formatter.hpp"
 
 namespace lsan::signals {
 /**

@@ -27,8 +27,8 @@
 #include <callstack_internals.h>
 #include <string>
 
-#include "../formatter.hpp"
 #include "../lsanMisc.hpp"
+#include "../formatter/formatter.hpp"
 #include "../suppression/firstPartyLibrary.hpp"
 
 namespace lsan::callstackHelper {
