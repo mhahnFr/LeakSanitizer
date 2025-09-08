@@ -22,8 +22,6 @@
 #ifndef lsanMisc_hpp
 #define lsanMisc_hpp
 
-#include <iostream>
-#include <string>
 #include <vector>
 
 #include "LeakSani.hpp"
@@ -71,24 +69,6 @@ auto maybeHintRelativePaths(std::ostream & out) -> std::ostream &;
  * @return the given output stream
  */
 auto printWorkingDirectory(std::ostream & out) -> std::ostream &;
-
-/**
- * @brief Returns whether the output stream to print to is a TTY.
- *
- * If the POSIX function @c isatty is not available, @c Behaviour::printFormatted()
- * is returned.
- *
- * @return whether the output stream to print to is an interactive terminal
- */
-auto isATTY() -> bool;
-
-/**
- * Returns whether the given variable has been set in the environment.
- *
- * @param var the variable to be checked
- * @return whether the variable name is in the environment
- */
-auto has(const std::string & var) -> bool;
 
 /**
  * Prints the stacktrace of the exit point if requested.
@@ -140,39 +120,6 @@ static inline auto getStats() -> const Stats & {
  */
 static inline void internalCleanUp() {
     delete std::addressof(getInstance());
-}
-
-/**
- * Returns the behaviour object of the main class.
- *
- * @return the behaviour object of the main class
- */
-static inline auto getBehaviour() -> const behaviour::Behaviour& {
-    return getInstance().getBehaviour();
-}
-
-/**
- * @brief Returns whether to print formatted.
- *
- * This condition is met when @c Behaviour::printFormatted() returns @c true
- * and the output stream prints onto an interactive terminal.
- *
- * @return whether to print formatted
- */
-static inline auto printFormatted() -> bool {
-    if (has("LSAN_PRINT_FORMATTED")) {
-        return getBehaviour().printFormatted();
-    }
-    return getBehaviour().printFormatted() && isATTY();
-}
-
-/**
- * Returns the appropriate output stream to print to.
- *
- * @return the output stream to print to
- */
-static inline auto getOutputStream() -> std::ostream & {
-    return getBehaviour().printCout() ? std::cout : std::clog;
 }
 
 /**

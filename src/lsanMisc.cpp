@@ -19,22 +19,16 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <filesystem>
-#include <fstream>
-#include <sstream>
-
-#if __has_include(<unistd.h>)
- #include <unistd.h>
-
- #define LSAN_HAS_UNISTD
-#endif
-
 #include "lsanMisc.hpp"
 
 #include <callstack.h>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
 #include <SimpleJSON/SimpleJSON.hpp>
 
 #include "formatter.hpp"
+#include "lsanFormat.hpp"
 #include "callstacks/callstackHelper.hpp"
 #include "suppression/defaultSuppression.hpp"
 #include "suppression/FunctionNotFoundException.hpp"
@@ -117,7 +111,7 @@ void exitHook() {
 }
 
 auto maybeHintRelativePaths(std::ostream & out) -> std::ostream & {
-    if (getBehaviour().relativePaths()) {
+    if (behaviour::getBehaviour().relativePaths()) {
         out << printWorkingDirectory << std::endl;
     }
     return out;
@@ -127,25 +121,13 @@ auto printWorkingDirectory(std::ostream& out) -> std::ostream& {
     return out << "Working directory: " << std::filesystem::current_path().string() << std::endl;
 }
 
-auto isATTY() -> bool {
-#ifdef LSAN_HAS_UNISTD
-    return isatty(getBehaviour().printCout() ? STDOUT_FILENO : STDERR_FILENO);
-#else
-    return getBehaviour().printFormatted();
-#endif
-}
-
-auto has(const std::string & var) -> bool {
-    return getenv(var.c_str()) != nullptr;
-}
-
 auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     using formatter::Style;
 
     if (getInstance().hasPrintedExit) return out;
 
     out << std::endl << formatter::format<Style::GREEN>("Exiting");
-    if (getBehaviour().printExitPoint()) {
+    if (behaviour::getBehaviour().printExitPoint()) {
         out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
         callstackHelper::format(lcs::callstack(), out);
     }
@@ -177,7 +159,7 @@ auto getTracker() -> trackers::ATracker& {
         pthread_setspecific(key, std::addressof(globalInstance));
         trackers::ATracker* tlsTracker;
         globalInstance.withIgnoration(true, [&] {
-            tlsTracker = newLocalTracker(getBehaviour().statsActive());
+            tlsTracker = newLocalTracker(behaviour::getBehaviour().statsActive());
             pthread_setspecific(key, tlsTracker);
         });
         return *tlsTracker;
@@ -221,7 +203,7 @@ static inline void loadSuppressions(std::vector<suppression::Suppression>& conte
             } catch (const suppression::FunctionNotFoundException& e) {
                 using namespace formatter;
 
-                if (getBehaviour().suppressionDevelopersMode()) {
+                if (behaviour::getBehaviour().suppressionDevelopersMode()) {
                     getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
                                                                          + "\" ignored: Function \"" + e.getFunctionName()
                                                                          + "\" not loaded.") << std::endl << std::endl;
@@ -246,7 +228,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
         }
     }
 
-    for (const auto& file : getFiles(getBehaviour().suppressionFiles())) {
+    for (const auto& file : getFiles(behaviour::getBehaviour().suppressionFiles())) {
         auto stream = std::ifstream();
         stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
 
@@ -301,7 +283,7 @@ auto loadSystemLibraries() -> std::vector<std::regex> {
         }
     }
 
-    for (const auto& file : getFiles(getBehaviour().systemLibraryFiles())) {
+    for (const auto& file : getFiles(behaviour::getBehaviour().systemLibraryFiles())) {
         auto stream = std::ifstream();
         stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
 
