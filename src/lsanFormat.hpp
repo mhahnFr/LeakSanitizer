@@ -47,6 +47,24 @@ auto has(const std::string& var) -> bool;
 auto isATTY() -> bool;
 
 /**
+ * Prints the note about the relative paths if relative paths are allowed by
+ * @c Behaviour::relativePaths() on the given output stream.
+ *
+ * @param out the output stream to print to
+ * @return the given output stream
+ */
+auto maybeHintRelativePaths(std::ostream& out) -> std::ostream&;
+
+/**
+ * Prints the hint about the relative paths, including the current working
+ * directory.
+ *
+ * @param out the output stream to print to
+ * @return the given output stream
+ */
+auto printWorkingDirectory(std::ostream& out) -> std::ostream&;
+
+/**
  * @brief Returns whether to print formatted.
  *
  * This condition is met when @c Behaviour::printFormatted() returns @c true

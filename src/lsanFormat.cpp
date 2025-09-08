@@ -21,10 +21,12 @@
 
 #include "lsanFormat.hpp"
 
-#if __has_include(<unistd.h>)
- #include <unistd.h>
+#include <filesystem>
 
- #define LSAN_HAS_UNISTD
+#if __has_include(<unistd.h>)
+# include <unistd.h>
+
+# define LSAN_HAS_UNISTD
 #endif
 
 namespace lsan {
@@ -38,5 +40,16 @@ auto isATTY() -> bool {
 #else
     return behaviour::getBehaviour().printFormatted();
 #endif
+}
+
+auto maybeHintRelativePaths(std::ostream& out) -> std::ostream& {
+    if (behaviour::getBehaviour().relativePaths()) {
+        out << printWorkingDirectory << std::endl;
+    }
+    return out;
+}
+
+auto printWorkingDirectory(std::ostream& out) -> std::ostream& {
+    return out << "Working directory: " << std::filesystem::current_path().string() << std::endl;
 }
 }

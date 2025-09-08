@@ -110,17 +110,6 @@ void exitHook() {
     internalCleanUp();
 }
 
-auto maybeHintRelativePaths(std::ostream & out) -> std::ostream & {
-    if (behaviour::getBehaviour().relativePaths()) {
-        out << printWorkingDirectory << std::endl;
-    }
-    return out;
-}
-
-auto printWorkingDirectory(std::ostream& out) -> std::ostream& {
-    return out << "Working directory: " << std::filesystem::current_path().string() << std::endl;
-}
-
 auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     using formatter::Style;
 

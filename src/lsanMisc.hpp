@@ -53,24 +53,6 @@ auto printInformation(std::ostream & out) -> std::ostream &;
 void exitHook();
 
 /**
- * Prints the note about the relative paths if relative paths are allowed by
- * @c Behaviour::relativePaths() on the given output stream.
- *
- * @param out the output stream to print to
- * @return the given output stream
- */
-auto maybeHintRelativePaths(std::ostream & out) -> std::ostream &;
-
-/**
- * Prints the hint about the relative paths, including the current working
- * directory.
- *
- * @param out the output stream to print to
- * @return the given output stream
- */
-auto printWorkingDirectory(std::ostream & out) -> std::ostream &;
-
-/**
  * Prints the stacktrace of the exit point if requested.
  *
  * @param out the output stream to print to
