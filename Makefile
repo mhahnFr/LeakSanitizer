@@ -51,7 +51,9 @@ SRCS = \
 	src/signals/signalHandlers.cpp \
 	src/signals/SignalInfo.cpp \
 	src/crashWarner/exceptionHandler.cpp \
+	src/crashWarner/core.cpp \
 	src/crashWarner/crashWarner.cpp \
+	src/crashWarner/crashForce.cpp \
 	src/callstacks/callstackHelper.cpp \
 	src/behaviour/getBehaviour.cpp \
 	src/allocators/ObjectPool.cpp \
