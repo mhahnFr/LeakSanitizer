@@ -35,7 +35,6 @@ SRCS = \
 	src/ThreadInfo.cpp \
 	src/MallocInfo.cpp \
 	src/lsanMisc.cpp \
-	src/lsanFormat.cpp \
 	src/LeakSani.cpp \
 	src/bytePrinter.cpp \
 	src/wrappers/wrap_malloc.cpp \
@@ -50,6 +49,7 @@ SRCS = \
 	src/signals/signals.cpp \
 	src/signals/signalHandlers.cpp \
 	src/signals/SignalInfo.cpp \
+	src/formatter/lsanFormat.cpp \
 	src/crashWarner/exceptionHandler.cpp \
 	src/crashWarner/core.cpp \
 	src/crashWarner/crashWarner.cpp \
