@@ -80,6 +80,12 @@
 		F16F67362E6EB3EA00F7798C /* getBehaviour.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16F67332E6EB3EA00F7798C /* getBehaviour.hpp */; };
 		F16F67392E6EBDA800F7798C /* signals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFAA94522B6C12FF007FC130 /* signals.cpp */; };
 		F16F673A2E6EBDBB00F7798C /* lsanFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F67302E6EAF7E00F7798C /* lsanFormat.cpp */; };
+		F16F673D2E6EC8CC00F7798C /* crashForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F673C2E6EC8CC00F7798C /* crashForce.cpp */; };
+		F16F673E2E6EC8CC00F7798C /* crashForce.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16F673B2E6EC8CC00F7798C /* crashForce.hpp */; };
+		F16F673F2E6EC8CC00F7798C /* crashForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F673C2E6EC8CC00F7798C /* crashForce.cpp */; };
+		F16F67412E6ECA8200F7798C /* core.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16F67402E6ECA8200F7798C /* core.hpp */; };
+		F16F67432E6ED07700F7798C /* core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F67422E6ED07700F7798C /* core.cpp */; };
+		F16F67452E6ED1FC00F7798C /* core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F67422E6ED07700F7798C /* core.cpp */; };
 		F1E6666C2E699572009909D1 /* SignalInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F1E6666B2E699572009909D1 /* SignalInfo.hpp */; };
 		F1E6666D2E69963B009909D1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
 		F1E6666F2E69A0E5009909D1 /* SignalInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1E6666E2E69A0E5009909D1 /* SignalInfo.cpp */; };
@@ -201,6 +207,10 @@
 		F16F67302E6EAF7E00F7798C /* lsanFormat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsanFormat.cpp; sourceTree = "<group>"; };
 		F16F67332E6EB3EA00F7798C /* getBehaviour.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = getBehaviour.hpp; sourceTree = "<group>"; };
 		F16F67342E6EB3EA00F7798C /* getBehaviour.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = getBehaviour.cpp; sourceTree = "<group>"; };
+		F16F673B2E6EC8CC00F7798C /* crashForce.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = crashForce.hpp; sourceTree = "<group>"; };
+		F16F673C2E6EC8CC00F7798C /* crashForce.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crashForce.cpp; sourceTree = "<group>"; };
+		F16F67402E6ECA8200F7798C /* core.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = core.hpp; sourceTree = "<group>"; };
+		F16F67422E6ED07700F7798C /* core.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = core.cpp; sourceTree = "<group>"; };
 		F18566A92DCDDA3C00D348F0 /* tlv.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tlv.json; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
@@ -288,6 +298,10 @@
 				BF4368F32AACF04700252E2A /* crashWarner.cpp */,
 				BF2C5CB12AEAB63600DE2224 /* exceptionHandler.hpp */,
 				BF2C5CB02AEAB63600DE2224 /* exceptionHandler.cpp */,
+				F16F673B2E6EC8CC00F7798C /* crashForce.hpp */,
+				F16F673C2E6EC8CC00F7798C /* crashForce.cpp */,
+				F16F67402E6ECA8200F7798C /* core.hpp */,
+				F16F67422E6ED07700F7798C /* core.cpp */,
 			);
 			path = crashWarner;
 			sourceTree = "<group>";
@@ -541,6 +555,7 @@
 				BFCDA80E2E2F7CDA0029AEC1 /* interpose.hpp in Headers */,
 				BFCDA80F2E2F7CDA0029AEC1 /* realAlloc.hpp in Headers */,
 				BFCDA8102E2F7CDA0029AEC1 /* callstackHelper.hpp in Headers */,
+				F16F67412E6ECA8200F7798C /* core.hpp in Headers */,
 				BFCDA8112E2F7CDA0029AEC1 /* crash.hpp in Headers */,
 				BFCDA8122E2F7CDA0029AEC1 /* warn.hpp in Headers */,
 				BFCDA8132E2F7CDA0029AEC1 /* exceptionHandler.hpp in Headers */,
@@ -564,6 +579,7 @@
 				BFCDA8232E2F7CDA0029AEC1 /* timing.hpp in Headers */,
 				BFCDA8242E2F7CDA0029AEC1 /* utils.hpp in Headers */,
 				BFCDA8252E2F7CDA0029AEC1 /* objcSupport.hpp in Headers */,
+				F16F673E2E6EC8CC00F7798C /* crashForce.hpp in Headers */,
 				BFCDA8262E2F7CDA0029AEC1 /* LeakType.hpp in Headers */,
 				BFCDA8272E2F7CDA0029AEC1 /* formatter.hpp in Headers */,
 			);
@@ -697,9 +713,11 @@
 				BFCDA7F12E2F7CA10029AEC1 /* ObjectPool.cpp in Sources */,
 				BFCDA7F22E2F7CA10029AEC1 /* signalHandlers.cpp in Sources */,
 				BFCDA7F32E2F7CA10029AEC1 /* signals.cpp in Sources */,
+				F16F67432E6ED07700F7798C /* core.cpp in Sources */,
 				BFCDA7F42E2F7CA10029AEC1 /* wrap_malloc.cpp in Sources */,
 				BFCDA7F52E2F7CA10029AEC1 /* misc.cpp in Sources */,
 				F16F67312E6EAF7E00F7798C /* lsanFormat.cpp in Sources */,
+				F16F673D2E6EC8CC00F7798C /* crashForce.cpp in Sources */,
 				BFCDA7F62E2F7CA10029AEC1 /* callstackHelper.cpp in Sources */,
 				BFCDA7F72E2F7CA10029AEC1 /* crashWarner.cpp in Sources */,
 				BFCDA7F82E2F7CA10029AEC1 /* exceptionHandler.cpp in Sources */,
@@ -728,9 +746,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F16F67452E6ED1FC00F7798C /* core.cpp in Sources */,
 				F16F673A2E6EBDBB00F7798C /* lsanFormat.cpp in Sources */,
 				F16F67392E6EBDA800F7798C /* signals.cpp in Sources */,
 				F1EDCE9F2E65879C007E260E /* main.cpp in Sources */,
+				F16F673F2E6EC8CC00F7798C /* crashForce.cpp in Sources */,
 				F1E666702E69A0E5009909D1 /* SignalInfo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
