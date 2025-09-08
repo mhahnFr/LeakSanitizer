@@ -19,63 +19,16 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <csignal>
 #include <iostream>
 
+#include "core.hpp"
 #include "crash.hpp"
 #include "warn.hpp"
-
 #include "../formatter.hpp"
 #include "../lsanMisc.hpp"
 #include "../callstacks/callstackHelper.hpp"
 
 namespace lsan {
-/**
- * Prints the given message and the given callstack.
- *
- * @param message the message to be printed
- * @param callstack the callstack to be printed
- * @param reason the optional reason for the message
- * @tparam Warning whether to use warning formatting
- * @tparam SizeHint whether to print the size hint if Warning is false
- */
-template<bool Warning, bool SizeHint = true>
-static inline void printer(const std::string& message, lcs::callstack& callstack,
-                                     const std::optional<std::string>& reason = std::nullopt) {
-    using formatter::Style;
-    
-    constexpr auto colour = Warning ? Style::MAGENTA : Style::RED;
-
-    std::cerr << formatter::clearAll() << std::endl
-              << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
-    if (reason.has_value()) {
-        std::cerr << *reason << "." << std::endl;
-    }
-    callstackHelper::format(callstack, std::cerr);
-    std::cerr << std::endl;
-    
-    if constexpr (!Warning && SizeHint) {
-        std::ostringstream oss;
-        getInstance().maybeHintCallstackSize(oss);
-        if (const auto& str = oss.str(); !str.empty()) {
-            std::cerr << "Hints:" << std::endl << str;
-        }
-        std::cerr << std::endl << maybeHintRelativePaths;
-    }
-}
-
-/**
- * Prints the given message and the given callstack.
- *
- * @param message the message to be printed
- * @param callstack the callstack to be printed
- * @tparam Warning whether to use warning formatting
- */
-template<bool Warning>
-constexpr static inline void printer(const std::string & message, lcs::callstack && callstack) {
-    printer<Warning>(message, callstack);
-}
-
 /**
  * Prints the given message, the allocation information found in the
  * optionally provided allocation record and the given callstack.
@@ -92,7 +45,7 @@ constexpr static inline void printer(const std::string&                     mess
     using namespace formatter;
     using namespace std::string_literals;
 
-    printer<Warning, false>(message, callstack);
+    crashWarner::printer<Warning, false>(message, callstack);
 
     auto& instance = getInstance();
     if (info.has_value()) {
@@ -137,7 +90,7 @@ static inline void withCallstack(const F & function) {
 
 void warn(const std::string & message) {
     withCallstack([&] (auto & callstack) {
-        printer<true>(message, callstack);
+        crashWarner::printer<true>(message, callstack);
     });
 }
 
@@ -150,7 +103,7 @@ void warn(const std::string& message,
 
 void crash(const std::string & message) {
     withCallstack([&] (auto & callstack) {
-        printer<false>(message, callstack);
+        crashWarner::printer<false>(message, callstack);
         abort();
     });
 }
@@ -161,10 +114,5 @@ void crash(const std::string& message,
         printer<false>(message, info, callstack);
         abort();
     });
-}
-
-[[ noreturn ]] void abort() {
-    signal(SIGABRT, SIG_DFL);
-    std::abort();
 }
 }

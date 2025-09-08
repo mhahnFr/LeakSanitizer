@@ -48,11 +48,6 @@ void crash(const std::string & message);
  */
 void crash(const std::string& message,
            const std::optional<MallocInfo::CRef>& info);
-
-/**
- * This function resets the signal handler for @c SIGABRT and performs the abort.
- */
-[[ noreturn ]] void abort();
 }
 
 #endif /* crash_hpp */
