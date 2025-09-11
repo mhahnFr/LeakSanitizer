@@ -159,10 +159,14 @@ constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tra
 #define dealloc(func, ptr, ...) deallocExpr(func, removeAllocation(ptr, tracker) __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef __APPLE__
-#define zoneAlloc(func, allocSize, type, ...)                \
-    if (zone == nullptr) {                                   \
-        crashWarner::crashForce("Called with NULL as zone"); \
-    }                                                        \
+constexpr inline void assertZone(const malloc_zone_t* zone, const std::string& message = "Called with NULL as zone") {
+    if (zone == nullptr) {
+        crashWarner::crashForce(message);
+    }
+}
+
+# define zoneAlloc(func, allocSize, type, ...)             \
+    assertZone(zone);                                      \
     alloc(func, allocSize, type __VA_OPT__(,) __VA_ARGS__)
 
 auto malloc_zone_malloc(malloc_zone_t* zone, const std::size_t size) -> void* {
@@ -182,10 +186,7 @@ auto malloc_zone_memalign(malloc_zone_t* zone, const std::size_t alignment, cons
 }
 
 void malloc_destroy_zone(malloc_zone_t* zone) {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Destroying NULL zone");
-    }
-
+    assertZone(zone, "Destroying NULL zone");
     BENCH_ONLY(bool ignored = true;
                std::chrono::nanoseconds trackingTimeOut;
                std::chrono::nanoseconds lockingTimeOut;)
@@ -219,9 +220,7 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
 }
 
 auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void** results, const unsigned num_requested) -> unsigned {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Batch allocating with NULL zone");
-    }
+    assertZone(zone, "Batch allocating with NULL zone");
     BENCH(const auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested);, std::chrono::nanoseconds, sysTime);
     if (!LSan::finished && batched > 0) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
@@ -235,25 +234,19 @@ auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void*
 }
 
 void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, const unsigned num) {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Batch free with NULL zone");
-    }
+    assertZone(zone, "Batch free with NULL zone");
     deallocExpr(::malloc_zone_batch_free, for (unsigned i = 0; i < num; ++i) {
         removeAllocation(to_be_freed[i], tracker);
     }, zone, to_be_freed, num);
 }
 
 void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Called with NULL as zone");
-    }
+    assertZone(zone);
     dealloc(::malloc_zone_free, ptr, zone, ptr);
 }
 
 auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size) -> void* {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Called with NULL as zone");
-    }
+    assertZone(zone);
 
     if (LSan::finished) {
         return ::malloc_zone_realloc(zone, ptr, size);
