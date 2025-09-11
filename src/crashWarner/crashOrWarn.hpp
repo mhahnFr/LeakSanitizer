@@ -25,6 +25,8 @@
 #include "crash.hpp"
 #include "warn.hpp"
 
+#include "../behaviour/getBehaviour.hpp"
+
 namespace lsan {
 /**
  * Calls either @c crash or @c warn with the given arguments.
