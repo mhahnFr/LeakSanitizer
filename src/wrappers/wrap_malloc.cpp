@@ -124,6 +124,40 @@ inline void ifNotIgnored(F&& func, Args&& ...args) {
     }                                                                                 \
     return ptr
 
+constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tracker) {
+    if (ptr == nullptr && behaviour::getBehaviour().freeNull()) {
+        warn("Free of NULL");
+    } else if (ptr != nullptr) {
+        if (const auto& [removed, previousAlloc] = tracker.removeMalloc(ptr);
+            behaviour::getBehaviour().invalidFree() && !removed) {
+            crashOrWarn(createInvalidFreeMessage(ptr, bool(previousAlloc)), previousAlloc);
+        }
+    }
+}
+
+#define deallocExpr(func, trackExpr, ...)                                                \
+    BENCH_ONLY(bool ignored = true;                                                      \
+               std::chrono::nanoseconds trackingTimeOut;                                 \
+               std::chrono::nanoseconds lockingTimeOut;)                                 \
+    if (!LSan::finished) {                                                               \
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {                                  \
+            BENCH(trackExpr, std::chrono::nanoseconds, trackingTime);                    \
+            BENCH_ONLY({                                                                 \
+                ignored = false;                                                         \
+                trackingTimeOut = trackingTime;                                          \
+                lockingTimeOut = lockingTime;                                            \
+            })                                                                           \
+        });                                                                              \
+    }                                                                                    \
+    BENCH(func(__VA_ARGS__);, std::chrono::nanoseconds, sysTime);                        \
+    BENCH_ONLY(if (!ignored) {                                                           \
+        getTracker().withIgnoration(true, [&] {                                          \
+            ADD_TIME(sysTime, lockingTimeOut, trackingTimeOut, timing::AllocType::free); \
+        });                                                                              \
+    })
+
+#define dealloc(func, ptr, ...) deallocExpr(func, removeAllocation(ptr, tracker) __VA_OPT__(,) __VA_ARGS__)
+
 #ifdef __APPLE__
 #define zoneAlloc(func, allocSize, type, ...)                \
     if (zone == nullptr) {                                   \
@@ -204,71 +238,16 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, const unsig
     if (zone == nullptr) {
         crashWarner::crashForce("Batch free with NULL zone");
     }
-    BENCH_ONLY(bool ignored = true;
-               std::chrono::nanoseconds trackingTimeOut;
-               std::chrono::nanoseconds lockingTimeOut;)
-    if (!LSan::finished && num > 0) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                for (unsigned i = 0; i < num; ++i) {
-                    if (to_be_freed[i] == nullptr && behaviour::getBehaviour().freeNull()) {
-                        warn("Free of NULL");
-                    } else if (to_be_freed[i] != nullptr) {
-                        const auto& it = tracker.removeMalloc(to_be_freed[i]);
-                        if (behaviour::getBehaviour().invalidFree() && !it.first) {
-                            crashOrWarn(createInvalidFreeMessage(to_be_freed[i], bool(it.second)), it.second);
-                        }
-                    }
-                }
-            }, std::chrono::nanoseconds, trackingTime);
-            BENCH_ONLY({
-                ignored = false;
-                trackingTimeOut = trackingTime;
-                lockingTimeOut = lockingTime;
-            })
-        });
-    }
-    BENCH(::malloc_zone_batch_free(zone, to_be_freed, num);, std::chrono::nanoseconds, sysTime);
-    BENCH_ONLY(if (!ignored) {
-        getTracker().withIgnoration(true, [&] {
-            ADD_TIME(sysTime, lockingTimeOut, trackingTimeOut, timing::AllocType::free);
-        });
-    })
+    deallocExpr(::malloc_zone_batch_free, for (unsigned i = 0; i < num; ++i) {
+        removeAllocation(to_be_freed[i], tracker);
+    }, zone, to_be_freed, num);
 }
 
 void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
     if (zone == nullptr) {
         crashWarner::crashForce("Called with NULL as zone");
     }
-
-    BENCH_ONLY(bool ignored = true;
-               std::chrono::nanoseconds trackingTimeOut;
-               std::chrono::nanoseconds lockingTimeOut;)
-    if (!LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (ptr == nullptr && behaviour::getBehaviour().freeNull()) {
-                    warn("Free of NULL");
-                } else if (ptr != nullptr) {
-                    const auto& it = tracker.removeMalloc(ptr);
-                    if (behaviour::getBehaviour().invalidFree() && !it.first) {
-                        crashOrWarn(createInvalidFreeMessage(ptr, bool(it.second)), it.second);
-                    }
-                }
-            }, std::chrono::nanoseconds, trackingTime);
-            BENCH_ONLY({
-                ignored = false;
-                trackingTimeOut = trackingTime;
-                lockingTimeOut = lockingTime;
-            })
-        });
-    }
-    BENCH(::malloc_zone_free(zone, ptr);, std::chrono::nanoseconds, sysTime);
-    BENCH_ONLY(if (!ignored) {
-        getTracker().withIgnoration(true, [&] {
-            ADD_TIME(sysTime, lockingTimeOut, trackingTimeOut, timing::AllocType::free);
-        });
-    })
+    dealloc(::malloc_zone_free, ptr, zone, ptr);
 }
 
 auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size) -> void* {
@@ -356,37 +335,7 @@ auto __lsan_realloc(void* pointer, const std::size_t size) -> void* {
 }
 
 void __lsan_free(void* pointer) {
-    if (LSan::finished) {
-        real::free(pointer);
-        return;
-    }
-
-    BENCH_ONLY(bool ignored = true;
-               std::chrono::nanoseconds lockingTimeOut;
-               std::chrono::nanoseconds trackingTime;)
-    ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-        BENCH({
-            if (pointer == nullptr && behaviour::getBehaviour().freeNull()) {
-                warn("Free of NULL");
-            } else if (pointer != nullptr) {
-                const auto& it = tracker.removeMalloc(pointer);
-                if (behaviour::getBehaviour().invalidFree() && !it.first) {
-                    crashOrWarn(createInvalidFreeMessage(pointer, static_cast<bool>(it.second)), it.second);
-                }
-            }
-        }, std::chrono::nanoseconds, trackingTimeLocal);
-        BENCH_ONLY({
-            trackingTime = trackingTimeLocal;
-            ignored = false;
-            lockingTimeOut = lockingTime;
-        })
-    });
-    BENCH(real::free(pointer);, std::chrono::nanoseconds, sysTime);
-    BENCH_ONLY(if (!ignored) {
-        getTracker().withIgnoration(true, [&] {
-            ADD_TIME(sysTime, lockingTimeOut, trackingTime, timing::AllocType::free);
-        });
-    })
+    dealloc(real::free, pointer, pointer);
 }
 
 REPLACE(auto, posix_memalign)(void** memPtr, const std::size_t alignment, const std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
