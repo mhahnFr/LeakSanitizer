@@ -108,85 +108,43 @@ inline void ifNotIgnored(F&& func, Args&& ...args) {
 # define ADD_TIME(sys, lock, track, type)
 #endif
 
-#ifdef __APPLE__
-auto malloc_zone_malloc(malloc_zone_t* zone, const std::size_t size) -> void* {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Called with NULL as zone");
-    }
+#define alloc(func, sizeExpr, type, ...)                                              \
+    const auto allocSize = (sizeExpr);                                                \
+    BENCH(const auto ptr = func(__VA_ARGS__);, std::chrono::nanoseconds, sysTime);    \
+    if (ptr != nullptr && !LSan::finished) {                                          \
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {                               \
+            BENCH({                                                                   \
+                if (behaviour::getBehaviour().zeroAllocation() && (allocSize) == 0) { \
+                    warn("Implementation-defined allocation of size 0");              \
+                }                                                                     \
+                tracker.addMalloc(MallocInfo(ptr, (allocSize)));                      \
+            }, std::chrono::nanoseconds, trackingTime);                               \
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::type);    \
+        });                                                                           \
+    }                                                                                 \
+    return ptr
 
-    BENCH(const auto ptr = ::malloc_zone_malloc(zone, size);, std::chrono::nanoseconds, sysTime);
-    if (ptr != nullptr && !LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
-                    warn("Implementation-defined allocation of size 0");
-                }
-                tracker.addMalloc(MallocInfo(ptr, size));
-            }, std::chrono::nanoseconds, trackingTime);
-            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
-        });
-    }
-    return ptr;
+#ifdef __APPLE__
+#define zoneAlloc(func, allocSize, type, ...)                \
+    if (zone == nullptr) {                                   \
+        crashWarner::crashForce("Called with NULL as zone"); \
+    }                                                        \
+    alloc(func, allocSize, type __VA_OPT__(,) __VA_ARGS__)
+
+auto malloc_zone_malloc(malloc_zone_t* zone, const std::size_t size) -> void* {
+    zoneAlloc(::malloc_zone_malloc, size, malloc, zone, size);
 }
 
 auto malloc_zone_calloc(malloc_zone_t* zone, const std::size_t count, const std::size_t size) -> void* {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Called with NULL as zone");
-    }
-
-    BENCH(const auto ptr = ::malloc_zone_calloc(zone, count, size);, std::chrono::nanoseconds, sysTime);
-    if (ptr != nullptr && !LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
-                    warn("Implementation-defined allocation of size 0");
-                }
-                tracker.addMalloc(MallocInfo(ptr, count * size));
-            }, std::chrono::nanoseconds, trackingTime);
-            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::calloc);
-        });
-    }
-    return ptr;
+    zoneAlloc(::malloc_zone_calloc, count * size, calloc, zone, count, size);
 }
 
 auto malloc_zone_valloc(malloc_zone_t* zone, const std::size_t size) -> void* {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Called with NULL as zone");
-    }
-
-    BENCH(const auto ptr = ::malloc_zone_valloc(zone, size);, std::chrono::nanoseconds, sysTime);
-    if (ptr != nullptr && !LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
-                    warn("Implementation-defined allocation of size 0");
-                }
-                tracker.addMalloc(MallocInfo(ptr, size));
-            }, std::chrono::nanoseconds, trackingTime);
-            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
-        });
-    }
-    return ptr;
+    zoneAlloc(::malloc_zone_valloc, size, malloc, zone, size);
 }
 
 auto malloc_zone_memalign(malloc_zone_t* zone, const std::size_t alignment, const std::size_t size) -> void* {
-    if (zone == nullptr) {
-        crashWarner::crashForce("Called with NULL as zone");
-    }
-
-    BENCH(const auto ptr = ::malloc_zone_memalign(zone, alignment, size);, std::chrono::nanoseconds, sysTime);
-    if (ptr != nullptr && !LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
-                    warn("Implementation-defined allocation of size 0");
-                }
-                tracker.addMalloc(MallocInfo(ptr, size));
-            }, std::chrono::nanoseconds, trackingTime);
-            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
-        });
-    }
-    return ptr;
+    zoneAlloc(::malloc_zone_memalign, size, malloc, zone, alignment, size);
 }
 
 void malloc_destroy_zone(malloc_zone_t* zone) {
@@ -346,71 +304,19 @@ auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size)
 #endif
 
 auto __lsan_malloc(const std::size_t size) -> void* {
-    BENCH(const auto ptr = real::malloc(size);, std::chrono::nanoseconds, systemTime);
-
-    if (ptr != nullptr && !LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
-                    warn("Implementation-defined allocation of size 0");
-                }
-                tracker.addMalloc(MallocInfo(ptr, size));
-            }, std::chrono::nanoseconds, trackingTime);
-            ADD_TIME(systemTime, lockingTime, trackingTime, timing::AllocType::malloc);
-        });
-    }
-    return ptr;
+    alloc(real::malloc, size, malloc, size);
 }
 
 auto __lsan_calloc(const std::size_t count, const std::size_t objectSize) -> void* {
-    BENCH(const auto ptr = real::calloc(count, objectSize);, std::chrono::nanoseconds, sysTime);
-
-    if (ptr != nullptr && !LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (behaviour::getBehaviour().zeroAllocation() && objectSize * count == 0) {
-                    warn("Implementation-defined allocation of size 0");
-                }
-                tracker.addMalloc(MallocInfo(ptr, objectSize * count));
-            }, std::chrono::nanoseconds, trackingTime);
-            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::calloc);
-        });
-    }
-    return ptr;
+    alloc(real::calloc, objectSize * count, calloc, count, objectSize);
 }
 
 auto __lsan_valloc(const std::size_t size) -> void* {
-    BENCH(const auto ptr = real::valloc(size);, std::chrono::nanoseconds, sysTime);
-
-    if (ptr != nullptr && !LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
-                    warn("Implementation-defined allocation of size 0");
-                }
-                tracker.addMalloc(MallocInfo(ptr, size));
-            }, std::chrono::nanoseconds, trackingTime);
-            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
-        });
-    }
-    return ptr;
+    alloc(real::valloc, size, malloc, size);
 }
 
 auto __lsan_aligned_alloc(const std::size_t alignment, const std::size_t size) -> void* {
-    BENCH(const auto ptr = real::aligned_alloc(alignment, size);, std::chrono::nanoseconds, sysTime);
-
-    if (ptr != nullptr && !LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                if (behaviour::getBehaviour().zeroAllocation() && size == 0) {
-                    warn("Implementation-defined allocation of size 0");
-                }
-                tracker.addMalloc(MallocInfo(ptr, size));
-            }, std::chrono::nanoseconds, trackingTime);
-            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::malloc);
-        });
-    }
-    return ptr;
+    alloc(real::aligned_alloc, size, malloc, alignment, size);
 }
 
 auto __lsan_realloc(void* pointer, const std::size_t size) -> void* {
