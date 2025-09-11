@@ -187,36 +187,14 @@ auto malloc_zone_memalign(malloc_zone_t* zone, const std::size_t alignment, cons
 
 void malloc_destroy_zone(malloc_zone_t* zone) {
     assertZone(zone, "Destroying NULL zone");
-    BENCH_ONLY(bool ignored = true;
-               std::chrono::nanoseconds trackingTimeOut;
-               std::chrono::nanoseconds lockingTimeOut;)
-    if (!LSan::finished) {
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
-            BENCH({
-                zone->introspect->enumerator(mach_task_self_,
-                                             &tracker,
-                                             MALLOC_PTR_IN_USE_RANGE_TYPE,
-                                             vm_address_t(zone),
-                                             nullptr, [](auto, auto context, auto, auto array, auto count) {
-                    auto& theTracker = *reinterpret_cast<trackers::ATracker*>(context);
-                    for (unsigned i = 0; i < count; ++i) {
-                        theTracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
-                    }
-                });
-            }, std::chrono::nanoseconds, trackingTime);
-            BENCH_ONLY({
-                ignored = false;
-                trackingTimeOut = trackingTime;
-                lockingTimeOut = lockingTime;
-            })
-        });
-    }
-    BENCH(::malloc_destroy_zone(zone);, std::chrono::nanoseconds, sysTime);
-    BENCH_ONLY(if (!ignored) {
-        getTracker().withIgnoration(true, [&] {
-            ADD_TIME(sysTime, lockingTimeOut, trackingTimeOut, timing::AllocType::free);
-        });
-    })
+    deallocExpr(::malloc_destroy_zone,
+                zone->introspect->enumerator(mach_task_self_, &tracker, MALLOC_PTR_IN_USE_RANGE_TYPE, vm_address_t(zone),
+                    nullptr, [](auto, auto context, auto, auto array, auto count) {
+            auto& theTracker = *reinterpret_cast<trackers::ATracker*>(context);
+            for (unsigned i = 0; i < count; ++i) {
+                theTracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
+            }
+        });, zone);
 }
 
 auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void** results, const unsigned num_requested) -> unsigned {
