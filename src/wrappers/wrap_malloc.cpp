@@ -159,7 +159,7 @@ constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tra
 #define dealloc(func, ptr, ...) deallocExpr(func, removeAllocation(ptr, tracker) __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef __APPLE__
-constexpr inline void assertZone(const malloc_zone_t* zone, const std::string& message = "Called with NULL as zone") {
+constexpr inline void assertZone(const malloc_zone_t* zone, const char* message = "Called with NULL as zone") {
     if (zone == nullptr) {
         crashWarner::crashForce(message);
     }
