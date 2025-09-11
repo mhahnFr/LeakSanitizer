@@ -165,24 +165,24 @@ constexpr inline void assertZone(const malloc_zone_t* zone, const char* message 
     }
 }
 
-# define zoneAlloc(func, allocSize, type, ...)             \
-    assertZone(zone);                                      \
-    alloc(func, allocSize, type __VA_OPT__(,) __VA_ARGS__)
-
 auto malloc_zone_malloc(malloc_zone_t* zone, const std::size_t size) -> void* {
-    zoneAlloc(::malloc_zone_malloc, size, malloc, zone, size);
+    assertZone(zone);
+    alloc(::malloc_zone_malloc, size, malloc, zone, size);
 }
 
 auto malloc_zone_calloc(malloc_zone_t* zone, const std::size_t count, const std::size_t size) -> void* {
-    zoneAlloc(::malloc_zone_calloc, count * size, calloc, zone, count, size);
+    assertZone(zone);
+    alloc(::malloc_zone_calloc, count * size, calloc, zone, count, size);
 }
 
 auto malloc_zone_valloc(malloc_zone_t* zone, const std::size_t size) -> void* {
-    zoneAlloc(::malloc_zone_valloc, size, malloc, zone, size);
+    assertZone(zone);
+    alloc(::malloc_zone_valloc, size, malloc, zone, size);
 }
 
 auto malloc_zone_memalign(malloc_zone_t* zone, const std::size_t alignment, const std::size_t size) -> void* {
-    zoneAlloc(::malloc_zone_memalign, size, malloc, zone, alignment, size);
+    assertZone(zone);
+    alloc(::malloc_zone_memalign, size, malloc, zone, alignment, size);
 }
 
 void malloc_destroy_zone(malloc_zone_t* zone) {
