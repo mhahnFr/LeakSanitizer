@@ -46,7 +46,7 @@ namespace lsan {
  * @param doubleFree whether the pointer has previously been freed
  * @return a descriptive invalid free message
  */
-static inline auto createInvalidFreeMessage(const void* address, const bool doubleFree) -> std::string {
+constexpr static inline auto createInvalidFreeMessage(const void* address, const bool doubleFree) -> std::string {
     using namespace formatter;
     
     return formatString<Style::BOLD, Style::RED>(doubleFree ? "Double free" : "Invalid free") 
@@ -66,7 +66,7 @@ static inline auto createInvalidFreeMessage(const void* address, const bool doub
  * @param args the arguments to be forwarded to the given function
  */
 template<typename F, typename ...Args>
-inline void ifNotIgnored(F&& func, Args&& ...args) {
+constexpr static inline void ifNotIgnored(F&& func, Args&& ...args) {
     static_assert(std::is_invocable_v<F, trackers::ATracker&,
 #ifdef BENCHMARK
                   std::chrono::nanoseconds&&,
@@ -159,7 +159,7 @@ constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tra
 #define dealloc(func, ptr, ...) deallocExpr(func, removeAllocation(ptr, tracker) __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef __APPLE__
-constexpr inline void assertZone(const malloc_zone_t* zone, const char* message = "Called with NULL as zone") {
+constexpr inline static void assertZone(const malloc_zone_t* zone, const char* message = "Called with NULL as zone") {
     if (zone == nullptr) {
         crashWarner::crashForce(message);
     }
