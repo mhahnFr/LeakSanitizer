@@ -223,33 +223,47 @@ void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
     dealloc(::malloc_zone_free, ptr, zone, ptr);
 }
 
-auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size) -> void* {
-    assertZone(zone);
-
+template<typename F, typename... Args>
+constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&& func, Args&&... args) {
     if (LSan::finished) {
-        return ::malloc_zone_realloc(zone, ptr, size);
+        return func(std::forward<Args&&>(args)...);
     }
+
     auto& tracker = getTracker();
-    std::lock_guard lock { tracker.mutex };
+    BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
+
     const auto ignored = tracker.ignoreMalloc;
     if (!ignored) {
         tracker.ignoreMalloc = true;
     }
-    const auto toReturn = ::malloc_zone_realloc(zone, ptr, size);
+    BENCH(void* ptr = func(std::forward<Args&&>(args)...);, std::chrono::nanoseconds, sysTime);
     if (!ignored) {
-        if (toReturn != nullptr) {
-            if (toReturn != ptr) {
-                if (ptr != nullptr) {
-                    tracker.removeMalloc(ptr);
+        BENCH({
+            if (ptr != nullptr) {
+                if (pointer != ptr) {
+                    if (pointer != nullptr) {
+                        tracker.removeMalloc(pointer);
+                    }
+                    tracker.addMalloc(MallocInfo(ptr, size));
+                } else {
+                    tracker.changeMalloc(MallocInfo(ptr, size));
                 }
-                tracker.addMalloc(MallocInfo(toReturn, size));
-            } else {
-                tracker.changeMalloc(MallocInfo(toReturn, size));
             }
-        }
+        }, std::chrono::nanoseconds, trackingTime);
+        BENCH_ONLY({
+            timing::addTrackingTime(trackingTime, timing::AllocType::realloc);
+            timing::addLockingTime(lockingTime, timing::AllocType::realloc);
+            timing::addSystemTime(sysTime, timing::AllocType::realloc);
+            timing::addTotalTime(sysTime + trackingTime + lockingTime, timing::AllocType::realloc);
+        })
         tracker.ignoreMalloc = false;
     }
-    return toReturn;
+    return ptr;
+}
+
+auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size) -> void* {
+    assertZone(zone);
+    return doRealloc(ptr, size, ::malloc_zone_realloc, zone, ptr, size);
 }
 #endif
 
@@ -270,39 +284,7 @@ auto __lsan_aligned_alloc(const std::size_t alignment, const std::size_t size) -
 }
 
 auto __lsan_realloc(void* pointer, const std::size_t size) -> void* {
-    if (LSan::finished) return real::realloc(pointer, size);
-
-    auto& tracker = getTracker();
-    BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
-
-    const auto ignored = tracker.ignoreMalloc;
-    if (!ignored) {
-        tracker.ignoreMalloc = true;
-    }
-    BENCH(void* ptr = real::realloc(pointer, size);, std::chrono::nanoseconds, sysTime);
-    if (!ignored) {
-        BENCH({
-            if (ptr != nullptr) {
-                if (pointer != ptr) {
-                    if (pointer != nullptr) {
-                        tracker.removeMalloc(pointer);
-                    }
-                    tracker.addMalloc(MallocInfo(ptr, size));
-                } else {
-                    tracker.changeMalloc(MallocInfo(ptr, size));
-                }
-            }
-        }, std::chrono::nanoseconds, trackingTime);
-
-        BENCH_ONLY({
-            timing::addTrackingTime(trackingTime, timing::AllocType::realloc);
-            timing::addLockingTime(lockingTime, timing::AllocType::realloc);
-            timing::addSystemTime(sysTime, timing::AllocType::realloc);
-            timing::addTotalTime(sysTime + trackingTime + lockingTime, timing::AllocType::realloc);
-        })
-        tracker.ignoreMalloc = false;
-    }
-    return ptr;
+    return doRealloc(pointer, size, real::realloc, pointer, size);
 }
 
 void __lsan_free(void* pointer) {
