@@ -54,6 +54,7 @@ SRCS = \
 	src/crashWarner/core.cpp \
 	src/crashWarner/crashWarner.cpp \
 	src/crashWarner/crashForce.cpp \
+	src/callstackHelper/suppression.cpp \
 	src/callstackHelper/callstackHelper.cpp \
 	src/behaviour/getBehaviour.cpp \
 	src/allocators/ObjectPool.cpp \

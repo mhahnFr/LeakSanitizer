@@ -22,11 +22,9 @@
 #ifndef callstackHelper_hpp
 #define callstackHelper_hpp
 
-#include <string>
-
 #include <callstack.h>
-
-#include "../suppression/Suppression.hpp"
+#include <ostream>
+#include <string>
 
 /** This namespace includes the helper functions for the callstacks. */
 namespace lsan::callstackHelper {
@@ -48,36 +46,6 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
  */
 static inline void format(lcs::callstack&& callstack, std::ostream& out, const std::string& indent = "") {
     format(callstack, out, indent);
-}
-
-/**
- * Returns whether the given callstack is suppressed by the given suppression.
- *
- * @param suppression the suppression
- * @param callstack the callstack to be checked
- * @return whether the callstack is suppressed by the given suppression
- */
-auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& callstack) -> bool;
-
-/**
- * @brief Returns whether the given callstack is suppressed by at least one
- * suppression of the given range.
- *
- * A callstack is never matched by an empty range of suppressions.
- *
- * @param suppBegin the beginning of the suppressions range
- * @param suppEnd the end of the suppressions range
- * @param callstack the callstack to be checked
- * @return whether the callstack was matched
- */
-template<typename It>
-constexpr inline auto isSuppressed(It suppBegin, It suppEnd, lcs::callstack& callstack) -> bool {
-    for (; suppBegin != suppEnd; ++suppBegin) {
-        if (isSuppressed(*suppBegin, callstack)) {
-            return true;
-        }
-    }
-    return false;
 }
 }
 

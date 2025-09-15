@@ -16,6 +16,8 @@
 		BF4DBFE02E460C25000D4B26 /* lsan_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = BF23A2DD289ECE6A00B17349 /* lsan_stats.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF5AAFE62E605492007C0329 /* PoolAllocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF5AAFE52E605492007C0329 /* PoolAllocator.cpp */; };
 		BF5AAFE82E6054E2007C0329 /* wrap_malloc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF5AAFE72E6054E2007C0329 /* wrap_malloc.hpp */; };
+		BFA6CC462E780D6000C8C62C /* suppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA6CC452E780D6000C8C62C /* suppression.cpp */; };
+		BFA6CC472E780D6000C8C62C /* suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CC442E780D6000C8C62C /* suppression.hpp */; };
 		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
 		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
@@ -170,6 +172,8 @@
 		BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsanMisc.cpp; sourceTree = "<group>"; };
 		BF84625C2AD1B489003B05F5 /* lsanMisc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lsanMisc.hpp; sourceTree = "<group>"; };
 		BF9623AC2AB36B86005FF2B7 /* interpose.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = interpose.hpp; sourceTree = "<group>"; };
+		BFA6CC442E780D6000C8C62C /* suppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = suppression.hpp; sourceTree = "<group>"; };
+		BFA6CC452E780D6000C8C62C /* suppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = suppression.cpp; sourceTree = "<group>"; };
 		BFA6CD7A2CD3F3B800959363 /* Suppression.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Suppression.hpp; sourceTree = "<group>"; };
 		BFA6CD7B2CD3F3B800959363 /* Suppression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Suppression.cpp; sourceTree = "<group>"; };
 		BFA7AA972D8037A700F2525A /* systemLibraries.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = systemLibraries.json; sourceTree = "<group>"; };
@@ -250,6 +254,8 @@
 			children = (
 				BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */,
 				BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */,
+				BFA6CC442E780D6000C8C62C /* suppression.hpp */,
+				BFA6CC452E780D6000C8C62C /* suppression.cpp */,
 			);
 			path = callstackHelper;
 			sourceTree = "<group>";
@@ -572,6 +578,7 @@
 				BF5AAFE82E6054E2007C0329 /* wrap_malloc.hpp in Headers */,
 				BFCDA8162E2F7CDA0029AEC1 /* Suppression.hpp in Headers */,
 				BFCDA8172E2F7CDA0029AEC1 /* FunctionNotFoundException.hpp in Headers */,
+				BFA6CC472E780D6000C8C62C /* suppression.hpp in Headers */,
 				BFCDA8182E2F7CDA0029AEC1 /* defaultSuppression.hpp in Headers */,
 				BFCDA8192E2F7CDA0029AEC1 /* firstPartyLibrary.hpp in Headers */,
 				BFCDA81A2E2F7CDA0029AEC1 /* LeakKindStats.hpp in Headers */,
@@ -747,6 +754,7 @@
 				BFCDA8042E2F7CA10029AEC1 /* ThreadInfo.cpp in Sources */,
 				BFCDA8052E2F7CA10029AEC1 /* timing.cpp in Sources */,
 				BFCDA8382E2F82F50029AEC1 /* Stats.cpp in Sources */,
+				BFA6CC462E780D6000C8C62C /* suppression.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

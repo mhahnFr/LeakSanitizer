@@ -25,6 +25,7 @@
 
 #include "FunctionNotFoundException.hpp"
 #include "../MallocInfo.hpp"
+#include "../callstackHelper/suppression.hpp"
 
 namespace lsan::suppression {
 using namespace simple_json;
