@@ -19,8 +19,8 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef callstackHelper_hpp
-#define callstackHelper_hpp
+#ifndef callstackHelper_format_hpp
+#define callstackHelper_format_hpp
 
 #include <callstack.h>
 #include <ostream>
@@ -49,4 +49,4 @@ static inline void format(lcs::callstack&& callstack, std::ostream& out, const s
 }
 }
 
-#endif /* callstackHelper_hpp */
+#endif /* callstackHelper_format_hpp */
