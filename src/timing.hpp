@@ -92,7 +92,7 @@ auto printTimings(std::ostream& out) -> std::ostream&;
 
 #define BENCH(expr, type, varName)                              \
 const auto __now##varName { std::chrono::steady_clock::now() }; \
-expr                                                            \
+expr;                                                           \
 const auto __end##varName { std::chrono::steady_clock::now() }; \
 type varName = std::chrono::duration_cast<type>(__end##varName - __now##varName)
 

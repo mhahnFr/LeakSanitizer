@@ -110,7 +110,7 @@ constexpr static inline void ifNotIgnored(F&& func, Args&& ...args) {
 
 #define alloc(func, sizeExpr, type, ...)                                              \
     const auto allocSize = (sizeExpr);                                                \
-    BENCH(const auto ptr = func(__VA_ARGS__);, std::chrono::nanoseconds, sysTime);    \
+    BENCH(const auto ptr = func(__VA_ARGS__), std::chrono::nanoseconds, sysTime);     \
     if (ptr != nullptr && !LSan::finished) {                                          \
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {                               \
             BENCH({                                                                   \
@@ -142,13 +142,13 @@ constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&
     }
 
     auto& tracker = getTracker();
-    BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
+    BENCH(std::lock_guard lock(tracker.mutex), std::chrono::nanoseconds, lockingTime);
 
     const auto ignored = tracker.ignoreMalloc;
     if (!ignored) {
         tracker.ignoreMalloc = true;
     }
-    BENCH(void* ptr = func(std::forward<Args&&>(args)...);, std::chrono::nanoseconds, sysTime);
+    BENCH(void* ptr = func(std::forward<Args&&>(args)...), std::chrono::nanoseconds, sysTime);
     if (!ignored) {
         BENCH(if (ptr != nullptr) {
             if (pointer != ptr) {
@@ -185,7 +185,7 @@ constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&
             })                                                                           \
         });                                                                              \
     }                                                                                    \
-    BENCH(func(__VA_ARGS__);, std::chrono::nanoseconds, sysTime);                        \
+    BENCH(func(__VA_ARGS__), std::chrono::nanoseconds, sysTime);                         \
     BENCH_ONLY(if (!ignored) {                                                           \
         getTracker().withIgnoration(true, [&] {                                          \
             ADD_TIME(sysTime, lockingTimeOut, trackingTimeOut, timing::AllocType::free); \
@@ -230,12 +230,12 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
             for (unsigned i = 0; i < count; ++i) {
                 theTracker.removeMalloc(reinterpret_cast<void*>(array[i].address));
             }
-        });, zone);
+        }), zone);
 }
 
 auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void** results, const unsigned num_requested) -> unsigned {
     assertZone(zone, "Batch allocating with NULL zone");
-    BENCH(const auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested);, std::chrono::nanoseconds, sysTime);
+    BENCH(const auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested), std::chrono::nanoseconds, sysTime);
     if (!LSan::finished && batched > 0) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH(for (std::size_t i = 0; i < batched; ++i) {
@@ -295,7 +295,7 @@ REPLACE(auto, posix_memalign)(void** memPtr, const std::size_t alignment, const 
     }
 
     const auto wasPtr = *memPtr;
-    BENCH(const auto toReturn = real::posix_memalign(memPtr, alignment, size);, std::chrono::nanoseconds, sysTime);
+    BENCH(const auto toReturn = real::posix_memalign(memPtr, alignment, size), std::chrono::nanoseconds, sysTime);
     if (!LSan::finished) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH({
