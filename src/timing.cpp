@@ -26,6 +26,7 @@
 #include <tuple>
 
 #include "formatter.hpp"
+#include "lsanMisc.hpp"
 
 namespace lsan::timing {
 /**
