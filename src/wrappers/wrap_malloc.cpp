@@ -135,6 +135,44 @@ constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tra
     }
 }
 
+template<typename F, typename... Args>
+constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&& func, Args&&... args) {
+    if (LSan::finished) {
+        return func(std::forward<Args&&>(args)...);
+    }
+
+    auto& tracker = getTracker();
+    BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
+
+    const auto ignored = tracker.ignoreMalloc;
+    if (!ignored) {
+        tracker.ignoreMalloc = true;
+    }
+    BENCH(void* ptr = func(std::forward<Args&&>(args)...);, std::chrono::nanoseconds, sysTime);
+    if (!ignored) {
+        BENCH({
+            if (ptr != nullptr) {
+                if (pointer != ptr) {
+                    if (pointer != nullptr) {
+                        tracker.removeMalloc(pointer);
+                    }
+                    tracker.addMalloc(MallocInfo(ptr, size));
+                } else {
+                    tracker.changeMalloc(MallocInfo(ptr, size));
+                }
+            }
+        }, std::chrono::nanoseconds, trackingTime);
+        BENCH_ONLY({
+            timing::addTrackingTime(trackingTime, timing::AllocType::realloc);
+            timing::addLockingTime(lockingTime, timing::AllocType::realloc);
+            timing::addSystemTime(sysTime, timing::AllocType::realloc);
+            timing::addTotalTime(sysTime + trackingTime + lockingTime, timing::AllocType::realloc);
+        })
+        tracker.ignoreMalloc = false;
+    }
+    return ptr;
+}
+
 #define deallocExpr(func, trackExpr, ...)                                                \
     BENCH_ONLY(bool ignored = true;                                                      \
                std::chrono::nanoseconds trackingTimeOut;                                 \
@@ -221,44 +259,6 @@ void malloc_zone_batch_free(malloc_zone_t* zone, void** to_be_freed, const unsig
 void malloc_zone_free(malloc_zone_t* zone, void* ptr) {
     assertZone(zone);
     dealloc(::malloc_zone_free, ptr, zone, ptr);
-}
-
-template<typename F, typename... Args>
-constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&& func, Args&&... args) {
-    if (LSan::finished) {
-        return func(std::forward<Args&&>(args)...);
-    }
-
-    auto& tracker = getTracker();
-    BENCH(std::lock_guard lock(tracker.mutex);, std::chrono::nanoseconds, lockingTime);
-
-    const auto ignored = tracker.ignoreMalloc;
-    if (!ignored) {
-        tracker.ignoreMalloc = true;
-    }
-    BENCH(void* ptr = func(std::forward<Args&&>(args)...);, std::chrono::nanoseconds, sysTime);
-    if (!ignored) {
-        BENCH({
-            if (ptr != nullptr) {
-                if (pointer != ptr) {
-                    if (pointer != nullptr) {
-                        tracker.removeMalloc(pointer);
-                    }
-                    tracker.addMalloc(MallocInfo(ptr, size));
-                } else {
-                    tracker.changeMalloc(MallocInfo(ptr, size));
-                }
-            }
-        }, std::chrono::nanoseconds, trackingTime);
-        BENCH_ONLY({
-            timing::addTrackingTime(trackingTime, timing::AllocType::realloc);
-            timing::addLockingTime(lockingTime, timing::AllocType::realloc);
-            timing::addSystemTime(sysTime, timing::AllocType::realloc);
-            timing::addTotalTime(sysTime + trackingTime + lockingTime, timing::AllocType::realloc);
-        })
-        tracker.ignoreMalloc = false;
-    }
-    return ptr;
 }
 
 auto malloc_zone_realloc(malloc_zone_t* zone, void* ptr, const std::size_t size) -> void* {
