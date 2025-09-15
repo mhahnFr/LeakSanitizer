@@ -150,16 +150,14 @@ constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&
     }
     BENCH(void* ptr = func(std::forward<Args&&>(args)...);, std::chrono::nanoseconds, sysTime);
     if (!ignored) {
-        BENCH({
-            if (ptr != nullptr) {
-                if (pointer != ptr) {
-                    if (pointer != nullptr) {
-                        tracker.removeMalloc(pointer);
-                    }
-                    tracker.addMalloc(MallocInfo(ptr, size));
-                } else {
-                    tracker.changeMalloc(MallocInfo(ptr, size));
+        BENCH(if (ptr != nullptr) {
+            if (pointer != ptr) {
+                if (pointer != nullptr) {
+                    tracker.removeMalloc(pointer);
                 }
+                tracker.addMalloc(MallocInfo(ptr, size));
+            } else {
+                tracker.changeMalloc(MallocInfo(ptr, size));
             }
         }, std::chrono::nanoseconds, trackingTime);
         BENCH_ONLY({
