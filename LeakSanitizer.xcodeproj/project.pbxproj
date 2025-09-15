@@ -245,13 +245,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		BF3204F22AC5C625004EC77E /* callstacks */ = {
+		BF3204F22AC5C625004EC77E /* callstackHelper */ = {
 			isa = PBXGroup;
 			children = (
 				BF3204ED2AC5C614004EC77E /* callstackHelper.hpp */,
 				BF3204EC2AC5C614004EC77E /* callstackHelper.cpp */,
 			);
-			path = callstacks;
+			path = callstackHelper;
 			sourceTree = "<group>";
 		};
 		BF378FB32919496000A4DAA9 /* Frameworks */ = {
@@ -408,7 +408,7 @@
 			children = (
 				F1B373972C67A0D700674C3C /* allocators */,
 				BFE023F12CA874AE00AEFD5A /* behaviour */,
-				BF3204F22AC5C625004EC77E /* callstacks */,
+				BF3204F22AC5C625004EC77E /* callstackHelper */,
 				BF4368F22AACEFFE00252E2A /* crashWarner */,
 				F16F67462E6ED93A00F7798C /* formatter */,
 				BFDD6DFD2CC6B5A9008B9CDC /* helpers */,

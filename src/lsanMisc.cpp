@@ -29,7 +29,7 @@
 
 #include "formatter.hpp"
 #include "lsanFormat.hpp"
-#include "callstacks/callstackHelper.hpp"
+#include "callstackHelper/callstackHelper.hpp"
 #include "suppression/defaultSuppression.hpp"
 #include "suppression/FunctionNotFoundException.hpp"
 #include "suppression/Suppression.hpp"

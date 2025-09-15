@@ -32,7 +32,7 @@
 #include <callstack.h>
 
 #include "LeakType.hpp"
-#include "callstacks/callstackHelper.hpp"
+#include "callstackHelper/callstackHelper.hpp"
 
 namespace lsan {
 /**
