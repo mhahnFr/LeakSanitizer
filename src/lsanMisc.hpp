@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "LeakSani.hpp"
+#include "callstackHelper/format.hpp"
 #include "suppression/Suppression.hpp"
 #include "trackers/ATracker.hpp"
 
@@ -80,6 +81,19 @@ auto loadSuppressions() -> std::vector<suppression::Suppression>;
  * @return the suppressions
  */
 auto createTLVSuppression() -> std::vector<suppression::Suppression>;
+
+namespace callstack {
+static inline void format(lcs::callstack& callstack, std::ostream& out, const std::string& indent = "") {
+    auto& instance = getInstance();
+    if (callstackHelper::format(std::move(callstack), out, indent)) {
+        instance.setCallstackSizeExceeded(true);
+    }
+}
+
+static inline void format(lcs::callstack&& callstack, std::ostream& out, const std::string& indent = "") {
+    format(callstack, out, indent);
+}
+}
 
 /**
  * Returns the current instance of the statistics object.
