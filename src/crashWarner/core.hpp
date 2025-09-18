@@ -27,6 +27,7 @@
 #include <optional>
 #include <string>
 
+#include "../hinter.hpp"
 #include "../callstackHelper/format.hpp"
 #include "../formatter/formatter.hpp"
 
@@ -53,16 +54,18 @@ static inline void printer(const std::string& message, lcs::callstack& callstack
     if (reason.has_value()) {
         std::cerr << *reason << "." << std::endl;
     }
-    callstackHelper::format(callstack, std::cerr);
+    const auto ex = callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
 
     if constexpr (!Warning && SizeHint) {
         std::ostringstream oss;
-        // getInstance().maybeHintCallstackSize(oss);
+        hinter::maybeHintCallstackSize(oss, ex);
         if (const auto& str = oss.str(); !str.empty()) {
             std::cerr << "Hints:" << std::endl << str;
         }
         std::cerr << std::endl << maybeHintRelativePaths;
+    } else {
+        // TODO: if (ex) getInstance().setCallstackSizeExceeded(true);
     }
 }
 
