@@ -27,6 +27,7 @@
 #include <optional>
 #include <string>
 
+#include "../callstackHelper/format.hpp"
 #include "../formatter/formatter.hpp"
 
 namespace lsan {
@@ -52,7 +53,7 @@ static inline void printer(const std::string& message, lcs::callstack& callstack
     if (reason.has_value()) {
         std::cerr << *reason << "." << std::endl;
     }
-    // callstackHelper::format(callstack, std::cerr);
+    callstackHelper::format(callstack, std::cerr);
     std::cerr << std::endl;
 
     if constexpr (!Warning && SizeHint) {
