@@ -29,10 +29,10 @@
 #include <regions/regions.h>
 
 #include "bytePrinter.hpp"
-#include "formatter.hpp"
 #include "lsanMisc.hpp"
 #include "utils.hpp"
 #include "crashWarner/exceptionHandler.hpp"
+#include "formatter/formatter.hpp"
 #include "signals/signalHandlers.hpp"
 #include "signals/signals.hpp"
 #include "suppression/firstPartyLibrary.hpp"
@@ -844,17 +844,6 @@ void LSan::changeMalloc(const ATracker* tracker, MallocInfo&& info) {
 
 void LSan::changeMalloc(MallocInfo&& info) {
     changeMalloc(nullptr, std::move(info));
-}
-
-auto LSan::maybeHintCallstackSize(std::ostream& out) const -> std::ostream& {
-    using namespace formatter;
-
-    if (callstackSizeExceeded) {
-        out << hintBegin << "Increase the value of " << format<Style::BOLD>("LSAN_CALLSTACK_SIZE")
-           << " (currently " << format<Style::BOLD>(getBehaviour().callstackSize())
-           << ") to see longer callstacks." << std::endl;
-    }
-    return out;
 }
 
 void LSan::addThread(ThreadInfo&& info) {

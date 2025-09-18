@@ -32,6 +32,7 @@
 #include <utility>
 #include <vector>
 
+#include "hinter.hpp"
 #include "MallocInfo.hpp"
 #include "ThreadInfo.hpp"
 
@@ -368,7 +369,10 @@ public:
      * @param out the output stream to print to
      * @return the given output stream
      */
-    auto maybeHintCallstackSize(std::ostream & out) const -> std::ostream &;
+    constexpr inline auto maybeHintCallstackSize(std::ostream& out) const -> std::ostream& {
+        hinter::maybeHintCallstackSize(out, callstackSizeExceeded);
+        return out;
+    }
 
     /**
      * Returns the globally tracked allocations.
