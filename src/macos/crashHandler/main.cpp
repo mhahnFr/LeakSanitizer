@@ -32,7 +32,6 @@ auto behaviour::getBehaviour() -> const Behaviour& {
     return instance;
 }
 
-
 auto main(int argc, const char** argv) -> int {
     using namespace signals;
 
