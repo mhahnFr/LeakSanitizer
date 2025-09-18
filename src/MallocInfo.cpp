@@ -24,8 +24,8 @@
 #include <limits>
 
 #include "bytePrinter.hpp"
-#include "formatter.hpp"
 #include "lsanMisc.hpp"
+#include "formatter/formatter.hpp"
 
 namespace lsan {
 /**
@@ -153,5 +153,18 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
 
 auto MallocInfo::getThreadId() -> unsigned long {
     return getInstance().getThreadId();
+}
+
+void MallocInfo::printCreatedCallstack(std::ostream& out, const std::string& indent) const {
+    callstack::format(createdCallstack, out, indent);
+}
+
+void MallocInfo::printDeletedCallstack(std::ostream& out) const {
+    if (!deletedCallstack) {
+        throw std::runtime_error("MallocInfo: No deleted callstack! "
+                                 "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");
+    }
+
+    callstack::format(*deletedCallstack, out);
 }
 }

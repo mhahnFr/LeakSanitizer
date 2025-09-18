@@ -168,7 +168,7 @@ void callstack(int, siginfo_t*, void* executionContext) {
         auto& out = getOutputStream();
         out << format<Style::ITALIC>("The current callstack:") << std::endl;
         lcs_activateSwiftDemangler = false;
-        callstackHelper::format(createCallstackFor(executionContext), out);
+        callstack::format(createCallstackFor(executionContext), out);
         lcs_activateSwiftDemangler = true;
         out << std::endl;
     });

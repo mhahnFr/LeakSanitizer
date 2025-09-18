@@ -32,7 +32,6 @@
 #include <callstack.h>
 
 #include "LeakType.hpp"
-#include "callstackHelper/format.hpp"
 
 namespace lsan {
 /**
@@ -101,23 +100,14 @@ struct MallocInfo {
      * @param out the output stream to print to
      * @param indent the indentation to use while printing this record
      */
-    inline void printCreatedCallstack(std::ostream& out, const std::string& indent = "") const {
-        callstackHelper::format(createdCallstack, out, indent);
-    }
+    void printCreatedCallstack(std::ostream& out, const std::string& indent = "") const;
 
     /**
      * Prints the callstack where this allocation was deallocated.
      *
      * @param out the output stream to print to
      */
-    inline void printDeletedCallstack(std::ostream& out) const {
-        if (!deletedCallstack) {
-            throw std::runtime_error("MallocInfo: No deleted callstack! "
-                                     "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");
-        }
-        
-        callstackHelper::format(*deletedCallstack, out);
-    }
+    void printDeletedCallstack(std::ostream& out) const;
 
     /**
      * Returns the pointer to the allocated memory.

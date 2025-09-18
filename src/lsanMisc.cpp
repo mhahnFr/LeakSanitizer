@@ -119,7 +119,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     out << std::endl << formatter::format<Style::GREEN>("Exiting");
     if (behaviour::getBehaviour().printExitPoint()) {
         out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
-        callstackHelper::format(lcs::callstack(), out);
+        callstack::format(lcs::callstack(), out);
     }
     getInstance().hasPrintedExit = true;
 
