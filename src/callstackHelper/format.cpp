@@ -23,11 +23,8 @@
 
 #include "format.hpp"
 
-#include <callstack.h>
 #include <callstack_internals.h>
-#include <string>
 
-#include "../lsanMisc.hpp"
 #include "../formatter/formatter.hpp"
 #include "../suppression/firstPartyLibrary.hpp"
 
@@ -114,7 +111,7 @@ static inline auto getIndent(const std::string::size_type indent, const char ind
     return indent > 0 ? std::string(indent, indentChar) : std::string();
 }
 
-void format(lcs::callstack& callstack, std::ostream& stream, const std::string& indent) {
+auto format(lcs::callstack& callstack, std::ostream& stream, const std::string& indent) -> bool {
     using formatter::Style;
 
     if (!callstack_autoClearCaches) {
@@ -124,7 +121,7 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
         //                          - mhahnFr
         if (callstack_getBinariesCached(callstack) == nullptr) {
             stream << indent << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
-            return;
+            return false;
         }
     }
     const auto& frames = callstack_toArray(callstack);
@@ -132,7 +129,7 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
 
     if (frames == nullptr) {
         stream << indent << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
-        return;
+        return false;
     }
 
     bool firstHit   = true,
@@ -174,9 +171,11 @@ void format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
         firstPrint = false;
         ++printed;
     }
+    auto toReturn = false;
     if (i < size) {
         stream << std::endl << indent << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(size - i) + " more line" + (size - i > 1 ? "s" : "") + "...") << std::endl;
-        getInstance().setCallstackSizeExceeded(true);
+        toReturn = true;
     }
+    return toReturn;
 }
 }
