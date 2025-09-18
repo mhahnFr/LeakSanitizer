@@ -21,12 +21,6 @@
 
 #include "defaultSuppression.hpp"
 
-#ifdef __APPLE__
-# define LSAN_APPLE
-#elif defined(__linux__)
-# define LSAN_LINUX
-#endif
-
 #ifdef LSAN_APPLE
 # include <fstream>
 # include <sstream>
@@ -40,24 +34,12 @@
 
 namespace lsan::suppression {
 #ifdef LSAN_APPLE
-static inline auto loadResource(CFURLRef url) -> std::string {
+static inline auto loadResource(const CFURLRef url) -> std::string {
     const auto path = CFURLCopyPath(url);
     CFRelease(url);
     const auto& pathStr = macos::bundle::convertCFString(path);
     CFRelease(path);
-    auto stream = std::ifstream();
-    auto strStr = std::ostringstream();
-    stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-    try {
-        stream.open(pathStr);
-        strStr << stream.rdbuf();
-        stream.close();
-    } catch (...) {
-        if (stream.is_open()) {
-            stream.close();
-        }
-    }
-    return strStr.str();
+    return readFile(pathStr);
 }
 #endif
 
