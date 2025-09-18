@@ -21,9 +21,10 @@
 
 #include "firstPartyLibrary.hpp"
 
+#include <algorithm>
 #include <map>
 
-#include "../lsanMisc.hpp"
+#include "systemLibraryLoader.hpp"
 
 namespace lsan::suppression {
 /**

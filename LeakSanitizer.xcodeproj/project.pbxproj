@@ -20,6 +20,10 @@
 		BFA6CC472E780D6000C8C62C /* suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CC442E780D6000C8C62C /* suppression.hpp */; };
 		BFA6CC482E7811DF00C8C62C /* format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3204EC2AC5C614004EC77E /* format.cpp */; };
 		BFA6CC492E78124300C8C62C /* firstPartyLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */; };
+		BFABB7D32E7BEEB400E2476E /* systemLibraryLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFABB7D12E7BEEB400E2476E /* systemLibraryLoader.hpp */; };
+		BFABB7D42E7BEEB400E2476E /* systemLibraryLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFABB7D22E7BEEB400E2476E /* systemLibraryLoader.cpp */; };
+		BFABB7D52E7BEEB400E2476E /* systemLibraryLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFABB7D22E7BEEB400E2476E /* systemLibraryLoader.cpp */; };
+		BFABB7D62E7BF35900E2476E /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F14B3CDC2D842C4A004768E9 /* parser.cpp */; };
 		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
 		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
@@ -115,18 +119,6 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		F1EDCE942E65876D007E260E /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = firstPartyLibrary.hpp; sourceTree = "<group>"; };
 		BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = firstPartyLibrary.cpp; sourceTree = "<group>"; };
@@ -182,6 +174,8 @@
 		BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ThreadInfo.hpp; sourceTree = "<group>"; };
 		BFAA94522B6C12FF007FC130 /* signals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signals.cpp; sourceTree = "<group>"; };
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
+		BFABB7D12E7BEEB400E2476E /* systemLibraryLoader.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = systemLibraryLoader.hpp; sourceTree = "<group>"; };
+		BFABB7D22E7BEEB400E2476E /* systemLibraryLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = systemLibraryLoader.cpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter/formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFB103D62E38CB7100ECECD5 /* bundle.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bundle.hpp; sourceTree = "<group>"; };
 		BFB103D72E38CB7100ECECD5 /* bundle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bundle.cpp; sourceTree = "<group>"; };
@@ -282,6 +276,8 @@
 				F13529AE2D10779B002534D0 /* defaultSuppression.cpp */,
 				BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */,
 				BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */,
+				BFABB7D12E7BEEB400E2476E /* systemLibraryLoader.hpp */,
+				BFABB7D22E7BEEB400E2476E /* systemLibraryLoader.cpp */,
 			);
 			path = suppression;
 			sourceTree = "<group>";
@@ -594,6 +590,7 @@
 				BFCDA8212E2F7CDA0029AEC1 /* lsanMisc.hpp in Headers */,
 				BFCDA8222E2F7CDA0029AEC1 /* ThreadInfo.hpp in Headers */,
 				BFCDA8232E2F7CDA0029AEC1 /* timing.hpp in Headers */,
+				BFABB7D32E7BEEB400E2476E /* systemLibraryLoader.hpp in Headers */,
 				BFCDA8242E2F7CDA0029AEC1 /* utils.hpp in Headers */,
 				BFCDA8252E2F7CDA0029AEC1 /* objcSupport.hpp in Headers */,
 				F16F673E2E6EC8CC00F7798C /* crashForce.hpp in Headers */,
@@ -652,7 +649,6 @@
 			buildPhases = (
 				F1EDCE922E65876D007E260E /* Sources */,
 				F1EDCE932E65876D007E260E /* Frameworks */,
-				F1EDCE942E65876D007E260E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -752,6 +748,7 @@
 				BFCDA8002E2F7CA10029AEC1 /* bytePrinter.cpp in Sources */,
 				BFCDA8012E2F7CA10029AEC1 /* LeakSani.cpp in Sources */,
 				BFCDA8022E2F7CA10029AEC1 /* MallocInfo.cpp in Sources */,
+				BFABB7D42E7BEEB400E2476E /* systemLibraryLoader.cpp in Sources */,
 				BFCDA8032E2F7CA10029AEC1 /* lsanMisc.cpp in Sources */,
 				BFCDA8042E2F7CA10029AEC1 /* ThreadInfo.cpp in Sources */,
 				BFCDA8052E2F7CA10029AEC1 /* timing.cpp in Sources */,
@@ -764,6 +761,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFABB7D62E7BF35900E2476E /* parser.cpp in Sources */,
 				BFA6CC492E78124300C8C62C /* firstPartyLibrary.cpp in Sources */,
 				BFA6CC482E7811DF00C8C62C /* format.cpp in Sources */,
 				F16F67452E6ED1FC00F7798C /* core.cpp in Sources */,
@@ -771,6 +769,7 @@
 				F16F67392E6EBDA800F7798C /* signals.cpp in Sources */,
 				F1EDCE9F2E65879C007E260E /* main.cpp in Sources */,
 				F16F673F2E6EC8CC00F7798C /* crashForce.cpp in Sources */,
+				BFABB7D52E7BEEB400E2476E /* systemLibraryLoader.cpp in Sources */,
 				F1E666702E69A0E5009909D1 /* SignalInfo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1070,7 +1069,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/CallstackLibrary/include";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/CallstackLibrary/include",
+					"$(PROJECT_DIR)/SimpleJSON/include",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CallstackLibrary",
@@ -1088,7 +1090,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/CallstackLibrary/include";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/CallstackLibrary/include",
+					"$(PROJECT_DIR)/SimpleJSON/include",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CallstackLibrary",

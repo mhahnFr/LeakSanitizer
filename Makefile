@@ -40,6 +40,7 @@ SRCS = \
 	src/wrappers/wrap_malloc.cpp \
 	src/wrappers/misc.cpp \
 	src/trackers/TLSTracker.cpp \
+	src/suppression/systemLibraryLoader.cpp \
 	src/suppression/Suppression.cpp \
 	src/suppression/firstPartyLibrary.cpp \
 	src/suppression/defaultSuppression.cpp \

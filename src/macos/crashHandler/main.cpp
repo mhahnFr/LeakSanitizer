@@ -24,10 +24,23 @@
 #include "../../behaviour/getBehaviour.hpp"
 #include "../../crashWarner/crashForce.hpp"
 #include "../../signals/SignalInfo.hpp"
+#include "../../suppression/defaultSuppression.hpp"
+#include "../../suppression/systemLibraryLoader.hpp"
 
 using namespace lsan;
 
 static std::filesystem::path executablePath;
+
+auto suppression::getSystemLibraries() -> const std::vector<std::regex>& {
+    static auto supps = loadSystemLibraries();
+    return supps;
+}
+
+auto suppression::getSystemLibraryFiles() -> std::vector<std::string> {
+    return {
+        readFile(executablePath.remove_filename() / "systemLibraries.json"),
+    };
+}
 
 auto behaviour::getBehaviour() -> const Behaviour& {
     static Behaviour instance;

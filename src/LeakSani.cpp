@@ -36,6 +36,7 @@
 #include "signals/signalHandlers.hpp"
 #include "signals/signals.hpp"
 #include "suppression/firstPartyLibrary.hpp"
+#include "suppression/systemLibraryLoader.hpp"
 
 #ifdef __APPLE__
 extern "C" {
@@ -882,7 +883,7 @@ auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
 
 auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
     if (!systemLibraries) {
-        systemLibraries = loadSystemLibraries();
+        systemLibraries = suppression::loadSystemLibraries();
     }
     return *systemLibraries;
 }

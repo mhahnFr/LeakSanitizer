@@ -75,13 +75,6 @@ auto getTracker() -> trackers::ATracker&;
 auto loadSuppressions() -> std::vector<suppression::Suppression>;
 
 /**
- * Loads the system library regexes.
- *
- * @return the loaded regexes
- */
-auto loadSystemLibraries() -> std::vector<std::regex>;
-
-/**
  * Loads and returns the suppressions to match thread-local memory leaks.
  *
  * @return the suppressions
@@ -111,15 +104,6 @@ static inline void internalCleanUp() {
  */
 static inline auto getSuppressions() -> const std::vector<suppression::Suppression>& {
     return getInstance().getSuppressions();
-}
-
-/**
- * Returns the system library regexes.
- *
- * @return the system library regexes
- */
-static inline auto getSystemLibraries() -> const std::vector<std::regex>& {
-    return getInstance().getSystemLibraries();
 }
 
 /**
