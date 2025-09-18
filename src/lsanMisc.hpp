@@ -119,16 +119,6 @@ static inline void internalCleanUp() {
 static inline auto getSuppressions() -> const std::vector<suppression::Suppression>& {
     return getInstance().getSuppressions();
 }
-
-/**
- * Prints an indicator for a hint.
- *
- * @param out the output stream to print onto
- * @return the given output stream
- */
-static inline auto hintBegin(std::ostream& out) -> std::ostream& {
-    return out << "  --   ";
-}
 }
 
 #endif /* lsanMisc_hpp */

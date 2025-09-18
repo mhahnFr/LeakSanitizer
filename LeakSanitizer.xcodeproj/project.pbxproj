@@ -24,6 +24,9 @@
 		BFABB7D42E7BEEB400E2476E /* systemLibraryLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFABB7D22E7BEEB400E2476E /* systemLibraryLoader.cpp */; };
 		BFABB7D52E7BEEB400E2476E /* systemLibraryLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFABB7D22E7BEEB400E2476E /* systemLibraryLoader.cpp */; };
 		BFABB7D62E7BF35900E2476E /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F14B3CDC2D842C4A004768E9 /* parser.cpp */; };
+		BFABB7D92E7C07FB00E2476E /* hinter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFABB7D82E7C07FB00E2476E /* hinter.cpp */; };
+		BFABB7DA2E7C07FB00E2476E /* hinter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFABB7D72E7C07FB00E2476E /* hinter.hpp */; };
+		BFABB7DB2E7C07FB00E2476E /* hinter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFABB7D82E7C07FB00E2476E /* hinter.cpp */; };
 		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
 		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
@@ -176,6 +179,8 @@
 		BFAA94532B6C12FF007FC130 /* signals.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signals.hpp; sourceTree = "<group>"; };
 		BFABB7D12E7BEEB400E2476E /* systemLibraryLoader.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = systemLibraryLoader.hpp; sourceTree = "<group>"; };
 		BFABB7D22E7BEEB400E2476E /* systemLibraryLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = systemLibraryLoader.cpp; sourceTree = "<group>"; };
+		BFABB7D72E7C07FB00E2476E /* hinter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = hinter.hpp; sourceTree = "<group>"; };
+		BFABB7D82E7C07FB00E2476E /* hinter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = hinter.cpp; sourceTree = "<group>"; };
 		BFAFADC528B4FDA40060076C /* formatter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = formatter.hpp; path = src/formatter/formatter.hpp; sourceTree = SOURCE_ROOT; };
 		BFB103D62E38CB7100ECECD5 /* bundle.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bundle.hpp; sourceTree = "<group>"; };
 		BFB103D72E38CB7100ECECD5 /* bundle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bundle.cpp; sourceTree = "<group>"; };
@@ -437,6 +442,8 @@
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
 				BFD983A62B8A4729003B6CC1 /* timing.cpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
+				BFABB7D72E7C07FB00E2476E /* hinter.hpp */,
+				BFABB7D82E7C07FB00E2476E /* hinter.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -558,6 +565,7 @@
 				F16F67362E6EB3EA00F7798C /* getBehaviour.hpp in Headers */,
 				BFCDA8082E2F7CDA0029AEC1 /* RealAllocator.hpp in Headers */,
 				BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */,
+				BFABB7DA2E7C07FB00E2476E /* hinter.hpp in Headers */,
 				BFCDA8092E2F7CDA0029AEC1 /* ObjectPool.hpp in Headers */,
 				BFCDA80A2E2F7CDA0029AEC1 /* Behaviour.hpp in Headers */,
 				BFCDA80B2E2F7CDA0029AEC1 /* helper.hpp in Headers */,
@@ -728,6 +736,7 @@
 				BFCDA7F32E2F7CA10029AEC1 /* signals.cpp in Sources */,
 				F16F67432E6ED07700F7798C /* core.cpp in Sources */,
 				BFCDA7F42E2F7CA10029AEC1 /* wrap_malloc.cpp in Sources */,
+				BFABB7D92E7C07FB00E2476E /* hinter.cpp in Sources */,
 				BFCDA7F52E2F7CA10029AEC1 /* misc.cpp in Sources */,
 				F16F67312E6EAF7E00F7798C /* lsanFormat.cpp in Sources */,
 				F16F673D2E6EC8CC00F7798C /* crashForce.cpp in Sources */,
@@ -765,6 +774,7 @@
 				BFA6CC492E78124300C8C62C /* firstPartyLibrary.cpp in Sources */,
 				BFA6CC482E7811DF00C8C62C /* format.cpp in Sources */,
 				F16F67452E6ED1FC00F7798C /* core.cpp in Sources */,
+				BFABB7DB2E7C07FB00E2476E /* hinter.cpp in Sources */,
 				F16F673A2E6EBDBB00F7798C /* lsanFormat.cpp in Sources */,
 				F16F67392E6EBDA800F7798C /* signals.cpp in Sources */,
 				F1EDCE9F2E65879C007E260E /* main.cpp in Sources */,

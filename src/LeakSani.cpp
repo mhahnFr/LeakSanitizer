@@ -1028,16 +1028,16 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     std::ostringstream hints;
     self.maybeHintCallstackSize(hints);
     if (printedLeaks && self.hadIndirects && !self.behaviour.showIndirects()) {
-        hints << hintBegin << "Set " << format<Style::BOLD>("LSAN_INDIRECT_LEAKS") << " to "
+        hints << hinter::hintBegin << "Set " << format<Style::BOLD>("LSAN_INDIRECT_LEAKS") << " to "
               << format<Style::BOLD>("true") << " to show indirect memory leaks." << std::endl;
     }
     if (!self.behaviour.showReachables() && stats.getTotalReachable() > 0) {
-        hints << hintBegin << "Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
+        hints << hinter::hintBegin << "Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
               << format<Style::BOLD>("true") << " to display the reachable memory leaks."
               << std::endl;
     }
     if (!isATTY() && !has("LSAN_PRINT_FORMATTED")) {
-        hints << hintBegin << "Set " << format<Style::BOLD>("LSAN_PRINT_FORMATTED") << " to "
+        hints << hinter::hintBegin << "Set " << format<Style::BOLD>("LSAN_PRINT_FORMATTED") << " to "
               << format<Style::BOLD>("true") << " to re-enable colored output." << std::endl;
     }
     if (const auto& str = hints.str(); !str.empty()) {
