@@ -134,13 +134,14 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
             .callstack = std::move(callstack)
         };
         info.toBinary(buffer, sizeof buffer, substitute);
-        char* args[] = {
+        const char* args[] = {
+            path.c_str(),
             substitute,
             buffer,
             nullptr,
         };
 
-        if (execv(path.c_str(), args) < 0) {
+        if (execv(path.c_str(), const_cast<char* const*>(args)) < 0) {
             crashWithTraceLocal(signalCode, signalContext, std::move(info.callstack));
         }
     } else {
