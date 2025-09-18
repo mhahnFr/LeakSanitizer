@@ -18,6 +18,8 @@
 		BF5AAFE82E6054E2007C0329 /* wrap_malloc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF5AAFE72E6054E2007C0329 /* wrap_malloc.hpp */; };
 		BFA6CC462E780D6000C8C62C /* suppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA6CC452E780D6000C8C62C /* suppression.cpp */; };
 		BFA6CC472E780D6000C8C62C /* suppression.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFA6CC442E780D6000C8C62C /* suppression.hpp */; };
+		BFA6CC482E7811DF00C8C62C /* format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF3204EC2AC5C614004EC77E /* format.cpp */; };
+		BFA6CC492E78124300C8C62C /* firstPartyLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */; };
 		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
 		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
@@ -762,6 +764,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFA6CC492E78124300C8C62C /* firstPartyLibrary.cpp in Sources */,
+				BFA6CC482E7811DF00C8C62C /* format.cpp in Sources */,
 				F16F67452E6ED1FC00F7798C /* core.cpp in Sources */,
 				F16F673A2E6EBDBB00F7798C /* lsanFormat.cpp in Sources */,
 				F16F67392E6EBDA800F7798C /* signals.cpp in Sources */,
