@@ -23,6 +23,8 @@
 #define Behaviour_hpp
 
 #include <chrono>
+#include <filesystem>
+#include <vector>
 
 #include "helper.hpp"
 
@@ -95,6 +97,26 @@ public:
 
 #undef FROM_ENV
 };
+
+/**
+ * @brief Returns the file names found in the given string.
+ *
+ * The string is split by the character @code :@endcode.
+ *
+ * @param files the string with the file names
+ * @return the deducted file names
+ */
+static inline auto getFiles(const char* files) -> std::vector<std::filesystem::path> {
+    auto toReturn = std::vector<std::filesystem::path>();
+    if (files != nullptr) {
+        auto stream = std::istringstream(files);
+        std::string s;
+        while (std::getline(stream, s, ':')) {
+            toReturn.emplace_back(s);
+        }
+    }
+    return toReturn;
+}
 }
 
 #endif /* Behaviour_hpp */

@@ -157,26 +157,6 @@ auto getTracker() -> trackers::ATracker& {
 }
 
 /**
- * @brief Returns the file names found in the given string.
- *
- * The string is split by the character @code :@endcode.
- *
- * @param files the string with the file names
- * @return the deducted file names
- */
-static inline auto getFiles(const char* files) -> std::vector<std::filesystem::path> {
-    auto toReturn = std::vector<std::filesystem::path>();
-    if (files != nullptr) {
-        auto stream = std::istringstream(files);
-        std::string s;
-        while (std::getline(stream, s, ':')) {
-            toReturn.emplace_back(s);
-        }
-    }
-    return toReturn;
-}
-
-/**
  * Loads the suppressions found in the given JSON value into the given
  * suppression vector.
  *
@@ -217,7 +197,7 @@ auto loadSuppressions() -> std::vector<suppression::Suppression> {
         }
     }
 
-    for (const auto& file : getFiles(behaviour::getBehaviour().suppressionFiles())) {
+    for (const auto& file : behaviour::getFiles(behaviour::getBehaviour().suppressionFiles())) {
         auto stream = std::ifstream();
         stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
 
