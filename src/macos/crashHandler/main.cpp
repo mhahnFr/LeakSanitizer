@@ -54,6 +54,7 @@ auto main(int argc, const char** argv) -> int {
 
     // TODO: Safety!!!
     auto info = SignalInfo::fromBinary(argv[2], sizeof(SignalInfo), argv[1][0]);
+    const auto _ = info.callstack.absolutize(argv + 3);
     const auto& [message, reason] = createCrashMessage(info.code, info.siCode, info.faultAddress);
     crashWarner::crashForce(message, reason, std::move(info.callstack));
 }
