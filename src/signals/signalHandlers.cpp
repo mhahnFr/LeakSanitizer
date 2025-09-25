@@ -133,13 +133,15 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
             .faultAddress = signalContext->si_addr,
             .callstack = std::move(callstack)
         };
-        info.toBinary(buffer, sizeof buffer, substitute);
-        const char* args[] = {
+        constexpr auto SIZE = CALLSTACK_BACKTRACE_SIZE + 4zu;
+        const char* args[SIZE] = {
             path.c_str(),
-            substitute,
-            buffer,
-            nullptr,
         };
+        args[SIZE - 1] = nullptr;
+        info.callstack.relativize(args + 3);
+        info.toBinary(buffer, sizeof buffer, substitute);
+        args[1] = substitute;
+        args[2] = buffer;
 
         if (execv(path.c_str(), const_cast<char* const*>(args)) < 0) {
             crashWithTraceLocal(signalCode, signalContext, std::move(info.callstack));
