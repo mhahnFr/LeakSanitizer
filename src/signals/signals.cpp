@@ -19,12 +19,10 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
-#include <csignal>
-
 #include "signals.hpp"
 
 #include <csignal>
+#include <cstdlib>
 
 namespace lsan::signals {
 auto registerFunction(void (*function)(int), const int signal) -> bool {
@@ -33,9 +31,9 @@ auto registerFunction(void (*function)(int), const int signal) -> bool {
 
 static bool hasAlternativeStack = false;
 auto createAlternativeStack() -> void* {
-    const std::size_t stackSize = SIGSTKSZ;
+    constexpr std::size_t stackSize = SIGSTKSZ;
 
-    auto toReturn = std::malloc(stackSize);
+    const auto toReturn = std::malloc(stackSize);
     if (toReturn == nullptr) {
         return nullptr;
     }
