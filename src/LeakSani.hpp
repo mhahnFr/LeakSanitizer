@@ -80,7 +80,7 @@ class LSan final: public trackers::ATracker {
     const std::thread::id mainId = std::this_thread::get_id();
     /** The thread-local storage key used for the thread-local allocation trackers.     */
     const pthread_key_t saniKey;
-void* const signalStack;
+    void* const signalStack;
     
 #ifdef BENCHMARK
     /** The registered timings of the allocations.                                      */

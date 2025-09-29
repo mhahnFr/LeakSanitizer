@@ -694,6 +694,7 @@ LSan::~LSan() {
             delete tracker;
         }
     }
+    std::free(signalStack);
 }
 
 auto LSan::copyTrackerList() -> decltype(tlsTrackers) {
