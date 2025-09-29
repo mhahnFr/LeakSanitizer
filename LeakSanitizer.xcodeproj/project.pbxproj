@@ -113,6 +113,13 @@
 			remoteGlobalIDString = F13529B32D1083FD002534D0;
 			remoteInfo = CallstackLibrary;
 		};
+		F1510E5E2E8A84E80093A690 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF97EB4E28831E5B00DAF1FE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F13529B32D1083FD002534D0;
+			remoteInfo = CallstackLibrary;
+		};
 		F1EDCEA02E6587D2007E260E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BF97EB4E28831E5B00DAF1FE /* Project object */;
@@ -661,6 +668,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F1510E5F2E8A84E80093A690 /* PBXTargetDependency */,
 			);
 			name = CrashHandler;
 			packageProductDependencies = (
@@ -791,6 +799,11 @@
 			isa = PBXTargetDependency;
 			target = F13529B32D1083FD002534D0 /* CallstackLibrary */;
 			targetProxy = BFCDA7EE2E2F7C430029AEC1 /* PBXContainerItemProxy */;
+		};
+		F1510E5F2E8A84E80093A690 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F13529B32D1083FD002534D0 /* CallstackLibrary */;
+			targetProxy = F1510E5E2E8A84E80093A690 /* PBXContainerItemProxy */;
 		};
 		F1EDCEA12E6587D2007E260E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
