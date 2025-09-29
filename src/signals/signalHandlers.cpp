@@ -20,7 +20,6 @@
  */
 
 #include <array>
-#include <optional>
 #include <string>
 
 #ifdef __APPLE__
@@ -31,10 +30,8 @@
 # include <unistd.h>
 #endif /* __APPLE__ */
 
-#define LCS_ACTIVATE_SWIFT_DEMANGLER_CONTROL 1
 #include "signalHandlers.hpp"
 
-#include <callstack_internals.h>
 #include <lsan_stats.h>
 
 #include "SignalInfo.hpp"
@@ -109,9 +106,6 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 }
 
 [[ noreturn ]] static inline void crashWithTraceLocal(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
-    using namespace formatter;
-
-    lcs_activateSwiftDemangler = false;
     const auto [message, reasonDescription] = createCrashMessage(signalCode, signalContext->si_code, signalContext->si_addr);
     crashWarner::crashForce(message, reasonDescription, std::move(callstack));
 }
@@ -169,9 +163,7 @@ void callstack(int, siginfo_t*, void* executionContext) {
     getTracker().withIgnoration(true, [&executionContext] {
         auto& out = getOutputStream();
         out << format<Style::ITALIC>("The current callstack:") << std::endl;
-        lcs_activateSwiftDemangler = false;
         callstack::format(createCallstackFor(executionContext), out);
-        lcs_activateSwiftDemangler = true;
         out << std::endl;
     });
 }
