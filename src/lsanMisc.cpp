@@ -1,50 +1,47 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-#include <filesystem>
-#include <iostream>
-
-#ifdef BENCHMARK
- #include <deque>
- #include <map>
-#endif
-
-#if __has_include(<unistd.h>)
- #include <unistd.h>
-
- #define LSAN_HAS_UNISTD
-#endif
 
 #include "lsanMisc.hpp"
 
-#include "formatter.hpp"
-#include "callstacks/callstackHelper.hpp"
+#include <callstack.h>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
+#include <SimpleJSON/SimpleJSON.hpp>
 
-#include "../include/lsan_internals.h"
-#include "../CallstackLibrary/include/callstack.h"
+#include "callstackHelper/format.hpp"
+#include "formatter/formatter.hpp"
+#include "formatter/lsanFormat.hpp"
+#include "suppression/defaultSuppression.hpp"
+#include "suppression/FunctionNotFoundException.hpp"
+#include "suppression/Suppression.hpp"
+#include "suppression/systemLibraryLoader.hpp"
+#include "trackers/PseudoTracker.hpp"
+#include "trackers/TLSTracker.hpp"
+
+#ifdef __APPLE__
+# include "macos/bundle.hpp"
+#endif
 
 namespace lsan {
-auto _getIgnoreMalloc() -> bool & {
-    static bool ignore = false;
-    return ignore;
-}
-
 auto getInstance() -> LSan & {
     static auto instance = new LSan();
     return *instance;
@@ -57,8 +54,8 @@ auto getInstance() -> LSan & {
  * @return the given output stream
  */
 static inline auto printLicense(std::ostream & out) -> std::ostream & {
-    out << "Copyright (C) 2022 - 2024  mhahnFr and contributors" << std::endl
-        << "Licensed under the terms of the GPL 3.0."            << std::endl
+    out << "Copyright (C) 2022 - 2025  mhahnFr and contributors"         << std::endl
+        << "Licensed under the terms of the GNU GPL version 3 or later." << std::endl
         << std::endl;
     
     return out;
@@ -82,11 +79,21 @@ static inline auto printWebsite(std::ostream & out) -> std::ostream & {
     return out;
 }
 
+static inline auto getVersion() -> std::string {
+#ifdef __APPLE__
+    return macos::bundle::getVersion();
+#elif defined(LSAN_VERSION)
+    return LSAN_VERSION;
+#else
+    return "CLEAN BUILD";
+#endif
+}
+
 auto printInformation(std::ostream & out) -> std::ostream & {
     using formatter::Style;
     
     out << "Report by " << formatter::format<Style::BOLD>("LeakSanitizer ")
-        << formatter::format<Style::ITALIC>(VERSION)
+        << formatter::format<Style::ITALIC>(getVersion())
         << std::endl << std::endl
         << printLicense
         << printWebsite;
@@ -95,45 +102,141 @@ auto printInformation(std::ostream & out) -> std::ostream & {
 }
 
 void exitHook() {
-    using formatter::Style;
-    
-    setIgnoreMalloc(true);
-    auto & out = getOutputStream();
-    out << std::endl << formatter::format<Style::GREEN>("Exiting");
-    
-    if (__lsan_printExitPoint) {
-        out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
-        callstackHelper::format(lcs::callstack(), out);
-    }
-    out << std::endl     << std::endl
-        << getInstance() << std::endl
-        << printInformation;
+    getInstance().finish();
+    getTracker().ignoreMalloc = true;
+    getOutputStream() << maybePrintExitPoint
+                      << std::endl     << std::endl
+                      << getInstance() << std::endl
+                      << printInformation;
     internalCleanUp();
 }
 
-auto maybeHintRelativePaths(std::ostream & out) -> std::ostream & {
-    if (__lsan_relativePaths) {
-        out << printWorkingDirectory << std::endl;
+auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
+    using formatter::Style;
+
+    if (getInstance().hasPrintedExit) return out;
+
+    out << std::endl << formatter::format<Style::GREEN>("Exiting");
+    if (behaviour::getBehaviour().printExitPoint()) {
+        out << formatter::format<Style::ITALIC>(", stacktrace:") << std::endl;
+        callstack::format(lcs::callstack(), out);
     }
+    getInstance().hasPrintedExit = true;
+
     return out;
 }
 
-auto printWorkingDirectory(std::ostream & out) -> std::ostream & {
-    out << "Note: " << formatter::format<formatter::Style::GREYED>("Paths are relative to the") << " working directory: "
-        << std::filesystem::current_path() << std::endl;
-    
-    return out;
+/**
+ * Creates a thread local tracker.
+ *
+ * @param pseudo whether to create a pseudo tracker
+ * @return the new and allocated thread local tracker
+ */
+static inline auto newLocalTracker(const bool pseudo) -> trackers::ATracker* {
+    if (pseudo) {
+        return new trackers::PseudoTracker();
+    }
+    return new trackers::TLSTracker();
 }
 
-auto isATTY() -> bool {
-#ifdef LSAN_HAS_UNISTD
-    return isatty(__lsan_printCout ? STDOUT_FILENO : STDERR_FILENO);
-#else
-    return __lsan_printFormatted;
-#endif
+auto getTracker() -> trackers::ATracker& {
+    auto& globalInstance = getInstance();
+    if (LSan::finished) return globalInstance;
+
+    const auto& key = globalInstance.getTlsKey();
+    const auto tlv = pthread_getspecific(key);
+    if (tlv == nullptr) {
+        pthread_setspecific(key, std::addressof(globalInstance));
+        trackers::ATracker* tlsTracker;
+        globalInstance.withIgnoration(true, [&] {
+            tlsTracker = newLocalTracker(behaviour::getBehaviour().statsActive());
+            pthread_setspecific(key, tlsTracker);
+        });
+        return *tlsTracker;
+    }
+    return *static_cast<trackers::ATracker*>(tlv);
 }
 
-auto has(const std::string & var) -> bool {
-    return getenv(var.c_str()) != nullptr;
+/**
+ * Loads the suppressions found in the given JSON value into the given
+ * suppression vector.
+ *
+ * @param content the vector with the deducted suppressions
+ * @param object the JSON value to deduct suppressions from
+ */
+static inline void loadSuppressions(std::vector<suppression::Suppression>& content,
+                                    const simple_json::Value& object) {
+    if (object.is(simple_json::ValueType::Array)) {
+        for (const auto& obj : object.as<simple_json::ValueType::Array>()) {
+            try {
+                content.emplace_back(simple_json::Object(obj));
+            } catch (const suppression::FunctionNotFoundException& e) {
+                using namespace formatter;
+
+                if (behaviour::getBehaviour().suppressionDevelopersMode()) {
+                    getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
+                                                                         + "\" ignored: Function \"" + e.getFunctionName()
+                                                                         + "\" not loaded.") << std::endl << std::endl;
+                }
+            }
+        }
+    } else {
+        content.emplace_back(simple_json::Object(object));
+    }
+}
+
+auto loadSuppressions() -> std::vector<suppression::Suppression> {
+    auto toReturn = std::vector<suppression::Suppression>();
+    for (const auto& file : suppression::getDefaultSuppression()) {
+        try {
+            loadSuppressions(toReturn, simple_json::parse(std::istringstream(file)));
+        } catch (const std::exception& e) {
+            using namespace formatter;
+            using namespace std::string_literals;
+
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load default suppression file: "s + e.what()) << std::endl << std::endl;
+        }
+    }
+
+    for (const auto& file : behaviour::getFiles(behaviour::getBehaviour().suppressionFiles())) {
+        auto stream = std::ifstream();
+        stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+
+        try {
+            stream.open(file);
+            loadSuppressions(toReturn, simple_json::parse(stream));
+        } catch (const std::exception& e) {
+            using namespace formatter;
+
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load suppression file \""
+                                                                 + file.string() + "\": " + e.what()) << std::endl << std::endl;
+        }
+        if (stream.is_open()) {
+            stream.close();
+        }
+    }
+
+    return toReturn;
+}
+
+auto createTLVSuppression() -> std::vector<suppression::Suppression> {
+    auto toReturn = std::vector<suppression::Suppression>();
+
+    for (const auto& suppression : suppression::getDefaultTLVSuppressions()) {
+        try {
+            loadSuppressions(toReturn, simple_json::parse(std::istringstream(suppression)));
+        } catch (const std::exception& e) {
+            using namespace formatter;
+            using namespace std::string_literals;
+
+            getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load TLV suppression: "s + e.what()) << std::endl << std::endl;
+        }
+    }
+
+    return toReturn;
+}
+
+auto suppression::getSystemLibraries() -> const std::vector<std::regex>& {
+    return getInstance().getSystemLibraries();
 }
 }

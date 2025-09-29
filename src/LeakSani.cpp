@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr and contributors
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -19,163 +19,862 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <dlfcn.h>
-
-#include <algorithm>
-
 #include "LeakSani.hpp"
 
+#include <algorithm>
+#include <callstack_internals.h>
+#include <filesystem>
+#include <stack>
+#include <functionInfo/functionInfo.h>
+#include <regions/regions.h>
+
 #include "bytePrinter.hpp"
-#include "formatter.hpp"
 #include "lsanMisc.hpp"
-#include "callstacks/callstackHelper.hpp"
-#include "signals/signals.hpp"
+#include "utils.hpp"
+#include "crashWarner/exceptionHandler.hpp"
+#include "formatter/formatter.hpp"
 #include "signals/signalHandlers.hpp"
+#include "signals/signals.hpp"
+#include "suppression/firstPartyLibrary.hpp"
+#include "suppression/systemLibraryLoader.hpp"
 
-#include "../include/lsan_internals.h"
-#include "../include/lsan_stats.h"
+#ifdef __APPLE__
+extern "C" {
+# include <mach/thread_state.h>
+}
 
-#include "../CallstackLibrary/include/callstack_internals.h"
+# include <objc/runtime.h>
+
+# include "macos/bundle.hpp"
+
+# ifdef LSAN_HANDLE_OBJC
+#  include <CoreFoundation/CFDictionary.h>
+
+#  define OBJC_SUPPORT_EXTRA 1
+#  include "objcSupport.hpp"
+# endif
+
+#endif
 
 namespace lsan {
+std::atomic_bool LSan::finished = false;
+std::atomic_bool LSan::preventDealloc = false;
+
 /**
- * Returns an optional containing the runtime name of this library.
+ * Aligns the given pointer to the next machine word.
  *
- * @return the runtime name of this library if available
+ * @param ptr the pointer to be aligned
+ * @param up whether to round up
+ * @return the aligned pointer
  */
-static inline auto lsanName() -> std::optional<const std::string> {
-    Dl_info info;
-    if (!dladdr(reinterpret_cast<const void *>(&lsanName), &info)) {
-        return std::nullopt;
+static constexpr inline auto align(uintptr_t ptr, const bool up = true) -> uintptr_t {
+    if (constexpr auto alignment = sizeof(void*); ptr % alignment != 0) {
+        if (up) {
+            ptr = ptr + alignment - ptr % alignment;
+        } else {
+            ptr = ptr - alignment + ptr % alignment;
+        }
     }
-    
-    return info.dli_fname;
+    return ptr;
 }
 
-auto LSan::generateRegex(const char * regex) -> std::optional<std::regex> {
-    if (regex == nullptr || *regex == '\0') {
-        return std::nullopt;
+/**
+ * Aligns the given pointer to the next machine word.
+ *
+ * @param ptr the pointer to be aligned
+ * @param up whether to round up
+ * @return the aligned pointer
+ */
+static inline auto align(const void* ptr, const bool up = true) -> uintptr_t {
+    return align(uintptr_t(ptr), up);
+}
+
+auto LSan::findWithSpecials(void* ptr) -> decltype(infos)::iterator {
+    auto toReturn = infos.find(ptr);
+    if (toReturn == infos.end()) {
+        toReturn = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) - 2 * sizeof(void*)));
     }
-    
-    try {
-        return std::regex(regex);
-    } catch (std::regex_error & e) {
-        userRegexError = e.what();
-        return std::nullopt;
+    if (toReturn == infos.end()) {
+        toReturn = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) - sizeof(void*)));
+    }
+    if (toReturn == infos.end()) {
+        toReturn = infos.find(reinterpret_cast<void*>(~uintptr_t(ptr)));
+    }
+    return toReturn;
+}
+
+void LSan::classifyLeaks(const uintptr_t begin, const uintptr_t end,
+                         const LeakType direct, const LeakType indirect,
+                         std::deque<MallocInfo::Ref>& directs, const bool skipClassifieds,
+                         const char* name, const char* nameRelative, const bool reclassify) {
+    for (uintptr_t it = begin; it < end; it += sizeof(uintptr_t)) {
+        const auto& record = findWithSpecials(*reinterpret_cast<void**>(it));
+        if (record == infos.end() || record->second.isDeleted() || (skipClassifieds && record->second.leakType != LeakType::unclassified)) {
+            continue;
+        }
+        if (record->second.leakType > direct || reclassify) {
+            record->second.leakType = direct;
+            record->second.imageName.first = name;
+            record->second.imageName.second = nameRelative;
+            directs.emplace_back(record->second);
+        }
+        classifyRecord(record->second, indirect, reclassify);
     }
 }
 
-LSan::LSan(): libName(lsanName().value()), signalStack(signals::createAlternativeStack()) {
+void LSan::classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, const LeakType direct, const LeakType indirect) {
+    const auto classWords = static_cast<void**>(cls);
+    const auto cachePtr = reinterpret_cast<void*>(uintptr_t(classWords[2]) & ((uintptr_t(1) << 48) - 1));
+    if (const auto& cacheIt = infos.find(cachePtr); cacheIt != infos.end() && cacheIt->second.leakType > direct) {
+        cacheIt->second.leakType = direct;
+        classifyRecord(cacheIt->second, indirect);
+        directs.emplace_back(cacheIt->second);
+    }
+
+    const auto ptr = reinterpret_cast<void*>(uintptr_t(classWords[4]) & 0x0f007ffffffffff8UL);
+    if (const auto& it = infos.find(ptr); it != infos.end()) {
+        if (it->second.leakType > direct) {
+            it->second.leakType = direct;
+            classifyRecord(it->second, indirect);
+            directs.emplace_back(it->second);
+        }
+
+        const auto rwStuff = static_cast<void**>(it->second.getPointer());
+        const auto rwPtr = reinterpret_cast<void*>(uintptr_t(rwStuff[1]) & ~1u);
+        if (const auto& rwIt = infos.find(rwPtr); rwIt != infos.end()) {
+            if (rwIt->second.leakType > direct) {
+                rwIt->second.leakType = direct;
+                classifyRecord(rwIt->second, indirect);
+                directs.emplace_back(rwIt->second);
+            }
+            if (rwIt->second.getSize() >= 4 * sizeof(void*)) {
+                const auto ptrArr = static_cast<void**>(rwIt->second.getPointer());
+                for (unsigned char i = 1; i < 4; ++i) {
+                    classifyPointerUnion<true>(ptrArr[i], directs, direct, indirect);
+                }
+            }
+        }
+    }
+}
+
+void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, const bool reclassify) {
+    auto stack = std::stack<std::reference_wrapper<MallocInfo>>();
+    stack.emplace(info);
+    while (!stack.empty()) {
+        auto elem = stack.top();
+        stack.pop();
+        if ((elem.get().leakType > currentType || reclassify) && elem.get().getPointer() != info.getPointer()) {
+            elem.get().leakType = currentType;
+        }
+
+        const auto beginPtr = align(elem.get().getPointer());
+        const auto   endPtr = align(beginPtr + elem.get().getSize(), false);
+
+        for (uintptr_t it = beginPtr; it < endPtr; it += sizeof(uintptr_t)) {
+            const auto& record = findWithSpecials(*reinterpret_cast<void**>(it));
+            if (record == infos.end()
+                || record->second.isDeleted()
+                || record->second.getPointer() == info.getPointer()
+                || record->second.getPointer() == elem.get().getPointer()) {
+                continue;
+            }
+            info.viaMeRecords.emplace_back(record->second);
+            if (record->second.leakType > currentType || reclassify)
+                stack.emplace(record->second);
+        }
+    }
+}
+
+/**
+ * Returns the stack begin of the given thread.
+ *
+ * @param thread the POSIX thread
+ * @return the stack begin
+ */
+static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
+    void* toReturn;
+
+#ifdef __APPLE__
+    toReturn = pthread_get_stackaddr_np(thread);
+#elif defined(__linux__)
+    pthread_attr_t attr;
+    std::size_t ignored;
+    if (pthread_getattr_np(thread, &attr) != 0) {
+        throw std::runtime_error("Failed to gather thread attributes");
+    }
+    if (pthread_attr_getstack(&attr, &toReturn, &ignored) != 0) {
+        pthread_attr_destroy(&attr);
+        throw std::runtime_error("Failed to gather stack address");
+    }
+    pthread_attr_destroy(&attr);
+#endif
+
+    return toReturn;
+}
+
+/**
+ * Returns the stack size of the given POSIX thread.
+ *
+ * @param thread the POSIX thread
+ * @return the stack size
+ */
+static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size_t {
+    std::size_t toReturn;
+
+#ifdef __APPLE__
+    toReturn = pthread_get_stacksize_np(thread);
+#elif defined(__linux__)
+    pthread_attr_t attr;
+    if (pthread_getattr_np(thread, &attr) != 0) {
+        throw std::runtime_error("Failed to gather thread attributes");
+    }
+    if (pthread_attr_getstacksize(&attr, &toReturn) != 0) {
+        pthread_attr_destroy(&attr);
+        throw std::runtime_error("Failed to gather stack size");
+    }
+    pthread_attr_destroy(&attr);
+#endif
+
+    return toReturn;
+}
+
+/**
+ * If the given pointer is a TLSTracker, it is deleted and the thread-local
+ * value is set to point to the global tracker instance.
+ *
+ * @param value the thread-local value
+ */
+static inline void destroySaniKey(void* value) {
+    if (auto& globalInstance = getInstance(); value != std::addressof(globalInstance)) {
+        pthread_setspecific(globalInstance.getTlsKey(), std::addressof(globalInstance));
+        auto tracker = static_cast<trackers::ATracker*>(value);
+        if (!LSan::preventDealloc) {
+            globalInstance.withIgnoration(true, [&tracker] {
+                delete tracker;
+            });
+        } else {
+            tracker->needsDealloc = true;
+        }
+    }
+}
+
+auto LSan::isSuppressed(const MallocInfo& info) -> bool {
+    if (suppression::isFirstParty(info.imageName.first, !callstack_autoClearCaches)) {
+        return true;
+    }
+
+    const auto& theSuppressions = getSuppressions();
+    return std::ranges::any_of(theSuppressions, [&info](const auto& suppression) {
+        return suppression.match(info);
+    });
+}
+
+auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>& thread) -> const std::string& {
+    using namespace std::string_literals;
+
+    if (const auto& it = threadDescriptions.find(id); it != threadDescriptions.end()) {
+        return it->second;
+    }
+    std::string desc;
+    if (id == 0) {
+        desc = "main thread";
+    } else {
+        desc = "thread # " + std::to_string(id);
+
+        std::optional<pthread_t> t = thread;
+        if (!t) {
+            const auto& it = std::ranges::find_if(std::as_const(threads), [id](const auto& element) {
+                return
+#ifdef __linux__
+                    !element.second.isDead() &&
+#endif
+                    element.second.getNumber() == id;
+            });
+            if (it != threads.end()) {
+                t = it->second.getThread();
+            }
+        }
+        constexpr auto BUFFER_SIZE = 1024u;
+        char buffer[BUFFER_SIZE];
+        if (t && pthread_getname_np(*t, buffer, BUFFER_SIZE) == 0 && buffer[0] != '\0') {
+            desc += " ("s + buffer + ")";
+        }
+    }
+    return threadDescriptions.emplace(id, std::move(desc)).first->second;
+}
+
+void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
+#ifndef __APPLE__
+    using id = void*;
+    using Class = void*;
+#endif
+
+    LOAD_FUNC(int (*)(Class*, int), objc_getClassList);
+    LOAD_FUNC(Class (*)(id), object_getClass);
+
+    if (objc_getClassList == nullptr || object_getClass == nullptr) {
+        return;
+    }
+
+    const auto& classNumber = objc_getClassList(nullptr, 0);
+    const auto classes = new Class[unsigned(classNumber)];
+    objc_getClassList(classes, classNumber);
+    for (int i = 0; i < classNumber; ++i) {
+        classifyClass(classes[i], records, LeakType::objcDirect, LeakType::objcIndirect);
+
+        const auto& meta = object_getClass(id(classes[i]));
+        classifyClass(meta, records, LeakType::objcDirect, LeakType::objcIndirect);
+    }
+    delete[] classes;
+}
+
+#ifdef __linux__
+/** The @c std::thread::id of the thread that performed the kill. */
+static std::thread::id killId;
+/** Whether to keep the killed threads paused.                    */
+volatile static bool holding = true;
+
+/**
+ * If the calling thread has not performed the kill, it is paused and the stack
+ * pointer is registered.
+ */
+static void holdOn(int) {
+    if (std::this_thread::get_id() != killId) {
+        getInstance().setSP(__builtin_frame_address(0));
+        while (holding); // FIXME: Use a condition variable
+    }
+}
+#endif
+
+/**
+ * Attempts to suspend the referred thread.
+ *
+ * @param info the thread to be suspended
+ * @return whether the thread was suspended successfully
+ */
+static inline auto suspendThread(const ThreadInfo& info) -> bool {
+    auto toReturn = false;
+#ifdef __APPLE__
+    toReturn = thread_suspend(pthread_mach_thread_np(info.getThread())) == KERN_SUCCESS;
+#else
+    killId = std::this_thread::get_id();
+    toReturn = pthread_kill(info.getThread(), SIGUSR1) == 0;
+#endif
+    return toReturn;
+}
+
+/**
+ * Attempts to resume the referred thread.
+ *
+ * @param info the thread to be resumed
+ * @return whether the thread was resumed successfully
+ */
+static inline auto resumeThread(const ThreadInfo& info) -> bool {
+    auto toReturn = false;
+#ifdef __APPLE__
+    toReturn = thread_resume(pthread_mach_thread_np(info.getThread())) == KERN_SUCCESS;
+#else
+    (void) info;
+    toReturn = true;
+#endif
+    return toReturn;
+}
+
+/**
+ * Returns the current stack pointer of the referred thread.
+ *
+ * @param info the thread
+ * @return the current stack pointer
+ */
+static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
+    uintptr_t toReturn;
+#ifdef __APPLE__
+    auto count = std::size_t(0);
+    if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
+                                           &toReturn, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE)
+#elif defined(__linux__)
+    void* sp;
+    while ((sp = info.getSP()) == nullptr);
+    return uintptr_t(sp);
+#endif
+        toReturn = uintptr_t(info.getStackTop()) - info.getStackSize();
+    return toReturn;
+}
+
+#ifdef __linux__
+auto LSan::gatherPthreadSize() -> std::size_t {
+    std::optional<ThreadInfo> info;
+    for (const auto& [_, thread] : threads) {
+        if (thread.getNumber() != 0 && !thread.isDead()) {
+            info = thread;
+            break;
+        }
+    }
+    std::size_t toReturn;
+    if (info) {
+        toReturn = uintptr_t(info->getStackTop()) - uintptr_t(info->getThread());
+    } else {
+        std::thread([&toReturn]() {
+            const auto& stackSize = findStackSize();
+            const auto& stackBegin = findStackBegin();
+            toReturn = uintptr_t(stackBegin) + stackSize - uintptr_t(pthread_self());
+        }).join();
+    }
+    return toReturn;
+}
+#endif
+
+auto LSan::classifyLeaks() -> LeakKindStats {
+    auto toReturn = LeakKindStats();
+
+    auto& out = getOutputStream();
+    const auto& clear = [](std::ostream& stream) -> std::ostream& {
+        if (isATTY()) {
+            return stream << "\r                                                             \r";
+        }
+        return stream << std::endl;
+    };
+    out << "Searching globals and compile time thread locals...";
+    const auto& [regions, regionsAmount] = regions_getLoadedRegions();
+
+    out << clear << "Collecting the leaks...";
+    for (auto it = infos.begin(); it != infos.end();) {
+        if (it->second.isDeleted()) {
+            it = infos.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    out << clear << "Reachability analysis: Objective-C runtime...";
+    classifyObjC(toReturn.recordsObjC);
+
+    out << clear << "Reachability analysis: Stacks...";
+#ifdef __linux__
+    signal(SIGUSR1, holdOn);
+#endif
+    auto failed = std::vector<ThreadInfo>();
+    for (const auto& [_, info] : threads) {
+#ifdef __linux__
+        if (info.isDead()) continue;
+#endif
+
+        using namespace formatter;
+
+        const auto& threadDesc = getThreadDescription(info.getNumber(), info.getThread());
+
+        const auto& selfThread = std::this_thread::get_id() == info.getId();
+        if (!selfThread && !suspendThread(info)) {
+            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
+            failed.push_back(info);
+            continue;
+        }
+        const auto& top = align(info.getStackTop(), false)
+#ifdef __linux__
+                - (info.getNumber() == 0 ? 0 : 3744)
+#endif
+            ;
+        const auto& sp = selfThread ? uintptr_t(__builtin_frame_address(0)) : getStackPointer(info);
+        classifyLeaks(align(sp), top, LeakType::reachableDirect, LeakType::reachableIndirect,
+                      toReturn.recordsStack, false, isThreaded ? threadDesc.c_str() : nullptr);
+    }
+
+    out << clear << "Reachability analysis: Globals...";
+    // Search in global space
+    for (std::size_t i = 0; i < regionsAmount; ++i) {
+        const auto& [begin, end, name, nameRelative] = regions[i];
+
+        classifyLeaks(align(begin), align(end, false),
+                      LeakType::globalDirect, LeakType::globalIndirect,
+                      toReturn.recordsGlobal, false, name, nameRelative);
+    }
+
+    out << clear << "Reachability analysis: Thread-locals...";
+    for (const auto& [_, info] : threads) {
+#ifdef __linux__
+        if (info.isDead()) continue;
+#endif
+        if (std::ranges::find(std::as_const(failed), info) != failed.end()) {
+            continue;
+        }
+
+        const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
+
+#ifdef __linux__
+        const auto& end   = align(uintptr_t(info.getThread()) + gatherPthreadSize(), false);
+        const auto& begin = align(end - 3744);
+#else
+        const auto& begin = align(uintptr_t(info.getThread()));
+        const auto& end   = align(begin + __PTHREAD_SIZE__, false);
+#endif
+        classifyLeaks(begin, end, LeakType::tlvDirect, LeakType::tlvIndirect, toReturn.recordsTlv, false, threadDesc);
+    }
+
+    if (const auto& tlvSupp = createTLVSuppression(); !tlvSupp.empty()) {
+        for (auto& [_, info] : infos) {
+            if (std::ranges::any_of(tlvSupp, [&info](const auto& supp) {
+                return supp.match(info);
+            })) {
+                classifyLeaks(align(info.getPointer()), align(uintptr_t(info.getPointer()) + info.getSize(), false), LeakType::tlvDirect,
+                              LeakType::tlvIndirect, toReturn.recordsTlv, false, nullptr, nullptr, true);
+                info.suppressed = true;
+            }
+        }
+    }
+
+    for (const auto& [_, info] : threads) {
+        if (info.getId() != std::this_thread::get_id() && std::ranges::find(std::as_const(failed), info) == failed.end() && !resumeThread(info)) {
+            using namespace formatter;
+
+            out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to resume "
+                                                     + getThreadDescription(info.getNumber(), info.getThread()) + ".")
+                << std::endl;
+        }
+    }
+#ifdef __linux__
+    holding = false;
+#endif
+
+#ifdef LSAN_HANDLE_OBJC
+    out << clear << "Reachability analysis: Cocoa thread-local variables...";
+    // Search in the Cocoa runtime thread-locals
+    // TODO: Get dicts of all threads
+    const auto& dict = CFDictionaryRef(_1(_2(NSThread, currentThread), threadDictionary));
+    const auto& count = CFDictionaryGetCount(dict);
+    const auto keys = new const void*[count];
+    const auto values = new const void*[count];
+    CFDictionaryGetKeysAndValues(dict, keys, values);
+    for (CFIndex i = 0; i < count; ++i) {
+        const auto& threadDesc = isThreaded ? getThreadDescription(getThreadId()).c_str() : nullptr;
+
+        if (const auto& keyIt = infos.find(keys[i]); keyIt != infos.end()) {
+            classifyRecord(keyIt->second, LeakType::tlvIndirect, true);
+            keyIt->second.leakType = LeakType::tlvDirect;
+            keyIt->second.imageName.first = threadDesc;
+            toReturn.recordsTlv.emplace_back(keyIt->second);
+        }
+        if (const auto& valIt = infos.find(values[i]); valIt != infos.end()) {
+            classifyRecord(valIt->second, LeakType::tlvIndirect, true);
+            valIt->second.leakType = LeakType::tlvDirect;
+            valIt->second.imageName.first = threadDesc;
+            toReturn.recordsTlv.emplace_back(valIt->second);
+        }
+    }
+    delete[] keys;
+    delete[] values;
+
+#endif
+
+    out << clear << "Reachability analysis: Lost memory...";
+    // All leaks still unclassified are unreachable, search for reachability inside them
+    for (auto& [pointer, record] : infos) {
+        if (record.leakType != LeakType::unclassified || record.isDeleted()) {
+            continue;
+        }
+        record.leakType = LeakType::unreachableDirect;
+        classifyRecord(record, LeakType::unreachableIndirect);
+        toReturn.recordsLost.emplace_back(record);
+    }
+
+    out << clear << "Filtering the memory leaks...";
+    for (const auto& leak : toReturn.recordsObjC) {
+        if (!leak.get().suppressed) {
+            leak.get().markSuppressed();
+        }
+    }
+    for (auto& [_, leak] : infos) {
+        if (isSuppressed(leak) && !leak.suppressed) {
+            leak.markSuppressed();
+        }
+    }
+
+    out << clear << "Enumerating memory leaks...";
+#define ENUMERATE(records, count, bytes, indirect, indirectBytes) \
+for (const auto& leak : (records)) {                              \
+    if (leak.get().suppressed || leak.get().enumerated) continue; \
+                                                                  \
+    ++(count);                                                    \
+    (bytes) += leak.get().getSize();                              \
+    const auto& [a, b] = leak.get().enumerate();                  \
+    (indirect) += a;                                              \
+    (indirectBytes) += b;                                         \
+}
+    ENUMERATE(toReturn.recordsStack, toReturn.stack, toReturn.bytesStack,
+              toReturn.stackIndirect, toReturn.bytesStackIndirect)
+    ENUMERATE(toReturn.recordsTlv, toReturn.tlv, toReturn.bytesTlv,
+              toReturn.tlvIndirect, toReturn.bytesTlvIndirect)
+    ENUMERATE(toReturn.recordsGlobal, toReturn.global, toReturn.bytesGlobal,
+              toReturn.globalIndirect, toReturn.bytesGlobalIndirect)
+    ENUMERATE(toReturn.recordsLost, toReturn.lost, toReturn.bytesLost,
+              toReturn.lostIndirect, toReturn.bytesLostIndirect)
+#undef ENUMERATE
+
+    out << clear;
+
+    return toReturn;
+}
+
+/**
+ * @brief Creates and returns a thread-local storage key with the function
+ * @c destroySaniKey as destructor.
+ *
+ * @return the thread-local storage key
+ * @throws std::runtime_error if the key could not be created
+ */
+static inline auto createSaniKey() -> pthread_key_t {
+    pthread_key_t key;
+    if (pthread_key_create(&key, destroySaniKey) != 0) {
+        throw std::runtime_error("Could not create TLS key!");
+    }
+    return key;
+}
+
+namespace {
+/**
+ * Wrapper class used to delay initialization to the point where global variables
+ * are constructed.
+ */
+struct Initializer {
+    inline Initializer() noexcept {
+        getTracker().withIgnoration(true, [] {
+            if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
+                tryCatch_setTerminateHandler(mhExceptionHandler);
+            }
+#ifdef __APPLE__
+            getInstance().crashHandlerPath = macos::bundle::getCrashHandlerPath();
+#endif
+        });
+    }
+};
+
+/** The hidden global variable delaying the initialization of some systems. */
+Initializer initializer;
+}
+
+LSan::LSan(): saniKey(createSaniKey()), signalStack(signals::createAlternativeStack()) {
+    using namespace signals;
+
     atexit(exitHook);
+
+    registerFunction(handlers::stats, SIGUSR1);
     
-    signals::registerFunction(signals::handlers::stats, SIGUSR1);
+    registerFunction(asHandler(handlers::callstack), SIGUSR2, false);
     
-    signals::registerFunction(signals::asHandler(signals::handlers::callstack), SIGUSR2, false);
-    
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSEGV);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGABRT);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTERM);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGALRM);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGPIPE);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGFPE);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGILL);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGQUIT);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGHUP);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGBUS);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGXFSZ);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGXCPU);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGSYS);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGVTALRM);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGPROF);
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGTRAP);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGSEGV);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGABRT);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGTERM);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGALRM);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGPIPE);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGFPE);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGILL);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGQUIT);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGHUP);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGBUS);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGXFSZ);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGXCPU);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGSYS);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGVTALRM);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGPROF);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGTRAP);
 
 #if defined(__APPLE__) || defined(SIGEMT)
-    signals::registerFunction(signals::asHandler(signals::handlers::crashWithTrace), SIGEMT);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGEMT);
 #endif
+
+    std::set_terminate(exceptionHandler);
 }
 
-auto LSan::removeMalloc(void* pointer) -> MallocInfoRemoved {
-    std::lock_guard lock(infoMutex);
-    
-    auto it = infos.find(pointer);
-    if (it == infos.end()) {
-        return MallocInfoRemoved(false, std::nullopt);
-    } else if (it->second.isDeleted()) {
-        return MallocInfoRemoved(false, it->second);
+LSan::~LSan() {
+#ifdef __APPLE__
+    macos::bundle::killBundle();
+#endif
+
+    for (const auto& tracker : copyTrackerList()) {
+        if (tracker->needsDealloc) {
+            delete tracker;
+        }
     }
-    if (__lsan_statsActive) {
+}
+
+auto LSan::copyTrackerList() -> decltype(tlsTrackers) {
+    std::lock_guard lock { tlsTrackerMutex };
+
+    return tlsTrackers;
+}
+
+void LSan::finish() {
+    preventDealloc = true;
+    finished = true;
+    {
+        std::lock_guard lock { mutex };
+        ignoreMalloc = true;
+    }
+
+    for (const auto trackers = copyTrackerList(); const auto tracker : trackers) {
+        tracker->finish();
+    }
+}
+
+void LSan::addThread() {
+    addThread({
+        findStackSize(),
+        findStackBegin(),
+        std::this_thread::get_id() == mainId ? 0 : ThreadInfo::createThreadId(),
+        std::this_thread::get_id(),
+        pthread_self(),
+    });
+    isThreaded = isThreaded || std::this_thread::get_id() != mainId;
+}
+
+void LSan::registerTracker(ATracker* tracker) {
+    std::lock_guard lock1 { mutex };
+    std::lock_guard lock { tlsTrackerMutex };
+
+    withIgnoration(true, [&] {
+        tlsTrackers.insert(tracker);
+        addThread();
+    });
+}
+
+void LSan::deregisterTracker(ATracker* tracker) {
+    std::lock_guard lock1 { mutex };
+    std::lock_guard lock { tlsTrackerMutex };
+
+    withIgnoration(true, [&] {
+        tlsTrackers.erase(tracker);
+        removeThread();
+    });
+}
+
+auto LSan::getThreadId(const std::thread::id& id) -> unsigned long {
+    if (id == mainId) return 0;
+
+    const auto& threadIt = threads.find(id);
+    if (threadIt == threads.end()) {
+        return std::numeric_limits<unsigned long>::max();
+    }
+    return threadIt->second.getNumber();
+}
+
+void LSan::absorbLeaks(PoolMap<const void* const, MallocInfo>&& leaks) {
+    std::lock_guard lock { mutex };
+    std::lock_guard lock1 { infoMutex };
+
+    withIgnoration(true, [&] {
+        alwaysEqual = true;
+        infos.merge(leaks);
+        alwaysEqual = false;
+        leaks.clear();
+        infos.get_allocator().merge(leaks.get_allocator());
+    });
+}
+
+// FIXME: Though unlikely, the invalidly freed record ref can become invalid throughout this process
+auto LSan::removeMalloc(const ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
+    const auto& result = maybeRemoveMalloc(pointer);
+    std::pair<bool, std::optional<MallocInfo::CRef>> tmp { false, std::nullopt };
+    if (!result.first) {
+        std::lock_guard lock { tlsTrackerMutex };
+        for (const auto element : tlsTrackers) {
+            if (element == tracker) continue;
+
+            auto trackerResult = element->maybeRemoveMalloc(pointer);
+            if (trackerResult.first) {
+                return trackerResult;
+            }
+            if (!tmp.second || (tmp.second && trackerResult.second && trackerResult.second->get().isMoreRecent(tmp.second->get()))) {
+                tmp = std::move(trackerResult);
+            }
+        }
+    }
+    if (!result.first) {
+        if (result.second && tmp.second) {
+            return result.second->get().isMoreRecent(tmp.second->get()) ? result : tmp;
+        }
+        return result.second ? result : tmp;
+    }
+    return result;
+}
+
+auto LSan::removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
+    return removeMalloc(nullptr, pointer);
+}
+
+auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> {
+    std::lock_guard lock { infoMutex };
+
+    const auto& it = infos.find(pointer);
+    if (it == infos.end()) {
+        return std::make_pair(false, std::nullopt);
+    }
+    if (it->second.isDeleted()) {
+        return std::make_pair(false, std::ref(it->second));
+    }
+    if (behaviour.statsActive()) {
         stats -= it->second;
-        it->second.setDeleted(true);
+    }
+    if (behaviour.statsActive()) {
+        it->second.markDeleted();
     } else {
         infos.erase(it);
     }
-    return MallocInfoRemoved(true, std::nullopt);
+    return std::make_pair(true, std::nullopt);
 }
 
-auto LSan::changeMalloc(const MallocInfo & info) -> bool {
-    std::lock_guard lock(infoMutex);
+void LSan::changeMalloc(const ATracker* tracker, MallocInfo&& info) {
+    std::lock_guard lock { infoMutex };
 
-    auto it = infos.find(info.getPointer());
+    const auto& it = infos.find(info.getPointer());
     if (it == infos.end()) {
-        return false;
-    }
-    if (__lsan_statsActive) {
-        if (it->second.getPointer() != info.getPointer()) {
-            stats -= it->second;
-            stats += info;
-        } else {
-            stats.replaceMalloc(it->second.getSize(), info.getSize());
+        std::lock_guard tlsLock { tlsTrackerMutex };
+        for (const auto element : tlsTrackers) {
+            if (element == tracker) continue;
+
+            if (element->maybeChangeMalloc(info)) {
+                return;
+            }
         }
-        it->second.setDeleted(true);
+        return;
+    }
+    if (behaviour.statsActive()) {
+        stats.replaceMalloc(it->second.getSize(), info.getSize());
     }
     infos.insert_or_assign(info.getPointer(), info);
-    return true;
 }
 
-void LSan::addMalloc(MallocInfo && info) {
-    std::lock_guard lock(infoMutex);
-    
-    if (__lsan_statsActive) {
-        stats += info;
+void LSan::changeMalloc(MallocInfo&& info) {
+    changeMalloc(nullptr, std::move(info));
+}
+
+void LSan::addThread(ThreadInfo&& info) {
+#ifdef __linux__
+    if (threads.find(info.getId()) != threads.end()) {
+        return;
     }
-    
-    infos.insert_or_assign(info.getPointer(), info);
+#endif
+    threads.insert_or_assign(info.getId(), info);
 }
 
-auto LSan::getTotalAllocatedBytes() -> std::size_t {
-    std::lock_guard lock(infoMutex);
-    
-    std::size_t ret = 0;
-    for (const auto & [ptr, info] : infos) {
-        ret += info.getSize();
+void LSan::removeThread(const std::thread::id& id) {
+#ifdef __linux__
+    threads.at(id).kill();
+#else
+    threads.erase(id);
+#endif
+}
+
+auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
+    if (!suppressions) {
+        suppressions = loadSuppressions();
     }
-    return ret;
+    return *suppressions;
 }
 
-/**
- * Prints the callstack size exceeded hint onto the given output stream.
- *
- * @param stream the output stream to print to
- * @return the given output stream
- */
-static inline auto printCallstackSizeExceeded(std::ostream & stream) -> std::ostream & {
-    using formatter::Style;
-    
-    stream << "Hint:" << formatter::get<Style::GREYED>
-           << formatter::format<Style::ITALIC>(" to see longer callstacks, increase the value of ")
-           << formatter::clear<Style::GREYED> << "LSAN_CALLSTACK_SIZE" << formatter::get<Style::GREYED>
-           << " (__lsan_callstackSize)" << formatter::format<Style::ITALIC>(" (currently ")
-           << formatter::clear<Style::GREYED> << __lsan_callstackSize
-           << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
-    
-    return stream;
-}
-
-auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
-    if (callstackSizeExceeded) {
-        out << printCallstackSizeExceeded;
+auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
+    if (!systemLibraries) {
+        systemLibraries = suppression::loadSystemLibraries();
     }
-    return out;
+    return *systemLibraries;
 }
 
 /**
@@ -183,18 +882,12 @@ auto LSan::maybeHintCallstackSize(std::ostream & out) const -> std::ostream & {
  *
  * @param out the output stream to print to
  * @param envName the name of the variable in the environment
- * @param apiName the name of the variable in the C API
  * @param message the deprecation message
  */
-static inline void printDeprecation(      std::ostream & out,
-                                    const std::string &  envName,
-                                    const std::string &  apiName,
-                                    const std::string &  message) {
-    using formatter::Style;
+static inline void printDeprecation(std::ostream& out, const std::string& envName, const std::string&  message) {
+    using namespace formatter;
     
-    out << std::endl << formatter::format<Style::RED>(formatter::formatString<Style::BOLD>(envName) + " ("
-                                                      + formatter::formatString<Style::ITALIC>(apiName) + ") " + message + "!")
-        << std::endl;
+    out << format<Style::RED>("  --   " + formatString<Style::BOLD>(envName) + " " + message + "!") << std::endl;
 }
 
 /**
@@ -204,107 +897,157 @@ static inline void printDeprecation(      std::ostream & out,
  * @param out the output stream to print to
  * @return the given output stream
  */
-static inline auto maybeShowDeprecationWarnings(std::ostream & out) -> std::ostream & {
-    using formatter::Style;
-    
+static inline auto maybeShowDeprecationWarnings(std::ostream& out) -> std::ostream& {
+    using namespace formatter;
+
+    std::ostringstream oss;
     if (has("LSAN_PRINT_STATS_ON_EXIT")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_STATS_ON_EXIT",
-                         "__lsan_printStatsOnExit",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.7"));
+        printDeprecation(oss, "LSAN_PRINT_STATS_ON_EXIT", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.7"));
     }
     if (has("LSAN_PRINT_LICENSE")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_LICENSE",
-                         "__lsan_printLicense",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.8"));
+        printDeprecation(oss, "LSAN_PRINT_LICENSE", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
     if (has("LSAN_PRINT_WEBSITE")) {
-        printDeprecation(out,
-                         "LSAN_PRINT_WEBSITE",
-                         "__lsan_printWebsite",
-                         "is no longer supported and " + formatter::formatString<Style::BOLD>("deprecated since version 1.8"));
+        printDeprecation(oss, "LSAN_PRINT_WEBSITE", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.8"));
+    }
+    if (has("LSAN_FIRST_PARTY_THRESHOLD")) {
+        printDeprecation(oss, "LSAN_FIRST_PARTY_THRESHOLD", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.11"));
+    }
+    if (has("LSAN_FIRST_PARTY_REGEX")) {
+        printDeprecation(oss, "LSAN_FIRST_PARTY_REGEX", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.11"));
+    }
+    if (has("LSAN_LEAK_COUNT")) {
+        printDeprecation(oss, "LSAN_LEAK_COUNT", "is no longer supported and "
+                         + formatString<Style::BOLD>("deprecated since version 1.11"));
+    }
+    if (const auto& str = oss.str(); !str.empty()) {
+        out << std::endl << format<Style::RED>("Warnings:") << std::endl << str;
     }
     return out;
 }
 
-std::ostream & operator<<(std::ostream & stream, LSan & self) {
-    using formatter::Style;
-    
-    std::lock_guard lock(self.infoMutex);
-    
-    callstack_autoClearCaches = false;
-    std::size_t i     = 0,
-                j     = 0,
-                bytes = 0,
-                count = 0,
-                total = self.infos.size();
-    for (auto & [ptr, info] : self.infos) {
-        if (isATTY()) {
-            char buffer[7] {};
-            std::snprintf(buffer, 7, "%05.2f", static_cast<double>(j) / total * 100);
-            stream << "\rCollecting the leaks: " << formatter::format<Style::BOLD>(buffer) << " %";
-        }
-        if (!info.isDeleted() && callstackHelper::getCallstackType(info.getCreatedCallstack()) == callstackHelper::CallstackType::USER) {
-            ++count;
-            bytes += info.getSize();
-            if (i < __lsan_leakCount) {
-                if (isATTY()) {
-                    stream << "\r";
-                }
-                stream << info << std::endl;
-                ++i;
+/**
+ * Prints the content of the given allocation record.
+ *
+ * @param out the output stream to print onto
+ * @param info the allocation record
+ */
+static inline void printRecord(std::ostream& out, const MallocInfo& info) {
+    const auto ptr = static_cast<void**>(info.getPointer());
+    for (std::size_t i = 0; i < info.getSize() / 8; ++i) {
+        out << ptr[i] << ", ";
+    }
+    out << std::endl << info.getPointer() << " ";
+}
+
+/**
+ * @brief Prints the given allocation records.
+ *
+ * Only those records matching the given leak type are printed. No record is
+ * printed more than once.
+ *
+ * @param records      the records to be printed
+ * @param out          the output stream to print onto
+ * @param allowed      which leak type to be printed
+ * @param printContent whether to print the content of the represented memory
+ * @return whether at least one record was printed
+ */
+static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out,
+                                const LeakType allowed, bool printContent = false) -> bool {
+    auto toReturn = false;
+    for (const auto& leak : records) {
+        if (auto& record = leak.get(); !record.printedInRoot && !record.suppressed && record.leakType == allowed) {
+            if (printContent) {
+                printRecord(out, record);
             }
+            out << record << std::endl;
+            record.printedInRoot = true;
+            toReturn = true;
         }
-        ++j;
     }
-    if (isATTY()) {
-        stream << "\r                                    \r";
+    return toReturn;
+}
+
+static inline auto operator<<(std::ostream& out, const LeakKindStats& stats) -> std::ostream& {
+    using namespace formatter;
+
+    // TODO: Maybe split between direct and indirect?
+    out << format<Style::BOLD>("Summary:") << std::endl
+        << "Total: " << stats.getTotal() << " leak" << (stats.getTotal() == 1 ? "" : "s")
+                     << " (" << bytesToString(stats.getTotalBytes()) << ")" << std::endl
+        << "       " << get<Style::BOLD> << stats.getTotalLost() << " leak" << (stats.getTotalLost() == 1 ? "" : "s")
+                     << " (" << bytesToString(stats.getLostBytes()) << ") lost" << clear<Style::BOLD> << std::endl
+        << "       " << stats.getTotalReachable() << " leak" << (stats.getTotalReachable() == 1 ? "" : "s")
+                     << " (" << bytesToString(stats.getReachableBytes()) << ") reachable";
+    if (!behaviour::getBehaviour().showReachables()) {
+        out << format<Style::ITALIC>(" (not shown)");
     }
-    if (self.callstackSizeExceeded) {
-        stream << printCallstackSizeExceeded;
-        self.callstackSizeExceeded = false;
+    return out << std::endl;
+}
+
+auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
+    using namespace formatter;
+
+    std::lock_guard lock(self.infoMutex);
+
+    callstack_rawNames = self.behaviour.suppressionDevelopersMode();
+    callstack_autoClearCaches = false;
+
+    const auto& stats = self.classifyLeaks();
+    auto printedLeaks = false;
+    if (stats.getTotal() > 0) {
+        // TODO: Optionally collapse identical callstacks
+        stream << stats << std::endl;
+
+        printedLeaks |= printRecords(stats.recordsLost, stream, LeakType::unreachableDirect);
+        if (self.behaviour.showReachables()) {
+            printedLeaks |= printRecords(stats.recordsGlobal, stream, LeakType::globalDirect);
+            printedLeaks |= printRecords(stats.recordsTlv, stream, LeakType::tlvDirect);
+            printedLeaks |= printRecords(stats.recordsStack, stream, LeakType::reachableDirect);
+        }
+    } else {
+        stream << format<Style::BOLD, Style::GREEN, Style::ITALIC>("No leaks detected.") << std::endl;
     }
-    if (i < count) {
-        stream << std::endl << formatter::format<Style::UNDERLINED, Style::ITALIC>("And " + std::to_string(count - i) + " more...") << std::endl << std::endl
-               << "Hint:" << formatter::format<Style::GREYED, Style::ITALIC>(" to see more, increase the value of ")
-               << "LSAN_LEAK_COUNT" << formatter::get<Style::GREYED> << " (__lsan_leakCount)"
-               << formatter::format<Style::ITALIC>(" (currently ") << formatter::clear<Style::GREYED>
-               << __lsan_leakCount << formatter::format<Style::ITALIC, Style::GREYED>(").") << std::endl << std::endl;
+
+    std::ostringstream hints;
+    self.maybeHintCallstackSize(hints);
+    if (printedLeaks && self.hadIndirects && !self.behaviour.showIndirects()) {
+        hints << hinter::hintBegin << "Set " << format<Style::BOLD>("LSAN_INDIRECT_LEAKS") << " to "
+              << format<Style::BOLD>("true") << " to show indirect memory leaks." << std::endl;
     }
-    
-    if (count == 0) {
-        stream << formatter::format<Style::ITALIC>(self.infos.empty() ? "No leaks possible." : "No leaks detected.") << std::endl;
+    if (!self.behaviour.showReachables() && stats.getTotalReachable() > 0) {
+        hints << hinter::hintBegin << "Set " << format<Style::BOLD>("LSAN_SHOW_REACHABLES") << " to "
+              << format<Style::BOLD>("true") << " to display the reachable memory leaks."
+              << std::endl;
     }
-    if (__lsan_relativePaths && count > 0) {
-        stream << std::endl << printWorkingDirectory;
+    if (!isATTY() && !has("LSAN_PRINT_FORMATTED")) {
+        hints << hinter::hintBegin << "Set " << format<Style::BOLD>("LSAN_PRINT_FORMATTED") << " to "
+              << format<Style::BOLD>("true") << " to re-enable colored output." << std::endl;
+    }
+    if (const auto& str = hints.str(); !str.empty()) {
+        stream << std::endl << "Hints:" << std::endl << str;
     }
     stream << maybeShowDeprecationWarnings;
-    if (self.userRegexError.has_value()) {
-        stream << std::endl << formatter::get<Style::RED>
-               << formatter::format<Style::BOLD>("LSAN_FIRST_PARTY_REGEX") << " ("
-               << formatter::format<Style::ITALIC>("__lsan_firstPartyRegex") << ") "
-               << formatter::format<Style::BOLD>("ignored: ")
-               << formatter::format<Style::ITALIC, Style::BOLD>("\"" + self.userRegexError.value() + "\"")
-               << formatter::clear<Style::RED> << std::endl;
+    if (printedLeaks && self.behaviour.relativePaths()) {
+        stream << std::endl << printWorkingDirectory;
     }
-    
-    if (count > 0) {
-        stream << std::endl << formatter::format<Style::BOLD>("Summary: ");
-        if (i == __lsan_leakCount && i < count) {
-            stream << "showing " << formatter::format<Style::ITALIC>(std::to_string(i)) << " of ";
-        }
-        stream << formatter::format<Style::BOLD>(std::to_string(count)) << " leaks, "
-               << formatter::format<Style::BOLD>(bytesToString(bytes)) << " lost.";
-        stream << std::endl;
+
+    if (stats.getTotal() > 0 && printedLeaks) {
+        stream << std::endl << stats;
     }
-    
+
     callstack_clearCaches();
     callstack_autoClearCaches = true;
     
 #ifdef BENCHMARK
     stream << std::endl << timing::printTimings << std::endl;
 #endif
+
     return stream;
 }
 }

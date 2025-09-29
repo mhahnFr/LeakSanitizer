@@ -1,38 +1,35 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef lsanMisc_hpp
 #define lsanMisc_hpp
 
-#include <iostream>
+#include <vector>
 
 #include "LeakSani.hpp"
+#include "callstackHelper/format.hpp"
+#include "suppression/Suppression.hpp"
+#include "trackers/ATracker.hpp"
 
 namespace lsan {
-/**
- * Returns a reference to a boolean value indicating
- * whether to ignore allocations.
- *
- * @return the ignoration flag
- */
-auto _getIgnoreMalloc() -> bool &;
-
 /**
  * Returns the current instance of this sanitizer.
  *
@@ -51,60 +48,51 @@ auto printInformation(std::ostream & out) -> std::ostream &;
 /**
  * @brief The hook to be called on exit.
  *
- * It prints all informations tracked by the sanitizer and performs internal cleaning.
+ * It prints all information tracked by the sanitizer and performs internal
+ * cleaning.
  */
 void exitHook();
 
 /**
- * Prints the note about the relative paths if relative paths are
- * allowed by `__lsan_relativePaths` on the given output stream.
+ * Prints the stacktrace of the exit point if requested.
  *
  * @param out the output stream to print to
  * @return the given output stream
  */
-auto maybeHintRelativePaths(std::ostream & out) -> std::ostream &;
+auto maybePrintExitPoint(std::ostream& out) -> std::ostream&;
 
 /**
- * Prints the hint about the relative paths, including the current working directory.
+ * Returns the tracker instance to be used to track allocations.
  *
- * @param out the output stream to print to
- * @return the given output stream
+ * @return the tracker to be used
  */
-auto printWorkingDirectory(std::ostream & out) -> std::ostream &;
+auto getTracker() -> trackers::ATracker&;
 
 /**
- * @brief Returns whether the output stream to print to is a TTY.
+ * Loads the suppressions.
  *
- * If the POSIX function `isatty` is not available, `__lsan_printFormatted` is returned.
- *
- * @return whether the output stream to print to is an interactive terminal
+ * @return the loaded suppressions
  */
-auto isATTY() -> bool;
+auto loadSuppressions() -> std::vector<suppression::Suppression>;
 
 /**
- * Returns whether the given variable has been set in the environment.
+ * Loads and returns the suppressions to match thread-local memory leaks.
  *
- * @param var the variable to be checked
- * @return whether the variable name is in the environment
+ * @return the suppressions
  */
-auto has(const std::string & var) -> bool;
+auto createTLVSuppression() -> std::vector<suppression::Suppression>;
 
-/**
- * Sets whether to ignore subsequent allocation management requests.
- *
- * @param ignoreMalloc whether to ignore allocations
- */
-static inline void setIgnoreMalloc(const bool ignoreMalloc) {
-    _getIgnoreMalloc() = ignoreMalloc;
+namespace callstack {
+static inline void format(lcs::callstack& callstack, std::ostream& out, const std::string& indent = "") {
+    auto& instance = getInstance();
+    if (callstackHelper::format(std::move(callstack), out, indent)) {
+        instance.setCallstackSizeExceeded(true);
+    }
 }
 
-/**
- * Returns whether to ignore subsequent alloction management requests.
- *
- * @return whether to ignore allocations
- */
-static inline auto getIgnoreMalloc() -> bool {
-    return _getIgnoreMalloc();
+static inline void format(lcs::callstack&& callstack, std::ostream& out, const std::string& indent = "") {
+    format(callstack, out, indent);
+}
 }
 
 /**
@@ -124,25 +112,12 @@ static inline void internalCleanUp() {
 }
 
 /**
- * Returns whether to print formatted, that is, whether `__lsan_printFormatted` is
- * `true` and the output stream is an interactive terminal.
+ * Returns the suppressions.
  *
- * @return whether to print formatted
+ * @return the suppressions
  */
-static inline auto printFormatted() -> bool {
-    if (has("LSAN_PRINT_FORMATTED")) {
-        return __lsan_printFormatted;
-    }
-    return __lsan_printFormatted && isATTY();
-}
-
-/**
- * Returns the appropriate output stream to print to.
- *
- * @return the output stream to print to
- */
-static inline auto getOutputStream() -> std::ostream & {
-    return __lsan_printCout ? std::cout : std::clog;
+static inline auto getSuppressions() -> const std::vector<suppression::Suppression>& {
+    return getInstance().getSuppressions();
 }
 }
 

@@ -1,100 +1,34 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
- * This file is part of the LeakSanitizer. This library is free software:
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
+ * This file is part of the LeakSanitizer.
  *
- * This library is distributed in the hope that it will be useful,
+ * The LeakSanitizer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The LeakSanitizer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this library, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with the
+ * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <csignal>
 #include <iostream>
 
+#include "core.hpp"
 #include "crash.hpp"
 #include "warn.hpp"
-
-#include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
-#include "../formatter.hpp"
-#include "../callstacks/callstackHelper.hpp"
+#include "../callstackHelper/suppression.hpp"
+#include "../formatter/formatter.hpp"
 
 namespace lsan {
-/**
- * Prints the given message and the given callstack.
- *
- * @param message the message to be printed
- * @param callstack the callstack to be printed
- * @param reason the optional reason for the message
- * @tparam Warning whether to use warning formatting
- */
-template<bool Warning>
-static inline void printer(const std::string& message, lcs::callstack& callstack, const std::optional<std::string>& reason = std::nullopt) {
-    using formatter::Style;
-    
-    const auto colour = Warning ? Style::MAGENTA : Style::RED;
-    
-    std::cerr << formatter::format<Style::BOLD, colour>((Warning ? "Warning: " : "") + message + "!") << std::endl;
-    if (reason.has_value()) {
-        std::cerr << *reason << "." << std::endl;
-    }
-    callstackHelper::format(callstack, std::cerr);
-    std::cerr << std::endl;
-    
-    if (!Warning) {
-        getInstance().maybeHintCallstackSize(std::cerr);
-        std::cerr << maybeHintRelativePaths;
-    }
-}
-
-/**
- * Prints the given message and the given callstack.
- *
- * @param message the message to be printed
- * @param callstack the callstack to be printed
- * @tparam Warning whether to use warning formatting
- */
-template<bool Warning>
-static inline void printer(const std::string & message, lcs::callstack && callstack) {
-    printer<Warning>(message, callstack);
-}
-
-/**
- * Prints the given message, the file with line number and the given callstack.
- *
- * @param message the message to be printed
- * @param file the file name
- * @param line the line number
- * @param callstack the callstack to be printed
- * @tparam Warning whether to use warning formatting
- */
-template<bool Warning>
-static inline void printer(const std::string & message,
-                           const std::string & file,
-                           const int           line,
-                           lcs::callstack &    callstack) {
-    using formatter::Style;
-    
-    const auto colour = Warning ? Style::MAGENTA : Style::RED;
-    
-    std::cerr << formatter::get<Style::BOLD>
-              << formatter::format<colour>((Warning ? "Warning: " : "") + message) << ", at "
-              << formatter::get<Style::UNDERLINED> << file << ":" << line
-              << formatter::clear<Style::BOLD, Style::UNDERLINED>
-              << std::endl;
-    callstackHelper::format(callstack, std::cerr);
-    std::cerr << std::endl;
-}
-
 /**
  * Prints the given message, the allocation information found in the
  * optionally provided allocation record and the given callstack.
@@ -105,25 +39,36 @@ static inline void printer(const std::string & message,
  * @tparam Warning whether to use warning formatting
  */
 template<bool Warning>
-static inline void printer(const std::string &                                     message,
-                           std::optional<std::reference_wrapper<const MallocInfo>> info,
-                           lcs::callstack &                                        callstack) {
-    using formatter::Style;
-    
-    printer<Warning>(message, callstack);
-    
+constexpr static inline void printer(const std::string&                     message,
+                                     const std::optional<MallocInfo::CRef>& info,
+                                     lcs::callstack&                        callstack) {
+    using namespace formatter;
+    using namespace std::string_literals;
+
+    crashWarner::printer<Warning, false>(message, callstack);
+
+    auto& instance = getInstance();
     if (info.has_value()) {
-        const auto   colour = Warning ? Style::MAGENTA : Style::RED;
-        const auto & record = info.value().get();
-        
-        std::cerr << formatter::format<Style::ITALIC, colour>("Previously allocated here:") << std::endl;
+        constexpr auto colour = Warning ? Style::MAGENTA : Style::RED;
+        const auto& record = info.value().get();
+        const auto& showThread = instance.getIsThreaded();
+
+        std::cerr << format<Style::ITALIC, colour>("Previously allocated"s
+                                                   + (showThread ? " by " + instance.getThreadDescription(record.getAllocationThread()) : "")
+                                                   + " here:") << std::endl;
         record.printCreatedCallstack(std::cerr);
         std::cerr << std::endl;
-        if (record.getDeletedCallstack().has_value()) {
-            std::cerr << std::endl << formatter::format<Style::ITALIC, colour>("Previously freed here:") << std::endl;
+        if (record.getDeallocationCallstack().has_value()) {
+            std::cerr << format<Style::ITALIC, colour>("Previously freed"s
+                                                       + (showThread ? " by " + instance.getThreadDescription(record.getDeallocationThread()) : "")
+                                                       + " here:") << std::endl;
             record.printDeletedCallstack(std::cerr);
             std::cerr << std::endl;
         }
+    }
+    if constexpr (!Warning) {
+        instance.maybeHintCallstackSize(std::cerr);
+        std::cerr << maybeHintRelativePaths;
     }
 }
 
@@ -137,66 +82,37 @@ static inline void printer(const std::string &                                  
 template<typename F>
 static inline void withCallstack(const F & function) {
     auto callstack = lcs::callstack();
-    if (callstackHelper::getCallstackType(callstack) == callstackHelper::CallstackType::USER) {
+    if (const auto& suppressions = getSuppressions();
+        !callstackHelper::isSuppressed(suppressions.cbegin(), suppressions.cend(), callstack)) {
         function(callstack);
     }
 }
 
 void warn(const std::string & message) {
     withCallstack([&] (auto & callstack) {
-        printer<true>(message, callstack);
+        crashWarner::printer<true>(message, callstack);
     });
 }
 
-void warn(const std::string & message, const std::string & file, int line) {
-    withCallstack([&] (auto & callstack) {
-        printer<true>(message, file, line, callstack);
-    });
-}
-
-void warn(const std::string &                                     message,
-          std::optional<std::reference_wrapper<const MallocInfo>> info) {
-    withCallstack([&] (auto & callstack) {
+void warn(const std::string& message,
+          const std::optional<MallocInfo::CRef>& info) {
+    withCallstack([&] (auto& callstack) {
         printer<true>(message, info, callstack);
     });
 }
 
 void crash(const std::string & message) {
     withCallstack([&] (auto & callstack) {
-        printer<false>(message, callstack);
+        crashWarner::printer<false>(message, callstack);
         abort();
     });
 }
 
-void crashForce(const std::string & message) {
-    std::cerr << formatter::clearAll() << std::endl;
-    printer<false>(message, lcs::callstack());
-    abort();
-}
-
-void crashForce(const std::string& message, const std::optional<std::string>& reason, lcs::callstack&& callstack) {
-    std::cerr << formatter::clearAll() << std::endl;
-    printer<false>(message, callstack, reason);
-    abort();
-}
-
-void crash(const std::string & message, const std::string & file, int line) {
-    withCallstack([&] (auto & callstack) {
-        printer<false>(message, file, line, callstack);
-        abort();
-    });
-}
-
-void crash(const std::string &                                     message,
-           std::optional<std::reference_wrapper<const MallocInfo>> info) {
-    withCallstack([&] (auto & callstack) {
+void crash(const std::string& message,
+           const std::optional<MallocInfo::CRef>& info) {
+    withCallstack([&] (auto& callstack) {
         printer<false>(message, info, callstack);
         abort();
     });
-}
-
-[[ noreturn ]] void abort() {
-    signal(SIGABRT, SIG_DFL);
-    std::abort();
 }
 }

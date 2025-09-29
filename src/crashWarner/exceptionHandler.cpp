@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2024  mhahnFr
+ * Copyright (C) 2023 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -24,12 +24,13 @@
 #include <sstream>
 #include <typeinfo>
 
+#include <callstack_exception.hpp>
+
 #include "exceptionHandler.hpp"
+#include "crashForce.hpp"
 
-#include "crash.hpp"
 #include "../lsanMisc.hpp"
-
-#include "../../CallstackLibrary/include/callstack_exception.hpp"
+#include "../utils.hpp"
 
 namespace lsan {
 /**
@@ -58,7 +59,7 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     std::stringstream stream;
     stream << "Uncaught exception of type " << demangle(typeid(exception).name()) << ": \"" << exception.what() << "\"";
     
-    crashForce(stream.str());
+    crashWarner::crashForce(stream.str());
 }
 
 /**
@@ -72,23 +73,35 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     std::stringstream stream;
     stream << "Uncaught exception of type " << exception.what();
     
-    crashForce(stream.str());
+    crashWarner::crashForce(stream.str());
 }
 
 [[ noreturn ]] void exceptionHandler() noexcept {
-    setIgnoreMalloc(true);
-    
-    if (auto exception = std::current_exception()) {
+    getTracker().ignoreMalloc = true;
+
+    if (const auto exception = std::current_exception()) {
         try {
             std::rethrow_exception(exception);
-        } catch (lcs::exception& exception) {
-            handleException(exception);
-        } catch (std::exception& exception) {
-            handleException(exception);
+        } catch (lcs::exception& e) {
+            handleException(e);
+        } catch (std::exception& e) {
+            handleException(e);
         } catch (...) {
-            crashForce("Unknown uncaught exception");
+            crashWarner::crashForce("Unknown uncaught exception");
         }
     }
-    crashForce("Terminating without active exception");
+    crashWarner::crashForce("Terminating without active exception");
+}
+
+[[ noreturn ]] void mhExceptionHandler() noexcept {
+    getTracker().ignoreMalloc = true;
+
+    if (LOAD_FUNC(void*(*)(), tryCatch_getException); tryCatch_getException != nullptr) {
+        if (const auto exception = tryCatch_getException(); exception != nullptr) {
+            const auto exceptionType = *reinterpret_cast<const char**>(uintptr_t(exception) - sizeof(char*));
+            crashWarner::crashForce("Uncaught exception of type " + std::string(exceptionType));
+        }
+    }
+    crashWarner::crashForce("Terminating with unknown exception");
 }
 }

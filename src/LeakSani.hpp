@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2024  mhahnFr
+ * Copyright (C) 2022 - 2025  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -22,111 +22,308 @@
 #ifndef LeakSani_hpp
 #define LeakSani_hpp
 
+#include <atomic>
 #include <map>
 #include <mutex>
 #include <optional>
-#include <ostream>
+#include <pthread.h>
 #include <regex>
+#include <set>
 #include <utility>
+#include <vector>
 
+#include "hinter.hpp"
 #include "MallocInfo.hpp"
+#include "ThreadInfo.hpp"
 
 #ifdef BENCHMARK
- #include "timing.hpp"
+# include "timing.hpp"
 #endif
 
-#include "initialization/init.hpp"
+#include "behaviour/Behaviour.hpp"
+#include "helpers/LeakKindStats.hpp"
 #include "statistics/Stats.hpp"
-
-#include "../include/lsan_internals.h"
+#include "suppression/Suppression.hpp"
+#include "trackers/ATracker.hpp"
+#include "wrappers/realAlloc.hpp"
 
 namespace lsan {
 /**
- * This class manages everything this sanitizer is capable to do.
+ * @brief This class manages everything this sanitizer is capable to do.
+ *
+ * It acts as an allocation tracker.
  */
-class LSan {
-    /** A pair consisting of a boolean and an optional allocation record.               */
-    using MallocInfoRemoved = std::pair<const bool, std::optional<std::reference_wrapper<const MallocInfo>>>;
-    
-    /** A map containing all allocation records, sorted by their allocated pointers.    */
-    std::map<const void * const, MallocInfo> infos;
+class LSan final: public trackers::ATracker {
+    /** Maps the known thread identifiers to their information structure.               */
+    std::map<std::thread::id, ThreadInfo> threads;
     /** An object holding all statistics.                                               */
-    Stats                                    stats;
+    Stats stats;
+    /** The behaviour handling object.                                                  */
+    behaviour::Behaviour behaviour;
     /** Indicates whether the set callstack size has been exceeded during the printing. */
-    bool                                     callstackSizeExceeded = false;
-    /** The mutex used to synchronize the allocations and tracking.                     */
-    std::recursive_mutex                     mutex;
-    /** This mutex is used to strictly synchronize the access to the infos.             */
-    std::mutex                               infoMutex;
-    /** The optional user regular expression.                                           */
-    std::optional<std::optional<std::regex>> userRegex;
-    /** The user regex error message.                                                   */
-    std::optional<std::string> userRegexError;
-    
-    /** The runtime name of this sanitizer.                                             */
-    const std::string libName;
-    void* const signalStack;
+    bool callstackSizeExceeded = false;
+    /** The general suppressions.                                                       */
+    std::optional<std::vector<suppression::Suppression>> suppressions;
+    /** The system library regular expressions.                                         */
+    std::optional<std::vector<std::regex>> systemLibraries;
+    /** Maps the thread numbers to their description.                                   */
+    std::map<unsigned long, std::string> threadDescriptions;
+    /** The registered thread-local allocation trackers.                                */
+    std::set<ATracker*> tlsTrackers;
+    /** The mutex to manage the access to the registered thread-local trackers.         */
+    std::mutex tlsTrackerMutex;
+    /** Indicates whether multithreading was used.                                      */
+    bool isThreaded = false;
+    /** Indicates whether @c PoolAllocator instances should bypass equality checks.     */
+    bool alwaysEqual = false;
+    /** The thread identifier of the main thread.                                       */
+    const std::thread::id mainId = std::this_thread::get_id();
+    /** The thread-local storage key used for the thread-local allocation trackers.     */
+    const pthread_key_t saniKey;
+void* const signalStack;
     
 #ifdef BENCHMARK
+    /** The registered timings of the allocations.                                      */
     std::map<timing::AllocType, timing::Timings> timingMap;
+    /** The mutex to manage access to the allocation timings.                           */
+    std::mutex timingMutex;
 #endif
-    
+
     /**
-     * @brief Generates and returns a regular expression object for the given string.
+     * Classifies all memory leaks.
      *
-     * Sets the regex error message if the given string was not a valid regular expression.
-     *
-     * @param regex the string with the regular expression
-     * @return an optional regex object
+     * @return the aggregated leak information
      */
-    auto generateRegex(const char * regex) -> std::optional<std::regex>;
-    
+    auto classifyLeaks() -> LeakKindStats;
+
     /**
-     * Loads the user first party regular expression.
+     * Classifies the given allocation record.
+     *
+     * @param info        the allocation record to be classified
+     * @param currentType the leak type to be used
+     * @param reclassify  whether to reclassify classified records
      */
-    inline void loadUserRegex() {
-        userRegex = generateRegex(__lsan_firstPartyRegex);
+    void classifyRecord(MallocInfo& info, const LeakType& currentType, bool reclassify = false);
+
+    /**
+     * Searches the Objective-C runtime for memory leaks and places their
+     * allocation records into the given list.
+     *
+     * @param records the place to store related allocation records in
+     */
+    void classifyObjC(std::deque<MallocInfo::Ref>& records);
+
+    /**
+     * Creates a thread-safe copy of the thread-local tracker list.
+     *
+     * @return the copy
+     */
+    auto copyTrackerList() -> decltype(tlsTrackers);
+
+    /**
+     * Searches for the allocation record referred to by the given pointer,
+     * applying pointer demasking if necessary.
+     *
+     * @param ptr the pointer
+     * @return the iterator to the found allocation record
+     */
+    auto findWithSpecials(void* ptr) -> decltype(infos)::iterator;
+
+    /**
+     * Classifies the memory leaks found in the given memory range.
+     *
+     * @param begin           the pointer to the beginning of the memory
+     * @param end             the pointer to the end of the memory
+     * @param direct          the leak type of leaks found in the given memory range
+     * @param indirect        the type of leaks found via direct leaks
+     * @param directs         the list to place direct memory leaks in
+     * @param skipClassifieds whether to skip already classified records
+     * @param name            the absolute name of the memory range
+     * @param nameRelative    the relative name of the memory range
+     * @param reclassify      whether to reclassify already classified records
+     */
+    void classifyLeaks(uintptr_t begin, uintptr_t end,
+                       LeakType direct, LeakType indirect,
+                       std::deque<MallocInfo::Ref>& directs, bool skipClassifieds = false,
+                       const char* name = nullptr, const char* nameRelative = nullptr, bool reclassify = false);
+
+    /**
+     * Classifies a pointer used as union of multiple pointers.
+     *
+     * @tparam Four whether the pointer union can hold four pointers
+     * @param ptr      the pointer union
+     * @param directs  the list to place direct memory leaks in
+     * @param direct   the direct leak type
+     * @param indirect the indirect leak type
+     */
+    template<bool Four = false>
+    constexpr inline void classifyPointerUnion(void* ptr, std::deque<MallocInfo::Ref>& directs,
+                                               const LeakType direct, const LeakType indirect) {
+        constexpr auto order = Four ? 3u : 1u;
+
+        if (const auto& it = infos.find(reinterpret_cast<void*>(uintptr_t(ptr) & ~order));
+            it != infos.end() && it->second.leakType > direct) {
+            it->second.leakType = direct;
+            classifyRecord(it->second, indirect);
+            directs.emplace_back(it->second);
+        }
     }
-    
+
+    /**
+     * Classifies the given Objective-C class.
+     *
+     * @param cls      the pointer to the Objective-C class
+     * @param directs  the list to place direct memory leaks in
+     * @param direct   the direct leak type
+     * @param indirect the indirect leak type
+     */
+    void classifyClass(void* cls, std::deque<MallocInfo::Ref>& directs, LeakType direct, LeakType indirect);
+
+    /**
+     * Returns whether the given allocation record should be suppressed.
+     *
+     * @param info the allocation record in question
+     * @return whether the allocation record should be suppressed
+     */
+    auto isSuppressed(const MallocInfo& info) -> bool;
+
+#ifdef __linux__
+    /**
+     * Gathers and returns the size of the memory referred to by @c pthread_t .
+     *
+     * @return the size of the POSIX thread structure
+     */
+    auto gatherPthreadSize() -> std::size_t;
+#endif
+
+protected:
+    /**
+     * Adds the given allocation record to the statistics if they are active.
+     *
+     * @param info the allocation record
+     */
+    inline void maybeAddToStats(const MallocInfo& info) override {
+        if (behaviour.statsActive()) {
+            stats += info;
+        }
+    }
+
 public:
+    /** Indicates whether the allocation tracking has finished.           */
+    static std::atomic_bool finished;
+    /** Indicates whether to ignore deallocations in the TLS deallocator. */
+    static std::atomic_bool preventDealloc;
+    /** Whether the exit has already been printed.                        */
+    bool hasPrintedExit = false;
+    /** Whether indirect memory leaks have been found.                    */
+    bool hadIndirects = false;
+#ifdef __APPLE__
+    /** The path to the bundled crash handler.                            */
+    std::string crashHandlerPath;
+#endif
+
     LSan();
-   ~LSan() {
-        inited = false;
-        std::free(signalStack);
+   ~LSan() override;
+
+    LSan(const LSan&) = delete;
+    LSan(LSan&&)      = delete;
+
+    auto operator=(const LSan&) -> LSan& = delete;
+    auto operator=(LSan&&)      -> LSan& = delete;
+
+    inline auto operator new(const std::size_t count) -> void* {
+        return real::malloc(count);
     }
-    
-    LSan(const LSan &)              = delete;
-    LSan(const LSan &&)             = delete;
-    LSan & operator=(const LSan &)  = delete;
-    LSan & operator=(const LSan &&) = delete;
-    
+
+    inline void operator delete(void* ptr) {
+        real::free(ptr);
+    }
+
+    /**
+     * @brief Attempts to remove the allocation record associated with the
+     * given pointer.
+     *
+     * If no record is found in this instance, all registered trackers except
+     * the given one are searched for the record.
+     *
+     * @param tracker the tracker to not be searched
+     * @param pointer the pointer to the allocation
+     * @return whether a record was removed and the potentially existing record
+     */
+    auto removeMalloc(const ATracker* tracker, void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>>;
+
+    /**
+     * @brief Replaces the allocation record with the given one.
+     *
+     * If no record is found in this instance, all registered trackers except
+     * the given one are searched for the record.
+     *
+     * @param tracker the allocation tracker to not be searched
+     * @param info the new allocation record
+     */
+    void changeMalloc(const ATracker* tracker, MallocInfo&& info);
+
+    /**
+     * Registers the given allocation tracker.
+     *
+     * @param tracker the allocation tracker to be registered
+     */
+    void registerTracker(ATracker* tracker);
+
+    /**
+     * Deregisters the given allocation tracker.
+     *
+     * @param tracker the allocation tracker to be deregistered
+     */
+    void deregisterTracker(ATracker* tracker);
+
+    /**
+     * Absorbs the given allocation records.
+     *
+     * @param leaks the memory leaks to absorb
+     */
+    void absorbLeaks(PoolMap<const void* const, MallocInfo>&& leaks);
+
+    void finish() override;
+
 #ifdef BENCHMARK
+    /**
+     * Returns the allocation timings.
+     *
+     * @return the allocation timings
+     */
     constexpr inline auto getTimingMap() -> std::map<timing::AllocType, timing::Timings>& {
         return timingMap;
     }
+
+    /**
+     * Returns the timing mutex.
+     *
+     * @return the timing mutex
+     */
+    constexpr inline auto getTimingMutex() -> std::mutex& {
+        return timingMutex;
+    }
 #endif
-    
+
     /**
-     * Returns the user first party regular expression.
+     * @brief Returns the global suppressions.
      *
-     * @return the user regular expression
+     * They are loaded if necessary.
+     *
+     * @return the global suppressions
      */
-    inline auto getUserRegex() -> const std::optional<std::regex> & {
-        if (!userRegex.has_value()) {
-            loadUserRegex();
-        }
-        return userRegex.value();
-    }
-    
+    auto getSuppressions() -> const std::vector<suppression::Suppression>&;
+
     /**
-     * Returns the runtime library name of this sanitizer.
+     * @brief Returns the system library regular expressions.
      *
-     * @return the runtime library name
+     * They are loaded if necessary.
+     *
+     * @return the system library regular expressions
      */
-    constexpr inline auto getLibName() const -> const std::string & {
-        return libName;
-    }
-    
+    auto getSystemLibraries() -> const std::vector<std::regex>&;
+
     /**
      * Returns the mutex for the allocations and tracking.
      *
@@ -135,7 +332,7 @@ public:
     constexpr inline auto getMutex() -> std::recursive_mutex & {
         return mutex;
     }
-    
+
     /**
      * Returns the mutex for the memory allocation infos.
      *
@@ -144,75 +341,155 @@ public:
     constexpr inline auto getInfoMutex() -> std::mutex & {
         return infoMutex;
     }
-    
+
+    void changeMalloc(MallocInfo&& info) override;
+
     /**
-     * @brief Attempts to exchange the allocation record associated with the given
-     * allocation record by the given allocation record.
-     *
-     * @param info the allocation record to be exchanged
-     * @return whether an allocation record was exchanged
-     */
-    auto changeMalloc(const MallocInfo & info) -> bool;
-    
-    /**
-     * Removes the allocation record acossiated with the given pointer.
+     * Removes the allocation record associated with the given pointer.
      *
      * @param pointer the allocation pointer
-     * @return a pair with a boolean indicating the success and optionally the already deleted allocation record
+     * @return a pair with a boolean indicating the success and optionally the
+     * already deleted allocation record
      */
-    auto removeMalloc(void* pointer) -> MallocInfoRemoved;
-    
+    auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
+
     /**
-     * Adds the given allocation record.
+     * @brief Attempts to remove the allocation record associated with the
+     * given pointer.
      *
-     * @param info the allocation record to be added
-     */
-    void addMalloc(MallocInfo && info);
-    
-    /**
-     * Calculates and returns the total count of allocated bytes that are stored inside the
-     * principal list containing the allocation records.
+     * Does not search in the thread-local trackers.
      *
-     * @return the total count of bytes found in the principal list
+     * @param pointer the allocation pointer
+     * @return whether a record was removed and the potentially existing record
      */
-    auto getTotalAllocatedBytes() -> std::size_t;
-    
+    auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
+
     /**
      * Prints a hint about the exceeded callstack size if it was exceeded.
      *
      * @param out the output stream to print to
      * @return the given output stream
      */
-    auto maybeHintCallstackSize(std::ostream & out) const -> std::ostream &;
-    
+    constexpr inline auto maybeHintCallstackSize(std::ostream& out) const -> std::ostream& {
+        hinter::maybeHintCallstackSize(out, callstackSizeExceeded);
+        return out;
+    }
+
     /**
      * Returns the globally tracked allocations.
      *
      * @return the globally tracked allocations
      */
-    constexpr inline auto getFragmentationInfos() const -> const std::map<const void * const, MallocInfo> & {
+    constexpr inline auto getFragmentationInfos() const -> const decltype(infos)& {
         return infos;
     }
-    
+
     /**
      * Sets whether the maximum callstack size has been exceeded during the printing.
      *
      * @param exceeded whether the maximum callstack size has been exceeded
      */
-    constexpr inline void setCallstackSizeExceeded(bool exceeded) {
+    constexpr inline void setCallstackSizeExceeded(const bool exceeded) {
         callstackSizeExceeded = exceeded;
     }
-    
+
     /**
      * Returns the current instance of the statistics object.
      *
      * @return the current statistics instance
      */
-    constexpr inline auto getStats() -> const Stats & {
+    constexpr inline auto getStats() const -> const Stats & {
         return stats;
     }
 
-    friend std::ostream & operator<<(std::ostream &, LSan &);
+    /**
+     * Registers the given thread information.
+     *
+     * @param info the thread information to be registered
+     */
+    void addThread(ThreadInfo&& info);
+
+    /**
+     * Adds the calling thread.
+     */
+    void addThread();
+
+    /**
+     * Removes the thread with the given thread identifier.
+     *
+     * @param id the identifier of the thread to be removed
+     */
+    void removeThread(const std::thread::id& id = std::this_thread::get_id());
+
+#ifdef __linux__
+    /**
+     * Sets the stack pointer for the calling thread.
+     *
+     * @param sp the stack pointer
+     */
+    inline void setSP(void* sp) {
+        threads.at(std::this_thread::get_id()).setSP(sp);
+    }
+#endif
+
+    /**
+     * Returns the number of the given thread.
+     *
+     * @param id the @c std::thread::id
+     * @return the number of the thread
+     */
+    auto getThreadId(const std::thread::id& id = std::this_thread::get_id()) -> unsigned long;
+
+    /**
+     * Returns the description for the given thread.
+     *
+     * @param id the thread number
+     * @param thread the POSIX thread identifier
+     * @return the thread description for the requested thread number
+     */
+    auto getThreadDescription(unsigned long id,
+                              const std::optional<pthread_t>& thread = std::nullopt) -> const std::string&;
+
+    /**
+     * Returns the behaviour object associated with this instance.
+     *
+     * @return the associated behaviour object
+     */
+    constexpr inline auto getBehaviour() const -> const behaviour::Behaviour& {
+        return behaviour;
+    }
+
+    /**
+     * Returns whether at any time in the lifetime of the program multiple threads
+     * have been used.
+     *
+     * @return whether multithreading was used
+     */
+    constexpr inline auto getIsThreaded() const -> bool {
+        return isThreaded;
+    }
+
+    /**
+     * Returns the thread-local key used to store the memory tracker for each
+     * thread.
+     *
+     * @return the thread-local key used by this sanitizer
+     */
+    constexpr inline auto getTlsKey() const {
+        return saniKey;
+    }
+
+    /**
+     * Returns whether @c PoolAllocator instances should bypass equality
+     * comparisons.
+     *
+     * @return whether to bypass equality comparisons
+     */
+    constexpr inline auto isAlwaysEqual() const {
+        return alwaysEqual;
+    }
+
+    friend auto operator<<(std::ostream&, LSan&) -> std::ostream&;
 };
 }
 
