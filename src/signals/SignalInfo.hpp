@@ -23,6 +23,8 @@
 #define SignalInfo_hpp
 
 #include <algorithm>
+#include <cstring>
+#include <limits>
 
 #include "callstack.h"
 
