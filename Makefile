@@ -53,7 +53,6 @@ SRCS = \
 	src/signals/SignalInfo.cpp \
 	src/formatter/lsanFormat.cpp \
 	src/crashWarner/exceptionHandler.cpp \
-	src/crashWarner/core.cpp \
 	src/crashWarner/crashWarner.cpp \
 	src/crashWarner/crashForce.cpp \
 	src/callstackHelper/suppression.cpp \

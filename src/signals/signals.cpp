@@ -22,6 +22,7 @@
 #include "signals.hpp"
 
 #include <csignal>
+#include <cstdlib>
 
 namespace lsan::signals {
 auto registerFunction(void (*function)(int), const int signal) -> bool {
@@ -60,7 +61,7 @@ auto getDescriptionFor(const int signal) noexcept -> const char* {
         case SIGXFSZ:   return "File size limit exceeded";
         case SIGVTALRM: return "Virtual time alarm";
         case SIGPROF:   return "Profiling timer alarm";
-            
+
 #if defined(__APPLE__) || defined(SIGEMT)
         case SIGEMT:    return "Emulate instruction executed";
 #endif
@@ -89,7 +90,7 @@ auto stringify(const int signal) noexcept -> const char* {
         case SIGXFSZ:   return "SIGXFSZ";
         case SIGVTALRM: return "SIGVTALRM";
         case SIGPROF:   return "SIGPROF";
-            
+
 #if defined(__APPLE__) || defined(SIGEMT)
         case SIGEMT:    return "SIGEMT";
 #endif
@@ -107,5 +108,12 @@ auto hasAddress(const int signal) noexcept -> bool {
 
         default: return false;
     }
+}
+}
+
+namespace lsan {
+[[ noreturn ]] void abort() {
+    signal(SIGABRT, SIG_DFL);
+    std::abort();
 }
 }

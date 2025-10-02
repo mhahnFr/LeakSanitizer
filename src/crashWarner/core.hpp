@@ -31,8 +31,7 @@
 #include "../callstackHelper/format.hpp"
 #include "../formatter/formatter.hpp"
 
-namespace lsan {
-namespace crashWarner {
+namespace lsan::crashWarner {
 /**
  * Prints the given message and the given callstack.
  *
@@ -80,12 +79,6 @@ template<bool Warning>
 constexpr static inline void printer(const std::string & message, lcs::callstack && callstack) {
     printer<Warning>(message, callstack);
 }
-}
-
-/**
- * This function resets the signal handler for @c SIGABRT and performs the abort.
- */
-[[ noreturn ]] void abort();
 }
 
 #endif /* core_hpp */
