@@ -21,6 +21,8 @@
 
 #include "SignalInfo.hpp"
 
+#include <csignal>
+
 #include "signals.hpp"
 #include "../utils.hpp"
 #include "../formatter/formatter.hpp"
