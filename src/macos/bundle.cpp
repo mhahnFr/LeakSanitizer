@@ -27,7 +27,7 @@ namespace lsan::macos::bundle {
 /**
  * @brief Loads the bundle associated with the LeakSanitizer.
  *
- * Allocations are not tracked.
+ * Allocations are explicitly tracked.
  *
  * @return the @c CFBundleRef
  */

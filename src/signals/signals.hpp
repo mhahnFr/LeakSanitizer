@@ -89,4 +89,11 @@ auto stringify(int signal) noexcept -> const char*;
 auto hasAddress(int signal) noexcept -> bool;
 }
 
+namespace lsan {
+/**
+ * This function resets the signal handler for @c SIGABRT and performs the abort.
+ */
+[[ noreturn ]] void abort();
+}
+
 #endif /* signals_hpp */

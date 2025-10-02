@@ -35,6 +35,7 @@
 #include <lsan_stats.h>
 
 #include "SignalInfo.hpp"
+#include "signals.hpp"
 #include "../lsanMisc.hpp"
 #include "../utils.hpp"
 #include "../callstackHelper/format.hpp"

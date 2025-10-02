@@ -20,7 +20,9 @@
  */
 
 #include "crashForce.hpp"
+
 #include "core.hpp"
+#include "../signals/signals.hpp"
 
 namespace lsan::crashWarner {
 void crashForce(const std::string& message) {

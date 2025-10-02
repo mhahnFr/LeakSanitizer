@@ -95,8 +95,6 @@
 		F16F673E2E6EC8CC00F7798C /* crashForce.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16F673B2E6EC8CC00F7798C /* crashForce.hpp */; };
 		F16F673F2E6EC8CC00F7798C /* crashForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F673C2E6EC8CC00F7798C /* crashForce.cpp */; };
 		F16F67412E6ECA8200F7798C /* core.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16F67402E6ECA8200F7798C /* core.hpp */; };
-		F16F67432E6ED07700F7798C /* core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F67422E6ED07700F7798C /* core.cpp */; };
-		F16F67452E6ED1FC00F7798C /* core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F67422E6ED07700F7798C /* core.cpp */; };
 		F1E6666C2E699572009909D1 /* SignalInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F1E6666B2E699572009909D1 /* SignalInfo.hpp */; };
 		F1E6666D2E69963B009909D1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
 		F1E6666F2E69A0E5009909D1 /* SignalInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1E6666E2E69A0E5009909D1 /* SignalInfo.cpp */; };
@@ -107,6 +105,13 @@
 
 /* Begin PBXContainerItemProxy section */
 		BFCDA7EE2E2F7C430029AEC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF97EB4E28831E5B00DAF1FE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F13529B32D1083FD002534D0;
+			remoteInfo = CallstackLibrary;
+		};
+		F1510E5E2E8A84E80093A690 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BF97EB4E28831E5B00DAF1FE /* Project object */;
 			proxyType = 1;
@@ -215,7 +220,6 @@
 		F16F673B2E6EC8CC00F7798C /* crashForce.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = crashForce.hpp; sourceTree = "<group>"; };
 		F16F673C2E6EC8CC00F7798C /* crashForce.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crashForce.cpp; sourceTree = "<group>"; };
 		F16F67402E6ECA8200F7798C /* core.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = core.hpp; sourceTree = "<group>"; };
-		F16F67422E6ED07700F7798C /* core.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = core.cpp; sourceTree = "<group>"; };
 		F18566A92DCDDA3C00D348F0 /* tlv.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tlv.json; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
@@ -310,7 +314,6 @@
 				F16F673B2E6EC8CC00F7798C /* crashForce.hpp */,
 				F16F673C2E6EC8CC00F7798C /* crashForce.cpp */,
 				F16F67402E6ECA8200F7798C /* core.hpp */,
-				F16F67422E6ED07700F7798C /* core.cpp */,
 			);
 			path = crashWarner;
 			sourceTree = "<group>";
@@ -661,6 +664,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F1510E5F2E8A84E80093A690 /* PBXTargetDependency */,
 			);
 			name = CrashHandler;
 			packageProductDependencies = (
@@ -734,7 +738,6 @@
 				BFCDA7F12E2F7CA10029AEC1 /* ObjectPool.cpp in Sources */,
 				BFCDA7F22E2F7CA10029AEC1 /* signalHandlers.cpp in Sources */,
 				BFCDA7F32E2F7CA10029AEC1 /* signals.cpp in Sources */,
-				F16F67432E6ED07700F7798C /* core.cpp in Sources */,
 				BFCDA7F42E2F7CA10029AEC1 /* wrap_malloc.cpp in Sources */,
 				BFABB7D92E7C07FB00E2476E /* hinter.cpp in Sources */,
 				BFCDA7F52E2F7CA10029AEC1 /* misc.cpp in Sources */,
@@ -773,7 +776,6 @@
 				BFABB7D62E7BF35900E2476E /* parser.cpp in Sources */,
 				BFA6CC492E78124300C8C62C /* firstPartyLibrary.cpp in Sources */,
 				BFA6CC482E7811DF00C8C62C /* format.cpp in Sources */,
-				F16F67452E6ED1FC00F7798C /* core.cpp in Sources */,
 				BFABB7DB2E7C07FB00E2476E /* hinter.cpp in Sources */,
 				F16F673A2E6EBDBB00F7798C /* lsanFormat.cpp in Sources */,
 				F16F67392E6EBDA800F7798C /* signals.cpp in Sources */,
@@ -791,6 +793,11 @@
 			isa = PBXTargetDependency;
 			target = F13529B32D1083FD002534D0 /* CallstackLibrary */;
 			targetProxy = BFCDA7EE2E2F7C430029AEC1 /* PBXContainerItemProxy */;
+		};
+		F1510E5F2E8A84E80093A690 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F13529B32D1083FD002534D0 /* CallstackLibrary */;
+			targetProxy = F1510E5E2E8A84E80093A690 /* PBXContainerItemProxy */;
 		};
 		F1EDCEA12E6587D2007E260E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
