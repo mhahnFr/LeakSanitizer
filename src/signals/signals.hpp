@@ -22,6 +22,8 @@
 #ifndef signals_hpp
 #define signals_hpp
 
+#include <cstddef>
+
 /**
  * This namespace contains the signal functions.
  */
@@ -50,7 +52,7 @@ static inline auto asHandler(F function) noexcept -> void* {
  * @param forCrash whether the handler is intended as crash handler
  * @return whether the function was registered successfully
  */
-auto registerFunction(void* function, int signal, bool forCrash = true) -> bool;
+auto registerFunction(void* function, int signal, bool useAltStack = false, bool forCrash = true) -> bool;
 
 /**
  * Registers the given function using the C standard signal handler registration.
@@ -61,7 +63,7 @@ auto registerFunction(void* function, int signal, bool forCrash = true) -> bool;
  */
 auto registerFunction(void (*function)(int), int signal) -> bool;
 
-auto createAlternativeStack() -> void*;
+auto createAlternativeStack(void*(&allocator)(std::size_t)) -> void*;
 
 /**
  * Returns a string description for the given signal code.

@@ -29,11 +29,13 @@ auto registerFunction(void (*function)(int), const int signal) -> bool {
     return ::signal(signal, function) != SIG_ERR;
 }
 
-static bool hasAlternativeStack = false;
-auto createAlternativeStack() -> void* {
-    constexpr std::size_t stackSize = SIGSTKSZ;
+auto createAlternativeStack(void*(&allocator)(std::size_t)) -> void* {
+#ifdef __APPLE__
+    constexpr
+#endif
+    std::size_t stackSize = SIGSTKSZ;
 
-    const auto toReturn = std::malloc(stackSize);
+    const auto toReturn = allocator(stackSize);
     if (toReturn == nullptr) {
         return nullptr;
     }
@@ -45,17 +47,16 @@ auto createAlternativeStack() -> void* {
         std::free(toReturn);
         return nullptr;
     }
-    hasAlternativeStack = true;
     return toReturn;
 }
 
-auto registerFunction(void* function, const int signal, const bool forCrash) -> bool {
+auto registerFunction(void* function, const int signal, const bool useAltStack, const bool forCrash) -> bool {
     struct sigaction s{};
     s.sa_sigaction = reinterpret_cast<void (*)(int, siginfo_t*, void*)>(function);
     s.sa_flags = SA_SIGINFO;
     if (forCrash) {
         s.sa_flags |= SA_RESETHAND;
-        if (hasAlternativeStack) {
+        if (useAltStack) {
             s.sa_flags |= SA_ONSTACK;
         }
     } else {

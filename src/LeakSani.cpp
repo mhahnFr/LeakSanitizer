@@ -651,34 +651,35 @@ struct Initializer {
 Initializer initializer;
 }
 
-LSan::LSan(): saniKey(createSaniKey()), signalStack(signals::createAlternativeStack()) {
+LSan::LSan(): saniKey(createSaniKey()), signalStack(signals::createAlternativeStack(real::malloc)) {
     using namespace signals;
 
     atexit(exitHook);
 
     registerFunction(handlers::stats, SIGUSR1);
     
-    registerFunction(asHandler(handlers::callstack), SIGUSR2, false);
-    
-    registerFunction(asHandler(handlers::crashWithTrace), SIGSEGV);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGABRT);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGTERM);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGALRM);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGPIPE);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGFPE);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGILL);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGQUIT);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGHUP);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGBUS);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGXFSZ);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGXCPU);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGSYS);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGVTALRM);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGPROF);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGTRAP);
+    registerFunction(asHandler(handlers::callstack), SIGUSR2, false, false);
+
+    const auto useAltStack = signalStack != nullptr;
+    registerFunction(asHandler(handlers::crashWithTrace), SIGSEGV, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGABRT, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGTERM, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGALRM, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGPIPE, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGFPE, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGILL, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGQUIT, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGHUP, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGBUS, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGXFSZ, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGXCPU, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGSYS, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGVTALRM, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGPROF, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGTRAP, useAltStack);
 
 #if defined(__APPLE__) || defined(SIGEMT)
-    registerFunction(asHandler(handlers::crashWithTrace), SIGEMT);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGEMT, useAltStack);
 #endif
 
     std::set_terminate(exceptionHandler);
