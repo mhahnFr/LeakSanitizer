@@ -120,7 +120,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     if (const auto pid = fork(); pid < 0) {
         crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
     } else if (pid == 0) {
-        char buffer[sizeof(SignalInfo)];
+        char buffer[sizeof(SignalInfo) + 1] {};
         char substitute[2] {};
         auto info = SignalInfo {
             .code = signalCode,
@@ -134,7 +134,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
         };
         args[SIZE - 1] = nullptr;
         info.callstack.relativize(args + 3);
-        info.toBinary(buffer, sizeof buffer, substitute);
+        info.toBinary(buffer, sizeof buffer - 1, substitute);
         args[1] = substitute;
         args[2] = buffer;
 
