@@ -661,22 +661,22 @@ LSan::LSan(): saniKey(createSaniKey()), signalStack(signals::createAlternativeSt
     registerFunction(asHandler(handlers::callstack), SIGUSR2, false, false);
 
     const auto useAltStack = signalStack != nullptr;
-    registerFunction(asHandler(handlers::crashWithTrace), SIGSEGV, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGABRT, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGTERM, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGALRM, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGPIPE, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGFPE, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGILL, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGQUIT, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGHUP, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGBUS, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGXFSZ, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGXCPU, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGSYS, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGSEGV,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGABRT,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGTERM,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGALRM,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGPIPE,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGFPE,    useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGILL,    useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGQUIT,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGHUP,    useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGBUS,    useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGXFSZ,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGXCPU,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGSYS,    useAltStack);
     registerFunction(asHandler(handlers::crashWithTrace), SIGVTALRM, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGPROF, useAltStack);
-    registerFunction(asHandler(handlers::crashWithTrace), SIGTRAP, useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGPROF,   useAltStack);
+    registerFunction(asHandler(handlers::crashWithTrace), SIGTRAP,   useAltStack);
 
 #if defined(__APPLE__) || defined(SIGEMT)
     registerFunction(asHandler(handlers::crashWithTrace), SIGEMT, useAltStack);
