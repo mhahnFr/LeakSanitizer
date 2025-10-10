@@ -38,7 +38,7 @@ namespace lsan::callstackHelper {
  * @return the name of the binary file of the given callstack frame
  */
 static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::string {
-    if (frame.binaryFile == nullptr) {
+    [[unlikely]] if (frame.binaryFile == nullptr) {
         return "<< Unknown >>";
     }
     
@@ -119,7 +119,7 @@ auto format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
         // potentially fail early.
         //
         //                          - mhahnFr
-        if (callstack_getBinariesCached(callstack) == nullptr) {
+        [[unlikely]] if (callstack_getBinariesCached(callstack) == nullptr) {
             stream << indent << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
             return false;
         }
@@ -127,7 +127,7 @@ auto format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
     const auto& frames = callstack_toArray(callstack);
     const auto& size   = callstack_getFrameCount(callstack);
 
-    if (frames == nullptr) {
+    [[unlikely]] if (frames == nullptr) {
         stream << indent << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
         return false;
     }
