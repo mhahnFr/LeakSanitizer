@@ -108,27 +108,27 @@ constexpr static inline void ifNotIgnored(F&& func, Args&& ...args) {
 # define ADD_TIME(sys, lock, track, type)
 #endif
 
-#define alloc(func, sizeExpr, type, ...)                                              \
-    const auto allocSize = (sizeExpr);                                                \
-    BENCH(const auto ptr = func(__VA_ARGS__), std::chrono::nanoseconds, sysTime);     \
-    if (ptr != nullptr && !LSan::finished) {                                          \
-        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {                               \
-            BENCH({                                                                   \
-                if (behaviour::getBehaviour().zeroAllocation() && (allocSize) == 0) { \
-                    warn("Implementation-defined allocation of size 0");              \
-                }                                                                     \
-                tracker.addMalloc(MallocInfo(ptr, (allocSize)));                      \
-            }, std::chrono::nanoseconds, trackingTime);                               \
-            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::type);    \
-        });                                                                           \
-    }                                                                                 \
+#define alloc(func, sizeExpr, type, ...)                                                           \
+    const auto allocSize = (sizeExpr);                                                             \
+    BENCH(const auto ptr = func(__VA_ARGS__), std::chrono::nanoseconds, sysTime);                  \
+    [[likely]] if (ptr != nullptr && !LSan::finished) {                                            \
+        ifNotIgnored([&] (auto& tracker LOCKING_TIME) {                                            \
+            BENCH({                                                                                \
+                [[unlikely]] if (behaviour::getBehaviour().zeroAllocation() && (allocSize) == 0) { \
+                    warn("Implementation-defined allocation of size 0");                           \
+                }                                                                                  \
+                tracker.addMalloc(MallocInfo(ptr, (allocSize)));                                   \
+            }, std::chrono::nanoseconds, trackingTime);                                            \
+            ADD_TIME(sysTime, lockingTime, trackingTime, timing::AllocType::type);                 \
+        });                                                                                        \
+    }                                                                                              \
     return ptr
 
 constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tracker) {
-    if (ptr == nullptr && behaviour::getBehaviour().freeNull()) {
+    [[unlikely]] if (ptr == nullptr && behaviour::getBehaviour().freeNull()) {
         warn("Free of NULL");
     } else if (ptr != nullptr) {
-        if (const auto& [removed, previousAlloc] = tracker.removeMalloc(ptr);
+        [[unlikely]] if (const auto& [removed, previousAlloc] = tracker.removeMalloc(ptr);
             behaviour::getBehaviour().invalidFree() && !removed) {
             crashOrWarn(createInvalidFreeMessage(ptr, bool(previousAlloc)), previousAlloc);
         }
@@ -196,7 +196,7 @@ constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&
 
 #ifdef __APPLE__
 constexpr inline static void assertZone(const malloc_zone_t* zone, const char* message = "Called with NULL as zone") {
-    if (zone == nullptr) {
+    [[unlikely]] if (zone == nullptr) {
         crashWarner::crashForce(message);
     }
 }
@@ -236,7 +236,7 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
 auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void** results, const unsigned num_requested) -> unsigned {
     assertZone(zone, "Batch allocating with NULL zone");
     BENCH(const auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested), std::chrono::nanoseconds, sysTime);
-    if (!LSan::finished && batched > 0) {
+    [[likely]] if (!LSan::finished && batched > 0) {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH(for (std::size_t i = 0; i < batched; ++i) {
                 tracker.addMalloc(MallocInfo(results[i], size));
@@ -290,7 +290,7 @@ void __lsan_free(void* pointer) {
 }
 
 REPLACE(auto, posix_memalign)(void** memPtr, const std::size_t alignment, const std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
-    if (void** checkPtr = memPtr; checkPtr == nullptr) {
+    [[unlikely]] if (void** checkPtr = memPtr; checkPtr == nullptr) {
         crashWarner::crashForce("posix_memalign of a NULL pointer");
     }
 
