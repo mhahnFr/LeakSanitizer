@@ -39,7 +39,7 @@ static inline auto getReasonSEGV(const int code) -> std::optional<std::string> {
         case SEGV_MAPERR: return "Address not existent";
         case SEGV_ACCERR: return "Access to address denied";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -60,7 +60,7 @@ static inline auto getReasonILL(const int code) -> std::optional<std::string> {
         case ILL_COPROC: return "Coprocessor error";
         case ILL_BADSTK: return "Internal stack error";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -81,7 +81,7 @@ static inline auto getReasonFPE(const int code) -> std::optional<std::string> {
         case FPE_INTDIV: return "Integer divide by zero";
         case FPE_INTOVF: return "Integer overflow";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -97,7 +97,7 @@ static inline auto getReasonBUS(const int code) -> std::optional<std::string> {
         case BUS_ADRERR: return "Physical address not existent";
         case BUS_OBJERR: return "Object-specific HW error";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -112,7 +112,7 @@ static inline auto getReasonTRAP(const int code) -> std::optional<std::string> {
         case TRAP_BRKPT: return "Process breakpoint";
         case TRAP_TRACE: return "Process trace trap";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -149,7 +149,7 @@ static inline auto getReason(const int signalCode, const int code) -> std::optio
         case SI_KERNEL: return "Sent by the kernel";
 #endif
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -164,7 +164,7 @@ static inline auto stringifyReasonSEGV(const int code) -> std::optional<std::str
         case SEGV_ACCERR: return "ACCERR";
         case SEGV_MAPERR: return "MAPERR";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -185,7 +185,7 @@ static inline auto stringifyReasonILL(const int code) -> std::optional<std::stri
         case ILL_COPROC: return "COPROC";
         case ILL_BADSTK: return "BADSTK";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -206,7 +206,7 @@ static inline auto stringifyReasonFPE(const int code) -> std::optional<std::stri
         case FPE_INTDIV: return "INTDIV";
         case FPE_INTOVF: return "INTOVF";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -222,7 +222,7 @@ static inline auto stringifyReasonBUS(const int code) -> std::optional<std::stri
         case BUS_ADRERR: return "ADRERR";
         case BUS_OBJERR: return "OBJERR";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -237,7 +237,7 @@ static inline auto stringifyReasonTRAP(const int code) -> std::optional<std::str
         case TRAP_BRKPT: return "BRKPT";
         case TRAP_TRACE: return "TRACE";
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 
@@ -272,7 +272,7 @@ static inline auto stringifyReason(const int signalCode, const int code) -> std:
         case SI_KERNEL: return "SI_KERNEL";
 #endif
 
-        default: return std::nullopt;
+        [[unlikely]] default: return std::nullopt;
     }
 }
 

@@ -46,7 +46,7 @@ struct SignalInfo {
                 break;
             }
         }
-        if (*substitute == 0) {
+        [[unlikely]] if (*substitute == 0) {
             throw std::runtime_error("No substitute found");
         }
         for (std::size_t i = 0; i < bufferSize; ++i) {

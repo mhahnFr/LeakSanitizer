@@ -36,14 +36,14 @@ auto createAlternativeStack(void*(&allocator)(std::size_t)) -> void* {
     std::size_t stackSize = SIGSTKSZ;
 
     const auto toReturn = allocator(stackSize);
-    if (toReturn == nullptr) {
+    [[unlikely]] if (toReturn == nullptr) {
         return nullptr;
     }
     stack_t s;
     s.ss_flags = 0;
     s.ss_size  = stackSize;
     s.ss_sp    = toReturn;
-    if (sigaltstack(&s, nullptr) != 0) {
+    [[unlikely]] if (sigaltstack(&s, nullptr) != 0) {
         std::free(toReturn);
         return nullptr;
     }
@@ -90,7 +90,7 @@ auto getDescriptionFor(const int signal) noexcept -> const char* {
         case SIGEMT:    return "Emulate instruction executed";
 #endif
 
-        default: return "Unknown signal";
+        [[unlikely]] default: return "Unknown signal";
     }
 }
 
@@ -119,7 +119,7 @@ auto stringify(const int signal) noexcept -> const char* {
         case SIGEMT:    return "SIGEMT";
 #endif
 
-        default: return "Unknown";
+        [[unlikely]] default: return "Unknown";
     }
 }
 

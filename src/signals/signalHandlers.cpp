@@ -114,10 +114,10 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 #ifdef __APPLE__
 [[ noreturn ]] static inline void crashWithTraceRemote(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
     const auto& path = getInstance().crashHandlerPath;
-    if (path.empty()) {
+    [[unlikely]] if (path.empty()) {
         crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
     }
-    if (const auto pid = fork(); pid < 0) {
+    [[unlikely]] if (const auto pid = fork(); pid < 0) {
         crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
     } else if (pid == 0) {
         char buffer[sizeof(SignalInfo) + 1] {};
@@ -138,7 +138,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
         args[1] = substitute;
         args[2] = buffer;
 
-        if (execv(path.c_str(), const_cast<char* const*>(args)) < 0) {
+        [[unlikely]] if (execv(path.c_str(), const_cast<char* const*>(args)) < 0) {
             crashWithTraceLocal(signalCode, signalContext, std::move(info.callstack));
         }
     } else {
