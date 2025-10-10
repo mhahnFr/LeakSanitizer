@@ -56,7 +56,7 @@ class AutoStats {
                 cv.wait_for(lock, sleepTime, [this] {
                     return !run;
                 });
-                if (!run) {
+                [[unlikely]] if (!run) {
                     return;
                 }
             }
@@ -84,7 +84,7 @@ public:
             run = false;
         }
         cv.notify_all();
-        if (statsThread.joinable()) {
+        [[likely]] if (statsThread.joinable()) {
             statsThread.join();
         }
     }
