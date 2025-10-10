@@ -199,10 +199,10 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
 #elif defined(__linux__)
     pthread_attr_t attr;
     std::size_t ignored;
-    if (pthread_getattr_np(thread, &attr) != 0) {
+    [[unlikely]] if (pthread_getattr_np(thread, &attr) != 0) {
         throw std::runtime_error("Failed to gather thread attributes");
     }
-    if (pthread_attr_getstack(&attr, &toReturn, &ignored) != 0) {
+    [[unlikely]] if (pthread_attr_getstack(&attr, &toReturn, &ignored) != 0) {
         pthread_attr_destroy(&attr);
         throw std::runtime_error("Failed to gather stack address");
     }
@@ -225,10 +225,10 @@ static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size
     toReturn = pthread_get_stacksize_np(thread);
 #elif defined(__linux__)
     pthread_attr_t attr;
-    if (pthread_getattr_np(thread, &attr) != 0) {
+    [[unlikely]] if (pthread_getattr_np(thread, &attr) != 0) {
         throw std::runtime_error("Failed to gather thread attributes");
     }
-    if (pthread_attr_getstacksize(&attr, &toReturn) != 0) {
+    [[unlikely]] if (pthread_attr_getstacksize(&attr, &toReturn) != 0) {
         pthread_attr_destroy(&attr);
         throw std::runtime_error("Failed to gather stack size");
     }
@@ -390,8 +390,8 @@ static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
     uintptr_t toReturn;
 #ifdef __APPLE__
     auto count = std::size_t(0);
-    if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
-                                           &toReturn, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE)
+    [[unlikely]] if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
+                                                        &toReturn, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE)
 #elif defined(__linux__)
     void* sp;
     while ((sp = info.getSP()) == nullptr);
@@ -464,7 +464,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& threadDesc = getThreadDescription(info.getNumber(), info.getThread());
 
         const auto& selfThread = std::this_thread::get_id() == info.getId();
-        if (!selfThread && !suspendThread(info)) {
+        [[unlikely]] if (!selfThread && !suspendThread(info)) {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
             failed.push_back(info);
             continue;
@@ -494,7 +494,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 #ifdef __linux__
         if (info.isDead()) continue;
 #endif
-        if (std::ranges::find(std::as_const(failed), info) != failed.end()) {
+        [[unlikely]] if (std::ranges::find(std::as_const(failed), info) != failed.end()) {
             continue;
         }
 
@@ -623,7 +623,7 @@ for (const auto& leak : (records)) {                              \
  */
 static inline auto createSaniKey() -> pthread_key_t {
     pthread_key_t key;
-    if (pthread_key_create(&key, destroySaniKey) != 0) {
+    [[unlikely]] if (pthread_key_create(&key, destroySaniKey) != 0) {
         throw std::runtime_error("Could not create TLS key!");
     }
     return key;
