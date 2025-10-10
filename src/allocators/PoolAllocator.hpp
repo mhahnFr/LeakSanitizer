@@ -84,19 +84,19 @@ struct PoolAllocator {
      * @throws std::bad_alloc if too many objects are requested or if unable to allocate
      */
     [[ nodiscard ]] constexpr auto allocate(const std::size_t count) -> T* {
-        if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
+        [[unlikely]] if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
         }
 
         if (count > 1) {
             auto toReturn = std::malloc(count * sizeof(T));
-            if (toReturn == nullptr) {
+            [[unlikely]] if (toReturn == nullptr) {
                 throw std::bad_alloc();
             }
             return static_cast<T*>(toReturn);
         }
         auto toReturn = static_cast<T*>(findPool().allocate());
-        if (toReturn == nullptr) {
+        [[unlikely]] if (toReturn == nullptr) {
             throw std::bad_alloc();
         }
         return toReturn;
@@ -179,7 +179,7 @@ private:
         } else if (create) {
             return *pools->insert(pools->end(), ObjectPool(size, 500));
         }
-        throw std::runtime_error("Object pool not found! Size = " + std::to_string(size) + ", create = false");
+        [[unlikely]] throw std::runtime_error("Object pool not found! Size = " + std::to_string(size) + ", create = false");
     }
 };
 }

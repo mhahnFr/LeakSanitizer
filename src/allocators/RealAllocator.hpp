@@ -52,12 +52,12 @@ struct RealAllocator {
      * @throws std::bad_alloc if too many objects are requested or when the allocator failed to allocate
      */
     [[ nodiscard ]] static constexpr inline auto allocate(const std::size_t n) -> T* {
-        if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
+        [[unlikely]] if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
             throw std::bad_array_new_length();
         }
 
         auto toReturn = real::malloc(n * sizeof(T));
-        if (toReturn == nullptr) {
+        [[unlikely]] if (toReturn == nullptr) {
             throw std::bad_alloc();
         }
         return static_cast<T*>(toReturn);

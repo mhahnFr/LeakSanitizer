@@ -40,7 +40,7 @@ auto ObjectPool::allocate() -> void* {
         return reinterpret_cast<void*>(uintptr_t(toReturn) + sizeof(MemoryBlock*));
     }
     auto buffer = std::malloc((objectSize + sizeof(MemoryBlock*)) * (blockSize * factor) + sizeof(MemoryBlock));
-    if (buffer == nullptr) {
+    [[unlikely]] if (buffer == nullptr) {
         return nullptr;
     }
     const auto newBlock = new(buffer) MemoryBlock(blockSize * factor);
