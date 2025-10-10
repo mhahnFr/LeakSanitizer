@@ -36,11 +36,11 @@ namespace lsan::suppression {
  */
 static inline void loadSystemLibraryFile(std::vector<std::regex>& content, const simple_json::Value& object) {
     using namespace simple_json;
-    if (!object.is(ValueType::Array)) {
+    [[unlikely]] if (!object.is(ValueType::Array)) {
         throw std::runtime_error("System libraries should be defined as a top level string array");
     }
     for (const auto& value : object.as<ValueType::Array>()) {
-        if (!value.is(ValueType::String)) {
+        [[unlikely]] if (!value.is(ValueType::String)) {
             throw std::runtime_error("System library regex was not a string");
         }
 
@@ -74,7 +74,7 @@ auto loadSystemLibraries() -> std::vector<std::regex> {
 
             getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load system library file \"" + file.string() + "\": " + e.what()) << std::endl << std::endl;
         }
-        if (stream.is_open()) {
+        [[likely]] if (stream.is_open()) {
             stream.close();
         }
     }

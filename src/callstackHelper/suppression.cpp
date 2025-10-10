@@ -54,7 +54,7 @@ auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& c
     const callstack_frame* binaries = nullptr;
     if (suppression.hasRegexes) {
         binaries = callstack_autoClearCaches ? callstack_getBinaries(callstack) : callstack_getBinariesCached(callstack);
-        if (binaries == nullptr) {
+        [[unlikely]] if (binaries == nullptr) {
             return false;
         }
     }

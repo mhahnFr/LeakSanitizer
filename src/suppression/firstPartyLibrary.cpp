@@ -49,7 +49,7 @@ static std::map<const char*, Classification> cache; // TODO: Use a pool map?
  * @return whether the given binary file name is first party
  */
 static inline auto isFirstPartyCore(const char* file) -> bool {
-    if (file == nullptr) {
+    [[unlikely]] if (file == nullptr) {
         return false;
     }
 

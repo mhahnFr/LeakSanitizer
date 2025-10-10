@@ -60,7 +60,7 @@ static inline auto getFunctionPair(const std::string& name,
  * @return the leak type corresponding to the given number
  */
 static inline constexpr auto asLeakType(const std::optional<unsigned long>& number) -> std::optional<LeakType> {
-    if (number && *number > 10) {
+    [[unlikely]] if (number && *number > 10) {
         throw std::runtime_error("Not a leak type: " + std::to_string(*number));
     }
     return number ? std::optional(LeakType(*number)) : std::nullopt;
@@ -101,13 +101,13 @@ static inline auto getCallstackObject(const Value& object, const std::string& su
                 for (const auto& regex : array) {
                     regexes.emplace_back(regex.as<ValueType::String>());
                 }
-            } else {
+            } else [[unlikely]] {
                 throw std::runtime_error("Library regex value is neither an array nor a (regex) string");
             }
             return { Suppression::Type::regex, regexes };
         }
     }
-    throw std::runtime_error("Unsupported value in function array");
+    [[unlikely]] throw std::runtime_error("Unsupported value in function array");
 }
 
 Suppression::Suppression(const Object& object):
@@ -117,11 +117,11 @@ Suppression::Suppression(const Object& object):
     imageName(object.get<ValueType::String>("imageName"))
 {
     const auto& functionArray = object.get<ValueType::Array>("functions");
-    if (!imageName && !functionArray) {
+    [[unlikely]] if (!imageName && !functionArray) {
         throw std::runtime_error("Suppressions need either 'imageName' or 'functions'");
     }
     if (functionArray) {
-        if (functionArray->empty()) {
+        [[unlikely]] if (functionArray->empty()) {
             throw std::runtime_error("Function array empty");
         }
         topCallstack.reserve(functionArray->size());
