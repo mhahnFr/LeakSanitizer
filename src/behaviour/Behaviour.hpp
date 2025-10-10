@@ -108,7 +108,7 @@ public:
  */
 static inline auto getFiles(const char* files) -> std::vector<std::filesystem::path> {
     auto toReturn = std::vector<std::filesystem::path>();
-    if (files != nullptr) {
+    [[likely]] if (files != nullptr) {
         auto stream = std::istringstream(files);
         std::string s;
         while (std::getline(stream, s, ':')) {

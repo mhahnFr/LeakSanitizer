@@ -69,7 +69,7 @@ constexpr inline auto get(const char* name) -> std::optional<T> {
 
 template<>
 constexpr inline auto getFrom(const char* value) -> std::optional<std::size_t> {
-    if (value == nullptr) {
+    [[unlikely]] if (value == nullptr) {
         return std::nullopt;
     }
 
@@ -103,7 +103,7 @@ static inline auto lowerCompare(const char * string1, const char * string2) -> b
 
 template<>
 constexpr inline auto getFrom(const char* value) -> std::optional<bool> {
-    if (value == nullptr) {
+    [[unlikely]] if (value == nullptr) {
         return std::nullopt;
     }
 
