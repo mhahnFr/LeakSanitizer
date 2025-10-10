@@ -789,7 +789,7 @@ auto LSan::removeMalloc(const ATracker* tracker, void* pointer) -> std::pair<boo
             }
         }
     }
-    if (!result.first) {
+    [[unlikely]] if (!result.first) {
         if (result.second && tmp.second) {
             return result.second->get().isMoreRecent(tmp.second->get()) ? result : tmp;
         }
@@ -812,10 +812,8 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
     if (it->second.isDeleted()) {
         return std::make_pair(false, std::ref(it->second));
     }
-    if (behaviour.statsActive()) {
+    [[unlikely]] if (behaviour.statsActive()) {
         stats -= it->second;
-    }
-    if (behaviour.statsActive()) {
         it->second.markDeleted();
     } else {
         infos.erase(it);
@@ -838,7 +836,7 @@ void LSan::changeMalloc(const ATracker* tracker, MallocInfo&& info) {
         }
         return;
     }
-    if (behaviour.statsActive()) {
+    [[unlikely]] if (behaviour.statsActive()) {
         stats.replaceMalloc(it->second.getSize(), info.getSize());
     }
     infos.insert_or_assign(info.getPointer(), info);

@@ -133,7 +133,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
  * @return the new and allocated thread local tracker
  */
 static inline auto newLocalTracker(const bool pseudo) -> trackers::ATracker* {
-    if (pseudo) {
+    [[unlikely]] if (pseudo) {
         return new trackers::PseudoTracker();
     }
     return new trackers::TLSTracker();
