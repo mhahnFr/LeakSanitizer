@@ -901,31 +901,31 @@ static inline auto maybeShowDeprecationWarnings(std::ostream& out) -> std::ostre
     using namespace formatter;
 
     std::ostringstream oss;
-    if (has("LSAN_PRINT_STATS_ON_EXIT")) {
+    [[unlikely]] if (has("LSAN_PRINT_STATS_ON_EXIT")) {
         printDeprecation(oss, "LSAN_PRINT_STATS_ON_EXIT", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.7"));
     }
-    if (has("LSAN_PRINT_LICENSE")) {
+    [[unlikely]] if (has("LSAN_PRINT_LICENSE")) {
         printDeprecation(oss, "LSAN_PRINT_LICENSE", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
-    if (has("LSAN_PRINT_WEBSITE")) {
+    [[unlikely]] if (has("LSAN_PRINT_WEBSITE")) {
         printDeprecation(oss, "LSAN_PRINT_WEBSITE", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
-    if (has("LSAN_FIRST_PARTY_THRESHOLD")) {
+    [[unlikely]] if (has("LSAN_FIRST_PARTY_THRESHOLD")) {
         printDeprecation(oss, "LSAN_FIRST_PARTY_THRESHOLD", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
-    if (has("LSAN_FIRST_PARTY_REGEX")) {
+    [[unlikely]] if (has("LSAN_FIRST_PARTY_REGEX")) {
         printDeprecation(oss, "LSAN_FIRST_PARTY_REGEX", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
-    if (has("LSAN_LEAK_COUNT")) {
+    [[unlikely]] if (has("LSAN_LEAK_COUNT")) {
         printDeprecation(oss, "LSAN_LEAK_COUNT", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
-    if (const auto& str = oss.str(); !str.empty()) {
+    [[unlikely]] if (const auto& str = oss.str(); !str.empty()) {
         out << std::endl << format<Style::RED>("Warnings:") << std::endl << str;
     }
     return out;
@@ -962,7 +962,7 @@ static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std:
     auto toReturn = false;
     for (const auto& leak : records) {
         if (auto& record = leak.get(); !record.printedInRoot && !record.suppressed && record.leakType == allowed) {
-            if (printContent) {
+            [[unlikely]] if (printContent) {
                 printRecord(out, record);
             }
             out << record << std::endl;

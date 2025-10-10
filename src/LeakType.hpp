@@ -100,7 +100,7 @@ constexpr static inline auto debugString(const LeakType& type) -> const char* {
         case LeakType::objcDirect:          return "objcDirect";
         case LeakType::objcIndirect:        return "objcIndirect";
 
-        default: return "Unknown";
+        [[unlikely]] default: return "Unknown";
     }
 }
 }

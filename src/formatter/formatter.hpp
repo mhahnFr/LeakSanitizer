@@ -78,8 +78,8 @@ constexpr inline auto get() -> const char * {
         switch (S) {
             case Style::BAR_EMPTY:  return ".";
             case Style::BAR_FILLED: return "=";
-            default:
-                return "";
+
+            default: return "";
         }
     }
     switch (S) {
@@ -95,8 +95,8 @@ constexpr inline auto get() -> const char * {
         case Style::BLUE:       return "\033[94m";
         case Style::AMBER:      return "\033[33m";
         case Style::UNDERLINED: return "\033[4m";
-        default:
-            return "";
+
+        [[unlikely]] default: return "";
     }
 }
 
@@ -129,8 +129,7 @@ constexpr inline auto clear() -> const char * {
             
         case Style::UNDERLINED: return "\033[24m";
             
-        default:
-            return "";
+        [[unlikely]] default: return "";
     }
 }
 

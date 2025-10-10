@@ -35,7 +35,7 @@ static constexpr inline const char* sizes[] { "EiB", "PiB", "TiB", "GiB", "MiB",
 
 auto bytesToString(const unsigned long long amount) -> std::string {
     std::stringstream s;
-    if (!behaviour::getBehaviour().humanPrint() || amount == 0) {
+    [[unlikely]] if (!behaviour::getBehaviour().humanPrint() || amount == 0) {
         s << amount << " B";
     } else {
         unsigned long long multiplier = exabyte;
