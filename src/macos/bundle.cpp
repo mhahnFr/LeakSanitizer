@@ -65,7 +65,7 @@ constexpr inline auto DEFAULT_VERSION = "CLEAN BUILD";
 auto getVersion() -> std::string {
     return getTracker().withIgnorationResult(false, [] -> std::string {
         const auto value = CFBundleGetValueForInfoDictionaryKey(getBundle(), kCFBundleVersionKey);
-        if (value == nil) {
+        [[unlikely]] if (value == nil) {
             return DEFAULT_VERSION;
         }
         return convertCFString(CFStringRef(value));
@@ -74,14 +74,14 @@ auto getVersion() -> std::string {
 
 auto convertCFString(const CFStringRef str) -> std::string {
     return getTracker().withIgnorationResult(false, [str] -> std::string {
-        if (str == nil) return {};
+        [[unlikely]] if (str == nil) return {};
 
         if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
             return cStr;
         }
         auto toReturn = std::string();
         toReturn.resize(std::string::size_type(CFStringGetLength(str) + 1));
-        if (!CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8)) {
+        [[unlikely]] if (!CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8)) {
             return {};
         }
         return toReturn;
