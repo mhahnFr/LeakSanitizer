@@ -238,7 +238,7 @@ constexpr inline auto operator<<(std::ostream& out, const format<S...>& f) -> st
  * @tparam S the requested styles
  */
 template<Style... S>
-inline auto formatString(const std::string & str) -> std::string {
+constexpr inline auto formatString(const std::string & str) -> std::string {
     return getString<S...>() + str + clearString<S...>();
 }
 }

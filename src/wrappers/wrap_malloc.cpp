@@ -46,7 +46,7 @@ namespace lsan {
  * @param doubleFree whether the pointer has previously been freed
  * @return a descriptive invalid free message
  */
-constexpr static inline auto createInvalidFreeMessage(const void* address, const bool doubleFree) -> std::string {
+static inline auto createInvalidFreeMessage(const void* address, const bool doubleFree) -> std::string {
     using namespace formatter;
     
     return formatString<Style::BOLD, Style::RED>(doubleFree ? "Double free" : "Invalid free") 

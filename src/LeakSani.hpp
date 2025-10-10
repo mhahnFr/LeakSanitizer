@@ -369,7 +369,7 @@ public:
      * @param out the output stream to print to
      * @return the given output stream
      */
-    constexpr inline auto maybeHintCallstackSize(std::ostream& out) const -> std::ostream& {
+    inline auto maybeHintCallstackSize(std::ostream& out) const -> std::ostream& {
         hinter::maybeHintCallstackSize(out, callstackSizeExceeded);
         return out;
     }
