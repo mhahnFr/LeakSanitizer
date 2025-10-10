@@ -36,7 +36,7 @@ namespace lsan {
  */
 template<typename ...Args>
 constexpr static inline void crashOrWarn(Args&& ...args) {
-    if (behaviour::getBehaviour().invalidCrash()) {
+    [[likely]] if (behaviour::getBehaviour().invalidCrash()) {
         crash(std::forward<Args>(args)...);
     } else {
         warn(std::forward<Args>(args)...);

@@ -97,7 +97,7 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     getTracker().ignoreMalloc = true;
 
     if (LOAD_FUNC(void*(*)(), tryCatch_getException); tryCatch_getException != nullptr) {
-        if (const auto exception = tryCatch_getException(); exception != nullptr) {
+        [[likely]] if (const auto exception = tryCatch_getException(); exception != nullptr) {
             const auto exceptionType = *reinterpret_cast<const char**>(uintptr_t(exception) - sizeof(char*));
             crashWarner::crashForce("Uncaught exception of type " + std::string(exceptionType));
         }
