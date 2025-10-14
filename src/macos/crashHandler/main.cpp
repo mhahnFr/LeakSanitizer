@@ -30,8 +30,6 @@
 
 using namespace lsan;
 
-static std::filesystem::path executablePath;
-
 auto suppression::getSystemLibraries() -> const std::vector<std::regex>& {
     static auto supps = loadSystemLibraries();
     return supps;
@@ -60,8 +58,6 @@ auto behaviour::getBehaviour() -> const Behaviour& {
 
 auto main(int argc, const char** argv) -> int {
     using namespace signals;
-
-    executablePath = argv[0];
 
     // TODO: Safety!!!
     auto info = SignalInfo::fromBinary(argv[2], sizeof(SignalInfo), argv[1][0]);
