@@ -27,6 +27,7 @@
 #include "../lsanMisc.hpp"
 #include "../callstackHelper/suppression.hpp"
 #include "../formatter/formatter.hpp"
+#include "../signals/signals.hpp"
 
 namespace lsan {
 /**
