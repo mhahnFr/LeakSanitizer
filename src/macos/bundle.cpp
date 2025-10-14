@@ -60,7 +60,7 @@ auto getCrashHandlerPath() -> std::string {
 }
 
 /** The default version string in case loading fails. */
-constexpr inline auto DEFAULT_VERSION = "CLEAN BUILD";
+constexpr inline auto DEFAULT_VERSION = std::string("CLEAN BUILD");
 
 auto getVersion() -> std::string {
     return getTracker().withIgnorationResult(false, [] -> std::string {
