@@ -95,6 +95,10 @@
 		F16F673E2E6EC8CC00F7798C /* crashForce.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16F673B2E6EC8CC00F7798C /* crashForce.hpp */; };
 		F16F673F2E6EC8CC00F7798C /* crashForce.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16F673C2E6EC8CC00F7798C /* crashForce.cpp */; };
 		F16F67412E6ECA8200F7798C /* core.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F16F67402E6ECA8200F7798C /* core.hpp */; };
+		F18881A22E9E510400319CD6 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF17750A2E33892700D46975 /* CoreFoundation.framework */; };
+		F18881A62E9E534C00319CD6 /* bundleShared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F18881A42E9E534C00319CD6 /* bundleShared.cpp */; };
+		F18881A72E9E534C00319CD6 /* bundleShared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F18881A42E9E534C00319CD6 /* bundleShared.cpp */; };
+		F18881A82E9E57D600319CD6 /* defaultSuppression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F13529AE2D10779B002534D0 /* defaultSuppression.cpp */; };
 		F1E6666C2E699572009909D1 /* SignalInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F1E6666B2E699572009909D1 /* SignalInfo.hpp */; };
 		F1E6666D2E69963B009909D1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
 		F1E6666F2E69A0E5009909D1 /* SignalInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1E6666E2E69A0E5009909D1 /* SignalInfo.cpp */; };
@@ -221,6 +225,7 @@
 		F16F673C2E6EC8CC00F7798C /* crashForce.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crashForce.cpp; sourceTree = "<group>"; };
 		F16F67402E6ECA8200F7798C /* core.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = core.hpp; sourceTree = "<group>"; };
 		F18566A92DCDDA3C00D348F0 /* tlv.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tlv.json; sourceTree = "<group>"; };
+		F18881A42E9E534C00319CD6 /* bundleShared.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bundleShared.cpp; sourceTree = "<group>"; };
 		F19C6EA62C51436A00E7E4FA /* PoolAllocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PoolAllocator.hpp; sourceTree = "<group>"; };
 		F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectPool.cpp; sourceTree = "<group>"; };
 		F19C6EA82C51496C00E7E4FA /* ObjectPool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ObjectPool.hpp; sourceTree = "<group>"; };
@@ -247,6 +252,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F18881A22E9E510400319CD6 /* CoreFoundation.framework in Frameworks */,
 				F1E6666D2E69963B009909D1 /* libcallstack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -470,6 +476,7 @@
 				F1EDCE912E658724007E260E /* crashHandler */,
 				BFB103D62E38CB7100ECECD5 /* bundle.hpp */,
 				BFB103D72E38CB7100ECECD5 /* bundle.cpp */,
+				F18881A42E9E534C00319CD6 /* bundleShared.cpp */,
 			);
 			path = macos;
 			sourceTree = "<group>";
@@ -753,6 +760,7 @@
 				BFCDA7FC2E2F7CA10029AEC1 /* Suppression.cpp in Sources */,
 				BFCDA7FD2E2F7CA10029AEC1 /* defaultSuppression.cpp in Sources */,
 				BF5AAFE62E605492007C0329 /* PoolAllocator.cpp in Sources */,
+				F18881A62E9E534C00319CD6 /* bundleShared.cpp in Sources */,
 				BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */,
 				F1E6666F2E69A0E5009909D1 /* SignalInfo.cpp in Sources */,
 				BFCDA7FE2E2F7CA10029AEC1 /* firstPartyLibrary.cpp in Sources */,
@@ -773,6 +781,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F18881A82E9E57D600319CD6 /* defaultSuppression.cpp in Sources */,
 				BFABB7D62E7BF35900E2476E /* parser.cpp in Sources */,
 				BFA6CC492E78124300C8C62C /* firstPartyLibrary.cpp in Sources */,
 				BFA6CC482E7811DF00C8C62C /* format.cpp in Sources */,
@@ -780,6 +789,7 @@
 				F16F673A2E6EBDBB00F7798C /* lsanFormat.cpp in Sources */,
 				F16F67392E6EBDA800F7798C /* signals.cpp in Sources */,
 				F1EDCE9F2E65879C007E260E /* main.cpp in Sources */,
+				F18881A72E9E534C00319CD6 /* bundleShared.cpp in Sources */,
 				F16F673F2E6EC8CC00F7798C /* crashForce.cpp in Sources */,
 				BFABB7D52E7BEEB400E2476E /* systemLibraryLoader.cpp in Sources */,
 				F1E666702E69A0E5009909D1 /* SignalInfo.cpp in Sources */,
