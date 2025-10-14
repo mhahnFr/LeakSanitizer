@@ -73,18 +73,21 @@ auto getVersion() -> std::string {
 }
 
 auto convertCFString(const CFStringRef str) -> std::string {
-    return getTracker().withIgnorationResult(false, [str] -> std::string {
-        [[unlikely]] if (str == nil) return {};
+    [[unlikely]] if (str == nil) return {};
 
-        if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8)) {
-            return cStr;
-        }
-        auto toReturn = std::string();
-        toReturn.resize(std::string::size_type(CFStringGetLength(str) + 1));
-        [[unlikely]] if (!CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8)) {
-            return {};
-        }
-        return toReturn;
+    auto& tracker = getTracker();
+    const auto cStr = tracker.withIgnorationResult(false, [str] {
+        return CFStringGetCStringPtr(str, kCFStringEncodingUTF8);
     });
+    [[likely]] if (cStr != nullptr) {
+        return cStr;
+    }
+
+    auto toReturn = std::string(std::string::size_type(tracker.withIgnorationResult(false, [str] {
+        return CFStringGetLength(str);
+    })), '\0');
+    return tracker.withIgnorationResult(false, [&toReturn, str] {
+        return CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8);
+    }) ? toReturn : std::string {};
 }
 }
