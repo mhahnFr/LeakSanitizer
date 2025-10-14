@@ -54,24 +54,6 @@ auto getSystemLibraryFiles() -> std::vector<std::string>;
  * @return the contents of the default thread-local value suppression files
  */
 auto getDefaultTLVSuppressions() -> std::vector<std::string>;
-
-#ifdef LSAN_APPLE
-static inline auto readFile(const std::filesystem::path& path) -> std::string {
-    auto stream = std::ifstream();
-    auto strStr = std::ostringstream();
-    stream.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-    try {
-        stream.open(path);
-        strStr << stream.rdbuf();
-        stream.close();
-    } catch (...) {
-        if (stream.is_open()) {
-            stream.close();
-        }
-    }
-    return strStr.str();
-}
-#endif
 }
 
 #endif /* defaultSuppression_hpp */

@@ -22,6 +22,7 @@
 #ifndef bundle_hpp
 #define bundle_hpp
 
+#include <filesystem>
 #include <string>
 
 #include <CoreFoundation/CFBundle.h>
@@ -67,6 +68,11 @@ auto getVersion() -> std::string;
  * @return the @c std::string representation
  */
 auto convertCFString(CFStringRef str) -> std::string;
+
+namespace shared {
+auto readFile(const std::filesystem::path& path) -> std::string;
+auto loadResource(const CFURLRef url) -> std::string;
+}
 }
 
 #endif /* bundle_hpp */
