@@ -24,21 +24,10 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan::macos::bundle {
-/**
- * @brief Loads the bundle associated with the LeakSanitizer.
- *
- * Allocations are explicitly tracked.
- *
- * @return the @c CFBundleRef
- */
-static inline auto getBundleWrapper() -> CFBundleRef {
-    return getTracker().withIgnorationResult(false, [] {
+auto getBundle() -> CFBundleRef {
+    static auto bundle = getTracker().withIgnorationResult(false, [] {
         return CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
     });
-}
-
-auto getBundle() -> CFBundleRef {
-    static CFBundleRef bundle = getBundleWrapper();
     return bundle;
 }
 
