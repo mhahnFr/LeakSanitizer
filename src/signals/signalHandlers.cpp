@@ -149,7 +149,11 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 #endif
 
 [[ noreturn ]] void crashWithTrace(const int signalCode, const siginfo_t* signalContext, void* executionContext) {
+#ifdef __APPLE__
     getTracker().ignoreMalloc = true;
+#else
+    LSan::crashed = LSan::finished = true;
+#endif
     auto callstack = createCallstackFor(executionContext);
 #ifdef __APPLE__
     crashWithTraceRemote(signalCode, signalContext, std::move(callstack));

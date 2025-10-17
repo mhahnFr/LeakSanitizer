@@ -212,6 +212,9 @@ protected:
 public:
     /** Indicates whether the allocation tracking has finished.           */
     static std::atomic_bool finished;
+#ifndef __APPLE__
+    static std::atomic_bool crashed;
+#endif
     /** Indicates whether to ignore deallocations in the TLS deallocator. */
     static std::atomic_bool preventDealloc;
     /** Whether the exit has already been printed.                        */
