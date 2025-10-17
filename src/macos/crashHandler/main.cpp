@@ -21,7 +21,6 @@
 
 #include <iostream>
 
-#include "../../behaviour/getBehaviour.hpp"
 #include "../../crashWarner/crashForce.hpp"
 #include "../../macos/bundle.hpp"
 #include "../../signals/SignalInfo.hpp"
@@ -49,11 +48,6 @@ auto macos::bundle::convertCFString(CFStringRef str) -> std::string {
 auto macos::bundle::getBundle() -> CFBundleRef {
     static auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
     return bundle;
-}
-
-auto behaviour::getBehaviour() -> const Behaviour& {
-    static Behaviour instance;
-    return instance;
 }
 
 auto main(int argc, const char** argv) -> int {

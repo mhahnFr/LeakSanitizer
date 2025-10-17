@@ -29,6 +29,7 @@
 		BFABB7DB2E7C07FB00E2476E /* hinter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFABB7D82E7C07FB00E2476E /* hinter.cpp */; };
 		BFB103D82E38CB7100ECECD5 /* bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFB103D72E38CB7100ECECD5 /* bundle.cpp */; };
 		BFB103D92E38CB7100ECECD5 /* bundle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BFB103D62E38CB7100ECECD5 /* bundle.hpp */; };
+		BFCD90F72EA245F400DB77C9 /* getBehaviourGlobal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFCD90F62EA245F400DB77C9 /* getBehaviourGlobal.cpp */; };
 		BFCDA7F02E2F7C580029AEC1 /* libcallstack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF378FB42919496000A4DAA9 /* libcallstack.a */; };
 		BFCDA7F12E2F7CA10029AEC1 /* ObjectPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19C6EA72C51496C00E7E4FA /* ObjectPool.cpp */; };
 		BFCDA7F22E2F7CA10029AEC1 /* signalHandlers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF49A5D72899599300BC1FFD /* signalHandlers.cpp */; };
@@ -203,6 +204,7 @@
 		BFC817142BEFB36E00332937 /* TLSTracker.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TLSTracker.cpp; sourceTree = "<group>"; };
 		BFC817152BEFB36E00332937 /* TLSTracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TLSTracker.hpp; sourceTree = "<group>"; };
 		BFC817182BEFB3C200332937 /* ATracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ATracker.hpp; sourceTree = "<group>"; };
+		BFCD90F62EA245F400DB77C9 /* getBehaviourGlobal.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = getBehaviourGlobal.cpp; sourceTree = "<group>"; };
 		BFCDA7E72E2F7C2C0029AEC1 /* LeakSanitizer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LeakSanitizer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFCF0B252BDD54A900EE259C /* misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
 		BFD983A62B8A4729003B6CC1 /* timing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timing.cpp; sourceTree = "<group>"; };
@@ -504,6 +506,7 @@
 		BFE023F12CA874AE00AEFD5A /* behaviour */ = {
 			isa = PBXGroup;
 			children = (
+				BFCD90F62EA245F400DB77C9 /* getBehaviourGlobal.cpp */,
 				BFE023F22CA874D100AEFD5A /* Behaviour.hpp */,
 				BFE023F62CA8765500AEFD5A /* helper.hpp */,
 				F16F67332E6EB3EA00F7798C /* getBehaviour.hpp */,
@@ -786,6 +789,7 @@
 				BFA6CC492E78124300C8C62C /* firstPartyLibrary.cpp in Sources */,
 				BFA6CC482E7811DF00C8C62C /* format.cpp in Sources */,
 				BFABB7DB2E7C07FB00E2476E /* hinter.cpp in Sources */,
+				BFCD90F72EA245F400DB77C9 /* getBehaviourGlobal.cpp in Sources */,
 				F16F673A2E6EBDBB00F7798C /* lsanFormat.cpp in Sources */,
 				F16F67392E6EBDA800F7798C /* signals.cpp in Sources */,
 				F1EDCE9F2E65879C007E260E /* main.cpp in Sources */,
