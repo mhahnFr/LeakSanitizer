@@ -71,7 +71,7 @@ auto convertCFString(CFStringRef str) -> std::string;
 
 namespace shared {
 auto readFile(const std::filesystem::path& path) -> std::string;
-auto loadResource(const CFURLRef url) -> std::string;
+auto loadResource(CFURLRef url) -> std::string;
 }
 }
 
