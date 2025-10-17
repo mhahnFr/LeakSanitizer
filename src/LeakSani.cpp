@@ -874,6 +874,16 @@ auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
 }
 
 auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
+#ifndef __APPLE__
+    [[unlikely]] if (LSan::crashed) {
+        static auto toReturn = suppression::loadSystemLibraries();
+        return toReturn;
+    }
+#endif
+    return getInstance().getSystemLibrariesCached();
+}
+
+auto LSan::getSystemLibrariesCached() -> const std::vector<std::regex>& {
     if (!systemLibraries) {
         systemLibraries = suppression::loadSystemLibraries();
     }

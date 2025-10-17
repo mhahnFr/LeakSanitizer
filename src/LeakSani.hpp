@@ -326,7 +326,9 @@ public:
      *
      * @return the system library regular expressions
      */
-    auto getSystemLibraries() -> const std::vector<std::regex>&;
+    auto getSystemLibrariesCached() -> const std::vector<std::regex>&;
+    
+    static auto getSystemLibraries() -> const std::vector<std::regex>&;
 
     /**
      * Returns the mutex for the allocations and tracking.
