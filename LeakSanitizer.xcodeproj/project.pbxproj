@@ -506,11 +506,11 @@
 		BFE023F12CA874AE00AEFD5A /* behaviour */ = {
 			isa = PBXGroup;
 			children = (
-				BFCD90F62EA245F400DB77C9 /* getBehaviourGlobal.cpp */,
 				BFE023F22CA874D100AEFD5A /* Behaviour.hpp */,
 				BFE023F62CA8765500AEFD5A /* helper.hpp */,
 				F16F67332E6EB3EA00F7798C /* getBehaviour.hpp */,
 				F16F67342E6EB3EA00F7798C /* getBehaviour.cpp */,
+				BFCD90F62EA245F400DB77C9 /* getBehaviourGlobal.cpp */,
 			);
 			path = behaviour;
 			sourceTree = "<group>";
