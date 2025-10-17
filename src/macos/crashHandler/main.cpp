@@ -19,12 +19,9 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
 #include "../../crashWarner/crashForce.hpp"
 #include "../../macos/bundle.hpp"
 #include "../../signals/SignalInfo.hpp"
-#include "../../suppression/defaultSuppression.hpp"
 #include "../../suppression/systemLibraryLoader.hpp"
 
 using namespace lsan;
