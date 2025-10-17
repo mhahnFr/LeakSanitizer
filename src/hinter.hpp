@@ -25,6 +25,13 @@
 #include <ostream>
 
 namespace lsan::hinter {
+/**
+ * Prints a hint about how to influence the callstack size onto the given
+ * output stream if the callstack size has been exceeded.
+ *
+ * @param out the output stream to print onto
+ * @param exceeded whether to print the hint
+ */
 void maybeHintCallstackSize(std::ostream& out, bool exceeded);
 
 /**
