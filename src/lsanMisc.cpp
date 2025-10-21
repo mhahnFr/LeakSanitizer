@@ -237,6 +237,6 @@ auto createTLVSuppression() -> std::vector<suppression::Suppression> {
 }
 
 auto suppression::getSystemLibraries() -> const std::vector<std::regex>& {
-    return getInstance().getSystemLibraries();
+    return LSan::getSystemLibraries();
 }
 }
