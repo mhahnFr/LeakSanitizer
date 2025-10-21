@@ -47,7 +47,7 @@ static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs)
 }
 
 template<typename F, typename... Args>
-constexpr void MallocInfo::forEachIndirect(const bool mark, F func, Args... args) const {
+constexpr inline void MallocInfo::forEachIndirect(const bool mark, F func, Args... args) const {
     for (const auto& leak : viaMeRecords) {
         leak.get().flag = false;
     }
