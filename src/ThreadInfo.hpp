@@ -60,11 +60,11 @@ public:
      * @param id the C++ thread id
      * @param thread the POSIX thread id
      */
-    constexpr inline ThreadInfo(const std::size_t stackSize,
-                                void* stackTop = __builtin_frame_address(0),
-                                const unsigned long number = createThreadId(),
-                                const std::thread::id& id = std::this_thread::get_id(),
-                                const pthread_t& thread = pthread_self()):
+    constexpr explicit inline ThreadInfo(const std::size_t stackSize,
+                                         void* stackTop = __builtin_frame_address(0),
+                                         const unsigned long number = createThreadId(),
+                                         const std::thread::id& id = std::this_thread::get_id(),
+                                         const pthread_t& thread = pthread_self()):
         number(number), stackSize(stackSize), id(id), thread(thread), stackTop(stackTop) {}
 
     /**

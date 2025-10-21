@@ -722,7 +722,7 @@ void LSan::finish() {
 }
 
 void LSan::addThread() {
-    addThread({
+    addThread(ThreadInfo {
         findStackSize(),
         findStackBegin(),
         std::this_thread::get_id() == mainId ? 0 : ThreadInfo::createThreadId(),
