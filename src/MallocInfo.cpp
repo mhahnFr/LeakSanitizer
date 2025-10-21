@@ -91,7 +91,7 @@ auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
  * @param path the pair with the relative and absolute path
  * @return the path to be used
  */
-static inline auto maybeRelativate(const std::pair<const char*, const char*>& path) -> const char* {
+static inline auto maybeRelativize(const std::pair<const char*, const char*>& path) -> const char* {
     if (!behaviour::getBehaviour().relativePaths()) return path.first;
 
     const auto& s1 = path.first == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.first);
@@ -123,7 +123,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
     }
     stream << ", " << leakType;
     if (print && imageName.first != nullptr) {
-        stream << " in " << format<Style::BLUE>(maybeRelativate(imageName));
+        stream << " in " << format<Style::BLUE>(maybeRelativize(imageName));
     }
 
     std::size_t count { 0 },
