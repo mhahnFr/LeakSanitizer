@@ -43,10 +43,14 @@ static inline auto match(const suppression::Suppression::RangeOrRegexType& supp,
         return address >= begin && address <= begin + end;
     }
     const auto& suppressions = std::get<suppression::Suppression::RegexType>(supp.second);
+    const char* binaryFile = frame->binaryFile;
+    [[unlikely]] if (binaryFile == nullptr) {
+        binaryFile = "";
+    }
     return std::ranges::any_of(suppressions, [&](const std::regex& regex) {
         return frame->binaryFileIsSelf
-            || (std::regex_match("LSAN_SYSTEM_LIBRARIES", regex) && suppression::isFirstParty(frame->binaryFile, !callstack_autoClearCaches))
-            || std::regex_match(frame->binaryFile, regex);
+            || (std::regex_match("LSAN_SYSTEM_LIBRARIES", regex) && suppression::isFirstParty(binaryFile, !callstack_autoClearCaches))
+            || std::regex_match(binaryFile, regex);
     });
 }
 
