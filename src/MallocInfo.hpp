@@ -193,8 +193,6 @@ struct MallocInfo {
      */
     auto enumerate() -> std::pair<std::size_t, std::size_t>;
 
-    friend auto operator<<(std::ostream&, const MallocInfo&) -> std::ostream&;
-
 private:
     /** Flag used to deduplicate the memory leaks.              */
     bool flag = false;
@@ -245,6 +243,8 @@ private:
      * @return the thread number of the calling thread
      */
     static auto getThreadId() -> unsigned long;
+
+    friend auto operator<<(std::ostream&, const MallocInfo&) -> std::ostream&;
 };
 }
 
