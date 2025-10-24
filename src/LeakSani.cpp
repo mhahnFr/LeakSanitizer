@@ -45,6 +45,7 @@ extern "C" {
 # include <mach/thread_state.h>
 }
 
+# include <objc/objc-exception.h>
 # include <objc/runtime.h>
 
 # ifdef LSAN_HANDLE_OBJC
@@ -640,6 +641,9 @@ struct Initializer {
             if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
                 tryCatch_setTerminateHandler(mhExceptionHandler);
             }
+#ifdef __APPLE__
+            objc_setUncaughtExceptionHandler(objcExceptionHandler);
+#endif
         });
     }
 };
