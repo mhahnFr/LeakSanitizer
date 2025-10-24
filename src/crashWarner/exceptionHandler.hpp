@@ -22,6 +22,10 @@
 #ifndef exceptionHandler_hpp
 #define exceptionHandler_hpp
 
+#ifdef __APPLE__
+# include <objc/objc.h>
+#endif
+
 namespace lsan {
 /**
  * @brief Handles the current exception pointer that is available.
@@ -36,6 +40,10 @@ namespace lsan {
  * Terminates the linked application.
  */
 [[ noreturn ]] void mhExceptionHandler() noexcept;
+
+#ifdef __APPLE__
+[[ noreturn ]] void objcExceptionHandler(id exception) noexcept;
+#endif
 }
 
 #endif /* exceptionHandler_hpp */
