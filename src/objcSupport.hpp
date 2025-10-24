@@ -23,14 +23,12 @@
 #define objcSupport_hpp
 
 #ifdef __APPLE__
-#include <objc/runtime.h>
-
-extern "C" id objc_msgSend(id, SEL, ...);
+#include <objc/message.h>
 
 #define CLASS(name) objc_getClass(#name)
 #define SELECTOR(name) sel_registerName(#name)
 
-#define CALL(receiver, selName, ...) objc_msgSend((id) (receiver), SELECTOR(selName) __VA_OPT__(,) __VA_ARGS__)
+#define CALL(receiver, selName, ...) reinterpret_cast<id(*)(id, SEL, ...)>(objc_msgSend)((id) (receiver), SELECTOR(selName) __VA_OPT__(,) __VA_ARGS__)
 #define CALL_CLASS(clsName, selName, ...) CALL(CLASS(clsName), selName __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef OBJC_SUPPORT_EXTRA
