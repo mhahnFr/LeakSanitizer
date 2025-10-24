@@ -71,10 +71,10 @@ SUPP_SRCS = \
 SUPP_HS = $(patsubst %.json, %.hpp, $(SUPP_SRCS))
 DEFAULT_SUPP_CPP = src/suppression/defaultSuppression.cpp
 
-LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack -ldl
-CXXFLAGS = -std=c++23 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -Ofast
-
 LINUX_SONAME_FLAG = -Wl,-soname,$(abspath $@)
+
+LDFLAGS  = -L$(LIBCALLSTACK_DIR) -lcallstack -ldl $(LINUX_SONAME_FLAG)
+CXXFLAGS = -std=c++23 -Wall -Wextra -pedantic -fPIC -I 'include' -I CallstackLibrary/include -I SimpleJSON/include -I suppressions -Ofast
 
 VERSION = "clean build"
 GIT_VERSION = $(shell git describe --tags --abbrev=1)
