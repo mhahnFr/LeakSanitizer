@@ -43,6 +43,7 @@ extern "C" {
 # include <mach/thread_state.h>
 }
 
+# include <objc/objc-exception.h>
 # include <objc/runtime.h>
 
 # include "macos/bundle.hpp"
@@ -646,6 +647,7 @@ struct Initializer {
 #ifdef __APPLE__
             // FIXME: Too early for macOS 14!
             getInstance().crashHandlerPath = macos::bundle::getCrashHandlerPath();
+            objc_setUncaughtExceptionHandler(objcExceptionHandler);
 #endif
         });
     }

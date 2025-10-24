@@ -19,16 +19,24 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "exceptionHandler.hpp"
+
+#include <callstack_exception.hpp>
 #include <cxxabi.h>
 #include <exception>
 #include <sstream>
 #include <typeinfo>
 
-#include <callstack_exception.hpp>
+#ifdef __APPLE__
+# include <CoreFoundation/CFNumber.h>
+# include <CoreFoundation/CFString.h>
+# include <objc/runtime.h>
 
-#include "exceptionHandler.hpp"
+# define OBJC_SUPPORT_EXTRA 1
+# include "../objcSupport.hpp"
+#endif
+
 #include "crashForce.hpp"
-
 #include "../lsanMisc.hpp"
 #include "../utils.hpp"
 
@@ -104,4 +112,46 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     }
     crashWarner::crashForce("Terminating with unknown exception");
 }
+
+#ifdef __APPLE__
+static inline auto convertCFString(const CFStringRef str) -> std::optional<std::string> {
+    if (str == nil) return std::nullopt;
+
+    if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8); cStr != nullptr) {
+        return cStr;
+    }
+    auto toReturn = std::string(std::string::size_type(CFStringGetLength(str)), '\0');
+    return CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8) ? std::make_optional(toReturn) : std::nullopt;
+}
+
+void objcExceptionHandler(const id exception) noexcept {
+    auto stream = std::ostringstream();
+    stream << "Uncaught exception of type " << object_getClassName(exception);
+
+    std::optional<lcs::callstack> callstack;
+    if (_1(exception, isKindOfClass:, objc_getClass("NSException"))) {
+        if (const auto name = convertCFString(CFStringRef(_1(exception, name)))) {
+            stream << ", name: " << *name;
+        }
+        if (const auto reason = convertCFString(CFStringRef(_1(exception, reason)))) {
+            stream << ", reason: " << *reason;
+        }
+        if (const auto cs = CFArrayRef(_1(exception, callStackReturnAddresses)); cs != nil) {
+            callstack = lcs::callstack(false);
+            const auto size = CFArrayGetCount(cs);
+            for (CFIndex i = 0; i < size; ++i) {
+                const auto value = CFNumberRef(CFArrayGetValueAtIndex(cs, i));
+                unsigned long number;
+                CFNumberGetValue(value, CFNumberGetType(value), &number);
+                (*callstack)->backtrace[i] = reinterpret_cast<void*>(number);
+            }
+            (*callstack)->backtraceSize = size;
+        }
+    }
+    if (callstack) {
+        crashForce(stream.str(), std::nullopt, std::move(*callstack));
+    }
+    crashForce(stream.str());
+}
+#endif
 }
