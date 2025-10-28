@@ -20,10 +20,10 @@
  */
 
 #include "../../crashWarner/crashForce.hpp"
+#include "../../formatter/formatter.hpp"
 #include "../../macos/bundle.hpp"
 #include "../../signals/SignalInfo.hpp"
 #include "../../suppression/systemLibraryLoader.hpp"
-#include "../../formatter/formatter.hpp"
 
 using namespace lsan;
 
