@@ -40,8 +40,16 @@ void killBundle() {
 auto getCrashHandlerPath() -> std::string {
     return getTracker().withIgnorationResult(false, [] {
         const auto result = CFBundleCopyResourceURL(getBundle(), CFSTR("CrashHandler"), nil, nil);
+        [[unlikely]] if (result == nil) {
+            return std::string {};
+        }
+
         const auto path = CFURLCopyPath(result);
         CFRelease(result);
+        [[unlikely]] if (path == nil) {
+            return std::string {};
+        }
+
         const auto& toReturn = convertCFString(path);
         CFRelease(path);
         return toReturn;
