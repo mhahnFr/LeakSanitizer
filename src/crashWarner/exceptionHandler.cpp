@@ -149,9 +149,9 @@ void objcExceptionHandler(const id exception) noexcept {
         }
     }
     if (callstack) {
-        crashForce(stream.str(), std::nullopt, std::move(*callstack));
+        crashWarner::crashForce(stream.str(), std::nullopt, std::move(*callstack));
     }
-    crashForce(stream.str());
+    crashWarner::crashForce(stream.str());
 }
 #endif
 }
