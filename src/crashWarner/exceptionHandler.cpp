@@ -131,10 +131,10 @@ void objcExceptionHandler(id exception) noexcept {
     std::optional<lcs::callstack> callstack;
     if (_1(exception, isKindOfClass:, objc_getClass("NSException"))) {
         if (const auto name = convertCFString(CFStringRef(_1(exception, name)))) {
-            stream << ", name: " << *name;
+            stream << ", name: \"" << *name << "\"";
         }
         if (const auto reason = convertCFString(CFStringRef(_1(exception, reason)))) {
-            stream << ", reason: " << *reason;
+            stream << ", reason: \"" << *reason << "\"";
         }
         if (const auto cs = CFArrayRef(_1(exception, callStackReturnAddresses)); cs != nil) {
             callstack = lcs::callstack(false);
