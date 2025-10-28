@@ -124,7 +124,7 @@ static inline auto convertCFString(const CFStringRef str) -> std::optional<std::
     return CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8) ? std::make_optional(toReturn) : std::nullopt;
 }
 
-void objcExceptionHandler(const id exception) noexcept {
+void objcExceptionHandler(id exception) noexcept {
     auto stream = std::ostringstream();
     stream << "Uncaught exception of type " << object_getClassName(exception);
 
@@ -145,7 +145,7 @@ void objcExceptionHandler(const id exception) noexcept {
                 CFNumberGetValue(value, CFNumberGetType(value), &number);
                 (*callstack)->backtrace[i] = reinterpret_cast<void*>(number);
             }
-            (*callstack)->backtraceSize = size;
+            (*callstack)->backtraceSize = static_cast<unsigned long>(size);
         }
     }
     if (callstack) {
