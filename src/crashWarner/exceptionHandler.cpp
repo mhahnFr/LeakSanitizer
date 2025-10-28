@@ -126,10 +126,11 @@ static inline auto convertCFString(const CFStringRef str) -> std::optional<std::
 
 void objcExceptionHandler(id exception) noexcept {
     auto stream = std::ostringstream();
-    stream << "Uncaught exception of type " << object_getClassName(exception);
+    const auto cls = object_getClass(exception);
+    stream << "Uncaught exception of type " << class_getName(cls);
 
     std::optional<lcs::callstack> callstack;
-    if (_1(exception, isKindOfClass:, objc_getClass("NSException"))) {
+    if (const auto nsExCls = objc_getClass("NSException"); _1(exception, isKindOfClass:, nsExCls) || cls == nsExCls) {
         if (const auto name = convertCFString(CFStringRef(_1(exception, name)))) {
             stream << ", name: \"" << *name << "\"";
         }
