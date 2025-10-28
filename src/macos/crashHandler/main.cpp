@@ -23,6 +23,7 @@
 #include "../../macos/bundle.hpp"
 #include "../../signals/SignalInfo.hpp"
 #include "../../suppression/systemLibraryLoader.hpp"
+#include "../../formatter/formatter.hpp"
 
 using namespace lsan;
 
@@ -47,10 +48,19 @@ auto macos::bundle::getBundle() -> CFBundleRef {
     return bundle;
 }
 
+[[noreturn]] static inline void error(const std::string& message) {
+    std::cerr << formatter::format<formatter::Style::RED, formatter::Style::BOLD>(message) << std::endl;
+    abort();
+}
+
 auto main(int argc, const char** argv) -> int {
     using namespace signals;
 
-    // TODO: Safety!!!
+    // FIXME: More safety
+    [[unlikely]] if (argc != 4) {
+        error("Not enough arguments provided for the crash handler of mhahnFr's LeakSanitizer!");
+    }
+
     auto info = SignalInfo::fromBinary(argv[2], sizeof(SignalInfo), argv[1][0]);
     const auto _ = info.callstack.absolutize(argv + 3);
     const auto& [message, reason] = createCrashMessage(info.code, info.siCode, info.faultAddress);
