@@ -718,8 +718,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F13529B32D1083FD002534D0 /* CallstackLibrary */,
 				BFCDA7E62E2F7C2C0029AEC1 /* LeakSanitizer */,
+				F13529B32D1083FD002534D0 /* CallstackLibrary */,
 				F1EDCE952E65876D007E260E /* CrashHandler */,
 			);
 		};
