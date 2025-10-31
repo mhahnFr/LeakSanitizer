@@ -42,6 +42,9 @@ auto readFile(const std::filesystem::path& path) -> std::string {
 }
 
 auto loadResource(const CFURLRef url) -> std::string {
+    [[unlikely]] if (url == nil) {
+        throw std::runtime_error("Resource URL is nil");
+    }
     const auto path = CFURLCopyPath(url);
     CFRelease(url);
     const auto& pathStr = convertCFString(path);
