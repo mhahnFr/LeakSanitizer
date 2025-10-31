@@ -55,10 +55,10 @@ auto macos::bundle::getBundle() -> CFBundleRef {
     std::cerr << get<Style::RED> << "CrashHandler of mhahnFr's LeakSanitizer: Error: "
               << format<Style::BOLD>(message) << "!"
               << clear<Style::RED> << std::endl;
-    abort();
+    exit(EXIT_FAILURE);
 }
 
-auto main(int argc, const char** argv) -> int {
+[[noreturn]] auto main(int argc, const char** argv) -> int {
     using namespace signals;
 
     // FIXME: More safety
