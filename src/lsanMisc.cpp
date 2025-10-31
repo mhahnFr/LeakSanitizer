@@ -103,11 +103,13 @@ auto printInformation(std::ostream & out) -> std::ostream & {
 
 void exitHook() {
     getInstance().finish();
-    getTracker().ignoreMalloc = true;
-    getOutputStream() << maybePrintExitPoint
-                      << std::endl     << std::endl
-                      << getInstance() << std::endl
-                      << printInformation;
+    [[likely]] if (!has("\t\n\f\vLSAN_SUPPRESSED_BY_CRASH_HANDLER")) {
+        getTracker().ignoreMalloc = true;
+        getOutputStream() << maybePrintExitPoint
+        << std::endl     << std::endl
+        << getInstance() << std::endl
+        << printInformation;
+    }
     internalCleanUp();
 }
 

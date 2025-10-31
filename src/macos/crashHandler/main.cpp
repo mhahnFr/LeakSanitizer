@@ -78,6 +78,7 @@ auto macos::bundle::getBundle() -> CFBundleRef {
     [[unlikely]] if (argc - 3 != info.callstack->backtraceSize) {
         error("Wrong number of binary file paths");
     }
+    setenv("\t\n\f\vLSAN_SUPPRESSED_BY_CRASH_HANDLER", "", false);
     const auto _ = info.callstack.absolutize(argv + 3);
     const auto& [message, reason] = createCrashMessage(info.code, info.siCode, info.faultAddress);
     crashWarner::crashForce(message, reason, std::move(info.callstack));
