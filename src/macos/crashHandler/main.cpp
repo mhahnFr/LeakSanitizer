@@ -45,6 +45,9 @@ auto macos::bundle::convertCFString(CFStringRef str) -> std::string {
 
 auto macos::bundle::getBundle() -> CFBundleRef {
     static auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
+    [[unlikely]] if (bundle == nil) {
+        throw std::runtime_error("Bundle not loaded");
+    }
     return bundle;
 }
 
