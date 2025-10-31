@@ -49,7 +49,12 @@ auto macos::bundle::getBundle() -> CFBundleRef {
 }
 
 [[noreturn]] static inline void error(const std::string& message) {
-    std::cerr << formatter::format<formatter::Style::RED, formatter::Style::BOLD>(message) << std::endl;
+    using namespace formatter;
+    using formatter::Style;
+
+    std::cerr << get<Style::RED> << "CrashHandler of mhahnFr's LeakSanitizer: Error: "
+              << format<Style::BOLD>(message) << "!"
+              << clear<Style::RED> << std::endl;
     abort();
 }
 
