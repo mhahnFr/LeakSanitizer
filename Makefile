@@ -134,12 +134,12 @@ $(LIBCALLSTACK_A):
 clean:
 	- $(RM) $(OBJS) $(DEPS)
 	- $(RM) $(SUPP_HS)
-	- $(RM) $(SHARED_L) $(DYLIB_NA)
+	- $(RM) $(NAME)
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) clean
 
 re: clean
 	$(MAKE) all
 
-.PHONY: re clean all install uninstall release default update bench debug
+.PHONY: re clean all install uninstall release update bench debug
 
 -include $(DEPS)
