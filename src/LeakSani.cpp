@@ -645,8 +645,6 @@ struct Initializer {
                 tryCatch_setTerminateHandler(mhExceptionHandler);
             }
 #ifdef __APPLE__
-            // FIXME: Too early for macOS 14!
-            getInstance().crashHandlerPath = macos::bundle::getCrashHandlerPath();
             objc_setUncaughtExceptionHandler(objcExceptionHandler);
 #endif
         });

@@ -28,6 +28,8 @@
 # undef _XOPEN_SOURCE
 
 # include <unistd.h>
+
+# include "../macos/bundle.hpp"
 #endif /* __APPLE__ */
 
 #include "signalHandlers.hpp"
@@ -113,7 +115,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 
 #ifdef __APPLE__
 [[ noreturn ]] static inline void crashWithTraceRemote(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
-    const auto& path = getInstance().crashHandlerPath;
+    const auto& path = macos::bundle::getCrashHandlerPath();
     [[unlikely]] if (path.empty()) {
         crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
     }
@@ -149,10 +151,11 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 #endif
 
 [[ noreturn ]] void crashWithTrace(const int signalCode, const siginfo_t* signalContext, void* executionContext) {
+    LSan::finished = true;
 #ifdef __APPLE__
     getTracker().ignoreMalloc = true;
 #else
-    LSan::crashed = LSan::finished = true;
+    LSan::crashed = true;
 #endif
     auto callstack = createCallstackFor(executionContext);
 #ifdef __APPLE__
