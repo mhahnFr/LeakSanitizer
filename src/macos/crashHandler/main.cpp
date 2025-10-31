@@ -64,12 +64,20 @@ auto macos::bundle::getBundle() -> CFBundleRef {
 [[noreturn]] auto main(int argc, const char** argv) -> int {
     using namespace signals;
 
-    // FIXME: More safety
-    [[unlikely]] if (argc != 4) {
-        error("Not enough arguments provided for the crash handler of mhahnFr's LeakSanitizer!");
+    [[unlikely]] if (argc < 3) {
+        error("Not enough arguments provided");
+    }
+    [[unlikely]] if (strlen(argv[1]) != 1) {
+        error("Zero replacement is not a single byte");
+    }
+    [[unlikely]] if (strlen(argv[2]) != sizeof(SignalInfo)) {
+        error("Passed wrong number of bytes");
     }
 
     auto info = SignalInfo::fromBinary(argv[2], sizeof(SignalInfo), argv[1][0]);
+    [[unlikely]] if (argc - 3 != info.callstack->backtraceSize) {
+        error("Wrong number of binary file paths");
+    }
     const auto _ = info.callstack.absolutize(argv + 3);
     const auto& [message, reason] = createCrashMessage(info.code, info.siCode, info.faultAddress);
     crashWarner::crashForce(message, reason, std::move(info.callstack));
