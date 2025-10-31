@@ -25,7 +25,7 @@
 
 namespace lsan::macos::bundle {
 auto getBundle() -> CFBundleRef {
-    static auto bundle = getTracker().withIgnorationResult(false, [] {
+    static auto bundle = getTracker().withIgnorationResult(true, [] {
         return CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
     });
     return bundle;
