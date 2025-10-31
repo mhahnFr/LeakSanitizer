@@ -221,10 +221,6 @@ public:
     bool hasPrintedExit = false;
     /** Whether indirect memory leaks have been found.                    */
     bool hadIndirects = false;
-#ifdef __APPLE__
-    /** The path to the bundled crash handler.                            */
-    std::string crashHandlerPath;
-#endif
 
     LSan();
    ~LSan() override;
