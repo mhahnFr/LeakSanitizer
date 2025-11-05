@@ -25,6 +25,11 @@
 #include "Behaviour.hpp"
 
 namespace lsan::behaviour {
+/**
+ * Aquires the behaviour object and returns a reference to it.
+ *
+ * @return the behaviour object to be used
+ */
 auto getBehaviour() -> const Behaviour&;
 }
 
