@@ -24,6 +24,8 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan::macos::bundle {
+constexpr static inline auto IGNORE_OBJC = false;
+
 auto getBundle() -> CFBundleRef {
     static auto bundle = getTracker().withIgnorationResult(true, [] {
         return CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
@@ -32,13 +34,13 @@ auto getBundle() -> CFBundleRef {
 }
 
 void killBundle() {
-    getTracker().withIgnoration(false, [] {
+    getTracker().withIgnoration(IGNORE_OBJC, [] {
         CFRelease(getBundle());
     });
 }
 
 auto getCrashHandlerPath() -> std::string {
-    return getTracker().withIgnorationResult(false, [] {
+    return getTracker().withIgnorationResult(IGNORE_OBJC, [] {
         const auto result = CFBundleCopyResourceURL(getBundle(), CFSTR("CrashHandler"), nil, nil);
         [[unlikely]] if (result == nil) {
             return std::string {};
@@ -60,7 +62,7 @@ auto getCrashHandlerPath() -> std::string {
 constexpr inline auto DEFAULT_VERSION = std::string("CLEAN BUILD");
 
 auto getVersion() -> std::string {
-    return getTracker().withIgnorationResult(false, [] -> std::string {
+    return getTracker().withIgnorationResult(IGNORE_OBJC, [] -> std::string {
         const auto value = CFBundleGetValueForInfoDictionaryKey(getBundle(), kCFBundleVersionKey);
         [[unlikely]] if (value == nil) {
             return DEFAULT_VERSION;
@@ -73,17 +75,17 @@ auto convertCFString(const CFStringRef str) -> std::string {
     [[unlikely]] if (str == nil) return {};
 
     auto& tracker = getTracker();
-    const auto cStr = tracker.withIgnorationResult(false, [str] {
+    const auto cStr = tracker.withIgnorationResult(IGNORE_OBJC, [str] {
         return CFStringGetCStringPtr(str, kCFStringEncodingUTF8);
     });
     [[likely]] if (cStr != nullptr) {
         return cStr;
     }
 
-    auto toReturn = std::string(std::string::size_type(tracker.withIgnorationResult(false, [str] {
+    auto toReturn = std::string(std::string::size_type(tracker.withIgnorationResult(IGNORE_OBJC, [str] {
         return CFStringGetLength(str);
     })), '\0');
-    return tracker.withIgnorationResult(false, [&toReturn, str] {
+    return tracker.withIgnorationResult(IGNORE_OBJC, [&toReturn, str] {
         return CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8);
     }) ? toReturn : std::string {};
 }
