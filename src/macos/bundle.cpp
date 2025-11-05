@@ -71,8 +71,8 @@ auto getVersion() -> std::string {
     });
 }
 
-auto convertCFString(const CFStringRef str) -> std::string {
-    [[unlikely]] if (str == nil) return {};
+auto convertCFString(const CFStringRef str) -> std::optional<std::string> {
+    [[unlikely]] if (str == nil) return std::nullopt;
 
     auto& tracker = getTracker();
     const auto cStr = tracker.withIgnorationResult(IGNORE_OBJC, [str] {
@@ -87,6 +87,6 @@ auto convertCFString(const CFStringRef str) -> std::string {
     })), '\0');
     return tracker.withIgnorationResult(IGNORE_OBJC, [&toReturn, str] {
         return CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8);
-    }) ? toReturn : std::string {};
+    }) ? std::make_optional(toReturn) : std::nullopt;
 }
 }

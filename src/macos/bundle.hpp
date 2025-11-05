@@ -23,6 +23,7 @@
 #define bundle_hpp
 
 #include <filesystem>
+#include <optional>
 #include <string>
 
 #include <CoreFoundation/CFBundle.h>
@@ -65,9 +66,9 @@ auto getVersion() -> std::string;
  * Returns an empty string if the convertion failed.
  *
  * @param str the @c CFStringRef to be converted
- * @return the @c std::string representation
+ * @return the optional @c std::string representation
  */
-auto convertCFString(CFStringRef str) -> std::string;
+auto convertCFString(CFStringRef str) -> std::optional<std::string>;
 
 namespace shared {
 auto readFile(const std::filesystem::path& path) -> std::string;
