@@ -32,15 +32,15 @@ auto suppression::getSystemLibraries() -> const std::vector<std::regex>& {
     return supps;
 }
 
-auto macos::bundle::convertCFString(CFStringRef str) -> std::string {
-    [[unlikely]] if (str == nil) return {};
+auto macos::bundle::convertCFString(CFStringRef str) -> std::optional<std::string> {
+    [[unlikely]] if (str == nil) return std::nullopt;
 
     const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8);
     [[likely]] if (cStr != nullptr) {
         return cStr;
     }
     auto toReturn = std::string(std::string::size_type(CFStringGetLength(str)), '\0');
-    return CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8) ? toReturn : std::string {};
+    return CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8) ? std::make_optional(toReturn) : std::nullopt;
 }
 
 auto macos::bundle::getBundle() -> CFBundleRef {
