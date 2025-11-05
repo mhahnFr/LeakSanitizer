@@ -34,6 +34,7 @@
 
 # define OBJC_SUPPORT_EXTRA 1
 # include "../objcSupport.hpp"
+# include "../macos/bundle.hpp"
 #endif
 
 #include "crashForce.hpp"
@@ -131,10 +132,10 @@ void objcExceptionHandler(id exception) noexcept {
 
     std::optional<lcs::callstack> callstack;
     if (const auto nsExCls = objc_getClass("NSException"); _1(exception, isKindOfClass:, nsExCls) || cls == nsExCls) {
-        if (const auto name = convertCFString(CFStringRef(_1(exception, name)))) {
+        if (const auto name = macos::bundle::convertCFString(CFStringRef(_1(exception, name)))) {
             stream << ", name: \"" << *name << "\"";
         }
-        if (const auto reason = convertCFString(CFStringRef(_1(exception, reason)))) {
+        if (const auto reason = macos::bundle::convertCFString(CFStringRef(_1(exception, reason)))) {
             stream << ", reason: \"" << *reason << "\"";
         }
         if (const auto cs = CFArrayRef(_1(exception, callStackReturnAddresses)); cs != nil) {
