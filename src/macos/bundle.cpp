@@ -54,7 +54,7 @@ auto getCrashHandlerPath() -> std::string {
 
         const auto& toReturn = convertCFString(path);
         CFRelease(path);
-        return toReturn;
+        return toReturn.value_or("");
     });
 }
 
@@ -67,7 +67,7 @@ auto getVersion() -> std::string {
         [[unlikely]] if (value == nil) {
             return DEFAULT_VERSION;
         }
-        return convertCFString(CFStringRef(value));
+        return convertCFString(CFStringRef(value)).value_or(DEFAULT_VERSION);
     });
 }
 

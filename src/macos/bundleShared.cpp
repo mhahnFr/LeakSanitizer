@@ -49,6 +49,6 @@ auto loadResource(const CFURLRef url) -> std::string {
     CFRelease(url);
     const auto& pathStr = convertCFString(path);
     CFRelease(path);
-    return readFile(pathStr);
+    return readFile(pathStr.value());
 }
 }
