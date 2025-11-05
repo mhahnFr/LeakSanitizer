@@ -652,7 +652,7 @@ struct Initializer {
 };
 
 /** The hidden global variable delaying the initialization of some systems. */
-Initializer initializer;
+Initializer initializer __attribute__((used));
 }
 
 LSan::LSan(): saniKey(createSaniKey()), signalStack(signals::createAlternativeStack(real::malloc)) {
