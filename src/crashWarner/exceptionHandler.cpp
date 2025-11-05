@@ -115,16 +115,6 @@ static inline auto demangle(const char * string) noexcept -> std::string {
 }
 
 #ifdef __APPLE__
-static inline auto convertCFString(const CFStringRef str) -> std::optional<std::string> {
-    if (str == nil) return std::nullopt;
-
-    if (const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8); cStr != nullptr) {
-        return cStr;
-    }
-    auto toReturn = std::string(std::string::size_type(CFStringGetLength(str)), '\0');
-    return CFStringGetCString(str, toReturn.data(), CFIndex(toReturn.capacity()), kCFStringEncodingUTF8) ? std::make_optional(toReturn) : std::nullopt;
-}
-
 void objcExceptionHandler(id exception) noexcept {
     auto stream = std::ostringstream();
     const auto cls = object_getClass(exception);
