@@ -91,6 +91,6 @@ public:
 };
 
 /** The hidden global variable of the auto stats printer. */
-AutoStats autoStats;
+AutoStats autoStats __attribute((used));
 }
 }
