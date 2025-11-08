@@ -70,8 +70,25 @@ auto getVersion() -> std::string;
  */
 auto convertCFString(CFStringRef str) -> std::optional<std::string>;
 
+/**
+ * This namespace includes the implemntation shared by the sanitizer and the
+ * crash handler.
+ */
 namespace shared {
+/**
+ * Reads the given file from disc and returns its contents.
+ *
+ * @param path the file path
+ * @return the contents
+ */
 auto readFile(const std::filesystem::path& path) -> std::string;
+
+/**
+ * Loads the resource represented by the given @c CFURLRef .
+ *
+ * @param url the url of the resource to load
+ * @return the contents
+ */
 auto loadResource(CFURLRef url) -> std::string;
 }
 }
