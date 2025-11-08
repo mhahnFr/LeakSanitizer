@@ -82,7 +82,7 @@ static inline void printStatsCore(const std::string & statsName, const std::size
 }
 
 /**
- * @brief A function that prints a bar using the given parameters.
+ * Prints a bar using the given parameters.
  *
  * @param current the current amount
  * @param peek the peek amount
@@ -113,7 +113,7 @@ static inline void printBar(const std::size_t   current,
 }
 
 /**
- * @brief Prints a bar representing the fragmentation of the allocated objects.
+ * Prints a bar representing the fragmentation of the allocated objects.
  *
  * @param width the width in characters the bar should have
  * @param out the output stream to print to
@@ -200,7 +200,7 @@ static inline void printFragmentationObjectBar(const std::size_t width, std::ost
 }
 
 /**
- * @brief Prints a bar representing the fragmentation of the allocated bytes.
+ * Prints a bar representing the fragmentation of the allocated bytes.
  *
  * @param width the width in characters the bar should have
  * @param out the output stream to print to
