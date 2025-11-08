@@ -42,6 +42,13 @@ namespace lsan {
 [[ noreturn ]] void mhExceptionHandler() noexcept;
 
 #ifdef __APPLE__
+/**
+ * @brief Handles the uncaught exception thrown using the Objective-C runtime.
+ *
+ * Terminates the linked application.
+ *
+ * @param exception the thrown exception object
+ */
 [[ noreturn ]] void objcExceptionHandler(id exception) noexcept;
 #endif
 }
