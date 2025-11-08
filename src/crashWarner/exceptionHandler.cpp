@@ -115,7 +115,7 @@ static inline auto demangle(const char * string) noexcept -> std::string {
 }
 
 #ifdef __APPLE__
-void objcExceptionHandler(id exception) noexcept {
+[[noreturn]] void objcExceptionHandler(id exception) noexcept {
     auto stream = std::ostringstream();
     const auto cls = object_getClass(exception);
     stream << "Uncaught exception of type " << class_getName(cls);
