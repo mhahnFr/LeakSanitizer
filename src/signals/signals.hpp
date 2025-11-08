@@ -63,6 +63,13 @@ auto registerFunction(void* function, int signal, bool useAltStack = false, bool
  */
 auto registerFunction(void (*function)(int), int signal) -> bool;
 
+/**
+ * Creates a alternative stack for the signal handling, registers it and
+ * returns its memory address.
+ *
+ * @param allocator the allocation function to be used
+ * @return the allocated stack or @c nullptr on error
+ */
 auto createAlternativeStack(void*(&allocator)(std::size_t)) -> void*;
 
 /**
