@@ -24,6 +24,7 @@
 #include "../lsanMisc.hpp"
 
 namespace lsan::macos::bundle {
+/** Indicates whether to ignore Objective-C related allocations. */
 constexpr static inline auto IGNORE_OBJC = false;
 
 auto getBundle() -> CFBundleRef {
