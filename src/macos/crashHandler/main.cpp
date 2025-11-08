@@ -51,6 +51,11 @@ auto macos::bundle::getBundle() -> CFBundleRef {
     return bundle;
 }
 
+/**
+ * Exits the crash handler and prints the given error message.
+ *
+ * @param message the message to print prior to failure exiting
+ */
 [[noreturn]] static inline void error(const std::string& message) {
     using namespace formatter;
     using formatter::Style;
