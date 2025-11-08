@@ -108,12 +108,26 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     return toReturn;
 }
 
+/**
+ * Handles the crash signal in the calling process.
+ *
+ * @param signalCode the code of the handled signal
+ * @param signalContext the signal info context
+ * @param callstack the crash callstack
+ */
 [[ noreturn ]] static inline void crashWithTraceLocal(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
     const auto [message, reasonDescription] = createCrashMessage(signalCode, signalContext->si_code, signalContext->si_addr);
     crashWarner::crashForce(message, reasonDescription, std::move(callstack));
 }
 
 #ifdef __APPLE__
+/**
+ * Handles the crash signal using the crash handler.
+ *
+ * @param signalCode the code of the signal
+ * @param signalContext the signal info context
+ * @param callstack the crash callstack
+ */
 [[ noreturn ]] static inline void crashWithTraceRemote(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
     const auto& path = macos::bundle::getCrashHandlerPath();
     [[unlikely]] if (path.empty()) {
