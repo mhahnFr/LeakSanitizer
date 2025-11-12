@@ -986,7 +986,7 @@ static inline auto showIgnoration(std::ostream& out) -> std::ostream& {
             strncmp(*it, "LSAN_", 5) == 0 && std::ranges::find(VARS, var) == std::end(VARS)) {
             if (first) {
                 first = false;
-                out << std::endl << get<Style::BOLD, Style::AMBER> << "Unknown variables ignored:" << std::endl;
+                out << std::endl << get<Style::BOLD, Style::AMBER> << "Unknown environment variables ignored:" << std::endl;
             }
             out << hinter::hintBegin << "\"" << var << "\"" << std::endl;
         }
