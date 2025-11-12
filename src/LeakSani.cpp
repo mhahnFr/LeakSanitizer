@@ -969,10 +969,22 @@ static inline auto showIgnoration(std::ostream& out) -> std::ostream& {
         "LSAN_STATS_ACTIVE",
         "LSAN_AUTO_STATS",
     };
+    using namespace formatter;
+    auto first = true;
     for (auto it = environ; *it != nullptr; ++it) {
-        if (strncmp(*it, "LSAN_", 5) == 0 && std::ranges::find(VARS, std::string(*it)) == std::end(VARS)) {
-            __builtin_printf("Unknown: %s\n", *it);
+        const auto line = std::string(*it);
+        const auto equal = line.find('=');
+        const auto var = std::string(*it, equal == std::string::npos ? line.size() : equal);
+        if (strncmp(*it, "LSAN_", 5) == 0 && std::ranges::find(VARS, var) == std::end(VARS)) {
+            if (first) {
+                first = false;
+                out << std::endl << get<Style::BOLD, Style::AMBER> << "Unknown variables ignored:" << std::endl;
+            }
+            out << hinter::hintBegin << "\"" << var << "\"" << std::endl;
         }
+    }
+    if (!first) {
+        out << clear<Style::BOLD, Style::AMBER>;
     }
     return out;
 }
