@@ -968,6 +968,14 @@ static inline auto showIgnoration(std::ostream& out) -> std::ostream& {
         "LSAN_RELATIVE_PATHS",
         "LSAN_STATS_ACTIVE",
         "LSAN_AUTO_STATS",
+
+        // Deprecated, so don't show ignoration:
+        "LSAN_PRINT_STATS_ON_EXIT",
+        "LSAN_PRINT_LICENSE",
+        "LSAN_PRINT_WEBSITE",
+        "LSAN_FIRST_PARTY_THRESHOLD",
+        "LSAN_FIRST_PARTY_REGEX",
+        "LSAN_LEAK_COUNT",
     };
     using namespace formatter;
     auto first = true;
