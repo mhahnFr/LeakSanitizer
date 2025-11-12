@@ -948,42 +948,42 @@ static inline auto maybeShowDeprecationWarnings(std::ostream& out) -> std::ostre
 }
 
 static inline auto showIgnoration(std::ostream& out) -> std::ostream& {
-    constexpr const char* VARS[] = {
-        "LSAN_SUPPRESSION_FILES",
-        "LSAN_SYSTEM_LIBRARY_FILES",
-        "LSAN_CALLSTACK_SIZE",
-        "LSAN_SUPPRESSION_DEVELOPER",
-        "LSAN_INDIRECT_LEAKS",
-        "LSAN_REACHABLE_LEAKS",
-        "LSAN_HUMAN_PRINT",
-        "LSAN_PRINT_COUT",
-        "LSAN_PRINT_FORMATTED",
-        "LSAN_INVALID_CRASH",
-        "LSAN_INVALID_FREE",
-        "LSAN_FREE_NULL",
-        "LSAN_ZERO_ALLOCATION",
-        "LSAN_PRINT_EXIT_POINT",
-        "LSAN_PRINT_BINARIES",
-        "LSAN_PRINT_FUNCTIONS",
-        "LSAN_RELATIVE_PATHS",
-        "LSAN_STATS_ACTIVE",
-        "LSAN_AUTO_STATS",
-
-        // Deprecated, so don't show ignoration:
-        "LSAN_PRINT_STATS_ON_EXIT",
-        "LSAN_PRINT_LICENSE",
-        "LSAN_PRINT_WEBSITE",
-        "LSAN_FIRST_PARTY_THRESHOLD",
-        "LSAN_FIRST_PARTY_REGEX",
-        "LSAN_LEAK_COUNT",
-    };
     using namespace formatter;
     auto first = true;
     for (auto it = environ; *it != nullptr; ++it) {
+        constexpr const char* VARS[] = {
+            "LSAN_SUPPRESSION_FILES",
+            "LSAN_SYSTEM_LIBRARY_FILES",
+            "LSAN_CALLSTACK_SIZE",
+            "LSAN_SUPPRESSION_DEVELOPER",
+            "LSAN_INDIRECT_LEAKS",
+            "LSAN_REACHABLE_LEAKS",
+            "LSAN_HUMAN_PRINT",
+            "LSAN_PRINT_COUT",
+            "LSAN_PRINT_FORMATTED",
+            "LSAN_INVALID_CRASH",
+            "LSAN_INVALID_FREE",
+            "LSAN_FREE_NULL",
+            "LSAN_ZERO_ALLOCATION",
+            "LSAN_PRINT_EXIT_POINT",
+            "LSAN_PRINT_BINARIES",
+            "LSAN_PRINT_FUNCTIONS",
+            "LSAN_RELATIVE_PATHS",
+            "LSAN_STATS_ACTIVE",
+            "LSAN_AUTO_STATS",
+
+            // Deprecated, so don't show ignoration:
+            "LSAN_PRINT_STATS_ON_EXIT",
+            "LSAN_PRINT_LICENSE",
+            "LSAN_PRINT_WEBSITE",
+            "LSAN_FIRST_PARTY_THRESHOLD",
+            "LSAN_FIRST_PARTY_REGEX",
+            "LSAN_LEAK_COUNT",
+        };
         const auto line = std::string(*it);
         const auto equal = line.find('=');
-        const auto var = std::string(*it, equal == std::string::npos ? line.size() : equal);
-        if (strncmp(*it, "LSAN_", 5) == 0 && std::ranges::find(VARS, var) == std::end(VARS)) {
+        if (const auto var = std::string(*it, equal == std::string::npos ? line.size() : equal);
+            strncmp(*it, "LSAN_", 5) == 0 && std::ranges::find(VARS, var) == std::end(VARS)) {
             if (first) {
                 first = false;
                 out << std::endl << get<Style::BOLD, Style::AMBER> << "Unknown variables ignored:" << std::endl;
