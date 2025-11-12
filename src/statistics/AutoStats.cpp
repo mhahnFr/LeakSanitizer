@@ -26,6 +26,7 @@
 
 #include <lsan_stats.h>
 
+#include "../lsanMisc.hpp"
 #include "../behaviour/getBehaviour.hpp"
 
 namespace lsan {
@@ -70,6 +71,8 @@ class AutoStats {
 
 public:
     inline AutoStats() {
+        [[unlikely]] if (!shouldActivate()) return;
+
         using namespace std::chrono_literals;
 
         if (const auto duration = behaviour::getBehaviour().autoStats()) {
