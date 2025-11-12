@@ -82,6 +82,8 @@ auto loadSuppressions() -> std::vector<suppression::Suppression>;
  */
 auto createTLVSuppression() -> std::vector<suppression::Suppression>;
 
+auto shouldActivate() -> bool;
+
 namespace callstack {
 static inline void format(lcs::callstack& callstack, std::ostream& out, const std::string& indent = "") {
     auto& instance = getInstance();

@@ -103,7 +103,7 @@ auto printInformation(std::ostream & out) -> std::ostream & {
 
 void exitHook() {
     getInstance().finish();
-    [[likely]] if (!has("\t\n\f\vLSAN_SUPPRESSED_BY_CRASH_HANDLER")) {
+    [[likely]] if (shouldActivate()) {
         getTracker().ignoreMalloc = true;
         getOutputStream() << maybePrintExitPoint
         << std::endl     << std::endl
@@ -240,5 +240,9 @@ auto createTLVSuppression() -> std::vector<suppression::Suppression> {
 
 auto suppression::getSystemLibraries() -> const std::vector<std::regex>& {
     return LSan::getSystemLibraries();
+}
+
+auto shouldActivate() -> bool {
+    return !has("\t\n\f\vLSAN_SUPPRESSED_BY_CRASH_HANDLER");
 }
 }
