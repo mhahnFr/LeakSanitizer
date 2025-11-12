@@ -34,7 +34,7 @@ namespace lsan {
  * @param var the variable to be checked
  * @return whether the variable name is in the environment
  */
-auto has(const std::string& var) -> bool;
+auto has(const char* var) -> bool;
 
 /**
  * @brief Returns whether the output stream to print to is a TTY.

@@ -30,8 +30,8 @@
 #endif
 
 namespace lsan {
-auto has(const std::string& var) -> bool {
-    return getenv(var.c_str()) != nullptr;
+auto has(const char* var) -> bool {
+    return getenv(var) != nullptr;
 }
 
 auto isATTY() -> bool {
