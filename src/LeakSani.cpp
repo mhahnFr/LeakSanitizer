@@ -57,6 +57,8 @@ extern "C" {
 
 #endif
 
+extern "C" const char** environ;
+
 namespace lsan {
 std::atomic_bool LSan::finished = false;
 std::atomic_bool LSan::preventDealloc = false;
@@ -945,6 +947,36 @@ static inline auto maybeShowDeprecationWarnings(std::ostream& out) -> std::ostre
     return out;
 }
 
+static inline auto showIgnoration(std::ostream& out) -> std::ostream& {
+    constexpr const char* VARS[] = {
+        "LSAN_SUPPRESSION_FILES",
+        "LSAN_SYSTEM_LIBRARY_FILES",
+        "LSAN_CALLSTACK_SIZE",
+        "LSAN_SUPPRESSION_DEVELOPER",
+        "LSAN_INDIRECT_LEAKS",
+        "LSAN_REACHABLE_LEAKS",
+        "LSAN_HUMAN_PRINT",
+        "LSAN_PRINT_COUT",
+        "LSAN_PRINT_FORMATTED",
+        "LSAN_INVALID_CRASH",
+        "LSAN_INVALID_FREE",
+        "LSAN_FREE_NULL",
+        "LSAN_ZERO_ALLOCATION",
+        "LSAN_PRINT_EXIT_POINT",
+        "LSAN_PRINT_BINARIES",
+        "LSAN_PRINT_FUNCTIONS",
+        "LSAN_RELATIVE_PATHS",
+        "LSAN_STATS_ACTIVE",
+        "LSAN_AUTO_STATS",
+    };
+    for (auto it = environ; *it != nullptr; ++it) {
+        if (strncmp(*it, "LSAN_", 5) == 0 && std::ranges::find(VARS, std::string(*it)) == std::end(VARS)) {
+            __builtin_printf("Unknown: %s\n", *it);
+        }
+    }
+    return out;
+}
+
 /**
  * Prints the content of the given allocation record.
  *
@@ -1046,6 +1078,7 @@ auto operator<<(std::ostream& stream, LSan& self) -> std::ostream& {
     if (const auto& str = hints.str(); !str.empty()) {
         stream << std::endl << "Hints:" << std::endl << str;
     }
+    stream << showIgnoration;
     stream << maybeShowDeprecationWarnings;
     if (printedLeaks && self.behaviour.relativePaths()) {
         stream << std::endl << printWorkingDirectory;
