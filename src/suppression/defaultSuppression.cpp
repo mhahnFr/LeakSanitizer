@@ -70,7 +70,7 @@ auto getDefaultTLVSuppressions() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        shared::loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("tlv"), CFSTR("json"), nullptr)),
+        shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("tlv"), CFSTR("json"), nil)),
 #endif
     });
 
