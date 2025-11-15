@@ -27,8 +27,10 @@
 
 namespace lsan::trackers {
 /**
- * Represents a memory allocation tracker that forwards all allocations to the
- * global instance.
+ * @brief Represents a memory allocation tracker that forwards all allocations
+ * to the global instance.
+ *
+ * It does not do any tracking on its own.
  */
 class PseudoTracker final: public ATracker {
     /** The main global instance to forward all calls to. */
