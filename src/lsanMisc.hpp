@@ -86,9 +86,8 @@ auto shouldActivate() -> bool;
 
 namespace callstack {
 static inline void format(lcs::callstack& callstack, std::ostream& out, const std::string& indent = "") {
-    auto& instance = getInstance();
-    if (callstackHelper::format(std::move(callstack), out, indent)) {
-        instance.setCallstackSizeExceeded(true);
+    if (callstackHelper::format(callstack, out, indent)) {
+        getInstance().setCallstackSizeExceeded(true);
     }
 }
 
