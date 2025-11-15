@@ -25,7 +25,7 @@
 
 namespace lsan::macos::bundle {
 /** Indicates whether to ignore Objective-C related allocations. */
-constexpr static inline auto IGNORE_OBJC = false;
+constexpr static inline auto IGNORE_OBJC = true;
 
 auto getBundle() -> CFBundleRef {
     static auto bundle = getTracker().withIgnorationResult(true, [] {

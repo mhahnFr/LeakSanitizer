@@ -165,7 +165,6 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 #endif
 
 [[ noreturn ]] void crashWithTrace(const int signalCode, const siginfo_t* signalContext, void* executionContext) {
-    LSan::finished = true;
 #ifdef __APPLE__
     getTracker().ignoreMalloc = true;
 #else
