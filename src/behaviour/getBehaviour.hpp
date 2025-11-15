@@ -26,7 +26,7 @@
 
 namespace lsan::behaviour {
 /**
- * Aquires the behaviour object and returns a reference to it.
+ * Acquires the behaviour object and returns a reference to it.
  *
  * @return the behaviour object to be used
  */
