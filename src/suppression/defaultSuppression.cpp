@@ -37,8 +37,8 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        shared::loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("AppKit"), CFSTR("json"), nullptr)),
-        shared::loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("core"), CFSTR("json"), nullptr)),
+        shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("AppKit"), CFSTR("json"), nullptr)),
+        shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("core"), CFSTR("json"), nullptr)),
 #elif defined(LSAN_LINUX)
         std::string(suppressions_linux_core),
 #endif
@@ -52,7 +52,7 @@ auto getSystemLibraryFiles() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        shared::loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("systemLibraries"), CFSTR("json"), nullptr)),
+        shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("systemLibraries"), CFSTR("json"), nullptr)),
 #elif defined(LSAN_LINUX)
         std::string(suppressions_linux_systemLibraries)
 #endif
@@ -66,7 +66,7 @@ auto getDefaultTLVSuppressions() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        shared::loadResource(CFBundleCopyResourceURL(macos::bundle::getBundle(), CFSTR("tlv"), CFSTR("json"), nullptr)),
+        shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("tlv"), CFSTR("json"), nullptr)),
 #endif
     });
 
