@@ -57,14 +57,14 @@ extern "C" {
 
 #endif
 
-extern "C" const char** environ;
-
 namespace lsan {
 std::atomic_bool LSan::finished = false;
 std::atomic_bool LSan::preventDealloc = false;
 #ifndef __APPLE__
 std::atomic_bool LSan::crashed = false;
 #endif
+
+extern "C" const char** environ;
 
 /**
  * Aligns the given pointer to the next machine word.
