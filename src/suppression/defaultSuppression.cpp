@@ -40,11 +40,9 @@ auto getDefaultSuppression() -> std::vector<std::string> {
     auto toReturn = std::vector<std::string>();
 
     toReturn.insert(toReturn.cend(), {
-#ifdef LSAN_APPLE
         std::string(core_json),
+#ifdef LSAN_APPLE
         std::string(AppKit_json),
-#elifdef LSAN_LINUX
-        std::string(suppressions_linux_core),
 #endif
     });
 
@@ -55,11 +53,7 @@ auto getSystemLibraryFiles() -> std::vector<std::string> {
     auto toReturn = std::vector<std::string>();
 
     toReturn.insert(toReturn.cend(), {
-#ifdef LSAN_APPLE
-        std::string(systemLibraries_json)
-#elifdef LSAN_LINUX
-        std::string(suppressions_linux_systemLibraries)
-#endif
+        std::string(systemLibraries_json),
     });
 
     return toReturn;
