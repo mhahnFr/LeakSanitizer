@@ -1009,6 +1009,7 @@
 					"$(PROJECT_DIR)/SimpleJSON/include",
 					"$(PROJECT_DIR)/CallstackLibrary/include",
 					"$(PROJECT_DIR)/include",
+					"$(SRCROOT)/suppressions",
 				);
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1046,6 +1047,7 @@
 					"$(PROJECT_DIR)/SimpleJSON/include",
 					"$(PROJECT_DIR)/CallstackLibrary/include",
 					"$(PROJECT_DIR)/include",
+					"$(SRCROOT)/suppressions",
 				);
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1109,6 +1111,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/CallstackLibrary/include",
 					"$(PROJECT_DIR)/SimpleJSON/include",
+					"$(SRCROOT)/suppressions",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1128,6 +1131,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/CallstackLibrary/include",
 					"$(PROJECT_DIR)/SimpleJSON/include",
+					"$(SRCROOT)/suppressions",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

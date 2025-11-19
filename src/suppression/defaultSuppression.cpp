@@ -22,10 +22,10 @@
 #include "defaultSuppression.hpp"
 
 #ifdef LSAN_APPLE
-// TODO: Generate these headers properly
-# include "../../suppressions/macos/AppKit.hpp"
-# include "../../suppressions/macos/core.hpp"
-# include "../../suppressions/macos/systemLibraries.hpp"
+# include <macos/AppKit.hpp>
+# include <macos/core.hpp>
+# include <macos/systemLibraries.hpp>
+
 # include "../macos/bundle.hpp"
 
 using namespace lsan::macos::bundle;
@@ -41,8 +41,8 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        std::string(suppressions_macos_core),
-        std::string(suppressions_macos_AppKit),
+        std::string(core_json),
+        std::string(AppKit_json),
 #elif defined(LSAN_LINUX)
         std::string(suppressions_linux_core),
 #endif
@@ -56,7 +56,7 @@ auto getSystemLibraryFiles() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        std::string(suppressions_macos_systemLibraries)
+        std::string(systemLibraries_json)
 #elif defined(LSAN_LINUX)
         std::string(suppressions_linux_systemLibraries)
 #endif
