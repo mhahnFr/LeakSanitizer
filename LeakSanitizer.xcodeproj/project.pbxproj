@@ -668,6 +668,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F1EDCE9A2E65876D007E260E /* Build configuration list for PBXNativeTarget "CrashHandler" */;
 			buildPhases = (
+				BFDDB8842ECDAC31003FA20A /* ShellScript */,
 				F1EDCE922E65876D007E260E /* Sources */,
 				F1EDCE932E65876D007E260E /* Frameworks */,
 			);
@@ -739,6 +740,33 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BFDDB8842ECDAC31003FA20A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Makefile",
+				"$(SRCROOT)/suppressions/macos/core.json",
+				"$(SRCROOT)/suppressions/macos/systemLibraries.json",
+				"$(SRCROOT)/suppressions/macos/AppKit.json",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/suppressions/macos/core.hpp",
+				"$(SRCROOT)/suppressions/macos/systemLibraries.hpp",
+				"$(SRCROOT)/suppressions/macos/AppKit.hpp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\n\nfor i in $(seq 1 $(( $SCRIPT_INPUT_FILE_COUNT - 1 )) )\ndo\n    OUT_NUM=$(( $i - 1 ))\n    VAR=SCRIPT_OUTPUT_FILE_$OUT_NUM\n    FILE=$(eval echo \"\\$$VAR\")\n    make -f $SCRIPT_INPUT_FILE_0 $FILE\ndone\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BFCDA7E32E2F7C2C0029AEC1 /* Sources */ = {
