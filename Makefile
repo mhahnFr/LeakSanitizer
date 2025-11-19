@@ -122,7 +122,7 @@ $(NAME): $(OBJS) $(LIBCALLSTACK_A)
 	$(CXX) $(CXXFLAGS) -DLSAN_VERSION=\"$(VERSION)\" -MMD -MP -c -o $@ $<
 
 %.hpp: %.json
-	echo 'constexpr const char*' `echo $(basename $<) | tr /. _` '= R"lsanJsonLiteral(' > $@
+	echo 'constexpr const char*' `basename $< | tr /. _` '= R"lsanJsonLiteral(' > $@
 	cat $< >> $@
 	echo '\n)lsanJsonLiteral";' >> $@
 
