@@ -134,6 +134,7 @@ $(LIBCALLSTACK_A):
 clean:
 	- $(RM) $(OBJS) $(DEPS)
 	- $(RM) $(SUPP_HS)
+	- $(RM) suppressions/macos/*.hpp
 	- $(RM) $(NAME)
 	- $(MAKE) -C $(LIBCALLSTACK_DIR) $(LIBCALLSTACK_FLAG) clean
 
