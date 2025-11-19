@@ -22,6 +22,10 @@
 #include "defaultSuppression.hpp"
 
 #ifdef LSAN_APPLE
+# include <macos/AppKit.hpp>
+# include <macos/core.hpp>
+# include <macos/systemLibraries.hpp>
+
 # include "../macos/bundle.hpp"
 
 using namespace lsan::macos::bundle;
@@ -37,8 +41,8 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("AppKit"), CFSTR("json"), nil)),
-        shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("core"), CFSTR("json"), nil)),
+        std::string(core_json),
+        std::string(AppKit_json),
 #elif defined(LSAN_LINUX)
         std::string(suppressions_linux_core),
 #endif
@@ -52,7 +56,7 @@ auto getSystemLibraryFiles() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
-        shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("systemLibraries"), CFSTR("json"), nil)),
+        std::string(systemLibraries_json)
 #elif defined(LSAN_LINUX)
         std::string(suppressions_linux_systemLibraries)
 #endif
