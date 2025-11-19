@@ -23,9 +23,9 @@
 #define timing_hpp
 
 #ifdef BENCHMARK
-#include <chrono>
-#include <deque>
-#include <ostream>
+# include <chrono>
+# include <deque>
+# include <ostream>
 
 namespace lsan::timing {
 /**
@@ -90,16 +90,16 @@ void addTotalTime(std::chrono::nanoseconds duration, AllocType type);
 auto printTimings(std::ostream& out) -> std::ostream&;
 }
 
-#define BENCH(expr, type, varName)                              \
-const auto __now##varName { std::chrono::steady_clock::now() }; \
-expr;                                                           \
-const auto __end##varName { std::chrono::steady_clock::now() }; \
+# define BENCH(expr, type, varName)                              \
+const auto __now##varName { std::chrono::steady_clock::now() };  \
+expr;                                                            \
+const auto __end##varName { std::chrono::steady_clock::now() };  \
 type varName = std::chrono::duration_cast<type>(__end##varName - __now##varName)
 
-#define BENCH_ONLY(block) block
+# define BENCH_ONLY(block) block
 #else
-#define BENCH(expr, type, varName) expr
-#define BENCH_ONLY(block)
+# define BENCH(expr, type, varName) expr
+# define BENCH_ONLY(block)
 #endif
 
 #endif /* timing_hpp */

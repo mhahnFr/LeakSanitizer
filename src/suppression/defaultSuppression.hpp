@@ -29,7 +29,7 @@
 
 #ifdef __APPLE__
 # define LSAN_APPLE
-#elif defined(__linux__)
+#elifdef __linux__
 # define LSAN_LINUX
 #endif
 

@@ -23,9 +23,9 @@
 #define interpose_hpp
 
 #ifdef __linux__
-#include <dlfcn.h>
+# include <dlfcn.h>
 
-#include "../lsanMisc.hpp"
+# include "../lsanMisc.hpp"
 
 namespace lsan {
 /**
@@ -51,10 +51,10 @@ static inline auto loadFunction(const char* name) -> T* {
 }
 }
 
-#define INTERPOSE(NEW, OLD) \
+# define INTERPOSE(NEW, OLD) \
 extern "C" decltype(OLD) OLD __attribute__((weak, alias(#NEW)))
 
-#define REPLACE(RET, NAME)                                              \
+# define REPLACE(RET, NAME)                                             \
 namespace lsan::real {                                                  \
 template<typename... Args>                                              \
 static inline auto NAME(Args... args) -> decltype(::NAME(args...)) {    \
@@ -80,21 +80,21 @@ struct interpose {
     const void* oldFunc;
 };
 
-#define INTERPOSE(NEW, OLD)                                     \
+# define INTERPOSE(NEW, OLD)                                    \
 static const struct interpose interpose_##OLD                   \
     __attribute__((used, section("__DATA, __interpose"))) = {   \
         reinterpret_cast<const void*>(uintptr_t(&(lsan::NEW))), \
         reinterpret_cast<const void*>(uintptr_t(&(OLD)))        \
     }
 
-#define REPLACE(RET, NAME) \
-namespace lsan::real {     \
-using ::NAME;              \
-}                          \
-namespace lsan {           \
-decltype(::NAME) NAME;     \
-}                          \
-INTERPOSE(NAME, NAME);     \
+# define REPLACE(RET, NAME) \
+namespace lsan::real {      \
+using ::NAME;               \
+}                           \
+namespace lsan {            \
+decltype(::NAME) NAME;      \
+}                           \
+INTERPOSE(NAME, NAME);      \
 RET lsan::NAME
 
 #endif

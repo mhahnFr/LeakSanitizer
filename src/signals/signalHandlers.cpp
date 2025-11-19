@@ -67,26 +67,26 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     const ucontext_t* context = static_cast<ucontext_t*>(ptr);
     
     uintptr_t ip, bp;
-#ifdef __APPLE__
- #ifdef __x86_64__
+# ifdef __APPLE__
+#  ifdef __x86_64__
     ip = context->uc_mcontext->__ss.__rip;
     bp = context->uc_mcontext->__ss.__rbp;
- #elif defined(__i386__)
+#  elifdef __i386__
     ip = context->uc_mcontext->__ss.__eip;
     bp = context->uc_mcontext->__ss.__ebp;
- #elif defined(__arm64__)
+#  elifdef __arm64__
     ip = __darwin_arm_thread_state64_get_lr(context->uc_mcontext->__ss);
     bp = __darwin_arm_thread_state64_get_fp(context->uc_mcontext->__ss);
- #endif
-#elif defined(__linux__)
- #ifdef __x86_64__
+#  endif
+# elifdef __linux__
+#  ifdef __x86_64__
     ip = context->uc_mcontext.gregs[REG_RIP];
     bp = context->uc_mcontext.gregs[REG_RBP];
- #elif defined(__i386__)
+#  elifdef __i386__
     ip = context->uc_mcontext.gregs[REG_EIP];
     bp = context->uc_mcontext.gregs[REG_EBP];
- #endif
-#endif
+#  endif
+# endif
 
     const void* previousFrame = nullptr;
     auto frame         = reinterpret_cast<void*>(bp);

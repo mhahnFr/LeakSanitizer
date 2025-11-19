@@ -82,7 +82,7 @@ static inline auto printWebsite(std::ostream & out) -> std::ostream & {
 static inline auto getVersion() -> std::string {
 #ifdef __APPLE__
     return macos::bundle::getVersion();
-#elif defined(LSAN_VERSION)
+#elifdef LSAN_VERSION
     return LSAN_VERSION;
 #else
     return "CLEAN BUILD";

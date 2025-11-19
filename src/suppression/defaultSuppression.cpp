@@ -30,7 +30,7 @@
 
 using namespace lsan::macos::bundle;
 
-#elif defined(LSAN_LINUX)
+#elifdef LSAN_LINUX
 # include <linux/core.hpp>
 # include <linux/systemLibraries.hpp>
 #endif
@@ -43,7 +43,7 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 #ifdef LSAN_APPLE
         std::string(core_json),
         std::string(AppKit_json),
-#elif defined(LSAN_LINUX)
+#elifdef LSAN_LINUX
         std::string(suppressions_linux_core),
 #endif
     });
@@ -57,7 +57,7 @@ auto getSystemLibraryFiles() -> std::vector<std::string> {
     toReturn.insert(toReturn.cend(), {
 #ifdef LSAN_APPLE
         std::string(systemLibraries_json)
-#elif defined(LSAN_LINUX)
+#elifdef LSAN_LINUX
         std::string(suppressions_linux_systemLibraries)
 #endif
     });
