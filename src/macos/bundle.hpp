@@ -71,7 +71,7 @@ auto getVersion() -> std::string;
 auto convertCFString(CFStringRef str) -> std::optional<std::string>;
 
 /**
- * This namespace includes the implemntation shared by the sanitizer and the
+ * This namespace includes the implementation shared by the sanitizer and the
  * crash handler.
  */
 namespace shared {
