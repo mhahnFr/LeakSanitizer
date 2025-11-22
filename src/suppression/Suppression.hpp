@@ -22,7 +22,6 @@
 #ifndef Suppression_hpp
 #define Suppression_hpp
 
-#include <cstdint>
 #include <optional>
 #include <regex>
 #include <utility>

@@ -22,8 +22,6 @@
 #ifndef defaultSuppression_hpp
 #define defaultSuppression_hpp
 
-#include <fstream>
-#include <sstream>
 #include <string>
 #include <vector>
 
