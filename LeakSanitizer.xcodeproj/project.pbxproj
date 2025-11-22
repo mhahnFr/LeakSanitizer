@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF11E64B2ED218F400E77D5D /* definitions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF11E64A2ED218F400E77D5D /* definitions.hpp */; };
 		BF1775062E337EAE00D46975 /* AppKit.json in Resources */ = {isa = PBXBuildFile; fileRef = F1E0904B2D68DE9500F79FA2 /* AppKit.json */; };
 		BF1775072E337EB200D46975 /* core.json in Resources */ = {isa = PBXBuildFile; fileRef = F1ACE4162D148B0F00E779A7 /* core.json */; };
 		BF1775082E337EB800D46975 /* systemLibraries.json in Resources */ = {isa = PBXBuildFile; fileRef = BFA7AA972D8037A700F2525A /* systemLibraries.json */; };
@@ -136,6 +137,7 @@
 		BF017DC62D76F26900572D07 /* firstPartyLibrary.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = firstPartyLibrary.hpp; sourceTree = "<group>"; };
 		BF017DC72D76F26900572D07 /* firstPartyLibrary.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = firstPartyLibrary.cpp; sourceTree = "<group>"; };
 		BF04B4B328F86EEA00051090 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		BF11E64A2ED218F400E77D5D /* definitions.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = definitions.hpp; sourceTree = "<group>"; };
 		BF17750A2E33892700D46975 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		BF23A2DC289ECE6A00B17349 /* lsan_stats.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lsan_stats.cpp; sourceTree = "<group>"; };
 		BF23A2DD289ECE6A00B17349 /* lsan_stats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lsan_stats.h; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 		BF11E6492ED2183500E77D5D /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				BF11E64A2ED218F400E77D5D /* definitions.hpp */,
 				F16901512C403EF200EED0AE /* utils.hpp */,
 			);
 			path = utils;
@@ -609,6 +612,7 @@
 				BFCDA8182E2F7CDA0029AEC1 /* defaultSuppression.hpp in Headers */,
 				BFCDA8192E2F7CDA0029AEC1 /* firstPartyLibrary.hpp in Headers */,
 				BFCDA81A2E2F7CDA0029AEC1 /* LeakKindStats.hpp in Headers */,
+				BF11E64B2ED218F400E77D5D /* definitions.hpp in Headers */,
 				BFCDA81B2E2F7CDA0029AEC1 /* ATracker.hpp in Headers */,
 				BFCDA81C2E2F7CDA0029AEC1 /* PseudoTracker.hpp in Headers */,
 				BFCDA81D2E2F7CDA0029AEC1 /* TLSTracker.hpp in Headers */,

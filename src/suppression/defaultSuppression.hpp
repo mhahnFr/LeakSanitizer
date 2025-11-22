@@ -27,12 +27,6 @@
 #include <string>
 #include <vector>
 
-#ifdef __APPLE__
-# define LSAN_APPLE
-#elifdef __linux__
-# define LSAN_LINUX
-#endif
-
 namespace lsan::suppression {
 /**
  * Loads and returns the contents of the default suppression files.
