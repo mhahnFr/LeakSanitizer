@@ -53,7 +53,7 @@ public:
      *
      * @return the name of the function
      */
-    constexpr inline auto getFunctionName() const -> const std::string& {
+    [[nodiscard]] constexpr inline auto getFunctionName() const -> const std::string& {
         return functionName;
     }
 
@@ -62,7 +62,7 @@ public:
      *
      * @return the name of the suppression
      */
-    constexpr inline auto getSuppressionName() const -> const std::string& {
+    [[nodiscard]] constexpr inline auto getSuppressionName() const -> const std::string& {
         return suppressionName;
     }
 };
