@@ -30,13 +30,13 @@
 
 #include "bytePrinter.hpp"
 #include "lsanMisc.hpp"
-#include "utils.hpp"
 #include "crashWarner/exceptionHandler.hpp"
 #include "formatter/formatter.hpp"
 #include "signals/signalHandlers.hpp"
 #include "signals/signals.hpp"
 #include "suppression/firstPartyLibrary.hpp"
 #include "suppression/systemLibraryLoader.hpp"
+#include "utils/utils.hpp"
 
 #ifndef LSAN_OS_DEFINED
 # error Unknown operating system
