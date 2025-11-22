@@ -39,7 +39,7 @@
 
 #include "crashForce.hpp"
 #include "../lsanMisc.hpp"
-#include "../utils.hpp"
+#include "../utils/utils.hpp"
 
 namespace lsan {
 /**

@@ -39,11 +39,11 @@
 #include "SignalInfo.hpp"
 #include "signals.hpp"
 #include "../lsanMisc.hpp"
-#include "../utils.hpp"
 #include "../callstackHelper/format.hpp"
 #include "../crashWarner/core.hpp"
 #include "../crashWarner/crashForce.hpp"
 #include "../formatter/formatter.hpp"
+#include "../utils/utils.hpp"
 
 namespace lsan::signals::handlers {
 /**

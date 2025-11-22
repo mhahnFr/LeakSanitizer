@@ -33,10 +33,10 @@
 #include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
 #include "../timing.hpp"
-#include "../utils.hpp"
 #include "../crashWarner/crashForce.hpp"
 #include "../crashWarner/crashOrWarn.hpp"
 #include "../formatter/formatter.hpp"
+#include "../utils/utils.hpp"
 
 namespace lsan {
 /**

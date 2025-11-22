@@ -24,8 +24,8 @@
 #include <csignal>
 
 #include "signals.hpp"
-#include "../utils.hpp"
 #include "../formatter/formatter.hpp"
+#include "../utils/utils.hpp"
 
 namespace lsan::signals {
 /**
