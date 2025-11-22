@@ -38,11 +38,11 @@
 
 # include <unistd.h>
 
+# include "signals.hpp"
 # include "../macos/bundle.hpp"
 #endif /* LSAN_OS_MACOS */
 
 #include "SignalInfo.hpp"
-#include "signals.hpp"
 #include "../lsanMisc.hpp"
 #include "../callstackHelper/format.hpp"
 #include "../crashWarner/core.hpp"
