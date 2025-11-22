@@ -45,14 +45,14 @@ REPLACE(void, exit)(const int code) noexcept(noexcept(::exit(code))) {
  */
 #ifdef LSAN_OS_LINUX
 extern "C" int __libc_start_main(
-        int (*)(int, char**, char**), int, char**, void (*)(void), void (*)(void), void (*)(void), void*);
+        int (*)(int, char**, char**), int, char**, void (*)(), void (*)(), void (*)(), void*);
 
 REPLACE(auto, __libc_start_main)(int (*main)(int, char**, char**),
                                  int    argc, 
                                  char** ubp_av,
-                                 void (*init)(void),
-                                 void (*fini)(void),
-                                 void (*rtld_fini)(void),
+                                 void (*init)(),
+                                 void (*fini)(),
+                                 void (*rtld_fini)(),
                                  void* stack_end) -> int {
     return  real::__libc_start_main(main, argc, ubp_av, init, fini, rtld_fini, stack_end);
 }
