@@ -23,7 +23,6 @@
 #define lsanFormat_hpp
 
 #include <iostream>
-#include <string>
 
 #include "../behaviour/getBehaviour.hpp"
 
