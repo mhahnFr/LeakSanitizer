@@ -25,6 +25,12 @@
 #include <pthread.h>
 #include <thread>
 
+#include "utils/definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
 namespace lsan {
 /**
  * Structures information about a particular thread.
@@ -43,7 +49,7 @@ class ThreadInfo {
     pthread_t thread;
     /** The pointer to the stack begin or top.   */
     void* stackTop;
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     /** Whether to consider this thread.         */
     bool dead = false;
     /** The current stack pointer of the thread. */
@@ -109,14 +115,14 @@ public:
      * @return the top of the stack
      */
     [[nodiscard]] constexpr inline auto getStackTop() const -> void* {
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
         return stackTop;
-#else
+#elifdef LSAN_OS_LINUX
         return reinterpret_cast<void*>(uintptr_t(stackTop) + stackSize);
 #endif
     }
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     /**
      * Returns whether the represented thread is still existent.
      *

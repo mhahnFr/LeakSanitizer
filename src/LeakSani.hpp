@@ -47,6 +47,10 @@
 #include "trackers/ATracker.hpp"
 #include "wrappers/realAlloc.hpp"
 
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
 namespace lsan {
 /**
  * @brief This class manages everything this sanitizer is capable to do.
@@ -188,7 +192,7 @@ class LSan final: public trackers::ATracker {
      */
     auto isSuppressed(const MallocInfo& info) -> bool;
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     /**
      * Gathers and returns the size of the memory referred to by @c pthread_t .
      *
@@ -212,7 +216,7 @@ protected:
 public:
     /** Indicates whether the allocation tracking has finished.           */
     static std::atomic_bool finished;
-#ifndef __APPLE__
+#ifdef LSAN_OS_LINUX
     static std::atomic_bool crashed;
 #endif
     /** Indicates whether to ignore deallocations in the TLS deallocator. */
@@ -423,7 +427,7 @@ public:
      */
     void removeThread(const std::thread::id& id = std::this_thread::get_id());
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     /**
      * Sets the stack pointer for the calling thread.
      *

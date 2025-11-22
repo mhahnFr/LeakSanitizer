@@ -24,13 +24,19 @@
 #include <csignal>
 #include <cstdlib>
 
+#include "../utils/definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
 namespace lsan::signals {
 auto registerFunction(void (*function)(int), const int signal) -> bool {
     return ::signal(signal, function) != SIG_ERR;
 }
 
 auto createAlternativeStack(void*(&allocator)(std::size_t)) -> void* {
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     constexpr
 #endif
     std::size_t stackSize = SIGSTKSZ;
@@ -86,7 +92,7 @@ auto getDescriptionFor(const int signal) noexcept -> const char* {
         case SIGVTALRM: return "Virtual time alarm";
         case SIGPROF:   return "Profiling timer alarm";
 
-#if defined(__APPLE__) || defined(SIGEMT)
+#if defined(LSAN_OS_MACOS) || defined(SIGEMT)
         case SIGEMT:    return "Emulate instruction executed";
 #endif
 
@@ -115,7 +121,7 @@ auto stringify(const int signal) noexcept -> const char* {
         case SIGVTALRM: return "SIGVTALRM";
         case SIGPROF:   return "SIGPROF";
 
-#if defined(__APPLE__) || defined(SIGEMT)
+#if defined(LSAN_OS_MACOS) || defined(SIGEMT)
         case SIGEMT:    return "SIGEMT";
 #endif
 

@@ -22,7 +22,13 @@
 #ifndef realAlloc_hpp
 #define realAlloc_hpp
 
-#ifdef __linux__
+#include "../utils/definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
+#ifdef LSAN_OS_LINUX
 extern "C" {
 void* __libc_malloc(std::size_t);
 void* __libc_valloc(std::size_t);
@@ -45,9 +51,9 @@ namespace lsan::real {
  */
 static inline auto malloc(std::size_t size) -> void * {
     void * toReturn;
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     toReturn = __libc_malloc(size);
-#else
+#elifdef LSAN_OS_MACOS
     toReturn = std::malloc(size);
 #endif
     return toReturn;
@@ -61,9 +67,9 @@ static inline auto malloc(std::size_t size) -> void * {
  */
 static inline auto valloc(std::size_t size) -> void* {
     void* toReturn;
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     toReturn = __libc_valloc(size);
-#else
+#elifdef LSAN_OS_MACOS
     toReturn = ::valloc(size);
 #endif
     return toReturn;
@@ -78,9 +84,9 @@ static inline auto valloc(std::size_t size) -> void* {
  */
 static inline auto calloc(std::size_t count, std::size_t size) -> void * {
     void * toReturn;
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     toReturn = __libc_calloc(count, size);
-#else
+#elifdef LSAN_OS_MACOS
     toReturn = std::calloc(count, size);
 #endif
     return toReturn;
@@ -95,9 +101,9 @@ static inline auto calloc(std::size_t count, std::size_t size) -> void * {
  */
 static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
     void* toReturn;
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     toReturn = __libc_memalign(alignment, size);
-#else
+#elifdef LSAN_OS_MACOS
     toReturn = std::aligned_alloc(alignment, size);
 #endif
     return toReturn;
@@ -112,9 +118,9 @@ static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> voi
  */
 static inline auto realloc(void * pointer, std::size_t size) -> void * {
     void * toReturn;
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     toReturn = __libc_realloc(pointer, size);
-#else
+#elifdef LSAN_OS_MACOS
     toReturn = std::realloc(pointer, size);
 #endif
     return toReturn;
@@ -126,9 +132,9 @@ static inline auto realloc(void * pointer, std::size_t size) -> void * {
  * @param pointer the pointer to be freed
  */
 static inline void free(void * pointer) {
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     __libc_free(pointer);
-#else
+#elifdef LSAN_OS_MACOS
     std::free(pointer);
 #endif
 }

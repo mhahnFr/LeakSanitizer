@@ -22,7 +22,13 @@
 #ifndef interpose_hpp
 #define interpose_hpp
 
-#ifdef __linux__
+#include "../utils/definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
+#ifdef LSAN_OS_LINUX
 # include <dlfcn.h>
 
 # include "../lsanMisc.hpp"
@@ -69,7 +75,7 @@ extern "C" decltype(::NAME) __lsan_##NAME;                              \
 INTERPOSE(__lsan_##NAME, NAME);                                         \
 RET lsan::__lsan_##NAME
 
-#else
+#elifdef LSAN_OS_MACOS
 /**
  * This structure contains the data for the @c __interpose Mach-O section.
  */

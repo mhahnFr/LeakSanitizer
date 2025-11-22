@@ -22,7 +22,11 @@
 #ifndef objcSupport_hpp
 #define objcSupport_hpp
 
-#ifdef __APPLE__
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
+#ifdef LSAN_OS_MACOS
 #include <objc/message.h>
 
 #define CLASS(name) objc_getClass(#name)

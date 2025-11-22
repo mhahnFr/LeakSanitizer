@@ -37,7 +37,11 @@
 #include "trackers/PseudoTracker.hpp"
 #include "trackers/TLSTracker.hpp"
 
-#ifdef __APPLE__
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
+#ifdef LSAN_OS_MACOS
 # include "macos/bundle.hpp"
 #endif
 
@@ -80,7 +84,7 @@ static inline auto printWebsite(std::ostream & out) -> std::ostream & {
 }
 
 static inline auto getVersion() -> std::string {
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     return macos::bundle::getVersion();
 #elifdef LSAN_VERSION
     return LSAN_VERSION;

@@ -38,7 +38,11 @@
 #include "suppression/firstPartyLibrary.hpp"
 #include "suppression/systemLibraryLoader.hpp"
 
-#ifdef __APPLE__
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
+#ifdef LSAN_OS_MACOS
 extern "C" {
 # include <mach/thread_state.h>
 }
@@ -60,7 +64,7 @@ extern "C" {
 namespace lsan {
 std::atomic_bool LSan::finished = false;
 std::atomic_bool LSan::preventDealloc = false;
-#ifndef __APPLE__
+#ifdef LSAN_OS_LINUX
 std::atomic_bool LSan::crashed = false;
 #endif
 
@@ -200,9 +204,9 @@ void LSan::classifyRecord(MallocInfo& info, const LeakType& currentType, const b
 static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
     void* toReturn;
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     toReturn = pthread_get_stackaddr_np(thread);
-#elifdef __linux__
+#elifdef LSAN_OS_LINUX
     pthread_attr_t attr;
     std::size_t ignored;
     [[unlikely]] if (pthread_getattr_np(thread, &attr) != 0) {
@@ -227,9 +231,9 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
 static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size_t {
     std::size_t toReturn;
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     toReturn = pthread_get_stacksize_np(thread);
-#elifdef __linux__
+#elifdef LSAN_OS_LINUX
     pthread_attr_t attr;
     [[unlikely]] if (pthread_getattr_np(thread, &attr) != 0) {
         throw std::runtime_error("Failed to gather thread attributes");
@@ -291,7 +295,7 @@ auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>
         if (!t) {
             const auto& it = std::ranges::find_if(std::as_const(threads), [id](const auto& element) {
                 return
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
                     !element.second.isDead() &&
 #endif
                     element.second.getNumber() == id;
@@ -310,7 +314,7 @@ auto LSan::getThreadDescription(unsigned long id, const std::optional<pthread_t>
 }
 
 void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
-#ifndef __APPLE__
+#ifdef LSAN_OS_LINUX
     using id = void*;
     using Class = void*;
 #endif
@@ -334,7 +338,7 @@ void LSan::classifyObjC(std::deque<MallocInfo::Ref>& records) {
     delete[] classes;
 }
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
 /** The @c std::thread::id of the thread that performed the kill. */
 static std::thread::id killId;
 /** Whether to keep the killed threads paused.                    */
@@ -360,9 +364,9 @@ static void holdOn(int) {
  */
 static inline auto suspendThread(const ThreadInfo& info) -> bool {
     auto toReturn = false;
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     toReturn = thread_suspend(pthread_mach_thread_np(info.getThread())) == KERN_SUCCESS;
-#else
+#elifdef LSAN_OS_LINUX
     killId = std::this_thread::get_id();
     toReturn = pthread_kill(info.getThread(), SIGUSR1) == 0;
 #endif
@@ -377,9 +381,9 @@ static inline auto suspendThread(const ThreadInfo& info) -> bool {
  */
 static inline auto resumeThread(const ThreadInfo& info) -> bool {
     auto toReturn = false;
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     toReturn = thread_resume(pthread_mach_thread_np(info.getThread())) == KERN_SUCCESS;
-#else
+#elifdef LSAN_OS_LINUX
     (void) info;
     toReturn = true;
 #endif
@@ -394,11 +398,11 @@ static inline auto resumeThread(const ThreadInfo& info) -> bool {
  */
 static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
     uintptr_t toReturn;
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     auto count = std::size_t(0);
     [[unlikely]] if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
                                                         &toReturn, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE)
-#elifdef __linux__
+#elifdef LSAN_OS_LINUX
     void* sp;
     while ((sp = info.getSP()) == nullptr);
     return uintptr_t(sp);
@@ -407,7 +411,7 @@ static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
     return toReturn;
 }
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
 auto LSan::gatherPthreadSize() -> std::size_t {
     std::optional<ThreadInfo> info;
     for (const auto& [_, thread] : threads) {
@@ -456,12 +460,12 @@ auto LSan::classifyLeaks() -> LeakKindStats {
     classifyObjC(toReturn.recordsObjC);
 
     out << clear << "Reachability analysis: Stacks...";
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     signal(SIGUSR1, holdOn);
 #endif
     auto failed = std::vector<ThreadInfo>();
     for (const auto& [_, info] : threads) {
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
         if (info.isDead()) continue;
 #endif
 
@@ -476,7 +480,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
             continue;
         }
         const auto& top = align(info.getStackTop(), false)
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
                 - (info.getNumber() == 0 ? 0 : 3744)
 #endif
             ;
@@ -497,7 +501,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
     out << clear << "Reachability analysis: Thread-locals...";
     for (const auto& [_, info] : threads) {
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
         if (info.isDead()) continue;
 #endif
         [[unlikely]] if (std::ranges::find(std::as_const(failed), info) != failed.end()) {
@@ -506,10 +510,10 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 
         const auto& threadDesc = isThreaded ? getThreadDescription(info.getNumber(), info.getThread()).c_str() : nullptr;
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
         const auto& end   = align(uintptr_t(info.getThread()) + gatherPthreadSize(), false);
         const auto& begin = align(end - 3744);
-#else
+#elifdef LSAN_OS_MACOS
         const auto& begin = align(uintptr_t(info.getThread()));
         const auto& end   = align(begin + __PTHREAD_SIZE__, false);
 #endif
@@ -537,7 +541,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
                 << std::endl;
         }
     }
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     holding = false;
 #endif
 
@@ -646,7 +650,7 @@ struct Initializer {
             if (LOAD_FUNC(void(*)(void(*)()), tryCatch_setTerminateHandler); tryCatch_setTerminateHandler != nullptr) {
                 tryCatch_setTerminateHandler(mhExceptionHandler);
             }
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
             objc_setUncaughtExceptionHandler(objcExceptionHandler);
 #endif
         });
@@ -659,9 +663,9 @@ Initializer initializer __attribute__((used));
 
 static inline constexpr auto getSignalStack() -> void* {
     return
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
         signals::createAlternativeStack(real::malloc)
-#else
+#elifdef LSAN_OS_LINUX
         nullptr
 #endif
         ;
@@ -694,7 +698,7 @@ LSan::LSan(): saniKey(createSaniKey()), signalStack(getSignalStack()) {
     registerFunction(asHandler(handlers::crashWithTrace), SIGPROF,   useAltStack);
     registerFunction(asHandler(handlers::crashWithTrace), SIGTRAP,   useAltStack);
 
-#if defined(__APPLE__) || defined(SIGEMT)
+#if defined(LSAN_OS_MACOS) || defined(SIGEMT)
     registerFunction(asHandler(handlers::crashWithTrace), SIGEMT, useAltStack);
 #endif
 
@@ -702,7 +706,7 @@ LSan::LSan(): saniKey(createSaniKey()), signalStack(getSignalStack()) {
 }
 
 LSan::~LSan() {
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     macos::bundle::killBundle();
 #endif
 
@@ -863,7 +867,7 @@ void LSan::changeMalloc(MallocInfo&& info) {
 }
 
 void LSan::addThread(ThreadInfo&& info) {
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     if (threads.find(info.getId()) != threads.end()) {
         return;
     }
@@ -872,9 +876,9 @@ void LSan::addThread(ThreadInfo&& info) {
 }
 
 void LSan::removeThread(const std::thread::id& id) {
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
     threads.at(id).kill();
-#else
+#elifdef LSAN_OS_MACOS
     threads.erase(id);
 #endif
 }
@@ -887,7 +891,7 @@ auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
 }
 
 auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
-#ifndef __APPLE__
+#ifdef LSAN_OS_LINUX
     [[unlikely]] if (LSan::crashed) {
         static auto toReturn = suppression::loadSystemLibraries();
         return toReturn;

@@ -21,7 +21,13 @@
 
 #include "defaultSuppression.hpp"
 
-#ifdef LSAN_APPLE
+#include "../utils/definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
+#ifdef LSAN_OS_MACOS
 # include <macos/AppKit.hpp>
 # include <macos/core.hpp>
 # include <macos/systemLibraries.hpp>
@@ -30,7 +36,7 @@
 
 using namespace lsan::macos::bundle;
 
-#elifdef LSAN_LINUX
+#elifdef LSAN_OS_LINUX
 # include <linux/core.hpp>
 # include <linux/systemLibraries.hpp>
 #endif
@@ -41,7 +47,7 @@ auto getDefaultSuppression() -> std::vector<std::string> {
 
     toReturn.insert(toReturn.cend(), {
         std::string(core_json),
-#ifdef LSAN_APPLE
+#ifdef LSAN_OS_MACOS
         std::string(AppKit_json),
 #endif
     });
@@ -63,7 +69,7 @@ auto getDefaultTLVSuppressions() -> std::vector<std::string> {
     auto toReturn = std::vector<std::string>();
 
     toReturn.insert(toReturn.cend(), {
-#ifdef LSAN_APPLE
+#ifdef LSAN_OS_MACOS
         shared::loadResource(CFBundleCopyResourceURL(getBundle(), CFSTR("tlv"), CFSTR("json"), nil)),
 #endif
     });

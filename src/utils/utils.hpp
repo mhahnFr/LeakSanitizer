@@ -26,6 +26,12 @@
 
 #include <functionInfo/functionInfo.h>
 
+#include "definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
 namespace lsan::utils {
 /**
  * Converts the given pointer to a string.
@@ -50,9 +56,9 @@ static inline auto loadFunc(const char* name) -> void* {
     return result.found ? reinterpret_cast<void*>(result.begin) : nullptr;
 }
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
 # define FUNC_NAME(name) "_" #name
-#else
+#elifdef LSAN_OS_LINUX
 # define FUNC_NAME(name) #name
 #endif
 

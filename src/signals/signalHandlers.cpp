@@ -19,10 +19,19 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "signalHandlers.hpp"
+
 #include <array>
+#include <lsan_stats.h>
 #include <string>
 
-#ifdef __APPLE__
+#include "../utils/definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
+#ifdef LSAN_OS_MACOS
 # define _XOPEN_SOURCE
 # include <ucontext.h>
 # undef _XOPEN_SOURCE
@@ -30,11 +39,7 @@
 # include <unistd.h>
 
 # include "../macos/bundle.hpp"
-#endif /* __APPLE__ */
-
-#include "signalHandlers.hpp"
-
-#include <lsan_stats.h>
+#endif /* LSAN_OS_MACOS */
 
 #include "SignalInfo.hpp"
 #include "signals.hpp"
@@ -63,11 +68,11 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
      *
      *                                                          - mhahnFr
      */
-#if defined(__APPLE__) && (defined(__x86_64__) || defined(__i386__) || defined(__arm64__))
+#if defined(LSAN_OS_MACOS) && (defined(__x86_64__) || defined(__i386__) || defined(__arm64__))
     const ucontext_t* context = static_cast<ucontext_t*>(ptr);
     
     uintptr_t ip, bp;
-# ifdef __APPLE__
+# ifdef LSAN_OS_MACOS
 #  ifdef __x86_64__
     ip = context->uc_mcontext->__ss.__rip;
     bp = context->uc_mcontext->__ss.__rbp;
@@ -78,7 +83,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     ip = __darwin_arm_thread_state64_get_lr(context->uc_mcontext->__ss);
     bp = __darwin_arm_thread_state64_get_fp(context->uc_mcontext->__ss);
 #  endif
-# elifdef __linux__
+# elifdef LSAN_OS_LINUX
 #  ifdef __x86_64__
     ip = context->uc_mcontext.gregs[REG_RIP];
     bp = context->uc_mcontext.gregs[REG_RBP];
@@ -120,7 +125,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
     crashWarner::crashForce(message, reasonDescription, std::move(callstack));
 }
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
 /**
  * Handles the crash signal using the crash handler.
  *
@@ -165,15 +170,15 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
 #endif
 
 [[ noreturn ]] void crashWithTrace(const int signalCode, const siginfo_t* signalContext, void* executionContext) {
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     getTracker().ignoreMalloc = true;
-#else
+#elifdef LSAN_OS_LINUX
     LSan::crashed = true;
 #endif
     auto callstack = createCallstackFor(executionContext);
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
     crashWithTraceRemote(signalCode, signalContext, std::move(callstack));
-#else
+#elifdef LSAN_OS_LINUX
     crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
 #endif
 }

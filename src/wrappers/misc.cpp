@@ -23,6 +23,10 @@
 #include "../lsanMisc.hpp"
 #include "../formatter/lsanFormat.hpp"
 
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
 REPLACE(void, exit)(const int code) noexcept(noexcept(::exit(code))) {
     getTracker().withIgnoration(true, [] {
         if (behaviour::getBehaviour().printExitPoint()) {
@@ -39,7 +43,7 @@ REPLACE(void, exit)(const int code) noexcept(noexcept(::exit(code))) {
  * is called directly.
  *                                                              - mhahnFr
  */
-#if defined(__linux__) && !defined(__APPLE__)
+#ifdef LSAN_OS_LINUX
 extern "C" int __libc_start_main(
         int (*)(int, char**, char**), int, char**, void (*)(void), void (*)(void), void (*)(void), void*);
 

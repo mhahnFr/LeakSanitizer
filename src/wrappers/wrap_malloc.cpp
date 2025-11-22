@@ -23,13 +23,16 @@
 
 #include <sstream>
 
-#include "interpose.hpp"
-#include "realAlloc.hpp"
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
 # include <mach/mach_init.h>
 #endif
 
+#include "interpose.hpp"
+#include "realAlloc.hpp"
 #include "../LeakSani.hpp"
 #include "../lsanMisc.hpp"
 #include "../timing.hpp"
@@ -194,7 +197,7 @@ constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&
 
 #define dealloc(func, ptr, ...) deallocExpr(func, removeAllocation(ptr, tracker) __VA_OPT__(,) __VA_ARGS__)
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
 constexpr inline static void assertZone(const malloc_zone_t* zone, const char* message = "Called with NULL as zone") {
     [[unlikely]] if (zone == nullptr) {
         crashWarner::crashForce(message);
@@ -324,7 +327,7 @@ INTERPOSE(__lsan_free,    free);
 
 INTERPOSE(__lsan_aligned_alloc, aligned_alloc);
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
 INTERPOSE(malloc_zone_malloc,   malloc_zone_malloc);
 INTERPOSE(malloc_zone_calloc,   malloc_zone_calloc);
 INTERPOSE(malloc_zone_valloc,   malloc_zone_valloc);

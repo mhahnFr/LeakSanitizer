@@ -22,12 +22,18 @@
 
 #include <cstddef>
 
-#ifdef __APPLE__
+#include "../utils/definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
+#endif
+
+#ifdef LSAN_OS_MACOS
 # include <malloc/malloc.h>
 #endif
 
 namespace lsan {
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
 auto malloc_zone_malloc(malloc_zone_t*, std::size_t) -> void*;
 auto malloc_zone_calloc(malloc_zone_t*, std::size_t, std::size_t) -> void*;
 auto malloc_zone_valloc(malloc_zone_t*, std::size_t) -> void*;
@@ -39,7 +45,7 @@ void malloc_zone_free(malloc_zone_t*, void*);
 auto malloc_zone_realloc(malloc_zone_t*, void*, std::size_t) -> void*;
 #endif
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
 extern "C" {
 #endif
 
@@ -50,7 +56,7 @@ auto __lsan_aligned_alloc(std::size_t, std::size_t) -> void*;
 auto __lsan_realloc(void*, std::size_t) -> void*;
 void __lsan_free(void*);
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
 } /* extern "C" */
 #endif
 }

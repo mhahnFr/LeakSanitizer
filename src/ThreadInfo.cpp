@@ -19,16 +19,20 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifdef __linux__
-# include <mutex>
+#include "ThreadInfo.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system
 #endif
 
-#include "ThreadInfo.hpp"
+#ifdef LSAN_OS_LINUX
+# include <mutex>
+#endif
 
 namespace lsan {
 unsigned long ThreadInfo::threadId = 0;
 
-#ifdef __linux__
+#ifdef LSAN_OS_LINUX
 /** The mutex used to synchronize the access to the stack pointers. */
 static std::mutex mutex;
 

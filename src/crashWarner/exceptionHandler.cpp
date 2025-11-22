@@ -27,7 +27,11 @@
 #include <sstream>
 #include <typeinfo>
 
-#ifdef __APPLE__
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system used!
+#endif
+
+#ifdef LSAN_OS_MACOS
 # include <CoreFoundation/CFNumber.h>
 # include <CoreFoundation/CFString.h>
 # include <objc/runtime.h>
@@ -114,7 +118,7 @@ static inline auto demangle(const char * string) noexcept -> std::string {
     crashWarner::crashForce("Terminating with unknown exception");
 }
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
 [[noreturn]] void objcExceptionHandler(id exception) noexcept {
     auto stream = std::ostringstream();
     const auto cls = object_getClass(exception);

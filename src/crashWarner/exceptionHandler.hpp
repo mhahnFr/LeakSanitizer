@@ -22,7 +22,13 @@
 #ifndef exceptionHandler_hpp
 #define exceptionHandler_hpp
 
-#ifdef __APPLE__
+#include "../utils/definitions.hpp"
+
+#ifndef LSAN_OS_DEFINED
+# error Unknown operating system used
+#endif
+
+#ifdef LSAN_OS_MACOS
 # include <objc/objc.h>
 #endif
 
@@ -41,7 +47,7 @@ namespace lsan {
  */
 [[ noreturn ]] void mhExceptionHandler() noexcept;
 
-#ifdef __APPLE__
+#ifdef LSAN_OS_MACOS
 /**
  * @brief Handles the uncaught exception thrown using the Objective-C runtime.
  *
