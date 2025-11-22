@@ -45,15 +45,9 @@ namespace lsan {
  */
 template<typename T>
 static inline auto loadFunction(const char* name) -> T* {
-    auto& tracker = getTracker();
-    std::lock_guard lock { tracker.mutex };
-    bool ignoreMalloc = tracker.ignoreMalloc;
-    tracker.ignoreMalloc = true;
-
-    auto toReturn = dlsym(RTLD_NEXT, name);
-
-    tracker.ignoreMalloc = ignoreMalloc;
-    return reinterpret_cast<T*>(toReturn);
+    return getTracker().withIgnorationResult(true, [name] {
+        return reinterpret_cast<T*>(dlsym(RTLD_NEXT, name));
+    });
 }
 }
 
@@ -63,10 +57,10 @@ extern "C" decltype(OLD) OLD __attribute__((weak, alias(#NEW)))
 # define REPLACE(RET, NAME)                                             \
 namespace lsan::real {                                                  \
 template<typename... Args>                                              \
-static inline auto NAME(Args... args) -> decltype(::NAME(args...)) {    \
+static inline auto NAME(Args&&... args) -> decltype(::NAME(args...)) {  \
     static auto realFunc = loadFunction<decltype(::NAME)>(#NAME);       \
                                                                         \
-    return realFunc(std::forward<Args>(args)...);                       \
+    return realFunc(std::forward<Args&&>(args)...);                     \
 }                                                                       \
 }                                                                       \
 namespace lsan {                                                        \
