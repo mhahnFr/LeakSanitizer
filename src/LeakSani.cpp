@@ -657,7 +657,17 @@ struct Initializer {
 Initializer initializer __attribute__((used));
 }
 
-LSan::LSan(): saniKey(createSaniKey()), signalStack(signals::createAlternativeStack(real::malloc)) {
+static inline constexpr auto getSignalStack() -> void* {
+    return
+#ifdef __APPLE__
+        signals::createAlternativeStack(real::malloc)
+#else
+        nullptr
+#endif
+        ;
+}
+
+LSan::LSan(): saniKey(createSaniKey()), signalStack(getSignalStack()) {
     using namespace signals;
 
     atexit(exitHook);
