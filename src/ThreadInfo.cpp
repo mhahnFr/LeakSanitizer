@@ -36,9 +36,9 @@ unsigned long ThreadInfo::threadId = 0;
 /** The mutex used to synchronize the access to the stack pointers. */
 static std::mutex mutex;
 
-void ThreadInfo::setSP(void* sp) {
+void ThreadInfo::setSP(void* newSp) {
     std::lock_guard lock { mutex };
-    ThreadInfo::sp = sp;
+    sp = newSp;
 }
 
 auto ThreadInfo::getSP() const -> void* {

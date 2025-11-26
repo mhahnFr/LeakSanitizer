@@ -142,9 +142,9 @@ public:
     /**
      * Sets the stack pointer for the represented thread.
      *
-     * @param sp the stack pointer
+     * @param newSp the stack pointer
      */
-    void setSP(void* sp);
+    void setSP(void* newSp);
 
     /**
      * Returns the current stack pointer of the represented thread as set with
