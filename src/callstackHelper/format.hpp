@@ -23,7 +23,6 @@
 #define callstackHelper_format_hpp
 
 #include <callstack.h>
-#include <ostream>
 #include <string>
 
 /** This namespace includes the helper functions for the callstacks. */

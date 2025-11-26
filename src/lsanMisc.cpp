@@ -27,7 +27,6 @@
 #include <sstream>
 #include <SimpleJSON/SimpleJSON.hpp>
 
-#include "callstackHelper/format.hpp"
 #include "formatter/formatter.hpp"
 #include "formatter/lsanFormat.hpp"
 #include "suppression/defaultSuppression.hpp"
