@@ -128,7 +128,7 @@ public:
      *
      * @return whether to consider this thread information
      */
-    constexpr inline auto isDead() const -> bool {
+    [[nodiscard]] constexpr inline auto isDead() const -> bool {
         return dead;
     }
 
@@ -152,7 +152,7 @@ public:
      *
      * @return the current stack pointer
      */
-    auto getSP() const -> void*;
+    [[nodiscard]] auto getSP() const -> void*;
 #endif
 
     inline auto operator==(const ThreadInfo& other) const -> bool {
