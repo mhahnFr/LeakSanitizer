@@ -49,7 +49,7 @@ namespace lsan::real {
  * @param size the requested allocation size
  * @return the allocated block of memory or @c NULL if no memory was available
  */
-static inline auto malloc(std::size_t size) -> void * {
+static inline auto malloc(const std::size_t size) -> void * {
     void * toReturn;
 #ifdef LSAN_OS_LINUX
     toReturn = __libc_malloc(size);
@@ -65,7 +65,7 @@ static inline auto malloc(std::size_t size) -> void * {
  * @param size the requested allocation size
  * @return the allocated block of memory or @c NULL if no memory was available
  */
-static inline auto valloc(std::size_t size) -> void* {
+static inline auto valloc(const std::size_t size) -> void* {
     void* toReturn;
 #ifdef LSAN_OS_LINUX
     toReturn = __libc_valloc(size);
@@ -82,7 +82,7 @@ static inline auto valloc(std::size_t size) -> void* {
  * @param size the size an individual object
  * @return the allocated block of memory or @c NULL if no memory was available
  */
-static inline auto calloc(std::size_t count, std::size_t size) -> void * {
+static inline auto calloc(const std::size_t count, const std::size_t size) -> void * {
     void * toReturn;
 #ifdef LSAN_OS_LINUX
     toReturn = __libc_calloc(count, size);
@@ -99,7 +99,7 @@ static inline auto calloc(std::size_t count, std::size_t size) -> void * {
  * @param size the amount of bytes
  * @return the allocated block of memory
  */
-static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> void* {
+static inline auto aligned_alloc(const std::size_t alignment, const std::size_t size) -> void* {
     void* toReturn;
 #ifdef LSAN_OS_LINUX
     toReturn = __libc_memalign(alignment, size);
@@ -116,7 +116,7 @@ static inline auto aligned_alloc(std::size_t alignment, std::size_t size) -> voi
  * @param size the requested new size the memory block
  * @return the reallocated memory block
  */
-static inline auto realloc(void * pointer, std::size_t size) -> void * {
+static inline auto realloc(void * pointer, const std::size_t size) -> void * {
     void * toReturn;
 #ifdef LSAN_OS_LINUX
     toReturn = __libc_realloc(pointer, size);
