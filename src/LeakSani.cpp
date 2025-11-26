@@ -424,7 +424,7 @@ auto LSan::gatherPthreadSize() -> std::size_t {
     if (info) {
         toReturn = uintptr_t(info->getStackTop()) - uintptr_t(info->getThread());
     } else {
-        std::thread([&toReturn]() {
+        std::thread([&toReturn] {
             const auto& stackSize = findStackSize();
             const auto& stackBegin = findStackBegin();
             toReturn = uintptr_t(stackBegin) + stackSize - uintptr_t(pthread_self());
@@ -868,7 +868,7 @@ void LSan::changeMalloc(MallocInfo&& info) {
 
 void LSan::addThread(ThreadInfo&& info) {
 #ifdef LSAN_OS_LINUX
-    if (threads.find(info.getId()) != threads.end()) {
+    if (threads.contains(info.getId())) {
         return;
     }
 #endif
@@ -892,7 +892,7 @@ auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
 
 auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
 #ifdef LSAN_OS_LINUX
-    [[unlikely]] if (LSan::crashed) {
+    [[unlikely]] if (crashed) {
         static auto toReturn = suppression::loadSystemLibraries();
         return toReturn;
     }
@@ -1038,7 +1038,7 @@ static inline void printRecord(std::ostream& out, const MallocInfo& info) {
  * @return whether at least one record was printed
  */
 static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std::ostream& out,
-                                const LeakType allowed, bool printContent = false) -> bool {
+                                const LeakType allowed, const bool printContent = false) -> bool {
     auto toReturn = false;
     for (const auto& leak : records) {
         if (auto& record = leak.get(); !record.printedInRoot && !record.suppressed && record.leakType == allowed) {

@@ -38,6 +38,8 @@ auto registerFunction(void (*function)(int), const int signal) -> bool {
 auto createAlternativeStack(void*(&allocator)(std::size_t)) -> void* {
 #ifdef LSAN_OS_MACOS
     constexpr
+#elifdef LSAN_OS_LINUX
+    const
 #endif
     std::size_t stackSize = SIGSTKSZ;
 
