@@ -35,6 +35,10 @@ REPLACE(void, exit)(const int code) noexcept(noexcept(::exit(code))) {
     });
 
     real::exit(code);
+
+#ifdef LSAN_OS_LINUX
+    __builtin_unreachable();
+#endif
 }
 
 /*
