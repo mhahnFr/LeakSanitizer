@@ -44,7 +44,6 @@
 
 #include "SignalInfo.hpp"
 #include "../lsanMisc.hpp"
-#include "../callstackHelper/format.hpp"
 #include "../crashWarner/core.hpp"
 #include "../crashWarner/crashForce.hpp"
 #include "../formatter/formatter.hpp"
