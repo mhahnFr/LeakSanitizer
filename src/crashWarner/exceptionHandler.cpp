@@ -37,8 +37,8 @@
 # include <objc/runtime.h>
 
 # define OBJC_SUPPORT_EXTRA 1
-# include "../objcSupport.hpp"
 # include "../macos/bundle.hpp"
+# include "../macos/objcSupport.hpp"
 #endif
 
 #include "crashForce.hpp"

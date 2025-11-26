@@ -56,7 +56,7 @@ extern "C" {
 #  include <CoreFoundation/CFDictionary.h>
 
 #  define OBJC_SUPPORT_EXTRA 1
-#  include "objcSupport.hpp"
+#  include "macos/objcSupport.hpp"
 # endif
 
 #endif

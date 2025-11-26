@@ -459,7 +459,6 @@
 				BF84625B2AD1B489003B05F5 /* lsanMisc.cpp */,
 				BFBF736428831FC200BC4208 /* MallocInfo.hpp */,
 				BFBF736328831FC200BC4208 /* MallocInfo.cpp */,
-				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
 				BFA95FB02D43FBDA0043C836 /* ThreadInfo.hpp */,
 				BFBF26C72D4402CC0034C570 /* ThreadInfo.cpp */,
 				BFD983A72B8A4729003B6CC1 /* timing.hpp */,
@@ -490,6 +489,7 @@
 				BFB103D62E38CB7100ECECD5 /* bundle.hpp */,
 				BFB103D72E38CB7100ECECD5 /* bundle.cpp */,
 				F18881A42E9E534C00319CD6 /* bundleShared.cpp */,
+				F12872392D36E0D200D5F0AF /* objcSupport.hpp */,
 			);
 			path = macos;
 			sourceTree = "<group>";
