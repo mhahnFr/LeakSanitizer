@@ -28,7 +28,7 @@
 #include <typeinfo>
 
 #ifndef LSAN_OS_DEFINED
-# error Unknown operating system used!
+# error Unknown operating system
 #endif
 
 #ifdef LSAN_OS_MACOS
