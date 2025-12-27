@@ -25,7 +25,6 @@
 #include <callstack_internals.h>
 #include <filesystem>
 #include <stack>
-#include <functionInfo/functionInfo.h>
 #include <regions/regions.h>
 
 #include "bytePrinter.hpp"
