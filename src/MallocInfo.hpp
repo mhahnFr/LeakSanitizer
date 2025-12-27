@@ -22,14 +22,13 @@
 #ifndef MallocInfo_hpp
 #define MallocInfo_hpp
 
+#include <callstack.h>
 #include <chrono>
 #include <functional>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <callstack.h>
 
 #include "LeakType.hpp"
 
@@ -57,6 +56,7 @@ struct MallocInfo {
     bool enumerated = false;
     /** The absolute and relative image name this record has been found in. */
     std::pair<const char*, const char*> imageName = { nullptr, nullptr };
+    uintptr_t foundInAddress = 0;
 
     /**
      * Initializes this allocation record using the given information.

@@ -125,6 +125,7 @@ void LSan::classifyLeaks(const uintptr_t begin, const uintptr_t end,
             record->second.leakType = direct;
             record->second.imageName.first = name;
             record->second.imageName.second = nameRelative;
+            record->second.foundInAddress = it;
             directs.emplace_back(record->second);
         }
         classifyRecord(record->second, indirect, reclassify);
