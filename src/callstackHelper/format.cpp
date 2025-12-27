@@ -30,77 +30,6 @@
 
 namespace lsan::callstackHelper {
 /**
- * @brief Returns the name of the binary file of the given callstack frame.
- *
- * The file name is allowed to be a relative if relative paths are activated.
- *
- * @param frame the callstack frame
- * @return the name of the binary file of the given callstack frame
- */
-static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::string {
-    [[unlikely]] if (frame.binaryFile == nullptr) {
-        return "<< Unknown >>";
-    }
-    
-    return behaviour::getBehaviour().relativePaths() ? callstack_frame_getShortestName(&frame) : frame.binaryFile;
-}
-
-/**
- * @brief Returns the name of the source file of the given callstack frame.
- *
- * The file name is allowed to be relative if relative paths are activated.
- *
- * @param frame the callstack frame
- * @return the name of the source file name of the given callstack frame
- */
-static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) -> std::string {
-    return behaviour::getBehaviour().relativePaths() ? callstack_frame_getShortestSourceFile(&frame) : frame.sourceFile;
-}
-
-/**
- * Formats the given callstack frame onto the given output stream using the
- * given style.
- *
- * @param frame the callstack frame to be formatted
- * @param out the output stream
- * @tparam S the style to be used
- */
-template<formatter::Style S>
-static inline void formatShared(const callstack_frame& frame, std::ostream& out) {
-    using namespace formatter;
-
-    if (behaviour::getBehaviour().printBinaries()) {
-        bool reset = false;
-        if constexpr (S == Style::GREYED || S == Style::BOLD) {
-            reset = true;
-        }
-        out << formatter::format<Style::ITALIC>("(" + formatString<Style::BLUE>(getCallstackFrameName(frame)) + ")") << (reset ? get<S>() : "") << " ";
-    }
-    bool needsBrackets = false;
-    if (frame.sourceFile == nullptr || behaviour::getBehaviour().printFunctions()) {
-        out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
-        needsBrackets = true;
-    }
-    if (frame.sourceFile != nullptr) {
-        if (needsBrackets) {
-            out << " (";
-        }
-        out << get<Style::CYAN> << getCallstackFrameSourceFile(frame) << ":" << frame.sourceLine;
-        if (frame.sourceLineColumn > 0) {
-            out << ":" << frame.sourceLineColumn;
-        }
-        out << clear<Style::CYAN>;
-        if (needsBrackets) {
-            if constexpr (S == Style::GREYED || S == Style::BOLD) {
-                out << get<S>;
-            }
-            out << ")";
-        }
-    }
-    out << clear<S> << std::endl;
-}
-
-/**
  * Creates and indent string if the given indentation is bigger than zero.
  *
  * @param indent the amount of indentation
@@ -157,16 +86,16 @@ auto format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
             const auto& number = std::to_string(printed + 1);
             stream << indent << formatter::get<Style::GREYED>
                    << formatter::format<Style::ITALIC>("# " + getIndent(maxCount - number.size()) + number + ": ");
-            formatShared<Style::GREYED>(frames[i], stream);
+            formatFrame<Style::GREYED>(frames[i], stream);
         } else if (firstHit) {
             firstHit = false;
             stream << indent << formatter::get<Style::BOLD>
                    << formatter::format<Style::ITALIC>(getIndent(maxCount - 1) + " ->  ");
-            formatShared<Style::BOLD>(frames[i], stream);
+            formatFrame<Style::BOLD>(frames[i], stream);
         } else {
             const auto& number = std::to_string(printed + 1);
             stream << indent << formatter::format<Style::ITALIC>("# " + getIndent(maxCount - number.size()) + number + ": ");
-            formatShared<Style::NONE>(frames[i], stream);
+            formatFrame<Style::NONE>(frames[i], stream);
         }
         firstPrint = false;
         ++printed;
