@@ -83,6 +83,7 @@ static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) ->
  *
  * @param frame the callstack frame to be formatted
  * @param out the output stream
+ * @param singleLine whether the frame info should be printed onto a single line
  * @tparam S the style to be used
  */
 template<formatter::Style S = formatter::Style::NONE>
