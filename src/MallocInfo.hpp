@@ -74,7 +74,6 @@ struct MallocInfo {
      * Creates a callstack of the point where this function is called.
      */
     inline void markDeleted() {
-        deleted = true;
         deletedCallstack = lcs::callstack();
         freeTimestamp = std::chrono::system_clock::now();
         deletedId = getThreadId();
@@ -133,7 +132,7 @@ struct MallocInfo {
      * @return whether the allocation is deallocated
      */
     constexpr inline auto isDeleted() const {
-        return deleted;
+        return deletedCallstack.has_value();
     }
 
     /**
@@ -200,8 +199,6 @@ private:
     void* pointer;
     /** The size of the allocated piece of memory.              */
     std::size_t size;
-    /** Indicates whether this allocation has been deallocated. */
-    bool deleted = false;
     /** The timestamp when this record was freed.               */
     std::optional<std::chrono::system_clock::time_point> freeTimestamp;
     /** The thread number that created this record.             */
