@@ -199,19 +199,19 @@ public:
     auto enumerate() -> std::pair<std::size_t, std::size_t>;
 
 private:
-    /** The pointer to the allocated piece of memory.           */
+    /** The pointer to the allocated piece of memory.                       */
     void* pointer;
-    /** The size of the allocated piece of memory.              */
+    /** The size of the allocated piece of memory.                          */
     std::size_t size;
-    /** The timestamp when this record was freed.               */
+    /** The timestamp when this record was freed.                           */
     std::optional<std::chrono::system_clock::time_point> freeTimestamp;
-    /** The thread number that created this record.             */
+    /** The thread number that created this record.                         */
     unsigned long threadId,
-    /** The thread number that performed the deallocation.      */
+    /** The thread number that performed the deallocation.                  */
                   deletedId = 0;
-    /** The callstack where the allocation happened.            */
+    /** The callstack where the allocation happened.                        */
     mutable lcs::callstack createdCallstack;
-    /** The callstack where the deallocation happened.          */
+    /** The callstack where the deallocation happened.                      */
     mutable std::optional<lcs::callstack> deletedCallstack;
 
     /**
