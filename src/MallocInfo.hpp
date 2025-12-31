@@ -43,10 +43,10 @@ struct MallocInfo {
     /** The preferred constant reference type of this class.                */
     using CRef = std::reference_wrapper<const MallocInfo>;
 
-    /** The type of leak this record has been classified as.                */
-    LeakType leakType = LeakType::unclassified;
     /** The allocation records reachable via this record.                   */
     std::vector<Ref> viaMeRecords;
+    /** The type of leak this record has been classified as.                */
+    LeakType leakType = LeakType::unclassified;
 
     /** Indicates whether this record has been printed as root leak.        */
     bool printedInRoot = false;
@@ -54,6 +54,12 @@ struct MallocInfo {
     bool suppressed = false;
     /** Indicates whether this record has been enumerated.                  */
     bool enumerated = false;
+
+private:
+    /** Flag used to deduplicate the memory leaks.                          */
+    bool flag = false;
+
+public:
     /** The absolute and relative image name this record has been found in. */
     std::pair<const char*, const char*> imageName = { nullptr, nullptr };
     uintptr_t foundInAddress = 0;
@@ -193,8 +199,6 @@ struct MallocInfo {
     auto enumerate() -> std::pair<std::size_t, std::size_t>;
 
 private:
-    /** Flag used to deduplicate the memory leaks.              */
-    bool flag = false;
     /** The pointer to the allocated piece of memory.           */
     void* pointer;
     /** The size of the allocated piece of memory.              */
