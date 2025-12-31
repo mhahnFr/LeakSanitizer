@@ -22,6 +22,7 @@
 #include "MallocInfo.hpp"
 
 #include <limits>
+#include <symbols/symbolInfo.h>
 
 #include "bytePrinter.hpp"
 #include "lsanMisc.hpp"
@@ -122,7 +123,13 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
         stream << ", " << clear<Style::ITALIC> << desc << get<Style::ITALIC>;
     }
     stream << ", " << leakType;
-    if (print && imageName.first != nullptr) {
+    if (leakType == LeakType::globalDirect && foundInAddress != 0) {
+        if (!behaviour::getBehaviour().printBinaries()) {
+            stream << ",";
+        }
+        stream << " ";
+        callstackHelper::formatFrame(symbols_getInfo(reinterpret_cast<void*>(foundInAddress)), stream, true);
+    } else if (print && imageName.first != nullptr) {
         stream << " in " << format<Style::BLUE>(maybeRelativize(imageName));
     }
 
