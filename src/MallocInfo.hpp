@@ -34,8 +34,8 @@
 
 namespace lsan {
 /**
- * This class acts as an allocation record: all information about the allocation
- * process that is available is stored.
+ * This class acts as an allocation record: all information about the
+ * allocation process that is available is stored.
  */
 struct MallocInfo {
     /** The preferred reference type of this class.                         */
@@ -62,6 +62,7 @@ private:
 public:
     /** The absolute and relative image name this record has been found in. */
     std::pair<const char*, const char*> imageName = { nullptr, nullptr };
+    /** The address the represented allocation was found in.                */
     uintptr_t foundInAddress = 0;
 
     /**
