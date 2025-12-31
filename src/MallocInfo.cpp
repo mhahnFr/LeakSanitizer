@@ -167,11 +167,6 @@ void MallocInfo::printCreatedCallstack(std::ostream& out, const std::string& ind
 }
 
 void MallocInfo::printDeletedCallstack(std::ostream& out) const {
-    if (!deletedCallstack) {
-        throw std::runtime_error("MallocInfo: No deleted callstack! "
-                                 "Hint: Check using MallocInfo::getDeletedCallstack()::has_value().");
-    }
-
-    callstack::format(*deletedCallstack, out);
+    callstack::format(deletedCallstack.value(), out);
 }
 }
