@@ -86,7 +86,7 @@ static inline auto getCallstackFrameSourceFile(const callstack_frame & frame) ->
  * @tparam S the style to be used
  */
 template<formatter::Style S = formatter::Style::NONE>
-static inline void formatFrame(const callstack_frame& frame, std::ostream& out) {
+static inline void formatFrame(const callstack_frame& frame, std::ostream& out, const bool singleLine = false) {
     using namespace formatter;
 
     if (behaviour::getBehaviour().printBinaries()) {
@@ -94,7 +94,8 @@ static inline void formatFrame(const callstack_frame& frame, std::ostream& out) 
         if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
         }
-        out << formatter::format<Style::ITALIC>("(" + formatString<Style::BLUE>(getCallstackFrameName(frame)) + ")") << (reset ? get<S>() : "") << " ";
+        out << formatter::format<Style::ITALIC>("(" + formatString<Style::BLUE>(getCallstackFrameName(frame)) + ")")
+            << (reset ? get<S>() : "") << (singleLine ? ":" : "") << " ";
     }
     bool needsBrackets = false;
     if (frame.sourceFile == nullptr || behaviour::getBehaviour().printFunctions()) {
@@ -117,7 +118,10 @@ static inline void formatFrame(const callstack_frame& frame, std::ostream& out) 
             out << ")";
         }
     }
-    out << clear<S> << std::endl;
+    out << clear<S>;
+    if (!singleLine) {
+        out << std::endl;
+    }
 }
 }
 
