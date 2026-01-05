@@ -19,6 +19,8 @@
  * LeakSanitizer, see the file LICENSE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#define LCS_USE_UNSAFE_OPTIMIZATION 1
+
 #include "MallocInfo.hpp"
 
 #include <limits>
@@ -124,7 +126,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
     }
     stream << ", " << leakType;
     if (leakType == LeakType::globalDirect && foundInAddress != 0) {
-        const auto& frame = symbols_getInfo(reinterpret_cast<void*>(foundInAddress));
+        const auto& frame = symbols_getInfoCached(reinterpret_cast<void*>(foundInAddress));
         if (!behaviour::getBehaviour().printBinaries() && (frame.function != nullptr || frame.sourceFile != nullptr)) {
             stream << ",";
         }
