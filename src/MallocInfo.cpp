@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2025  mhahnFr
+ * Copyright (C) 2022 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -124,11 +124,12 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
     }
     stream << ", " << leakType;
     if (leakType == LeakType::globalDirect && foundInAddress != 0) {
-        if (!behaviour::getBehaviour().printBinaries()) {
+        const auto& frame = symbols_getInfo(reinterpret_cast<void*>(foundInAddress));
+        if (!behaviour::getBehaviour().printBinaries() && (frame.function != nullptr || frame.sourceFile != nullptr)) {
             stream << ",";
         }
         stream << " ";
-        callstackHelper::formatFrame(symbols_getInfo(reinterpret_cast<void*>(foundInAddress)), stream, true);
+        callstackHelper::formatFrame(frame, stream, true);
     } else if (print && imageName.first != nullptr) {
         stream << " in " << format<Style::BLUE>(maybeRelativize(imageName));
     }

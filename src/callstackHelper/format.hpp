@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2025  mhahnFr
+ * Copyright (C) 2023 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -90,18 +90,21 @@ template<formatter::Style S = formatter::Style::NONE>
 static inline void formatFrame(const callstack_frame& frame, std::ostream& out, const bool singleLine = false) {
     using namespace formatter;
 
-    if (behaviour::getBehaviour().printBinaries()) {
+    if (const auto willPrintMore = frame.sourceFile != nullptr || (singleLine ? frame.function != nullptr : true);
+        behaviour::getBehaviour().printBinaries() || !willPrintMore) {
         bool reset = false;
         if constexpr (S == Style::GREYED || S == Style::BOLD) {
             reset = true;
         }
         out << formatter::format<Style::ITALIC>("(" + formatString<Style::BLUE>(getCallstackFrameName(frame)) + ")")
-            << (reset ? get<S>() : "") << (singleLine ? ":" : "") << " ";
+            << (reset ? get<S>() : "") << (willPrintMore ? ":" : "") << " ";
     }
     bool needsBrackets = false;
     if (frame.sourceFile == nullptr || behaviour::getBehaviour().printFunctions()) {
-        out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
-        needsBrackets = true;
+        if (!(frame.function == nullptr && singleLine)) {
+            out << (frame.function == nullptr ? "<< Unknown >>" : frame.function);
+            needsBrackets = true;
+        }
     }
     if (frame.sourceFile != nullptr) {
         if (needsBrackets) {
