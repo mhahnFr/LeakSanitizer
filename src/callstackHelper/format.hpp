@@ -110,9 +110,10 @@ static inline void formatFrame(const callstack_frame& frame, std::ostream& out, 
         if (needsBrackets) {
             out << " (";
         }
-        out << get<Style::CYAN> << getCallstackFrameSourceFile(frame) << ":" << frame.sourceLine;
+        out << formatter::format<Style::CYAN>(getCallstackFrameSourceFile(frame)) << ":"
+            << formatter::format<Style::AMBER>(frame.sourceLine);
         if (frame.sourceLineColumn > 0) {
-            out << ":" << frame.sourceLineColumn;
+            out << ":" << formatter::format<Style::AMBER>(frame.sourceLineColumn);
         }
         out << clear<Style::CYAN>;
         if (needsBrackets) {
