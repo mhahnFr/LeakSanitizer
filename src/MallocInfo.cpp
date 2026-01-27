@@ -146,7 +146,7 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
         getInstance().hadIndirects = true;
         stream << ", " << count << " leak" << (count > 1 ? "s" : "") << " (" << bytesToString(bytes) << ") indirect";
     }
-    stream << std::endl;
+    stream << clear<Style::ITALIC> << std::endl;
     printCreatedCallstack(stream, indentString);
 
     if (behaviour::getBehaviour().showIndirects() && count > 0) {
