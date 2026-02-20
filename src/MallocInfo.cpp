@@ -126,12 +126,14 @@ void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long
     }
     stream << ", " << leakType;
     if (leakType == LeakType::globalDirect && foundInAddress != 0) {
-        const auto& frame = symbols_getInfoCached(reinterpret_cast<void*>(foundInAddress));
-        if (!behaviour::getBehaviour().printBinaries() && (frame.function != nullptr || frame.sourceFile != nullptr)) {
-            stream << ",";
+        auto frame = callstack_frame callstack_frame_initializer;
+        if (symbols_getInfoCached(reinterpret_cast<void*>(foundInAddress), &frame)) {
+            if (!behaviour::getBehaviour().printBinaries() && (frame.function != nullptr || frame.sourceFile != nullptr)) {
+                stream << ",";
+            }
+            stream << " ";
+            callstackHelper::formatFrame(frame, stream, true);
         }
-        stream << " ";
-        callstackHelper::formatFrame(frame, stream, true);
     } else if (print && imageName.first != nullptr) {
         stream << " in " << format<Style::BLUE>(maybeRelativize(imageName));
     }
