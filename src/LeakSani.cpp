@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2025  mhahnFr
+ * Copyright (C) 2022 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -842,10 +842,11 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
 }
 
 void LSan::changeMalloc(const ATracker* tracker, MallocInfo&& info) {
-    std::lock_guard lock { infoMutex };
+    std::unique_lock lock { infoMutex };
 
     const auto& it = infos.find(info.getPointer());
     if (it == infos.end()) {
+        lock.unlock();
         std::lock_guard tlsLock { tlsTrackerMutex };
         for (const auto element : tlsTrackers) {
             if (element == tracker) continue;
