@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2025  mhahnFr
+ * Copyright (C) 2022 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -139,7 +139,7 @@ constexpr inline auto clear() -> const char * {
  * @return the corresponding escape code
  */
 constexpr inline auto clearAll() -> const char * {
-    return "\033[0m";
+    return printFormatted() ? "\033[0m" : "";
 }
 
 /**
