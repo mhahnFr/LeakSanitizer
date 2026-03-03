@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -110,9 +110,10 @@ auto TLSTracker::removeMalloc(void* pointer) -> std::pair<bool, std::optional<Ma
 }
 
 void TLSTracker::changeMalloc(MallocInfo&& info) {
-    std::lock_guard lock { infoMutex };
+    std::unique_lock lock { infoMutex };
 
     if (const auto& it = infos.find(info.getPointer()); it == infos.end()) {
+        lock.unlock();
         getInstance().changeMalloc(this, std::move(info));
         return;
     }
