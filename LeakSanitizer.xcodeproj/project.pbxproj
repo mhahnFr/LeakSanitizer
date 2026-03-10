@@ -927,6 +927,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/SimpleJSON/include",
+					"$(PROJECT_DIR)/CallstackLibrary/include",
+					"$(SRCROOT)/suppressions",
+				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/CallstackLibrary";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1001,6 +1007,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/SimpleJSON/include",
+					"$(PROJECT_DIR)/CallstackLibrary/include",
+					"$(SRCROOT)/suppressions",
+				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/CallstackLibrary";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1014,31 +1026,24 @@
 		BFCDA7EC2E2F7C2C0029AEC1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2.0;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 2;
 				DYLIB_CURRENT_VERSION = 2.0;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = YES;
-				GCC_WARN_SHADOW = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/SimpleJSON/include",
 					"$(PROJECT_DIR)/CallstackLibrary/include",
-					"$(PROJECT_DIR)/include",
 					"$(SRCROOT)/suppressions",
+					"$(PROJECT_DIR)/include",
 				);
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/CallstackLibrary",
 				);
 				MARKETING_VERSION = 2.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
@@ -1053,31 +1058,24 @@
 		BFCDA7ED2E2F7C2C0029AEC1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2.0;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 2;
 				DYLIB_CURRENT_VERSION = 2.0;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = YES;
-				GCC_WARN_SHADOW = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/SimpleJSON/include",
 					"$(PROJECT_DIR)/CallstackLibrary/include",
-					"$(PROJECT_DIR)/include",
 					"$(SRCROOT)/suppressions",
+					"$(PROJECT_DIR)/include",
 				);
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/CallstackLibrary",
 				);
 				MARKETING_VERSION = 2.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
@@ -1128,16 +1126,6 @@
 			buildSettings = {
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/CallstackLibrary/include",
-					"$(PROJECT_DIR)/SimpleJSON/include",
-					"$(SRCROOT)/suppressions",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/CallstackLibrary",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.mhahn.LeakSanitizer.CrashHandler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1148,16 +1136,6 @@
 			buildSettings = {
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/CallstackLibrary/include",
-					"$(PROJECT_DIR)/SimpleJSON/include",
-					"$(SRCROOT)/suppressions",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/CallstackLibrary",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.mhahn.LeakSanitizer.CrashHandler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
