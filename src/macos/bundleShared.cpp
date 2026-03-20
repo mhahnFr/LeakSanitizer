@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2025  mhahnFr
+ * Copyright (C) 2025 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -42,7 +42,7 @@ auto readFile(const std::filesystem::path& path) -> std::string {
 }
 
 auto loadResource(const CFURLRef url) -> std::string {
-    [[unlikely]] if (url == nil) {
+    if (url == nil) [[unlikely]] {
         throw std::runtime_error("Resource URL is nil");
     }
     const auto path = CFURLCopyPath(url);

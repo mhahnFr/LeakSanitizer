@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2025  mhahnFr
+ * Copyright (C) 2025 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -43,13 +43,13 @@ void killBundle() {
 auto getCrashHandlerPath() -> std::string {
     return getTracker().withIgnorationResult(IGNORE_OBJC, [] {
         const auto result = CFBundleCopyResourceURL(getBundle(), CFSTR("CrashHandler"), nil, nil);
-        [[unlikely]] if (result == nil) {
+        if (result == nil) [[unlikely]] {
             return std::string {};
         }
 
         const auto path = CFURLCopyPath(result);
         CFRelease(result);
-        [[unlikely]] if (path == nil) {
+        if (path == nil) [[unlikely]] {
             return std::string {};
         }
 
@@ -65,7 +65,7 @@ constexpr inline auto DEFAULT_VERSION = std::string("CLEAN BUILD");
 auto getVersion() -> std::string {
     return getTracker().withIgnorationResult(IGNORE_OBJC, [] -> std::string {
         const auto value = CFBundleGetValueForInfoDictionaryKey(getBundle(), kCFBundleVersionKey);
-        [[unlikely]] if (value == nil) {
+        if (value == nil) [[unlikely]] {
             return DEFAULT_VERSION;
         }
         return convertCFString(CFStringRef(value)).value_or(DEFAULT_VERSION);
@@ -73,13 +73,13 @@ auto getVersion() -> std::string {
 }
 
 auto convertCFString(const CFStringRef str) -> std::optional<std::string> {
-    [[unlikely]] if (str == nil) return std::nullopt;
+    if (str == nil) [[unlikely]] return std::nullopt;
 
     auto& tracker = getTracker();
     const auto cStr = tracker.withIgnorationResult(IGNORE_OBJC, [str] {
         return CFStringGetCStringPtr(str, kCFStringEncodingUTF8);
     });
-    [[likely]] if (cStr != nullptr) {
+    if (cStr != nullptr) [[likely]] {
         return cStr;
     }
 

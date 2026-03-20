@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2025  mhahnFr
+ * Copyright (C) 2025 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -33,10 +33,10 @@ auto suppression::getSystemLibraries() -> const std::vector<std::regex>& {
 }
 
 auto macos::bundle::convertCFString(CFStringRef str) -> std::optional<std::string> {
-    [[unlikely]] if (str == nil) return std::nullopt;
+    if (str == nil) [[unlikely]] return std::nullopt;
 
     const auto cStr = CFStringGetCStringPtr(str, kCFStringEncodingUTF8);
-    [[likely]] if (cStr != nullptr) {
+    if (cStr != nullptr) [[likely]] {
         return cStr;
     }
     auto toReturn = std::string(std::string::size_type(CFStringGetLength(str)), '\0');
@@ -45,7 +45,7 @@ auto macos::bundle::convertCFString(CFStringRef str) -> std::optional<std::strin
 
 auto macos::bundle::getBundle() -> CFBundleRef {
     static auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("fr.mhahn.LeakSanitizer"));
-    [[unlikely]] if (bundle == nil) {
+    if (bundle == nil) [[unlikely]] {
         throw std::runtime_error("Bundle not loaded");
     }
     return bundle;
@@ -69,18 +69,18 @@ auto macos::bundle::getBundle() -> CFBundleRef {
 [[noreturn]] auto main(int argc, const char** argv) -> int {
     using namespace signals;
 
-    [[unlikely]] if (argc < 3) {
+    if (argc < 3) [[unlikely]] {
         error("Not enough arguments provided");
     }
-    [[unlikely]] if (strlen(argv[1]) != 1) {
+    if (strlen(argv[1]) != 1) [[unlikely]] {
         error("Zero replacement is not a single byte");
     }
-    [[unlikely]] if (strlen(argv[2]) != sizeof(SignalInfo)) {
+    if (strlen(argv[2]) != sizeof(SignalInfo)) [[unlikely]] {
         error("Passed wrong number of bytes");
     }
 
     auto info = SignalInfo::fromBinary(argv[2], sizeof(SignalInfo), argv[1][0]);
-    [[unlikely]] if (argc - 3 != info.callstack->backtraceSize) {
+    if (argc - 3 != info.callstack->backtraceSize) [[unlikely]] {
         error("Wrong number of binary file paths");
     }
     setenv("\t\n\f\vLSAN_SUPPRESSED_BY_CRASH_HANDLER", "", false);
