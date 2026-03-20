@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -108,7 +108,7 @@ public:
  */
 static inline auto getFiles(const char* files) -> std::vector<std::filesystem::path> {
     auto toReturn = std::vector<std::filesystem::path>();
-    [[likely]] if (files != nullptr) {
+    if (files != nullptr) [[likely]] {
         auto stream = std::istringstream(files);
         std::string s;
         while (std::getline(stream, s, ':')) {
