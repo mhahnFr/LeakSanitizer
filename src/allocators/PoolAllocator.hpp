@@ -148,7 +148,7 @@ struct PoolAllocator {
                 return element.getObjectSize() == pool.getObjectSize();
             });
             if (it == pools->end()) {
-                pools->push_back(pool);
+                pools->emplace_back(pool);
             } else {
                 it->merge(pool);
             }

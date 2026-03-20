@@ -476,7 +476,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& selfThread = std::this_thread::get_id() == info.getId();
         if (!selfThread && !suspendThread(info)) [[unlikely]] {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
-            failed.push_back(info);
+            failed.emplace_back(info);
             continue;
         }
         const auto& top = align(info.getStackTop(), false)

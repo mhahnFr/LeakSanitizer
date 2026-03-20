@@ -128,7 +128,7 @@ Suppression::Suppression(const Object& object):
         for (const auto& functionObject : *functionArray) {
             auto&& frame = getCallstackObject(functionObject, name);
             hasRegexes = hasRegexes || frame.first == Type::regex;
-            topCallstack.push_back(std::move(frame));
+            topCallstack.emplace_back(std::move(frame));
         }
     }
 }
