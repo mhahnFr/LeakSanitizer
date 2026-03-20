@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2025  mhahnFr
+ * Copyright (C) 2025 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -49,7 +49,7 @@ static std::map<const char*, Classification> cache; // TODO: Use a pool map?
  * @return whether the given binary file name is first party
  */
 static inline auto isFirstPartyCore(const char* file) -> bool {
-    [[unlikely]] if (file == nullptr) {
+    if (file == nullptr) [[unlikely]] {
         return false;
     }
 

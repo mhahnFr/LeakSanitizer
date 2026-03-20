@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -60,7 +60,7 @@ static inline auto getFunctionPair(const std::string& name,
  * @return the leak type corresponding to the given number
  */
 static inline constexpr auto asLeakType(const std::optional<unsigned long>& number) -> std::optional<LeakType> {
-    [[unlikely]] if (number && *number > 10) {
+    if (number && *number > 10) [[unlikely]] {
         throw std::runtime_error("Not a leak type: " + std::to_string(*number));
     }
     return number ? std::optional(LeakType(*number)) : std::nullopt;
@@ -117,11 +117,11 @@ Suppression::Suppression(const Object& object):
     imageName(object.get<ValueType::String>("imageName"))
 {
     const auto& functionArray = object.get<ValueType::Array>("functions");
-    [[unlikely]] if (!imageName && !functionArray) {
+    if (!imageName && !functionArray) [[unlikely]] {
         throw std::runtime_error("Suppressions need either 'imageName' or 'functions'");
     }
     if (functionArray) {
-        [[unlikely]] if (functionArray->empty()) {
+        if (functionArray->empty()) [[unlikely]] {
             throw std::runtime_error("Function array empty");
         }
         topCallstack.reserve(functionArray->size());

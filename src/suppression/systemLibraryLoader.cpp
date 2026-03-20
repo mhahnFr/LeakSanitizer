@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2025  mhahnFr
+ * Copyright (C) 2025 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -36,11 +36,11 @@ namespace lsan::suppression {
  */
 static inline void loadSystemLibraryFile(std::vector<std::regex>& content, const simple_json::Value& object) {
     using namespace simple_json;
-    [[unlikely]] if (!object.is(ValueType::Array)) {
+    if (!object.is(ValueType::Array)) [[unlikely]] {
         throw std::runtime_error("System libraries should be defined as a top level string array");
     }
     for (const auto& value : object.as<ValueType::Array>()) {
-        [[unlikely]] if (!value.is(ValueType::String)) {
+        if (!value.is(ValueType::String)) [[unlikely]] {
             throw std::runtime_error("System library regex was not a string");
         }
 
@@ -74,7 +74,7 @@ auto loadSystemLibraries() -> std::vector<std::regex> {
 
             getOutputStream() << format<Style::RED, Style::BOLD>("LSan: Failed to load system library file \"" + file.string() + "\": " + e.what()) << std::endl << std::endl;
         }
-        [[likely]] if (stream.is_open()) {
+        if (stream.is_open()) [[likely]] {
             stream.close();
         }
     }

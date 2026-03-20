@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2025  mhahnFr
+ * Copyright (C) 2025 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -44,7 +44,7 @@ static inline auto match(const suppression::Suppression::RangeOrRegexType& supp,
     }
     const auto& suppressions = std::get<suppression::Suppression::RegexType>(supp.second);
     const char* binaryFile = frame->binaryFile;
-    [[unlikely]] if (binaryFile == nullptr) {
+    if (binaryFile == nullptr) [[unlikely]] {
         binaryFile = "";
     }
     return std::ranges::any_of(suppressions, [&](const std::regex& regex) {
@@ -58,7 +58,7 @@ auto isSuppressed(const suppression::Suppression& suppression, lcs::callstack& c
     const callstack_frame* binaries = nullptr;
     if (suppression.hasRegexes) {
         binaries = callstack_autoClearCaches ? callstack_getBinaries(callstack) : callstack_getBinariesCached(callstack);
-        [[unlikely]] if (binaries == nullptr) {
+        if (binaries == nullptr) [[unlikely]] {
             return false;
         }
     }
