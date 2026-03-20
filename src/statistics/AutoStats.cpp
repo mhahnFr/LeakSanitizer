@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -57,7 +57,7 @@ class AutoStats {
                 cv.wait_for(lock, sleepTime, [this] {
                     return !run;
                 });
-                [[unlikely]] if (!run) {
+                if (!run) [[unlikely]] {
                     return;
                 }
             }
@@ -71,7 +71,7 @@ class AutoStats {
 
 public:
     inline AutoStats() {
-        [[unlikely]] if (!shouldActivate()) return;
+        if (!shouldActivate()) [[unlikely]] return;
 
         using namespace std::chrono_literals;
 
@@ -87,7 +87,7 @@ public:
             run = false;
         }
         cv.notify_all();
-        [[likely]] if (statsThread.joinable()) {
+        if (statsThread.joinable()) [[likely]] {
             statsThread.join();
         }
     }
