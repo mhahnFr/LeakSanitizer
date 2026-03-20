@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -36,7 +36,7 @@ namespace lsan {
  */
 template<typename ...Args>
 constexpr static inline void crashOrWarn(Args&& ...args) {
-    [[likely]] if (behaviour::getBehaviour().invalidCrash()) {
+    if (behaviour::getBehaviour().invalidCrash()) [[likely]] {
         crash(std::forward<Args>(args)...);
     } else {
         warn(std::forward<Args>(args)...);

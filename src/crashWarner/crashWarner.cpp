@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2025  mhahnFr
+ * Copyright (C) 2023 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -83,8 +83,8 @@ constexpr static inline void printer(const std::string&                     mess
 template<typename F>
 static inline void withCallstack(const F & function) {
     auto callstack = lcs::callstack();
-    [[likely]] if (const auto& suppressions = getSuppressions();
-        !callstackHelper::isSuppressed(suppressions.cbegin(), suppressions.cend(), callstack)) {
+    if (const auto& suppressions = getSuppressions();
+        !callstackHelper::isSuppressed(suppressions.cbegin(), suppressions.cend(), callstack)) [[likely]] {
         function(callstack);
     }
 }
