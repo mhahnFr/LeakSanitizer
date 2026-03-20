@@ -1,9 +1,5 @@
 # Behaviour
-The LeakSanitizer allows you to adjust its behaviour using a set of variables.
-
-Since version
-- **1.6** they can be set as environment variables
-- **1.11** the *C* API for the behavioral variables is deprecated *(find its documentation [here][1])*
+The LeakSanitizer allows you to adjust its behaviour using a set of environment variables.
 
 ## Environment variables
 ### `LSAN_HUMAN_PRINT`
@@ -157,7 +153,6 @@ Time intervals are defined as non-negative integral number, which may immediatel
 - `m`: minutes
 - `h`: hours
 
-[1]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_internals.h
 [2]: #boolean
 [3]: #lsan_auto_stats
 [4]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h
