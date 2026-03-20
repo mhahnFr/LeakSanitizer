@@ -58,7 +58,7 @@ namespace lsan::callstackHelper {
  * @return the name of the binary file of the given callstack frame
  */
 static inline auto getCallstackFrameName(const callstack_frame & frame) -> std::string {
-    [[unlikely]] if (frame.binaryFile == nullptr) {
+    if (frame.binaryFile == nullptr) [[unlikely]] {
         return "<< Unknown >>";
     }
 

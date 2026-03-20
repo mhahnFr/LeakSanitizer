@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2025  mhahnFr
+ * Copyright (C) 2023 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -48,7 +48,7 @@ auto format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
         // potentially fail early.
         //
         //                          - mhahnFr
-        [[unlikely]] if (callstack_getBinariesCached(callstack) == nullptr) {
+        if (callstack_getBinariesCached(callstack) == nullptr) [[unlikely]] {
             stream << indent << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
             return false;
         }
@@ -56,7 +56,7 @@ auto format(lcs::callstack& callstack, std::ostream& stream, const std::string& 
     const auto& frames = callstack_toArray(callstack);
     const auto& size   = callstack_getFrameCount(callstack);
 
-    [[unlikely]] if (frames == nullptr) {
+    if (frames == nullptr) [[unlikely]] {
         stream << indent << formatter::format<Style::RED>("LSan: Error: Failed to translate the callstack.") << std::endl;
         return false;
     }
