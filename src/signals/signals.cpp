@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -44,14 +44,14 @@ auto createAlternativeStack(void*(&allocator)(std::size_t)) -> void* {
     std::size_t stackSize = SIGSTKSZ;
 
     const auto toReturn = allocator(stackSize);
-    [[unlikely]] if (toReturn == nullptr) {
+    if (toReturn == nullptr) [[unlikely]] {
         return nullptr;
     }
     stack_t s;
     s.ss_flags = 0;
     s.ss_size  = stackSize;
     s.ss_sp    = toReturn;
-    [[unlikely]] if (sigaltstack(&s, nullptr) != 0) {
+    if (sigaltstack(&s, nullptr) != 0) [[unlikely]] {
         std::free(toReturn);
         return nullptr;
     }

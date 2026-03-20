@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2025  mhahnFr
+ * Copyright (C) 2025 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -46,7 +46,7 @@ struct SignalInfo {
                 break;
             }
         }
-        [[unlikely]] if (*substitute == 0) {
+        if (*substitute == 0) [[unlikely]] {
             throw std::runtime_error("No substitute found");
         }
         for (std::size_t i = 0; i < bufferSize; ++i) {

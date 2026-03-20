@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2025  mhahnFr
+ * Copyright (C) 2022 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -134,10 +134,10 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
  */
 [[ noreturn ]] static inline void crashWithTraceRemote(const int signalCode, const siginfo_t* signalContext, lcs::callstack&& callstack) {
     const auto& path = macos::bundle::getCrashHandlerPath();
-    [[unlikely]] if (path.empty()) {
+    if (path.empty()) [[unlikely]] {
         crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
     }
-    [[unlikely]] if (const auto pid = fork(); pid < 0) {
+    if (const auto pid = fork(); pid < 0) [[unlikely]] {
         crashWithTraceLocal(signalCode, signalContext, std::move(callstack));
     } else if (pid == 0) {
         char buffer[sizeof(SignalInfo) + 1] {};
@@ -158,7 +158,7 @@ static inline auto createCallstackFor(void* ptr) -> lcs::callstack {
         args[1] = substitute;
         args[2] = buffer;
 
-        [[unlikely]] if (execv(path.c_str(), const_cast<char* const*>(args)) < 0) {
+        if (execv(path.c_str(), const_cast<char* const*>(args)) < 0) [[unlikely]] {
             crashWithTraceLocal(signalCode, signalContext, std::move(info.callstack));
         }
     } else {
