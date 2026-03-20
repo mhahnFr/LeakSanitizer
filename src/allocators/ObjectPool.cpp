@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -40,7 +40,7 @@ auto ObjectPool::allocate() -> void* {
         return reinterpret_cast<void*>(uintptr_t(toReturn) + sizeof(MemoryBlock*));
     }
     auto buffer = std::malloc((objectSize + sizeof(MemoryBlock*)) * (blockSize * factor) + sizeof(MemoryBlock));
-    [[unlikely]] if (buffer == nullptr) {
+    if (buffer == nullptr) [[unlikely]] {
         return nullptr;
     }
     const auto newBlock = new(buffer) MemoryBlock(blockSize * factor);

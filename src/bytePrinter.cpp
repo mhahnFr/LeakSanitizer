@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2025  mhahnFr
+ * Copyright (C) 2022 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -35,7 +35,7 @@ static constexpr inline const char* sizes[] { "EiB", "PiB", "TiB", "GiB", "MiB",
 
 auto bytesToString(const unsigned long long amount) -> std::string {
     std::stringstream s;
-    [[unlikely]] if (!behaviour::getBehaviour().humanPrint() || amount == 0) {
+    if (!behaviour::getBehaviour().humanPrint() || amount == 0) [[unlikely]] {
         s << amount << " B";
     } else {
         unsigned long long multiplier = exabyte;

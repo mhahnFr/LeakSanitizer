@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2025  mhahnFr
+ * Copyright (C) 2023 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -69,7 +69,7 @@ constexpr inline auto get(const char* name) -> std::optional<T> {
 
 template<>
 constexpr inline auto getFrom(const char* value) -> std::optional<std::size_t> {
-    [[unlikely]] if (value == nullptr) {
+    if (value == nullptr) [[unlikely]] {
         return std::nullopt;
     }
 
@@ -103,7 +103,7 @@ static inline auto lowerCompare(const char * string1, const char * string2) -> b
 
 template<>
 constexpr inline auto getFrom(const char* value) -> std::optional<bool> {
-    [[unlikely]] if (value == nullptr) {
+    if (value == nullptr) [[unlikely]] {
         return std::nullopt;
     }
 

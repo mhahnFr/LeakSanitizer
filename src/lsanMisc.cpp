@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2025  mhahnFr
+ * Copyright (C) 2023 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -106,7 +106,7 @@ auto printInformation(std::ostream & out) -> std::ostream & {
 
 void exitHook() {
     getInstance().finish();
-    [[likely]] if (shouldActivate()) {
+    if (shouldActivate()) [[likely]] {
         getTracker().ignoreMalloc = true;
         getOutputStream() << maybePrintExitPoint
         << std::endl     << std::endl
@@ -138,7 +138,7 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
  * @return the new and allocated thread local tracker
  */
 static inline auto newLocalTracker(const bool pseudo) -> trackers::ATracker* {
-    [[unlikely]] if (pseudo) {
+    if (pseudo) [[unlikely]] {
         return new trackers::PseudoTracker();
     }
     return new trackers::TLSTracker();

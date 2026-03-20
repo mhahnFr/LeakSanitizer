@@ -209,10 +209,10 @@ static inline auto findStackBegin(pthread_t thread = pthread_self()) -> void* {
 #elifdef LSAN_OS_LINUX
     pthread_attr_t attr;
     std::size_t ignored;
-    [[unlikely]] if (pthread_getattr_np(thread, &attr) != 0) {
+    if (pthread_getattr_np(thread, &attr) != 0) [[unlikely]] {
         throw std::runtime_error("Failed to gather thread attributes");
     }
-    [[unlikely]] if (pthread_attr_getstack(&attr, &toReturn, &ignored) != 0) {
+    if (pthread_attr_getstack(&attr, &toReturn, &ignored) != 0) [[unlikely]] {
         pthread_attr_destroy(&attr);
         throw std::runtime_error("Failed to gather stack address");
     }
@@ -235,10 +235,10 @@ static inline auto findStackSize(pthread_t thread = pthread_self()) -> std::size
     toReturn = pthread_get_stacksize_np(thread);
 #elifdef LSAN_OS_LINUX
     pthread_attr_t attr;
-    [[unlikely]] if (pthread_getattr_np(thread, &attr) != 0) {
+    if (pthread_getattr_np(thread, &attr) != 0) [[unlikely]] {
         throw std::runtime_error("Failed to gather thread attributes");
     }
-    [[unlikely]] if (pthread_attr_getstacksize(&attr, &toReturn) != 0) {
+    if (pthread_attr_getstacksize(&attr, &toReturn) != 0) [[unlikely]] {
         pthread_attr_destroy(&attr);
         throw std::runtime_error("Failed to gather stack size");
     }
@@ -400,8 +400,8 @@ static inline auto getStackPointer(const ThreadInfo& info) -> uintptr_t {
     uintptr_t toReturn;
 #ifdef LSAN_OS_MACOS
     auto count = std::size_t(0);
-    [[unlikely]] if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
-                                                        &toReturn, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE)
+    if (thread_get_register_pointer_values(pthread_mach_thread_np(info.getThread()),
+                                           &toReturn, &count, nullptr) != KERN_INSUFFICIENT_BUFFER_SIZE) [[unlikely]]
 #elifdef LSAN_OS_LINUX
     void* sp;
     while ((sp = info.getSP()) == nullptr);
@@ -474,7 +474,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
         const auto& threadDesc = getThreadDescription(info.getNumber(), info.getThread());
 
         const auto& selfThread = std::this_thread::get_id() == info.getId();
-        [[unlikely]] if (!selfThread && !suspendThread(info)) {
+        if (!selfThread && !suspendThread(info)) [[unlikely]] {
             out << std::endl << format<Style::AMBER>("LSan: Warning: Failed to suspend " + threadDesc + ".") << std::endl;
             failed.push_back(info);
             continue;
@@ -504,7 +504,7 @@ auto LSan::classifyLeaks() -> LeakKindStats {
 #ifdef LSAN_OS_LINUX
         if (info.isDead()) continue;
 #endif
-        [[unlikely]] if (std::ranges::find(std::as_const(failed), info) != failed.end()) {
+        if (std::ranges::find(std::as_const(failed), info) != failed.end()) [[unlikely]] {
             continue;
         }
 
@@ -633,7 +633,7 @@ for (const auto& leak : (records)) {                              \
  */
 static inline auto createSaniKey() -> pthread_key_t {
     pthread_key_t key;
-    [[unlikely]] if (pthread_key_create(&key, destroySaniKey) != 0) {
+    if (pthread_key_create(&key, destroySaniKey) != 0) [[unlikely]] {
         throw std::runtime_error("Could not create TLS key!");
     }
     return key;
@@ -809,7 +809,7 @@ auto LSan::removeMalloc(const ATracker* tracker, void* pointer) -> std::pair<boo
             }
         }
     }
-    [[unlikely]] if (!result.first) {
+    if (!result.first) [[unlikely]] {
         if (result.second && tmp.second) {
             return result.second->get().isMoreRecent(tmp.second->get()) ? result : tmp;
         }
@@ -832,7 +832,7 @@ auto LSan::maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<Mal
     if (it->second.isDeleted()) {
         return std::make_pair(false, std::ref(it->second));
     }
-    [[unlikely]] if (behaviour.statsActive()) {
+    if (behaviour.statsActive()) [[unlikely]] {
         stats -= it->second;
         it->second.markDeleted();
     } else {
@@ -857,7 +857,7 @@ void LSan::changeMalloc(const ATracker* tracker, MallocInfo&& info) {
         }
         return;
     }
-    [[unlikely]] if (behaviour.statsActive()) {
+    if (behaviour.statsActive()) [[unlikely]] {
         stats.replaceMalloc(it->second.getSize(), info.getSize());
     }
     infos.insert_or_assign(info.getPointer(), info);
@@ -893,7 +893,7 @@ auto LSan::getSuppressions() -> const std::vector<suppression::Suppression>& {
 
 auto LSan::getSystemLibraries() -> const std::vector<std::regex>& {
 #ifdef LSAN_OS_LINUX
-    [[unlikely]] if (crashed) {
+    if (crashed) [[unlikely]] {
         static auto toReturn = suppression::loadSystemLibraries();
         return toReturn;
     }
@@ -932,31 +932,31 @@ static inline auto maybeShowDeprecationWarnings(std::ostream& out) -> std::ostre
     using namespace formatter;
 
     std::ostringstream oss;
-    [[unlikely]] if (has("LSAN_PRINT_STATS_ON_EXIT")) {
+    if (has("LSAN_PRINT_STATS_ON_EXIT")) [[unlikely]] {
         printDeprecation(oss, "LSAN_PRINT_STATS_ON_EXIT", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.7"));
     }
-    [[unlikely]] if (has("LSAN_PRINT_LICENSE")) {
+    if (has("LSAN_PRINT_LICENSE")) [[unlikely]] {
         printDeprecation(oss, "LSAN_PRINT_LICENSE", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
-    [[unlikely]] if (has("LSAN_PRINT_WEBSITE")) {
+    if (has("LSAN_PRINT_WEBSITE")) [[unlikely]] {
         printDeprecation(oss, "LSAN_PRINT_WEBSITE", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.8"));
     }
-    [[unlikely]] if (has("LSAN_FIRST_PARTY_THRESHOLD")) {
+    if (has("LSAN_FIRST_PARTY_THRESHOLD")) [[unlikely]] {
         printDeprecation(oss, "LSAN_FIRST_PARTY_THRESHOLD", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
-    [[unlikely]] if (has("LSAN_FIRST_PARTY_REGEX")) {
+    if (has("LSAN_FIRST_PARTY_REGEX")) [[unlikely]] {
         printDeprecation(oss, "LSAN_FIRST_PARTY_REGEX", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
-    [[unlikely]] if (has("LSAN_LEAK_COUNT")) {
+    if (has("LSAN_LEAK_COUNT")) [[unlikely]] {
         printDeprecation(oss, "LSAN_LEAK_COUNT", "is no longer supported and "
                          + formatString<Style::BOLD>("deprecated since version 1.11"));
     }
-    [[unlikely]] if (const auto& str = oss.str(); !str.empty()) {
+    if (const auto& str = oss.str(); !str.empty()) [[unlikely]] {
         out << std::endl << format<Style::RED>("Warnings:") << std::endl << str;
     }
     return out;
@@ -1043,7 +1043,7 @@ static inline auto printRecords(const std::deque<MallocInfo::Ref>& records, std:
     auto toReturn = false;
     for (const auto& leak : records) {
         if (auto& record = leak.get(); !record.printedInRoot && !record.suppressed && record.leakType == allowed) {
-            [[unlikely]] if (printContent) {
+            if (printContent) [[unlikely]] {
                 printRecord(out, record);
             }
             out << record << std::endl;
