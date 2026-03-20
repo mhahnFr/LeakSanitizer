@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2025  mhahnFr
+ * Copyright (C) 2022 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -114,10 +114,10 @@ constexpr static inline void ifNotIgnored(F&& func, Args&& ...args) {
 #define alloc(func, sizeExpr, type, ...)                                                           \
     const auto allocSize = (sizeExpr);                                                             \
     BENCH(const auto ptr = func(__VA_ARGS__), std::chrono::nanoseconds, sysTime);                  \
-    [[likely]] if (ptr != nullptr && !LSan::finished) {                                            \
+    if (ptr != nullptr && !LSan::finished) [[likely]] {                                            \
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {                                            \
             BENCH({                                                                                \
-                [[unlikely]] if (behaviour::getBehaviour().zeroAllocation() && (allocSize) == 0) { \
+                if (behaviour::getBehaviour().zeroAllocation() && (allocSize) == 0) [[unlikely]] { \
                     warn("Implementation-defined allocation of size 0");                           \
                 }                                                                                  \
                 tracker.addMalloc(MallocInfo(ptr, (allocSize)));                                   \
@@ -128,11 +128,11 @@ constexpr static inline void ifNotIgnored(F&& func, Args&& ...args) {
     return ptr
 
 constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tracker) {
-    [[unlikely]] if (ptr == nullptr && behaviour::getBehaviour().freeNull()) {
+    if (ptr == nullptr && behaviour::getBehaviour().freeNull()) [[unlikely]] {
         warn("Free of NULL");
     } else if (ptr != nullptr) {
-        [[unlikely]] if (const auto& [removed, previousAlloc] = tracker.removeMalloc(ptr);
-            behaviour::getBehaviour().invalidFree() && !removed) {
+        if (const auto& [removed, previousAlloc] = tracker.removeMalloc(ptr);
+            behaviour::getBehaviour().invalidFree() && !removed) [[unlikely]] {
             crashOrWarn(createInvalidFreeMessage(ptr, bool(previousAlloc)), previousAlloc);
         }
     }
@@ -199,7 +199,7 @@ constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&
 
 #ifdef LSAN_OS_MACOS
 constexpr inline static void assertZone(const malloc_zone_t* zone, const char* message = "Called with NULL as zone") {
-    [[unlikely]] if (zone == nullptr) {
+    if (zone == nullptr) [[unlikely]] {
         crashWarner::crashForce(message);
     }
 }
@@ -239,7 +239,7 @@ void malloc_destroy_zone(malloc_zone_t* zone) {
 auto malloc_zone_batch_malloc(malloc_zone_t* zone, const std::size_t size, void** results, const unsigned num_requested) -> unsigned {
     assertZone(zone, "Batch allocating with NULL zone");
     BENCH(const auto batched = ::malloc_zone_batch_malloc(zone, size, results, num_requested), std::chrono::nanoseconds, sysTime);
-    [[likely]] if (!LSan::finished && batched > 0) {
+    if (!LSan::finished && batched > 0) [[likely]] {
         ifNotIgnored([&] (auto& tracker LOCKING_TIME) {
             BENCH(for (std::size_t i = 0; i < batched; ++i) {
                 tracker.addMalloc(MallocInfo(results[i], size));
@@ -293,7 +293,7 @@ void __lsan_free(void* pointer) {
 }
 
 REPLACE(auto, posix_memalign)(void** memPtr, const std::size_t alignment, const std::size_t size) noexcept(noexcept(::posix_memalign(memPtr, alignment, size))) -> int {
-    [[unlikely]] if (void** checkPtr = memPtr; checkPtr == nullptr) {
+    if (void** checkPtr = memPtr; checkPtr == nullptr) [[unlikely]] {
         crashWarner::crashForce("posix_memalign of a NULL pointer");
     }
 
