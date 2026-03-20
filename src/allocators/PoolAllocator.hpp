@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -84,19 +84,19 @@ struct PoolAllocator {
      * @throws std::bad_alloc if too many objects are requested or if unable to allocate
      */
     [[ nodiscard ]] constexpr auto allocate(const std::size_t count) -> T* {
-        [[unlikely]] if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
+        if (count > std::numeric_limits<std::size_t>::max() / sizeof(T)) [[unlikely]] {
             throw std::bad_array_new_length();
         }
 
         if (count > 1) {
             auto toReturn = std::malloc(count * sizeof(T));
-            [[unlikely]] if (toReturn == nullptr) {
+            if (toReturn == nullptr) [[unlikely]] {
                 throw std::bad_alloc();
             }
             return static_cast<T*>(toReturn);
         }
         auto toReturn = static_cast<T*>(findPool().allocate());
-        [[unlikely]] if (toReturn == nullptr) {
+        if (toReturn == nullptr) [[unlikely]] {
             throw std::bad_alloc();
         }
         return toReturn;

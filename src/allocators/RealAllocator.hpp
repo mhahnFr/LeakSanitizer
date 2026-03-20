@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -52,12 +52,12 @@ struct RealAllocator {
      * @throws std::bad_alloc if too many objects are requested or when the allocator failed to allocate
      */
     [[ nodiscard ]] static constexpr inline auto allocate(const std::size_t n) -> T* {
-        [[unlikely]] if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) {
+        if (n > std::numeric_limits<std::size_t>::max() / sizeof(T)) [[unlikely]] {
             throw std::bad_array_new_length();
         }
 
         auto toReturn = real::malloc(n * sizeof(T));
-        [[unlikely]] if (toReturn == nullptr) {
+        if (toReturn == nullptr) [[unlikely]] {
             throw std::bad_alloc();
         }
         return static_cast<T*>(toReturn);
