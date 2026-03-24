@@ -57,7 +57,7 @@ auto getInstance() -> LSan & {
  * @return the given output stream
  */
 static inline auto printLicense(std::ostream & out) -> std::ostream & {
-    out << "Copyright (C) 2022 - 2025  mhahnFr and contributors"         << std::endl
+    out << "Copyright (C) 2022 - 2026  mhahnFr and contributors"         << std::endl
         << "Licensed under the terms of the GNU GPL version 3 or later." << std::endl
         << std::endl;
     
@@ -75,7 +75,7 @@ static inline auto printWebsite(std::ostream & out) -> std::ostream & {
     
     out << formatter::get<Style::ITALIC>
         << "For more information, visit "
-        << formatter::format<Style::UNDERLINED>("github.com/mhahnFr/LeakSanitizer")
+        << formatter::format<Style::UNDERLINED>("lsan.mhahn.fr")
         << formatter::clear<Style::ITALIC>
         << std::endl << std::endl;
     
