@@ -47,7 +47,6 @@
 #include "../crashWarner/core.hpp"
 #include "../crashWarner/crashForce.hpp"
 #include "../formatter/formatter.hpp"
-#include "../utils/utils.hpp"
 
 namespace lsan::signals::handlers {
 /**
