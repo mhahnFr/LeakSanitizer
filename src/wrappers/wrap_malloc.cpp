@@ -111,6 +111,14 @@ constexpr static inline void ifNotIgnored(F&& func, Args&& ...args) {
 # define ADD_TIME(sys, lock, track, type)
 #endif
 
+/**
+ * Performs a tracked allocation while ignoring related side effects.
+ *
+ * @param func     the allocation function to be called
+ * @param sizeExpr the amount of bytes to be allocated
+ * @param type     the allocation type used for the benchmark mode
+ * @param ...      the arguments to pass to the given allocation function
+ */
 #define alloc(func, sizeExpr, type, ...)                                                           \
     const auto allocSize = (sizeExpr);                                                             \
     BENCH(const auto ptr = func(__VA_ARGS__), std::chrono::nanoseconds, sysTime);                  \
@@ -127,6 +135,12 @@ constexpr static inline void ifNotIgnored(F&& func, Args&& ...args) {
     }                                                                                              \
     return ptr
 
+/**
+ * Removes the allocation associated to the given pointer from the given tracker.
+ *
+ * @param ptr     the pointer to the allocated memory to be removed from the tracking
+ * @param tracker the tracker from which to remove the record
+ */
 constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tracker) {
     if (ptr == nullptr && behaviour::getBehaviour().freeNull()) [[unlikely]] {
         warn("Free of NULL");
@@ -138,6 +152,17 @@ constexpr static inline void removeAllocation(void* ptr, trackers::ATracker& tra
     }
 }
 
+/**
+ * Performs a tracked reallocation.
+ *
+ * @tparam F    the type of the function to be called
+ * @tparam Args the types of the arguments passed on to the given function
+ * @param pointer the old memory pointer to be reallocated
+ * @param size    the requested new size of the memory
+ * @param func    the function to be called to perform the reallocation
+ * @param args    the arguments to be passed on to the given function
+ * @return the reallocated pointer
+ */
 template<typename F, typename... Args>
 constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&& func, Args&&... args) {
     if (LSan::finished) {
@@ -174,6 +199,13 @@ constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&
     return ptr;
 }
 
+/**
+ * Performs a tracked deallocation by invoking the given function.
+ *
+ * @param func      the function to be called to perform the deallocation
+ * @param trackExpr the tracking expression
+ * @param ...       the arguments to pass on to the given function
+ */
 #define deallocExpr(func, trackExpr, ...)                                                \
     BENCH_ONLY(bool ignored = true;                                                      \
                std::chrono::nanoseconds trackingTimeOut;                                 \
@@ -195,9 +227,23 @@ constexpr static inline auto doRealloc(void* pointer, const std::size_t size, F&
         });                                                                              \
     })
 
+/**
+ * Performs a simple tracked deallocation for the given pointer using the given
+ * function.
+ *
+ * @param func the deallocating function
+ * @param ptr  the pointer to be deallocated
+ * @param ...  the arguments to be passed on
+ */
 #define dealloc(func, ptr, ...) deallocExpr(func, removeAllocation(ptr, tracker) __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef LSAN_OS_MACOS
+/**
+ * Asserts that the given zone is not @c nullptr .
+ *
+ * @param zone    the allocation zone to be checked
+ * @param message the message to be printed on failure
+ */
 constexpr inline static void assertZone(const malloc_zone_t* zone, const char* message = "Called with NULL as zone") {
     if (zone == nullptr) [[unlikely]] {
         crashWarner::crashForce(message);
