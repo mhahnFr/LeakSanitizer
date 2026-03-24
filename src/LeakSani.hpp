@@ -208,7 +208,7 @@ protected:
      * @param info the allocation record
      */
     inline void maybeAddToStats(const MallocInfo& info) override {
-        [[unlikely]] if (behaviour.statsActive()) {
+        if (behaviour.statsActive()) [[unlikely]] {
             stats += info;
         }
     }
