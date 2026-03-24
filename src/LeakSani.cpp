@@ -962,6 +962,12 @@ static inline auto maybeShowDeprecationWarnings(std::ostream& out) -> std::ostre
     return out;
 }
 
+/**
+ * Prints warnings about the usage of unknown @c LSAN_* environment variables.
+ *
+ * @param out the output stream to print onto
+ * @return the given output stream
+ */
 static inline auto showIgnoration(std::ostream& out) -> std::ostream& {
     using namespace formatter;
     auto first = true;

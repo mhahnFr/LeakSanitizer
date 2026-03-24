@@ -217,6 +217,7 @@ public:
     /** Indicates whether the allocation tracking has finished.           */
     static std::atomic_bool finished;
 #ifdef LSAN_OS_LINUX
+    /** Indicates whether currently a crash is being handled.             */
     static std::atomic_bool crashed;
 #endif
     /** Indicates whether to ignore deallocations in the TLS deallocator. */
@@ -327,7 +328,12 @@ public:
      * @return the system library regular expressions
      */
     auto getSystemLibrariesCached() -> const std::vector<std::regex>&;
-    
+
+    /**
+     * Returns the system library regular expressions and loads them if needed.
+     *
+     * @return the system library regular expressions
+     */
     static auto getSystemLibraries() -> const std::vector<std::regex>&;
 
     /**
