@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2022 - 2025  mhahnFr
+ * Copyright (C) 2022 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -350,24 +350,8 @@ public:
 
     void changeMalloc(MallocInfo&& info) override;
 
-    /**
-     * Removes the allocation record associated with the given pointer.
-     *
-     * @param pointer the allocation pointer
-     * @return a pair with a boolean indicating the success and optionally the
-     * already deleted allocation record
-     */
     auto removeMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
 
-    /**
-     * @brief Attempts to remove the allocation record associated with the
-     * given pointer.
-     *
-     * Does not search in the thread-local trackers.
-     *
-     * @param pointer the allocation pointer
-     * @return whether a record was removed and the potentially existing record
-     */
     auto maybeRemoveMalloc(void* pointer) -> std::pair<bool, std::optional<MallocInfo::CRef>> override;
 
     /**
