@@ -1,4 +1,5 @@
-# Suppressions
+<h1 style="text-align: center">Suppressions</h1>
+
 Since version **1.11**, the LeakSanitizer provides a sophisticated system for suppressing irrelevant memory leaks.
 
 This system is based on JSON files containing suppression objects as defined below. A [JSON schema][1] is also available.
@@ -15,7 +16,8 @@ LSAN_SUPPRESSION_DEVELOPER=true ./a.out
 ```
 If this mode is active, function names are printed as they are used by the linker.
 
-## Suppression object
+<h2 style="text-align: center">Suppression object</h2>
+
 A suppression object is designed to match memory leaks. This can be achieved by defining one or multiple of the
 available metadata to be matched.
 
@@ -147,7 +149,8 @@ Consider the following example suppression stacktrace:
 | `(fdf) main (main.c:26:10)`                                                  | *No further matching performed*         |
 | `(/usr/lib/dyld) start + 3056`                                               | *No further matching performed*         |
 
-## System library detection
+<h2 style="text-align: center">System library detection</h2>
+
 The system library detection available using the special regular expression value of `LSAN_SYSTEM_LIBRARIES` can be
 extended by providing a simple JSON file. This JSON file should include an array of regular expressions matching the
 binary file names of the runtime images to be treated as a system library.

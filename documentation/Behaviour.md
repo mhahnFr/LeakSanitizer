@@ -1,7 +1,9 @@
-# Behaviour
-The LeakSanitizer allows you to adjust its behaviour using a set of environment variables.
+<h1 style="text-align: center">Behavior</h1>
 
-## Environment variables
+The LeakSanitizer allows you to adjust its behavior using a set of environment variables.
+
+<h2 style="text-align: center">Environment variables</h2>
+
 ### `LSAN_HUMAN_PRINT`
 Indicates whether to print in a human-readable format.
 

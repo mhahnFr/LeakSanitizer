@@ -1,4 +1,5 @@
-# Signal handlers
+<h1 style="text-align: center">Signal handlers</h1>
+
 The LeakSanitizer catches deadly signals. Signal handlers registered by you take precedence.
 
 ## Deadly signals
