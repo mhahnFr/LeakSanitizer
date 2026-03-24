@@ -1,4 +1,5 @@
-<h1 style="text-align: center">LeakSanitizer</h1>
+<h1 align="center">LeakSanitizer</h1>
+
 Tool to track down memory leaks.
 
 It can be used in conjunction with code written in almost any programming language that compiles down to native machine
@@ -11,14 +12,16 @@ Officially supported languages are currently:
 
 This tool is available for both **Linux** and **macOS**.
 
-<h2 style="text-align: center">Quickstart</h2>
+<h2 align="center">Quickstart</h2>
+
 Use the LeakSanitizer for finding memory leaks in your own applications.
 
 [Download a release here][1] and link your application with the prebuilt framework.
 
 Alternatively, you can [build it yourself][11].
 
-<h2 style="text-align: center">Usage</h2>
+<h2 align="center">Usage</h2>
+
 Use the LeakSanitizer by linking with its framework. On Linux, link with the runtime library directly.
 
 ### macOS
@@ -43,6 +46,8 @@ You can also inject the runtime library into a process by adding it to the prelo
 linker:
 - **Linux**: `LD_PRELOAD=<path/to/LeakSanitizer>/liblsan.so`
 - **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/LeakSanitizer>/LeakSanitizer.framework/LeakSanitizer`
+
+---
 
 ### Leak detection
 Once this sanitizer is bundled with your application the detected memory leaks are printed upon termination.
@@ -281,7 +286,8 @@ make INSTALL_PATH=/usr/local uninstall
 ```
 Adapt the value of the `INSTALL_PATH` argument to your needs.
 
-<h2 style="text-align: center">Behind the scenes or: How does it work?</h2>
+<h2 align="center">Behind the scenes or: How does it work?</h2>
+
 In order to track the memory allocations this sanitizer replaces the common allocation management functions such as
 `malloc`, `calloc`, `realloc` and `free`. Every allocation and deallocation is registered and a stacktrace is created
 for it.  
@@ -294,7 +300,8 @@ When the exit handler registered using `atexit` is invoked the allocated memory 
 leaks are printed.  
 The stacktraces are managed using the [CallstackLibrary][6].
 
-<h2 style="text-align: center">Final notes</h2>
+<h2 align="center">Final notes</h2>
+
 If you experience any problems with the LeakSanitizer or if you have ideas to further improve it do not hesitate to
 [open an issue][7] or to [open a pull request][8].
 
