@@ -212,9 +212,9 @@ This sanitizer comes with handlers for the following signals:
 |-------------------|----------------------------------------------------------------------------------------------|
 | `SIGUSR1`         | Prints the statistics if enabled using [`LSAN_STATS_ACTIVE`][b7] or [`LSAN_AUTO_STATS`][be]. |
 | `SIGUSR2`         | Prints the current callstack.                                                                |
-| Any deadly signal | is caught and the stacktrace of the cash is printed.                                         |
+| Any deadly signal | is caught and the stacktrace of the crash is printed.                                        |
 
-More about the signal handlers [here][4].
+Your own signal handlers take precedence. More about the signal handlers [here][4].
 
 ### Statistics
 The statistics of the tracked memory can be queried at runtime. To do so activate the statistical bookkeeping by either

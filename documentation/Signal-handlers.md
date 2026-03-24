@@ -1,5 +1,5 @@
 # Signal handlers
-The LeakSanitizer catches deadly signals.
+The LeakSanitizer catches deadly signals. Signal handlers registered by you take precedence.
 
 ## Deadly signals
 Upon receipt of a deadly signal, the program is terminated and the callstack of the receiving point is printed.
