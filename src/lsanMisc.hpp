@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2023 - 2025  mhahnFr
+ * Copyright (C) 2023 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -82,15 +82,37 @@ auto loadSuppressions() -> std::vector<suppression::Suppression>;
  */
 auto createTLVSuppression() -> std::vector<suppression::Suppression>;
 
+/**
+ * Returns whether the LeakSanitizer should activate itself.
+ *
+ * @return whether the leak tracking and printing should be active
+ */
 auto shouldActivate() -> bool;
 
+/**
+ * Contains callstack related helper functions.
+ */
 namespace callstack {
+/**
+ * Formats the given callstack onto the given output stream.
+ *
+ * @param callstack the callstack to be formatted
+ * @param out       the output stream to print the callstack to
+ * @param indent    the indentation to be used for the given callstack
+ */
 static inline void format(lcs::callstack& callstack, std::ostream& out, const std::string& indent = "") {
     if (callstackHelper::format(callstack, out, indent)) {
         getInstance().setCallstackSizeExceeded(true);
     }
 }
 
+/**
+ * Formats the given callstack onto the given output stream.
+ *
+ * @param callstack the callstack to be formatted
+ * @param out       the output stream to print the callstack to
+ * @param indent    the indentation to be used for the given callstack
+ */
 static inline void format(lcs::callstack&& callstack, std::ostream& out, const std::string& indent = "") {
     format(callstack, out, indent);
 }

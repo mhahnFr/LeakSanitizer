@@ -82,6 +82,11 @@ static inline auto printWebsite(std::ostream & out) -> std::ostream & {
     return out;
 }
 
+/**
+ * Returns a string representing the current version of this project.
+ *
+ * @return the version string
+ */
 static inline auto getVersion() -> std::string {
 #ifdef LSAN_OS_MACOS
     return macos::bundle::getVersion();
