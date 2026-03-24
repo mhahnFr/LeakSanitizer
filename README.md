@@ -1,4 +1,4 @@
-# LeakSanitizer
+<h1 style="text-align: center">LeakSanitizer</h1>
 Tool to track down memory leaks.
 
 It can be used in conjunction with code written in almost any programming language that compiles down to native machine
@@ -11,67 +11,38 @@ Officially supported languages are currently:
 
 This tool is available for both **Linux** and **macOS**.
 
-## Usage
-### Installation
-Get started by [downloading a release][1].  
-Simply move the headers and the library anywhere you like.
+<h2 style="text-align: center">Quickstart</h2>
+Use the LeakSanitizer for finding memory leaks in your own applications.
 
-Alternatively, you can build the LeakSanitizer from source:
-```shell
-git clone --recurse-submodules https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer && make
-```
-It is automatically installed in the directory where the LeakSanitizer was cloned in. To install it in a specific
-directory, use the following command:
-```shell
-make INSTALL_PATH=/usr/local install
-```
-Adapt the value of the `INSTALL_PATH` argument to your needs.
+[Download a release here][1] and link your application with the prebuilt framework.
+
+Alternatively, you can [build it yourself][11].
+
+<h2 style="text-align: center">Usage</h2>
+Use the LeakSanitizer by linking with its framework. On Linux, link with the runtime library directly.
+
+### macOS
+Either embed the framework into your application or add the directory where you have put the LeakSanitizer's framework
+to the framework search path and the runtime search path of your application.
 
 > [!TIP]
-> To create a portable build (just like a downloaded release), use the following command:
-> ```shell
-> make release
-> ```
+> **Example** of the necessary compiler flags for Apple's Clang compiler on macOS:  
+> `-F<path/to/LeakSanitizer> -rpath <path/to/LeakSanitizer> -framework LeakSanitizer`
 
-#### Build dependencies
-The LeakSanitizer adheres to the standard of C++23.
-
-Additionally, the following command line tools are necessary to successfully build the LeakSanitizer:
-- GNU compatible `make` command line tool
-- The `cat` command line tool *(POSIX.2)*
-
-All [dependencies introduced by the CallstackLibrary][2] are needed as well.
-
-### Uninstallation
-To uninstall the LeakSanitizer, simply remove its headers and its library from the installation directory.  
-This can be done by the following command:
-```shell
-make INSTALL_PATH=/usr/local uninstall
-```
-Adapt the value of the `INSTALL_PATH` argument to your needs.
-
-### Usage, take II
-Use this tool by preloading its runtime library or by linking against it *(recommended)*.
-
-#### Linking *(recommended)*
+### Linux
 Add the runtime library of the LeakSanitizer to your linking arguments.
 
 > [!TIP]
-> **Example** for standard C/C++ compilers:
-> ```shell
-> -L<path/to/LeakSanitizer> -llsan
-> ```
+> **Example** for standard C/C++ compilers:  
+> `-L<path/to/LeakSanitizer> -llsan`
 
-#### Preloading
-Add the runtime library to the preload environment variable of your dynamic linker:
-- **Linux**:
-```shell
-LD_PRELOAD=<path/to/LeakSanitizer>/liblsan.so
-```
-- **macOS**:
-```shell
-DYLD_INSERT_LIBRARIES=<path/to/LeakSanitizer>/liblsan.dylib
-```
+---
+
+### Preloading
+You can also inject the runtime library into a process by adding it to the preload environment variable of your dynamic
+linker:
+- **Linux**: `LD_PRELOAD=<path/to/LeakSanitizer>/liblsan.so`
+- **macOS**: `DYLD_INSERT_LIBRARIES=<path/to/LeakSanitizer>/LeakSanitizer.framework/LeakSanitizer`
 
 ### Leak detection
 Once this sanitizer is bundled with your application the detected memory leaks are printed upon termination.
@@ -110,7 +81,7 @@ Compiled and linked on **macOS** with the command
 ```shell
 cc -g test.c -L<path/to/LeakSanitizer> -llsan
 ```
-this example creates the following output:
+this example creates the following output:  
 <picture>
     <source srcset="documentation/images/light/leak-example.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
     <source srcset="documentation/images/dark/leak-example.png" media="(prefers-color-scheme: dark)" />
@@ -121,7 +92,7 @@ Compiled and linked on **Fedora** with the command
 ```shell
 gcc -g test.c -L<path/to/LeakSanitizer> -llsan
 ```
-the example above creates the following output:
+the example above creates the following output:  
 <picture>
     <source srcset="documentation/images/light/leak-example-fedora.png" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
     <source srcset="documentation/images/dark/leak-example-fedora.png" media="(prefers-color-scheme: dark)" />
@@ -153,30 +124,34 @@ Currently, debug symbols in the following formats are supported:
 The DWARF parser supports DWARF in version **2**, **3**, **4** and **5**.
 
 ### Behaviour
-Since version 1.6 the behaviour of this sanitizer can be adjusted by setting certain environment variables.  
+Since version 1.6 the behavior of this sanitizer can be adjusted by setting certain environment variables.  
 The following variables are currently supported:
 
-| Name                               | Description                                                 | Since | Type                 | Default value |
-|------------------------------------|-------------------------------------------------------------|-------|----------------------|---------------|
-| [`LSAN_HUMAN_PRINT`][b1]           | Print human-readably formatted                              | v1.6  | [Boolean][b15]       | `true`        |
-| [`LSAN_PRINT_COUT`][b2]            | Print to the default output stream                          | v1.6  | [Boolean][b15]       | `false`       |
-| [`LSAN_PRINT_FORMATTED`][b3]       | Print using ANSI escape codes                               | v1.6  | [Boolean][b15]       | `true`        |
-| [`LSAN_INVALID_CRASH`][b4]         | Terminate if an invalid action is detected                  | v1.6  | [Boolean][b15]       | `true`        |
-| [`LSAN_INVALID_FREE`][b5]          | Detect invalid deallocations                                | v1.6  | [Boolean][b15]       | `true`        |
-| [`LSAN_FREE_NULL`][b6]             | Issue a warning if `NULL` is `free`d                        | v1.6  | [Boolean][b15]       | `false`       |
-| [`LSAN_STATS_ACTIVE`][b7]          | Enable the statistical bookkeeping                          | v1.6  | [Boolean][b15]       | `false`       |
-| [`LSAN_CALLSTACK_SIZE`][b8]        | The amount of frames to be printed in a callstack           | v1.6  | Number               | `20`          |
-| [`LSAN_PRINT_EXIT_POINT`][b9]      | Print the callstack of the exit point                       | v1.7  | [Boolean][b15]       | `false`       |
-| [`LSAN_PRINT_BINARIES`][ba]        | Print the binary file names                                 | v1.8  | [Boolean][b15]       | `true`        |
-| [`LSAN_PRINT_FUNCTIONS`][bb]       | Always print the function names                             | v1.8  | [Boolean][b15]       | `true`        |
-| [`LSAN_RELATIVE_PATHS`][bc]        | Allow relative paths to be printed                          | v1.8  | [Boolean][b15]       | `true`        |
-| [`LSAN_ZERO_ALLOCATION`][bd]       | Issue a warning when `0` byte are allocated                 | v1.8  | [Boolean][b15]       | `false`       |
-| [`LSAN_AUTO_STATS`][be]            | Time interval between the automatically statistics printing | v1.11 | [Time interval][b16] | *None*        |
-| [`LSAN_SUPPRESSION_DEVELOPER`][bf] | Activates more suppression developer output                 | v1.11 | [Boolean][b15]       | `false`       |
-| [`LSAN_INDIRECT_LEAKS`][b11]       | Whether to print indirectly leaked allocations              | v1.11 | [Boolean][b15]       | `false`       |
-| [`LSAN_REACHABLE_LEAKS`][b12]      | Whether to print leaks to whose a pointer was found         | v1.11 | [Boolean][b15]       | `true`        |
-| [`LSAN_SUPPRESSION_FILES`][b13]    | List of additional suppression files to be considered       | v1.11 | [File list][b17]     | *None*        |
-| [`LSAN_SYSTEM_LIBRARY_FILES`][b14] | List of additional system library files to be considered    | v1.11 | [File list][b17]     | *None*        |
+| Name                               | Description                                              | Since | Type                 | Default value |
+|------------------------------------|----------------------------------------------------------|-------|----------------------|---------------|
+| [`LSAN_HUMAN_PRINT`][b1]           | Print human-readably formatted                           | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_PRINT_COUT`][b2]            | Print to the default output stream                       | v1.6  | [Boolean][b15]       | `false`       |
+| [`LSAN_PRINT_FORMATTED`][b3]       | Print using ANSI escape codes                            | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_INDIRECT_LEAKS`][b11]       | Whether to print indirectly leaked allocations           | v1.11 | [Boolean][b15]       | `false`       |
+| [`LSAN_REACHABLE_LEAKS`][b12]      | Whether to print leaks to whose a pointer was found      | v1.11 | [Boolean][b15]       | `true`        |
+|                                    |                                                          |       |                      |               |
+| [`LSAN_CALLSTACK_SIZE`][b8]        | The amount of frames to be printed in a callstack        | v1.6  | Number               | `20`          |
+| [`LSAN_PRINT_EXIT_POINT`][b9]      | Print the callstack of the exit point                    | v1.7  | [Boolean][b15]       | `false`       |
+| [`LSAN_PRINT_BINARIES`][ba]        | Print the binary file names                              | v1.8  | [Boolean][b15]       | `true`        |
+| [`LSAN_PRINT_FUNCTIONS`][bb]       | Always print the function names                          | v1.8  | [Boolean][b15]       | `true`        |
+| [`LSAN_RELATIVE_PATHS`][bc]        | Allow relative paths to be printed                       | v1.8  | [Boolean][b15]       | `true`        |
+|                                    |                                                          |       |                      |               |
+| [`LSAN_INVALID_CRASH`][b4]         | Terminate if an invalid action is detected               | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_INVALID_FREE`][b5]          | Detect invalid deallocations                             | v1.6  | [Boolean][b15]       | `true`        |
+| [`LSAN_FREE_NULL`][b6]             | Issue a warning if `NULL` is `free`d                     | v1.6  | [Boolean][b15]       | `false`       |
+| [`LSAN_ZERO_ALLOCATION`][bd]       | Issue a warning when `0` byte are allocated              | v1.8  | [Boolean][b15]       | `false`       |
+|                                    |                                                          |       |                      |               |
+| [`LSAN_STATS_ACTIVE`][b7]          | Enable the statistical bookkeeping                       | v1.6  | [Boolean][b15]       | `false`       |
+| [`LSAN_AUTO_STATS`][be]            | Time interval between the automatic statistics printing  | v1.11 | [Time interval][b16] | *None*        |
+|                                    |                                                          |       |                      |               |
+| [`LSAN_SUPPRESSION_DEVELOPER`][bf] | Activates more suppression developer output              | v1.11 | [Boolean][b15]       | `false`       |
+| [`LSAN_SUPPRESSION_FILES`][b13]    | List of additional suppression files to be considered    | v1.11 | [File list][b17]     | *None*        |
+| [`LSAN_SYSTEM_LIBRARY_FILES`][b14] | List of additional system library files to be considered | v1.11 | [File list][b17]     | *None*        |
 
 > [!TIP]
 > [`LSAN_AUTO_STATS`][be] should be assigned a number with a time unit directly after the number.  
@@ -226,28 +201,100 @@ The statistics then can be queried using the following API:
 | [`lsan_getTotalMallocs()`][s1]       | Returns the total count of allocations registered.                                             |
 | [`lsan_getTotalBytes()`][s2]         | Returns the total count of allocated bytes.                                                    |
 | [`lsan_getTotalFrees()`][s3]         | Returns the total count of registered allocations that have been deallocated.                  |
+|                                      |                                                                                                |
 | [`lsan_getCurrentMallocCount()`][s4] | Returns the count of currently active allocations.                                             |
 | [`lsan_getCurrentByteCount()`][s5]   | Returns the amount of currently allocated bytes.                                               |
+|                                      |                                                                                                |
 | [`lsan_getMallocPeek()`][s6]         | Returns the highest amount of allocations at the same time.                                    |
 | [`lsan_getBytePeek()`][s7]           | Returns the highest amount of bytes allocated at the same time.                                |
+|                                      |                                                                                                |
 | [`lsan_printStats()`][s8]            | Prints the statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2].               |
 | [`lsan_printFStats()`][s9]           | Prints the fragmentation statistics to the output stream specified by [`LSAN_PRINT_COUT`][b2]. |
 
 More on the statistics [here][5].
 
-## Behind the scenes or: How does it work?
+### Installation
+Get started by [downloading a release][1]. Alternatively, you can [build the LeakSanitizer from source][11].
+
+#### macOS
+Simply move the downloaded framework anywhere you like, for example into the directory `/Library/Frameworks`.
+
+#### Linux
+Simply move the headers and the library anywhere you like.  
+For example, the headers can be moved into the directory `/usr/local/include` and the library into the directory
+`/usr/local/lib`.
+
+#### Building from source
+Clone the repository:
+```shell
+git clone --recurse-submodules https://github.com/mhahnFr/LeakSanitizer.git && cd LeakSanitizer
+```
+
+##### macOS
+Build the framework using the following command:
+```shell
+xcodebuild
+```
+Upon successfully building the framework, it can be found in the directory `./build/Release`. You can also specify
+another build directory by passing the option `-derivedDataPath <desiredBuildPath>` to the preceding command.
+> [!TIP]
+> **Example:**
+> ```shell
+> xcodebuild -derivedDataPath <path/to/build/folder>
+> ```
+> The framework `LeakSanitizer.framework` will then be located in the directory `<path/to/build/folder>/Release`.
+
+##### Linux
+Build the library by using GNU Make:
+```shell
+make
+```
+It is automatically installed in the directory where the LeakSanitizer was cloned in. To install it in a specific
+directory, use the following command:
+```shell
+make INSTALL_PATH=/usr/local install
+```
+Adapt the value of the `INSTALL_PATH` argument to your needs.
+
+> [!TIP]
+> To create a portable build (just like the [downloaded release][1]), use the following command:
+> ```shell
+> make release
+> ```
+
+##### Dependencies
+The LeakSanitizer adheres to the standard of C++23.
+
+Additionally, the following command line tools are necessary to successfully build the LeakSanitizer:
+- GNU compatible `make` command line tool
+- The `cat` command line tool *(POSIX.2)*
+
+All [dependencies introduced by the CallstackLibrary][2] are needed as well.
+
+### Uninstallation
+To uninstall the LeakSanitizer, on macOS, simply remove the framework from the installation directory.
+
+#### Linux
+On Linux, simply remove its headers and its library. This can be done by the following command:
+```shell
+make INSTALL_PATH=/usr/local uninstall
+```
+Adapt the value of the `INSTALL_PATH` argument to your needs.
+
+<h2 style="text-align: center">Behind the scenes or: How does it work?</h2>
 In order to track the memory allocations this sanitizer replaces the common allocation management functions such as
 `malloc`, `calloc`, `realloc` and `free`. Every allocation and deallocation is registered and a stacktrace is created
 for it.  
-The allocations created by the LeakSanitizer are ignored.
+The allocations caused by the LeakSanitizer itself are ignored.
 
 The signal handlers and the wrapper functions are installed once the sanitizer has been loaded by the dynamic linker.
+Your own signal handlers take precedence.
 
 When the exit handler registered using `atexit` is invoked the allocated memory is examined and the detected memory
 leaks are printed.  
 The stacktraces are managed using the [CallstackLibrary][6].
 
-## Final notes
+<h2 style="text-align: center">Final notes</h2>
 If you experience any problems with the LeakSanitizer or if you have ideas to further improve it do not hesitate to
 [open an issue][7] or to [open a pull request][8].
 
@@ -265,16 +312,17 @@ This project is licensed under the terms of the GNU GPL in version 3 or later.
  [8]: https://github.com/mhahnFr/LeakSanitizer/pulls
  [9]: https://github.com/mhahnFr
 [10]: documentation/Suppressions.md
+[11]: #building-from-source
 
-[s1]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_gettotalmallocs
-[s2]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_gettotalbytes
-[s3]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_gettotalfrees
-[s4]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_getcurrentmalloccount
-[s5]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_getcurrentbytecount
-[s6]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_getmallocpeek
-[s7]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-__lsan_getbytepeek
-[s8]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#void-__lsan_printstats
-[s9]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#void-__lsan_printfstats
+[s1]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-lsan_gettotalmallocs
+[s2]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-lsan_gettotalbytes
+[s3]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-lsan_gettotalfrees
+[s4]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-lsan_getcurrentmalloccount
+[s5]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-lsan_getcurrentbytecount
+[s6]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-lsan_getmallocpeek
+[s7]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#size_t-lsan_getbytepeek
+[s8]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#void-lsan_printstats
+[s9]: https://github.com/mhahnFr/LeakSanitizer/wiki/lsan_stats.h#void-lsan_printfstats
 
  [b1]: documentation/Behaviour.md#lsan_human_print
  [b2]: documentation/Behaviour.md#lsan_print_cout
