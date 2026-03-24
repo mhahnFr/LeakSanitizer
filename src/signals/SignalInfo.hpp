@@ -30,11 +30,26 @@
 #include "callstack.h"
 
 namespace lsan::signals {
+/**
+ * Represents the gathered information about a caught signal.
+ */
 struct SignalInfo {
-    int code = 0, siCode = 0;
+    /** The signal code.                             */
+    int code = 0,
+    /** The SI code of the signal.                   */
+        siCode = 0;
+    /** The faulting address.                        */
     void* faultAddress = nullptr;
+    /** The callstack where the signal was received. */
     lcs::callstack callstack;
 
+    /**
+     * Serializes this instance, replacing zero bytes by a substitute.
+     *
+     * @param buffer     the buffer into which to serialize
+     * @param bufferSize the size of the given buffer
+     * @param substitute the substitute used for zero bytes
+     */
     inline void toBinary(char* buffer, const std::size_t bufferSize, char* substitute) const {
         *substitute = 0;
         std::memcpy(buffer, this, bufferSize);
@@ -56,6 +71,15 @@ struct SignalInfo {
         }
     }
 
+    /**
+     * Deserializes an instance from the given buffer, treating bytes matching
+     * the given substitute as zero bytes.
+     *
+     * @param buffer     the buffer from which to deserialize
+     * @param bufferSize the size of the given buffer
+     * @param substitute the substitute for zero bytes
+     * @return the deserialized instance
+     */
     static inline auto fromBinary(const char* buffer, const std::size_t bufferSize, const char substitute) -> SignalInfo {
         auto toReturn = SignalInfo();
         for (std::size_t i = 0; i < bufferSize; ++i) {
@@ -65,6 +89,14 @@ struct SignalInfo {
     }
 };
 
+/**
+ * Creates an appropriate crash message for the given signal information.
+ *
+ * @param signalCode the code of the signal
+ * @param siCode     the SI code of the signal
+ * @param siAddr     the SI address of the signal
+ * @return an appropriate crash message with an optional second line
+ */
 auto createCrashMessage(int signalCode, int siCode, const void* siAddr) -> std::pair<std::string, std::optional<std::string>>;
 }
 
