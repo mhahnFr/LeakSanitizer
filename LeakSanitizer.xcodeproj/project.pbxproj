@@ -1099,9 +1099,11 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOS_ARCH_FLAGS2 = "-arch x86_64 -arch arm64 -arch arm64e";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USE_BUILTINS = false;
 			};
 			name = Debug;
 		};
@@ -1115,9 +1117,11 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOS_ARCH_FLAGS2 = "-arch x86_64 -arch arm64 -arch arm64e";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USE_BUILTINS = false;
 			};
 			name = Release;
 		};
