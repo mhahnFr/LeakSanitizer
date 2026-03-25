@@ -661,7 +661,7 @@ struct Initializer {
 Initializer initializer __attribute__((used));
 }
 
-static inline constexpr auto getSignalStack() -> void* {
+static inline auto getSignalStack() -> void* {
     return
 #ifdef LSAN_OS_MACOS
         signals::createAlternativeStack(real::malloc)
