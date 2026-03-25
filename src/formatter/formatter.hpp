@@ -138,7 +138,7 @@ constexpr inline auto clear() -> const char * {
  *
  * @return the corresponding escape code
  */
-constexpr inline auto clearAll() -> const char * {
+inline auto clearAll() -> const char* {
     return printFormatted() ? "\033[0m" : "";
 }
 
