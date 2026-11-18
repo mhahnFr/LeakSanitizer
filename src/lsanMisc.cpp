@@ -50,51 +50,53 @@ auto getInstance() -> LSan & {
     return *instance;
 }
 
-/**
- * Prints the license information of this sanitizer.
- *
- * @param out the output stream to print to
- * @return the given output stream
- */
-static inline auto printLicense(std::ostream & out) -> std::ostream & {
-    out << "Copyright (C) 2022 - 2026  mhahnFr and contributors"         << std::endl
-        << "Licensed under the terms of the GNU GPL version 3 or later." << std::endl
-        << std::endl;
-    
-    return out;
-}
+namespace {
+    /**
+     * Prints the license information of this sanitizer.
+     *
+     * @param out the output stream to print to
+     * @return the given output stream
+     */
+    constexpr inline auto printLicense(std::ostream& out) -> std::ostream& {
+        out << "Copyright (C) 2022 - 2026  mhahnFr and contributors"         << std::endl
+            << "Licensed under the terms of the GNU GPL version 3 or later." << std::endl
+            << std::endl;
 
-/**
- * Prints the link to the website of this sanitizer.
- *
- * @param out the output stream to print to
- * @return the given output stream
- */
-static inline auto printWebsite(std::ostream & out) -> std::ostream & {
-    using formatter::Style;
-    
-    out << formatter::get<Style::ITALIC>
-        << "For more information, visit "
-        << formatter::format<Style::UNDERLINED>("lsan.mhahn.fr")
-        << formatter::clear<Style::ITALIC>
-        << std::endl << std::endl;
-    
-    return out;
-}
+        return out;
+    }
 
-/**
- * Returns a string representing the current version of this project.
- *
- * @return the version string
- */
-static inline auto getVersion() -> std::string {
+    /**
+     * Prints the link to the website of this sanitizer.
+     *
+     * @param out the output stream to print to
+     * @return the given output stream
+     */
+    constexpr inline auto printWebsite(std::ostream& out) -> std::ostream& {
+        using formatter::Style;
+
+        out << formatter::get<Style::ITALIC>
+            << "For more information, visit "
+            << formatter::format<Style::UNDERLINED>("lsan.mhahn.fr")
+            << formatter::clear<Style::ITALIC>
+            << std::endl << std::endl;
+
+        return out;
+    }
+
+    /**
+     * Returns a string representing the current version of this project.
+     *
+     * @return the version string
+     */
+    constexpr inline auto getVersion() -> std::string {
 #ifdef LSAN_OS_MACOS
-    return macos::bundle::getVersion();
+        return macos::bundle::getVersion();
 #elifdef LSAN_VERSION
-    return LSAN_VERSION;
+        return LSAN_VERSION;
 #else
-    return "CLEAN BUILD";
+        return "CLEAN BUILD";
 #endif
+    }
 }
 
 auto printInformation(std::ostream & out) -> std::ostream & {
@@ -136,17 +138,19 @@ auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     return out;
 }
 
-/**
- * Creates a thread local tracker.
- *
- * @param pseudo whether to create a pseudo tracker
- * @return the new and allocated thread local tracker
- */
-static inline auto newLocalTracker(const bool pseudo) -> trackers::ATracker* {
-    if (pseudo) [[unlikely]] {
-        return new trackers::PseudoTracker();
+namespace {
+    /**
+     * Creates a thread local tracker.
+     *
+     * @param pseudo whether to create a pseudo tracker
+     * @return the new and allocated thread local tracker
+     */
+    constexpr inline auto newLocalTracker(const bool pseudo) -> trackers::ATracker* {
+        if (pseudo) [[unlikely]] {
+            return new trackers::PseudoTracker();
+        }
+        return new trackers::TLSTracker();
     }
-    return new trackers::TLSTracker();
 }
 
 auto getTracker() -> trackers::ATracker& {
@@ -167,31 +171,33 @@ auto getTracker() -> trackers::ATracker& {
     return *static_cast<trackers::ATracker*>(tlv);
 }
 
-/**
- * Loads the suppressions found in the given JSON value into the given
- * suppression vector.
- *
- * @param content the vector with the deducted suppressions
- * @param object the JSON value to deduct suppressions from
- */
-static inline void loadSuppressions(std::vector<suppression::Suppression>& content,
-                                    const simple_json::Value& object) {
-    if (object.is(simple_json::ValueType::Array)) {
-        for (const auto& obj : object.as<simple_json::ValueType::Array>()) {
-            try {
-                content.emplace_back(simple_json::Object(obj));
-            } catch (const suppression::FunctionNotFoundException& e) {
-                using namespace formatter;
+namespace {
+    /**
+     * Loads the suppressions found in the given JSON value into the given
+     * suppression vector.
+     *
+     * @param content the vector with the deducted suppressions
+     * @param object the JSON value to deduct suppressions from
+     */
+    constexpr inline void loadSuppressions(std::vector<suppression::Suppression>& content,
+                                        const simple_json::Value& object) {
+        if (object.is(simple_json::ValueType::Array)) {
+            for (const auto& obj : object.as<simple_json::ValueType::Array>()) {
+                try {
+                    content.emplace_back(simple_json::Object(obj));
+                } catch (const suppression::FunctionNotFoundException& e) {
+                    using namespace formatter;
 
-                if (behaviour::getBehaviour().suppressionDevelopersMode()) {
-                    getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
-                                                                         + "\" ignored: Function \"" + e.getFunctionName()
-                                                                         + "\" not loaded.") << std::endl << std::endl;
+                    if (behaviour::getBehaviour().suppressionDevelopersMode()) {
+                        getOutputStream() << format<Style::BOLD, Style::RED>("LSan: Suppression \"" + e.getSuppressionName()
+                                                                             + "\" ignored: Function \"" + e.getFunctionName()
+                                                                             + "\" not loaded.") << std::endl << std::endl;
+                    }
                 }
             }
+        } else {
+            content.emplace_back(simple_json::Object(object));
         }
-    } else {
-        content.emplace_back(simple_json::Object(object));
     }
 }
 
