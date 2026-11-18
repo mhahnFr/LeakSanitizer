@@ -126,7 +126,9 @@ void exitHook() {
 auto maybePrintExitPoint(std::ostream& out) -> std::ostream& {
     using formatter::Style;
 
-    if (getInstance().hasPrintedExit) return out;
+    if (getInstance().hasPrintedExit) {
+        return out;
+    }
 
     out << std::endl << formatter::format<Style::GREEN>("Exiting");
     if (behaviour::getBehaviour().printExitPoint()) {
@@ -155,7 +157,9 @@ namespace {
 
 auto getTracker() -> trackers::ATracker& {
     auto& globalInstance = getInstance();
-    if (LSan::finished) return globalInstance;
+    if (LSan::finished) {
+        return globalInstance;
+    }
 
     const auto& key = globalInstance.getTlsKey();
     const auto tlv = pthread_getspecific(key);
