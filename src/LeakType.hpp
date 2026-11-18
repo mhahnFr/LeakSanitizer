@@ -46,7 +46,7 @@ enum class LeakType: std::uint8_t {
     unreachableIndirect,
     unreachableDirect,
 
-    unclassified
+    unclassified,
 };
 
 /**
