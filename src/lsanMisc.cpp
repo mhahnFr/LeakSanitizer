@@ -46,7 +46,7 @@
 
 namespace lsan {
 auto getInstance() -> LSan & {
-    static auto instance = new LSan();
+    static auto* instance = new LSan();
     return *instance;
 }
 
@@ -162,7 +162,7 @@ auto getTracker() -> trackers::ATracker& {
     }
 
     const auto& key = globalInstance.getTlsKey();
-    const auto tlv = pthread_getspecific(key);
+    auto* const tlv = pthread_getspecific(key);
     if (tlv == nullptr) {
         pthread_setspecific(key, std::addressof(globalInstance));
         trackers::ATracker* tlsTracker;
