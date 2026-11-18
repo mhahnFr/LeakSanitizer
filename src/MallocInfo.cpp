@@ -31,22 +31,40 @@
 #include "formatter/formatter.hpp"
 
 namespace lsan {
-/**
- * Returns whether the first given leak type is greater than the other one.
- *
- * @param lhs the first leak type
- * @param rhs the second leak type
- * @return whether the first leak type is considered to be greater
- */
-static inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs) -> bool {
-    if (lhs == LeakType::unreachableIndirect && rhs == LeakType::unreachableDirect) {
-        return true;
-    }
-    if (lhs == LeakType::unreachableDirect && rhs == LeakType::unreachableIndirect) {
-        return false;
+namespace {
+    /**
+     * Returns whether the first given leak type is greater than the other one.
+     *
+     * @param lhs the first leak type
+     * @param rhs the second leak type
+     * @return whether the first leak type is considered to be greater
+     */
+    constexpr inline auto isConsideredGreater(const LeakType& lhs, const LeakType& rhs) -> bool {
+        if (lhs == LeakType::unreachableIndirect && rhs == LeakType::unreachableDirect) {
+            return true;
+        }
+        if (lhs == LeakType::unreachableDirect && rhs == LeakType::unreachableIndirect) {
+            return false;
+        }
+
+        return lhs > rhs;
     }
 
-    return lhs > rhs;
+    /**
+     * Returns the best of the given paths.
+     *
+     * @param path the pair with the relative and absolute path
+     * @return the path to be used
+     */
+    constexpr inline auto maybeRelativize(const std::pair<const char*, const char*>& path) -> const char* {
+        if (!behaviour::getBehaviour().relativePaths()) {
+            return path.first;
+        }
+
+        const auto& s1 = path.first == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.first);
+        const auto& s2 = path.second == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.second);
+        return s2 < s1 ? path.second : path.first;
+    }
 }
 
 template<typename F, typename... Args>
@@ -86,20 +104,6 @@ auto MallocInfo::enumerate() -> std::pair<std::size_t, std::size_t> {
 auto operator<<(std::ostream& stream, const MallocInfo& self) -> std::ostream& {
     self.print(stream);
     return stream;
-}
-
-/**
- * Returns the best of the given paths.
- *
- * @param path the pair with the relative and absolute path
- * @return the path to be used
- */
-static inline auto maybeRelativize(const std::pair<const char*, const char*>& path) -> const char* {
-    if (!behaviour::getBehaviour().relativePaths()) return path.first;
-
-    const auto& s1 = path.first == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.first);
-    const auto& s2 = path.second == nullptr ? std::numeric_limits<std::size_t>::max() : std::strlen(path.second);
-    return s2 < s1 ? path.second : path.first;
 }
 
 void MallocInfo::print(std::ostream& stream, unsigned long indent, unsigned long number, const unsigned long indent2) const {
