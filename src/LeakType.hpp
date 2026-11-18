@@ -1,7 +1,7 @@
 /*
  * LeakSanitizer - Small library showing information about lost memory.
  *
- * Copyright (C) 2024 - 2025  mhahnFr
+ * Copyright (C) 2024 - 2026  mhahnFr
  *
  * This file is part of the LeakSanitizer.
  *
@@ -30,7 +30,7 @@ namespace lsan {
  *
  * The order indicates the classification priority.
  */
-enum class LeakType {
+enum class LeakType: std::uint8_t {
     objcDirect,
     objcIndirect,
 
